@@ -34,7 +34,17 @@ public class Token {
 
     @Override
     public boolean equals(Object obj) {
-        Token token = (Token) obj;
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        if (obj == this) {
+            return true;
+        }
+
+        final Token token = (Token) obj;
         return this.lexeme.equals(token.lexeme)
                 && this.tokenType.equals(token.tokenType);
     }
