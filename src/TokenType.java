@@ -11,11 +11,13 @@ public enum TokenType {
 	
 	/*
 	 * White Space
+	 * DEPRECATED
 	 */
 	SPACE, TAB, NEWLINE,
 	
 	/*
 	 * Comments
+	 * DEPRECATED
 	 */
 	COMMENT, BLOCK_COMMENT,
 	
@@ -54,6 +56,62 @@ public enum TokenType {
 	/*
 	 * Literals
 	 */
-	CHAR, STRING, INTEGER,
+	CHARACTER, STRING, INTEGER,
 	
+	/*
+	 * Keywords
+	 * Some of these do not need to be implemented, but based on what 
+	 * Ondrej said in class they still need to be recognized as keyword
+	 * for this to be valid Java. In parser we should take care to stop
+	 * unimplemented keyword.
+	 * 
+	 */
+	ABSTRACT,
+	BOOLEAN,
+	BREAK,
+	BYTE,
+	CASE,
+	CATCH,
+	CHAR,
+	CLASS,
+	CONST,
+	CONTINUE,
+	DEFAULT,
+	DO,
+	DOUBLE,
+	ELSE,
+	EXTENDS,
+	FINAL,
+	FINALLY,
+	FLOAT,
+	FOR,
+	GOTO,
+	IF,
+	IMPLEMENTS,
+	IMPORT,
+	INSTANCEOF,
+	INT,
+	INTERFACE,
+	LONG,
+	NATIVE,
+	NEW,
+	PACKAGE,
+	PRIVATE,
+	PROTECTED,
+	PUBLIC,
+	RETURN,
+	SHORT,
+	STATIC,
+	STRICTFP,
+	SUPER,
+	SWITCH,
+	SYNCHRONIZED,
+	THIS,
+	THROW,
+	THROWS,
+	TRANSIENT,
+	TRY,
+	VOID,
+	VOLATILE,
+	WHILE
 }
