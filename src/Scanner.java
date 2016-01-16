@@ -83,6 +83,16 @@ public class Scanner {
     private void InitOpMap() {
         opMap.put('>', scanRangle);
         opMap.put('=', scanAssign);
+        opMap.put('<', scanLangle);
+        opMap.put('!', scanExclamation);
+        opMap.put('&', scanAmpersand);
+        opMap.put('|', scanVertical);
+        opMap.put('^', scanCaret);
+        opMap.put('+', scanPlus);
+        opMap.put('-', scanMinus);
+        opMap.put('*', scanStar);
+        opMap.put('/', ScanSlash);
+        opMap.put('%', scanPercent);
     }
 
     public List<Token> scan() {
