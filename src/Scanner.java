@@ -194,4 +194,64 @@ public class Scanner {
             }
         }
     };
+
+    private Runnable scanLangle = new Runnable() {
+
+        public void run() {
+        }
+    };
+
+    private Runnable scanExclamation = new Runnable() {
+
+        public void run() {
+        }
+    };
+
+    private Runnable scanAmpersand = new Runnable() {
+
+        public void run() {
+        }
+    };
+
+    private Runnable scanVertical = new Runnable() {
+
+        public void run() {
+        }
+    };
+
+    private Runnable scanCaret = new Runnable() {
+
+        public void run() {
+        }
+    };
+
+    private Runnable scanPlus = new Runnable() {
+
+        public void run() {
+        }
+    };
+
+    private Runnable scanMinus = new Runnable() {
+
+        public void run() {
+        }
+    };
+
+    private Runnable scanStar = new Runnable() {
+
+        public void run() {
+        }
+    };
+
+    private Runnable ScanSlash = new Runnable() {
+
+        public void run() {
+        }
+    };
+
+    private Runnable scanPercent = new Runnable() {
+
+        public void run() {
+        }
+    };
 }
