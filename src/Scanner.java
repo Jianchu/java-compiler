@@ -14,6 +14,7 @@ public class Scanner {
     
     private final Map<Character, Runnable> opMap;
     private final Map<Character, TokenType> sepMap;
+    private final Map<String, TokenType> idMap;
     
     public Scanner(Reader in) {
         _in = in;
@@ -26,6 +27,56 @@ public class Scanner {
         opMap.put('<', scanLangle);
         
         sepMap = new HashMap<Character, TokenType>();        
+
+        idMap = new HashMap<String, TokenType>();
+        idMap.put("abstract", TokenType.ABSTRACT);
+        idMap.put("boolean", TokenType.BOOLEAN);
+        idMap.put("break", TokenType.BREAK);
+        idMap.put("byte", TokenType.BYTE);
+        idMap.put("case", TokenType.CASE);
+        idMap.put("catch", TokenType.CATCH);
+        idMap.put("char", TokenType.CHAR);
+        idMap.put("class", TokenType.CLASS);
+        idMap.put("const", TokenType.CONST);
+        idMap.put("continue", TokenType.CONTINUE);
+        idMap.put("default", TokenType.DEFAULT);
+        idMap.put("do", TokenType.DO);
+        idMap.put("double", TokenType.DOUBLE);
+        idMap.put("else", TokenType.ELSE);
+        idMap.put("extends", TokenType.EXTENDS);
+        idMap.put("final", TokenType.FINAL);
+        idMap.put("finally", TokenType.FINALLY);
+        idMap.put("float", TokenType.FLOAT);
+        idMap.put("for", TokenType.FOR);
+        idMap.put("goto", TokenType.GOTO);
+        idMap.put("if", TokenType.IF);
+        idMap.put("implements", TokenType.IMPLEMENTS);
+        idMap.put("import", TokenType.IMPORT);
+        idMap.put("instanceof", TokenType.INSTANCEOF);
+        idMap.put("int", TokenType.INT);
+        idMap.put("interface", TokenType.INTERFACE);
+        idMap.put("long", TokenType.LONG);
+        idMap.put("native", TokenType.NATIVE);
+        idMap.put("new", TokenType.NEW);
+        idMap.put("package", TokenType.PACKAGE);
+        idMap.put("private", TokenType.PRIVATE);
+        idMap.put("protected", TokenType.PROTECTED);
+        idMap.put("public", TokenType.PUBLIC);
+        idMap.put("return", TokenType.RETURN);
+        idMap.put("short", TokenType.SHORT);
+        idMap.put("static", TokenType.STATIC);
+        idMap.put("strictfp", TokenType.STRICTFP);
+        idMap.put("super", TokenType.SUPER);
+        idMap.put("switch", TokenType.SWITCH);
+        idMap.put("synchronized", TokenType.SYNCHRONIZED);
+        idMap.put("this", TokenType.THIS);
+        idMap.put("throw", TokenType.THROW);
+        idMap.put("throws", TokenType.THROWS);
+        idMap.put("transient", TokenType.TRANSIENT);
+        idMap.put("try", TokenType.TRY);
+        idMap.put("void", TokenType.VOID);
+        idMap.put("volatile", TokenType.VOLATILE);
+        idMap.put("while", TokenType.WHILE);
     }
 
     public List<Token> scan() {
@@ -53,14 +104,13 @@ public class Scanner {
             _sb.setLength(0); //clear StringBuilder
             
             if (Character.isLetter(_next)) {
-                //need to add the resulting token to list/structure
                 scanId();
             } else if (sepMap.containsKey((char) _next)) {
             	//find TokenType.
             } else if (opMap.containsKey((char) _next)) {
             	opMap.get((char) _next).run();
             } else {
-                throw new RuntimeException("not yet implemented");
+                throw new RuntimeException("input " + _next + "[" + (char)_next + "] not yet implemented");
             }
         }
     }
@@ -70,7 +120,9 @@ public class Scanner {
             _sb.append((char) _next);
             _next = _in.read();
             if (!Character.isLetterOrDigit(_next) && _next != '_' && _next != '$') {
-                //need to return <TokenType.ID, sb.toString()>
+                String lexeme = _sb.toString();
+                TokenType type = (idMap.containsKey(lexeme) ? idMap.get(lexeme) : TokenType.ID);
+                _tokens.add(new Token(lexeme, type));
                 return;
             }
         }
