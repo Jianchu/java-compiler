@@ -113,6 +113,10 @@ public class Scanner {
     private void scanStart() throws IOException {
         _next = _in.read();
         for ( ; ; ) {
+            while (Character.isWhitespace(_next)) {
+                _next= _in.read();
+            }
+
             if (_next == -1) { //end of file
                 break;
             }
