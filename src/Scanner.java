@@ -29,6 +29,7 @@ public class Scanner {
         sepMap = new HashMap<Character, TokenType>();        
 
         idMap = new HashMap<String, TokenType>();
+        idMap.put("null", TokenType.NULL);
         idMap.put("abstract", TokenType.ABSTRACT);
         idMap.put("boolean", TokenType.BOOLEAN);
         idMap.put("break", TokenType.BREAK);
