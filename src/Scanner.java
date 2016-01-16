@@ -24,7 +24,7 @@ public class Scanner {
         
         // Example for organizing functions for operators
         opMap = new HashMap<Character, Runnable>();
-        InitOpMap();
+        initOpMap();
         
         sepMap = new HashMap<Character, TokenType>();        
 
@@ -80,7 +80,7 @@ public class Scanner {
         idMap.put("while", TokenType.WHILE);
     }
 
-    private void InitOpMap() {
+    private void initOpMap() {
         opMap.put('>', scanRangle);
         opMap.put('=', scanAssign);
         opMap.put('<', scanLangle);
