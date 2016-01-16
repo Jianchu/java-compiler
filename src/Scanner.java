@@ -8,8 +8,9 @@ import java.util.Map;
 
 public class Scanner {
     private Reader _in;
-    private StringBuilder _sb;
-    private int _next;
+    private StringBuilder _sb;  // builds lexemes
+    private int _next;          // character read
+    private List _tokens;
     
     private final Map<Character, Runnable> opMap;
     private final Map<Character, TokenType> sepMap;
@@ -18,6 +19,7 @@ public class Scanner {
         _in = in;
         _sb = new StringBuilder();
         _next = -1;
+        _tokens = null;
         
         // Example for organizing functions for operators
         opMap = new HashMap<Character, Runnable>();
@@ -26,18 +28,22 @@ public class Scanner {
         sepMap = new HashMap<Character, TokenType>();        
     }
 
-    public void scan() {
-        try {
-        	// need to use the return value. --Z
-            scanStart();
-        } catch (IOException ioe) {
-            // handle IOException
+    public List<Token> scan() {
+        // if scan has already been called, just return the same list
+        if (_tokens == null) {
+            _tokens = new ArrayList<Token>();
+            try {
+                // need to use the return value. --Z
+                scanStart();
+            } catch (IOException ioe) {
+                // handle IOException
+            }
         }
+
+        return _tokens;
     }
 
-    private List<Token> scanStart() throws IOException {
-    	List<Token> tokens = new ArrayList<Token>();
-    	
+    private void scanStart() throws IOException {
         _next = _in.read();
         for ( ; ; ) {
             if (_next == -1) { //end of file
@@ -57,8 +63,6 @@ public class Scanner {
                 throw new RuntimeException("not yet implemented");
             }
         }
-        
-        return tokens;
     }
 
     private void scanId() throws IOException {
