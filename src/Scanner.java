@@ -24,7 +24,7 @@ public class Scanner {
         
         // Example for organizing functions for operators
         opMap = new HashMap<Character, Runnable>();
-        opMap.put('<', scanLangle);
+        InitOpMap();
         
         sepMap = new HashMap<Character, TokenType>();        
 
@@ -80,6 +80,11 @@ public class Scanner {
         idMap.put("while", TokenType.WHILE);
     }
 
+    private void InitOpMap() {
+        opMap.put('>', scanRangle);
+        opMap.put('=', scanAssign);
+    }
+
     public List<Token> scan() {
         // if scan has already been called, just return the same list
         if (_tokens == null) {
@@ -128,11 +133,54 @@ public class Scanner {
             }
         }
     }
-    
-    
-    private Runnable scanLangle = new Runnable() {
-    	public void run() {
-    		//whatever you should do?
-    	}
+
+    private Token getLastToken() {
+        return _tokens.get(_tokens.size() - 1);
+    }
+
+    private void setToken(Token token, String lexeme, TokenType tokenType) {
+        token.setLexeme(lexeme);
+        token.setTokenType(tokenType);
+    }
+
+    private Runnable scanRangle = new Runnable() {
+        Token lastToken = getLastToken();
+
+        public void run() {
+            switch (lastToken.getTokenType()) {
+            case RANGLE:
+                setToken(lastToken, ">>", TokenType.DBRANGLE);
+                break;
+            case DBRANGLE:
+                setToken(lastToken, ">>>", TokenType.TPRANGLE);
+                break;
+            default:
+                _tokens.add(new Token(">", TokenType.RANGLE));
+                break;
+            }
+        }
+    };
+
+    private Runnable scanAssign = new Runnable() {
+        Token lastToken = getLastToken();
+
+        public void run() {
+            switch (lastToken.getTokenType()) {
+            case ASSIGN:
+                setToken(lastToken, "==", TokenType.EQUAL);
+                break;
+            case RANGLE:
+                setToken(lastToken, ">=", TokenType.GEQ);
+                break;
+            case DBRANGLE:
+                setToken(lastToken, ">>=", TokenType.RSHIFT_EQ);
+                break;
+            case TPRANGLE:
+                setToken(lastToken, ">>>=", TokenType.URSHIFT_EQ);
+                break;
+            default:
+                _tokens.add(new Token("=", TokenType.EQUAL));
+            }
+        }
     };
 }
