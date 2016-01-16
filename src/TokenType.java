@@ -10,16 +10,15 @@ public enum TokenType {
 	ID,
 	
 	/*
-	 * White Space
-	 * DEPRECATED
+	 * White Space -- DEPRECATED
+	 * SPACE, TAB, NEWLINE,
 	 */
-	SPACE, TAB, NEWLINE,
 	
 	/*
-	 * Comments
-	 * DEPRECATED
+	 * Comments -- DEPRECATED
+	 * COMMENT, BLOCK_COMMENT,
 	 */
-	COMMENT, BLOCK_COMMENT,
+
 	
 	/*
 	 * Operators 
@@ -57,9 +56,10 @@ public enum TokenType {
 	 * Literals
 	 */
 	CHARACTER, STRING, INTEGER,
-	
+
 	/*
 	 * Keywords
+	 * 
 	 * Some of these do not need to be implemented, but based on what 
 	 * Ondrej said in class they still need to be recognized as keyword
 	 * for this to be valid Java. In parser we should take care to stop
