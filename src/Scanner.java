@@ -180,6 +180,7 @@ public class Scanner {
                 break;
             default:
                 _tokens.add(new Token("=", TokenType.EQUAL));
+                break;
             }
         }
     };
