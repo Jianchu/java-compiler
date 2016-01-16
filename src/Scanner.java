@@ -10,7 +10,7 @@ public class Scanner {
     private Reader _in;
     private StringBuilder _sb;  // builds lexemes
     private int _next;          // character read
-    private List _tokens;
+    private List<Token> _tokens;
     
     private final Map<Character, Runnable> opMap;
     private final Map<Character, TokenType> sepMap;
