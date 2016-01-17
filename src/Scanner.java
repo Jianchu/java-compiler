@@ -306,6 +306,9 @@ public class Scanner {
     
     /**
      * scanning integer literals
+     * NOTE: 
+     * 		1. leaving size check for parser.
+     * 		2. No Octal, Hex or Long.
      * @throws IOException
      */
     private void scanInteger() throws IOException {
