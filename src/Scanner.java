@@ -41,6 +41,8 @@ public class Scanner {
         opMap.put('=', scanAssign);
         opMap.put('<', scanLangle);
         opMap.put('!', scanExclamation);
+        opMap.put('?', scanQuestion);
+        opMap.put(':', scanColon);
         opMap.put('&', scanAmpersand);
         opMap.put('|', scanVertical);
         opMap.put('^', scanCaret);
@@ -161,6 +163,7 @@ public class Scanner {
     }
 
     private Function scanRangle = new Function() {
+
         public void run() throws IOException {
             TokenType tokenType = TokenType.RANGLE;
             _sb.append(">");
@@ -179,7 +182,7 @@ public class Scanner {
                 } else {
                     break;
                 }
-                _sb.append(_next);
+                _sb.append((char) _next);
             }
             _tokens.add(new Token(_sb.toString(), tokenType));
         }
@@ -203,49 +206,149 @@ public class Scanner {
 
     private Function scanLangle = new Function() {
 
-        public void run() {
+        public void run() throws IOException {
+            _next = _in.read();
+            switch (_next) {
+            case '=':
+                _tokens.add(new Token("<=", TokenType.LEQ));
+                _next = _in.read();
+                break;
+            default:
+                _tokens.add(new Token("<", TokenType.LANGLE));
+                break;
+            }
         }
     };
 
     private Function scanExclamation = new Function() {
 
-        public void run() {
+        public void run() throws IOException {
+            _next = _in.read();
+            switch (_next) {
+            case '=':
+                _tokens.add(new Token("!=", TokenType.NEQ));
+                _next = _in.read();
+                break;
+            default:
+                _tokens.add(new Token("!", TokenType.NOT));
+                break;
+            }
+        }
+    };
+
+    private Function scanQuestion = new Function() {
+
+        public void run() throws IOException {
+            _tokens.add(new Token("?", TokenType.QUESTION));
+            _next = _in.read();
+        }
+    };
+
+    private Function scanColon = new Function() {
+
+        public void run() throws IOException {
+            _tokens.add(new Token(":", TokenType.COLON));
+            _next = _in.read();
         }
     };
 
     private Function scanAmpersand = new Function() {
 
-        public void run() {
+        public void run() throws IOException {
+            _tokens.add(new Token("&", TokenType.BITAND));
+            _next = _in.read();
         }
     };
 
     private Function scanVertical = new Function() {
 
-        public void run() {
+        public void run() throws IOException {
+            _next = _in.read();
+            switch (_next) {
+            case '|':
+                _tokens.add(new Token("||", TokenType.LOR));
+                _next = _in.read();
+                break;
+            case '=':
+                _tokens.add(new Token("|=", TokenType.OR_EQ));
+                _next = _in.read();
+                break;
+            default:
+                _tokens.add(new Token("|", TokenType.BITOR));
+                break;
+            }
         }
     };
 
     private Function scanCaret = new Function() {
 
-        public void run() {
+        public void run() throws IOException {
+            _next = _in.read();
+            switch (_next) {
+            case '=':
+                _tokens.add(new Token("^=", TokenType.EXOR_EQ));
+                _next = _in.read();
+                break;
+            default:
+                _tokens.add(new Token("^", TokenType.EXOR));
+                break;
+            }
         }
     };
 
     private Function scanPlus = new Function() {
 
-        public void run() {
+        public void run() throws IOException {
+            _next = _in.read();
+            switch (_next) {
+            case '+':
+                _tokens.add(new Token("++", TokenType.INCREMENT));
+                _next = _in.read();
+                break;
+            case '=':
+                _tokens.add(new Token("+=", TokenType.PLUS_EQ));
+                _next = _in.read();
+                break;
+            default:
+                _tokens.add(new Token("+", TokenType.PLUS));
+                break;
+            }
         }
     };
 
     private Function scanMinus = new Function() {
 
-        public void run() {
+        public void run() throws IOException {
+            _next = _in.read();
+            switch (_next) {
+            case '-':
+                _tokens.add(new Token("--", TokenType.DECREMENT));
+                _next = _in.read();
+                break;
+            case '=':
+                _tokens.add(new Token("-=", TokenType.MINUS_EQ));
+                _next = _in.read();
+                break;
+            default:
+                _tokens.add(new Token("-", TokenType.MINUS));
+                break;
+            }
         }
     };
 
     private Function scanStar = new Function() {
 
-        public void run() {
+        public void run() throws IOException {
+            _next = _in.read();
+            switch (_next) {
+            case '=':
+                _tokens.add(new Token("*=", TokenType.STAR_EQ));
+                _next = _in.read();
+                break;
+            default:
+                _tokens.add(new Token("*", TokenType.STAR));
+                break;
+            }
         }
     };
 
@@ -285,7 +388,17 @@ public class Scanner {
 
     private Function scanPercent = new Function() {
 
-        public void run() {
+        public void run() throws IOException {
+            _next = _in.read();
+            switch (_next) {
+            case '=':
+                _tokens.add(new Token("%=", TokenType.MOD_EQ));
+                _next = _in.read();
+                break;
+            default:
+                _tokens.add(new Token("%", TokenType.MOD));
+                break;
+            }
         }
     };
 }
