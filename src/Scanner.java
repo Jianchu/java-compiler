@@ -154,9 +154,10 @@ public class Scanner {
     }
 
     private Runnable scanRangle = new Runnable() {
-        Token lastToken = getLastToken();
 
         public void run() {
+            Token lastToken = getLastToken();
+
             switch (lastToken.getTokenType()) {
             case RANGLE:
                 setToken(lastToken, ">>", TokenType.DBRANGLE);
@@ -172,9 +173,10 @@ public class Scanner {
     };
 
     private Runnable scanAssign = new Runnable() {
-        Token lastToken = getLastToken();
 
         public void run() {
+            Token lastToken = getLastToken();
+
             switch (lastToken.getTokenType()) {
             case ASSIGN:
                 setToken(lastToken, "==", TokenType.EQUAL);
