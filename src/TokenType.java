@@ -55,7 +55,7 @@ public enum TokenType {
 	/*
 	 * Literals
 	 */
-	CHARACTER, STRING, INTEGER, NULL, //Null is also in keywords
+	CHARACTER, STRING, DECIMAL, NULL, //Null is also in keywords
 
 	/*
 	 * Keywords

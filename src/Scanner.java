@@ -309,6 +309,10 @@ public class Scanner {
      * @throws IOException
      */
     private void scanInteger() throws IOException {
-    	
+    	while (Character.isDigit(_next)) {
+    		_sb.append((char) _next);
+    		_next = _in.read();
+    	}
+    	_tokens.add(new Token(_sb.toString(), TokenType.DECIMAL));
     }
 }
