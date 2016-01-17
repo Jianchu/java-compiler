@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
 
 public class Scanner {
@@ -15,6 +17,7 @@ public class Scanner {
     private final Map<Character, RunnableScan> opMap;
     private final Map<Character, TokenType> sepMap;
     private final Map<String, TokenType> idMap;
+    private final Set<Character> ESCAPES;
     
     private interface RunnableScan {
         void run() throws IOException;
@@ -34,6 +37,11 @@ public class Scanner {
 
         idMap = new HashMap<String, TokenType>();
         initIdMap();
+        
+        ESCAPES = new TreeSet<Character>();
+        for (char e : "btnfr\"\'\\".toCharArray()) {
+        	ESCAPES.add(e);
+        }
     }
 
     private void initOpMap() {
@@ -116,13 +124,18 @@ public class Scanner {
                 // handle IOException
             } catch (IllegalIDException ide) {
             	ide.printStackTrace();
-            }
+            } catch (IllegalCharException ice) {
+            	ice.printStackTrace();
+            } catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
         }
 
         return _tokens;
     }
 
-    private void scanStart() throws IOException, IllegalIDException {
+    private void scanStart() throws Exception {
         _next = _in.read();
         for ( ; ; ) {
             /* The loop intentionally does not call _in.read() here--not all tokens are terminated with whitespace;
@@ -146,7 +159,7 @@ public class Scanner {
             	scanInteger();
             } else if ('\'' == (char) _next) {
             	// character literals
-            	
+            	scanChar();
             } else if (sepMap.containsKey((char) _next)) {
             	//find TokenType.
             	scanSeparators();
@@ -393,8 +406,41 @@ public class Scanner {
     /**
      * scanning character literals
      */
-    private void scanChar() throws IOException {
+    private void scanChar() throws IOException, IllegalCharException {
+    	_sb.append((char) _next);
+    	_next = _in.read();
     	
+    	// single character
+    	if ('\\' == _next) {
+    		// escape character
+    		scanEscape();
+    	} else {
+    		// normal character
+    		_sb.append((char) _next);
+    	}
+    	
+    	// terminating literal
+    	_next = _in.read();
+    	if ('\'' != _next) {
+    		throw new IllegalCharException(_sb.toString() + '\'');
+    	}
+    	
+    	_next = _in.read();
+    }
+    
+    /**
+     * reading escape character.
+     * Octal and Unicode Escape not implemented.
+     * @throws IOException
+     * @throws IllegalCharException
+     */
+    private void scanEscape() throws IOException, IllegalCharException {
+    	_sb.append((char) _next);
+    	_next = _in.read();
+    	if (!ESCAPES.contains((char) _next)) {
+    		throw new IllegalCharException(_sb.toString() + (char) _next);
+    	}
+    	_sb.append((char) _next);
     }
     
 }
