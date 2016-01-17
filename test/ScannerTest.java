@@ -25,7 +25,7 @@ public class ScannerTest {
     @Test
     public void testInt() {
     	String num = "123712";
-    	List<Token> tokens = intSetUp(num);
+    	List<Token> tokens = inputSetUp(num);
     	assertEquals(1, tokens.size());
     	assertEquals(num, tokens.get(0).getLexeme());
     }
@@ -33,7 +33,7 @@ public class ScannerTest {
     @Test
     public void testIntSpace() {
     	String num = "123" + " sdf";
-    	List<Token> tokens = intSetUp(num);
+    	List<Token> tokens = inputSetUp(num);
     	assertEquals(2, tokens.size());
     	assertEquals("123", tokens.get(0).getLexeme());
     }
@@ -42,10 +42,10 @@ public class ScannerTest {
     public void testIntFail() {
 //    	thrown.expect(IllegalIDException.class);
     	String num = "123c";
-    	intSetUp(num);
+    	inputSetUp(num);
     }
 
-    public List<Token> intSetUp(String num) {
+    public List<Token> inputSetUp(String num) {
     	StringReader sr = new StringReader(num);
     	scan = new Scanner(sr);
     	List<Token> tokens = scan.scan();
