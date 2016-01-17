@@ -188,57 +188,59 @@ public class Scanner {
         }
     };
 
+    private void scanTwoOptionsOp(TokenType defaultType, char secondChar,
+            TokenType twoCharsType) throws IOException {
+        TokenType tokenType = defaultType;
+        _sb.append((char) _next);
+        for (;;) {
+            _next = _in.read();
+            if (_next == secondChar) {
+                tokenType = twoCharsType;
+            } else {
+                break;
+            }
+            _sb.append((char) _next);
+        }
+        _tokens.add(new Token(_sb.toString(), tokenType));
+    }
+
+    private void scanThreeOptionsOp(TokenType defaultType, char firstOption,
+            TokenType firstType, char secondOption, TokenType secondType)
+            throws IOException {
+        TokenType tokenType = defaultType;
+        _sb.append((char) _next);
+        for (;;) {
+            _next = _in.read();
+            if (_next == firstOption) {
+                tokenType = firstType;
+            } else if (_next == secondOption) {
+                tokenType = secondType;
+            } else {
+                break;
+            }
+            _sb.append((char) _next);
+        }
+        _tokens.add(new Token(_sb.toString(), tokenType));
+    }
+
     private Function scanAssign = new Function() {
 
         public void run() throws IOException {
-            _sb.append((char) _next);
-            _next = _in.read();
-            switch (_next) {
-            case '=':
-                _sb.append((char) _next);
-                _tokens.add(new Token(_sb.toString(), TokenType.EQUAL));
-                _next = _in.read();
-                break;
-            default:
-                _tokens.add(new Token(_sb.toString(), TokenType.ASSIGN));
-                break;
-            }
+            scanTwoOptionsOp(TokenType.ASSIGN, '=', TokenType.EQUAL);
         }
     };
 
     private Function scanLangle = new Function() {
 
         public void run() throws IOException {
-            _sb.append((char) _next);
-            _next = _in.read();
-            switch (_next) {
-            case '=':
-                _sb.append((char) _next);
-                _tokens.add(new Token(_sb.toString(), TokenType.LEQ));
-                _next = _in.read();
-                break;
-            default:
-                _tokens.add(new Token(_sb.toString(), TokenType.LANGLE));
-                break;
-            }
+            scanTwoOptionsOp(TokenType.LANGLE, '=', TokenType.LEQ);
         }
     };
 
     private Function scanExclamation = new Function() {
 
         public void run() throws IOException {
-            _sb.append((char) _next);
-            _next = _in.read();
-            switch (_next) {
-            case '=':
-                _sb.append((char) _next);
-                _tokens.add(new Token(_sb.toString(), TokenType.NEQ));
-                _next = _in.read();
-                break;
-            default:
-                _tokens.add(new Token(_sb.toString(), TokenType.NOT));
-                break;
-            }
+            scanTwoOptionsOp(TokenType.NOT, '=', TokenType.NEQ);
         }
     };
 
@@ -272,105 +274,38 @@ public class Scanner {
     private Function scanVertical = new Function() {
 
         public void run() throws IOException {
-            _sb.append((char) _next);
-            _next = _in.read();
-            switch (_next) {
-            case '|':
-                _sb.append((char) _next);
-                _tokens.add(new Token(_sb.toString(), TokenType.LOR));
-                _next = _in.read();
-                break;
-            case '=':
-                _sb.append((char) _next);
-                _tokens.add(new Token(_sb.toString(), TokenType.OR_EQ));
-                _next = _in.read();
-                break;
-            default:
-                _tokens.add(new Token(_sb.toString(), TokenType.BITOR));
-                break;
-            }
+            scanThreeOptionsOp(TokenType.BITOR, '|', TokenType.LOR, '=',
+                    TokenType.OR_EQ);
         }
     };
 
     private Function scanCaret = new Function() {
 
         public void run() throws IOException {
-            _sb.append((char) _next);
-            _next = _in.read();
-            switch (_next) {
-            case '=':
-                _sb.append((char) _next);
-                _tokens.add(new Token(_sb.toString(), TokenType.EXOR_EQ));
-                _next = _in.read();
-                break;
-            default:
-                _tokens.add(new Token(_sb.toString(), TokenType.EXOR));
-                break;
-            }
+            scanTwoOptionsOp(TokenType.EXOR, '=', TokenType.EXOR_EQ);
         }
     };
 
     private Function scanPlus = new Function() {
 
         public void run() throws IOException {
-            _sb.append((char) _next);
-            _next = _in.read();
-            switch (_next) {
-            case '+':
-                _sb.append((char) _next);
-                _tokens.add(new Token(_sb.toString(), TokenType.INCREMENT));
-                _next = _in.read();
-                break;
-            case '=':
-                _sb.append((char) _next);
-                _tokens.add(new Token(_sb.toString(), TokenType.PLUS_EQ));
-                _next = _in.read();
-                break;
-            default:
-                _tokens.add(new Token(_sb.toString(), TokenType.PLUS));
-                break;
-            }
+            scanThreeOptionsOp(TokenType.PLUS, '+', TokenType.INCREMENT, '=',
+                    TokenType.PLUS_EQ);
         }
     };
 
     private Function scanMinus = new Function() {
 
         public void run() throws IOException {
-            _sb.append((char) _next);
-            _next = _in.read();
-            switch (_next) {
-            case '-':
-                _sb.append((char) _next);
-                _tokens.add(new Token(_sb.toString(), TokenType.DECREMENT));
-                _next = _in.read();
-                break;
-            case '=':
-                _sb.append((char) _next);
-                _tokens.add(new Token(_sb.toString(), TokenType.MINUS_EQ));
-                _next = _in.read();
-                break;
-            default:
-                _tokens.add(new Token(_sb.toString(), TokenType.MINUS));
-                break;
-            }
+            scanThreeOptionsOp(TokenType.MINUS, '-', TokenType.DECREMENT, '=',
+                    TokenType.MINUS_EQ);
         }
     };
 
     private Function scanStar = new Function() {
 
         public void run() throws IOException {
-            _sb.append((char) _next);
-            _next = _in.read();
-            switch (_next) {
-            case '=':
-                _sb.append((char) _next);
-                _tokens.add(new Token(_sb.toString(), TokenType.STAR_EQ));
-                _next = _in.read();
-                break;
-            default:
-                _tokens.add(new Token(_sb.toString(), TokenType.STAR));
-                break;
-            }
+            scanTwoOptionsOp(TokenType.STAR, '=', TokenType.STAR_EQ);
         }
     };
 
@@ -411,18 +346,7 @@ public class Scanner {
     private Function scanPercent = new Function() {
 
         public void run() throws IOException {
-            _sb.append((char) _next);
-            _next = _in.read();
-            switch (_next) {
-            case '=':
-                _sb.append((char) _next);
-                _tokens.add(new Token(_sb.toString(), TokenType.MOD_EQ));
-                _next = _in.read();
-                break;
-            default:
-                _tokens.add(new Token(_sb.toString(), TokenType.MOD));
-                break;
-            }
+            scanTwoOptionsOp(TokenType.MOD, '=', TokenType.MOD_EQ);
         }
     };
 }
