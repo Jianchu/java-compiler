@@ -290,6 +290,10 @@ public class Scanner {
         }
     };
     
+    /**
+     * scanning separators
+     * @throws IOException
+     */
     private void scanSeparators() throws IOException {
     	_sb.append((char) _next);
     	String lexeme = _sb.toString();
