@@ -114,13 +114,15 @@ public class Scanner {
                 scanStart();
             } catch (IOException ioe) {
                 // handle IOException
+            } catch (IllegalIDException ide) {
+            	ide.printStackTrace();
             }
         }
 
         return _tokens;
     }
 
-    private void scanStart() throws IOException {
+    private void scanStart() throws IOException, IllegalIDException {
         _next = _in.read();
         for ( ; ; ) {
             /* The loop intentionally does not call _in.read() here--not all tokens are terminated with whitespace;
@@ -370,12 +372,26 @@ public class Scanner {
      * 		1. leaving size check for parser.
      * 		2. No Octal, Hex or Long.
      * @throws IOException
+     * @throws IllegalIDException 
      */
-    private void scanInteger() throws IOException {
+    private void scanInteger() throws IOException, IllegalIDException {
     	while (Character.isDigit(_next)) {
     		_sb.append((char) _next);
     		_next = _in.read();
     	}
     	_tokens.add(new Token(_sb.toString(), TokenType.DECIMAL));
+    	// 
+    	if (Character.isLetter(_next) || _next == '_' || _next == '$') {
+    		throw new IllegalIDException(_sb.toString() + (char) _next);
+    	}
+    }
+    
+    public class IllegalIDException extends Exception {
+    	public IllegalIDException() {
+    	}
+    	
+    	public IllegalIDException(String message) {
+    		super(message + " is not recoginzed.");
+    	}
     }
 }
