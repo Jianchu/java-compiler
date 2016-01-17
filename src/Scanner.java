@@ -75,7 +75,7 @@ public class Scanner {
     
     private Runnable scanLangle = new Runnable() {
     	public void run() {
-    		//whatever you should do?
+    		//keep reading. return lexeme and type.
     	}
     };
 }
