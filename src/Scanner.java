@@ -144,7 +144,10 @@ public class Scanner {
             } else if (Character.isDigit(_next)) {
             	// integer literals
             	scanInteger();
-            }else if (sepMap.containsKey((char) _next)) {
+            } else if ('\'' == (char) _next) {
+            	// character literals
+            	
+            } else if (sepMap.containsKey((char) _next)) {
             	//find TokenType.
             	scanSeparators();
             } else if (opMap.containsKey((char) _next)) {
@@ -380,10 +383,18 @@ public class Scanner {
     		_next = _in.read();
     	}
     	_tokens.add(new Token(_sb.toString(), TokenType.DECIMAL));
-    	// 
+    	// A proper integer must be terminated with space, operators or ';'.
+    	// check for illegal identifiers.
     	if (Character.isLetter(_next) || _next == '_' || _next == '$') {
     		throw new IllegalIDException(_sb.toString() + (char) _next);
     	}
+    }
+    
+    /**
+     * scanning character literals
+     */
+    private void scanChar() throws IOException {
+    	
     }
     
 }
