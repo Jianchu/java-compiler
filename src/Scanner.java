@@ -33,6 +33,25 @@ public class Scanner {
         sepMap = new HashMap<Character, TokenType>();        
 
         idMap = new HashMap<String, TokenType>();
+        initIdMap();
+    }
+
+    private void initOpMap() {
+        opMap.put('>', scanRangle);
+        opMap.put('=', scanAssign);
+        opMap.put('<', scanLangle);
+        opMap.put('!', scanExclamation);
+        opMap.put('&', scanAmpersand);
+        opMap.put('|', scanVertical);
+        opMap.put('^', scanCaret);
+        opMap.put('+', scanPlus);
+        opMap.put('-', scanMinus);
+        opMap.put('*', scanStar);
+        opMap.put('/', scanSlash);
+        opMap.put('%', scanPercent);
+    }
+
+    private void initIdMap() {
         idMap.put("null", TokenType.NULL);
         idMap.put("abstract", TokenType.ABSTRACT);
         idMap.put("boolean", TokenType.BOOLEAN);
@@ -82,21 +101,6 @@ public class Scanner {
         idMap.put("void", TokenType.VOID);
         idMap.put("volatile", TokenType.VOLATILE);
         idMap.put("while", TokenType.WHILE);
-    }
-
-    private void initOpMap() {
-        opMap.put('>', scanRangle);
-        opMap.put('=', scanAssign);
-        opMap.put('<', scanLangle);
-        opMap.put('!', scanExclamation);
-        opMap.put('&', scanAmpersand);
-        opMap.put('|', scanVertical);
-        opMap.put('^', scanCaret);
-        opMap.put('+', scanPlus);
-        opMap.put('-', scanMinus);
-        opMap.put('*', scanStar);
-        opMap.put('/', scanSlash);
-        opMap.put('%', scanPercent);
     }
 
     public List<Token> scan() {
