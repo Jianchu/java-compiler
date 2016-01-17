@@ -12,10 +12,14 @@ public class Scanner {
     private int _next;          // character read
     private List<Token> _tokens;
     
-    private final Map<Character, Runnable> opMap;
+    private final Map<Character, Function> opMap;
     private final Map<Character, TokenType> sepMap;
     private final Map<String, TokenType> idMap;
     
+    private interface Function {
+        void run() throws IOException;
+    }
+
     public Scanner(Reader in) {
         _in = in;
         _sb = new StringBuilder();
@@ -23,7 +27,7 @@ public class Scanner {
         _tokens = null;
         
         // Example for organizing functions for operators
-        opMap = new HashMap<Character, Runnable>();
+        opMap = new HashMap<Character, Function>();
         initOpMap();
         
         sepMap = new HashMap<Character, TokenType>();        
@@ -91,7 +95,7 @@ public class Scanner {
         opMap.put('+', scanPlus);
         opMap.put('-', scanMinus);
         opMap.put('*', scanStar);
-        opMap.put('/', ScanSlash);
+        opMap.put('/', scanSlash);
         opMap.put('%', scanPercent);
     }
 
@@ -113,6 +117,10 @@ public class Scanner {
     private void scanStart() throws IOException {
         _next = _in.read();
         for ( ; ; ) {
+            /* The loop intentionally does not call _in.read() here--not all tokens are terminated with whitespace;
+             * e.g., "scanStart();" needs to read the '(' to find the end of the ID and return.
+             * If _in.read() was called in this loop, the LPAREN will be skipped.
+             */
             while (Character.isWhitespace(_next)) {
                 _next= _in.read();
             }
@@ -157,7 +165,7 @@ public class Scanner {
         token.setTokenType(tokenType);
     }
 
-    private Runnable scanRangle = new Runnable() {
+    private Function scanRangle = new Function() {
 
         public void run() {
             Token lastToken = getLastToken();
@@ -176,7 +184,7 @@ public class Scanner {
         }
     };
 
-    private Runnable scanAssign = new Runnable() {
+    private Function scanAssign = new Function() {
 
         public void run() {
             Token lastToken = getLastToken();
@@ -201,61 +209,89 @@ public class Scanner {
         }
     };
 
-    private Runnable scanLangle = new Runnable() {
+    private Function scanLangle = new Function() {
 
         public void run() {
         }
     };
 
-    private Runnable scanExclamation = new Runnable() {
+    private Function scanExclamation = new Function() {
 
         public void run() {
         }
     };
 
-    private Runnable scanAmpersand = new Runnable() {
+    private Function scanAmpersand = new Function() {
 
         public void run() {
         }
     };
 
-    private Runnable scanVertical = new Runnable() {
+    private Function scanVertical = new Function() {
 
         public void run() {
         }
     };
 
-    private Runnable scanCaret = new Runnable() {
+    private Function scanCaret = new Function() {
 
         public void run() {
         }
     };
 
-    private Runnable scanPlus = new Runnable() {
+    private Function scanPlus = new Function() {
 
         public void run() {
         }
     };
 
-    private Runnable scanMinus = new Runnable() {
+    private Function scanMinus = new Function() {
 
         public void run() {
         }
     };
 
-    private Runnable scanStar = new Runnable() {
+    private Function scanStar = new Function() {
 
         public void run() {
         }
     };
 
-    private Runnable ScanSlash = new Runnable() {
+    private Function scanSlash = new Function() {
+        public void run() throws IOException {
+            _next = _in.read();
+            if (_next == '/') {         // in-line comment
+                do {
+                    _next = _in.read();
+                } while (_next != '\n' && _next != '\r');
+                // Note that if the line terminator is \r\n, scanStart will ignore the \n
 
-        public void run() {
+                _next = _in.read();
+            } else if (_next == '*') {  // block comment
+                _next = _in.read();
+                for ( ; ; ) {
+                    if (_next == '*') {
+                        _next = _in.read();
+                        if (_next == '/') {
+                            break;
+                        }
+                    } else { // necessary since "**/" can end a comment
+                        _next = _in.read();
+                    }
+                }
+
+                _next = _in.read();
+            } else if (_next == '=') {
+                _tokens.add(new Token("/=", TokenType.SLASH_EQ));
+
+                _next = _in.read();
+            } else {
+                _tokens.add(new Token("/", TokenType.SLASH));
+            }
         }
     };
 
-    private Runnable scanPercent = new Runnable() {
+    private Function scanPercent = new Function() {
 
         public void run() {
         }
