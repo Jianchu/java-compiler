@@ -137,7 +137,10 @@ public class Scanner {
             
             if (Character.isLetter(_next)) {
                 scanId();
-            } else if (sepMap.containsKey((char) _next)) {
+            } else if (Character.isDigit(_next)) {
+            	// integer literals
+            	scanInteger();
+            }else if (sepMap.containsKey((char) _next)) {
             	//find TokenType.
             	scanSeparators();
             } else if (opMap.containsKey((char) _next)) {
@@ -299,5 +302,13 @@ public class Scanner {
     	String lexeme = _sb.toString();
     	_tokens.add(new Token(lexeme, sepMap.get(lexeme)));
     	_next = _in.read();
+    }
+    
+    /**
+     * scanning integer literals
+     * @throws IOException
+     */
+    private void scanInteger() throws IOException {
+    	
     }
 }
