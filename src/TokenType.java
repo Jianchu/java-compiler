@@ -55,7 +55,7 @@ public enum TokenType {
 	/*
 	 * Literals
 	 */
-	CHARACTER, STRING, INTEGER,
+	CHARACTER, STRING, INTEGER, NULL,
 
 	/*
 	 * Keywords
