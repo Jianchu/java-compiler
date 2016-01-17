@@ -41,6 +41,8 @@ public class Scanner {
         opMap.put('=', scanAssign);
         opMap.put('<', scanLangle);
         opMap.put('!', scanExclamation);
+        opMap.put('?', scanQuestion);
+        opMap.put(':', scanColon);
         opMap.put('&', scanAmpersand);
         opMap.put('|', scanVertical);
         opMap.put('^', scanCaret);
@@ -167,7 +169,7 @@ public class Scanner {
     private RunnableScan scanRangle = new RunnableScan() {
         public void run() throws IOException {
             TokenType tokenType = TokenType.RANGLE;
-            _sb.append(">");
+            _sb.append((char) _next);
             for (;;) {
                 _next = _in.read();
                 if (_next == '>' && tokenType.equals(TokenType.RANGLE)) {
@@ -220,7 +222,7 @@ public class Scanner {
                 break;
             }
         _sb.append((char) _next);
-    }
+        }
         _tokens.add(new Token(_sb.toString(), tokenType));
     }
 
@@ -242,6 +244,24 @@ public class Scanner {
 
         public void run() throws IOException {
             scanTwoOptionsOp(TokenType.NOT, '=', TokenType.NEQ);
+        }
+    };
+
+    private RunnableScan scanQuestion = new RunnableScan() {
+
+        public void run() throws IOException {
+            _sb.append((char) _next);
+            _tokens.add(new Token(_sb.toString(), TokenType.QUESTION));
+            _next = _in.read();
+        }
+    };
+
+    private RunnableScan scanColon = new RunnableScan() {
+
+        public void run() throws IOException {
+            _sb.append((char) _next);
+            _tokens.add(new Token(_sb.toString(), TokenType.COLON));
+            _next = _in.read();
         }
     };
 
