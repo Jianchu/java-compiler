@@ -422,8 +422,10 @@ public class Scanner {
     	// terminating literal
     	_next = _in.read();
     	if ('\'' != _next) {
-    		throw new IllegalCharException(_sb.toString() + '\'');
+    		throw new IllegalCharException(_sb.toString() + (char) _next + '\'');
     	}
+    	_sb.append((char) _next);
+    	_tokens.add(new Token(_sb.toString(), TokenType.CHARACTER));
     	
     	_next = _in.read();
     }
@@ -438,7 +440,7 @@ public class Scanner {
     	_sb.append((char) _next);
     	_next = _in.read();
     	if (!ESCAPES.contains((char) _next)) {
-    		throw new IllegalCharException(_sb.toString() + (char) _next);
+    		throw new IllegalCharException(_sb.toString() + (char) _next + '\'');
     	}
     	_sb.append((char) _next);
     }

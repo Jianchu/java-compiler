@@ -45,10 +45,45 @@ public class ScannerTest {
     	inputSetUp(num);
     }
 
+    @Test
+    public void testChar() {
+    	String in = "\'c\'";
+    	List<Token> tokens = inputSetUp(in);
+    	assertEquals(1, tokens.size());
+    	assertEquals(in, tokens.get(0).getLexeme());
+    }
+    
+    @Test
+    public void testCharEscape() {
+    	String in = "\'\\b\'";
+    	List<Token> tokens = inputSetUp(in);
+    	assertEquals(1, tokens.size());
+    	assertEquals(in, tokens.get(0).getLexeme());
+//    	printTokens(tokens);
+    }
+    
+    @Test
+    public void testCharFail() {
+    	String in = "\'sa\'";
+    	List<Token> tokens = inputSetUp(in);
+    }
+    
+    @Test
+    public void testCharEscapeFail() {
+    	String in = "\'\\a\'";
+    	List<Token> tokens = inputSetUp(in);
+    }
+    
     public List<Token> inputSetUp(String num) {
     	StringReader sr = new StringReader(num);
     	scan = new Scanner(sr);
     	List<Token> tokens = scan.scan();
     	return tokens;
+    }
+    
+    public void printTokens(List<Token> tokens) {
+    	for (Token t : tokens) {
+    		System.out.println(t.getLexeme() + "\t");
+    	}
     }
 }
