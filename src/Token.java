@@ -1,7 +1,7 @@
 
 public class Token {
 
-    private String lexeme;
+    private final String lexeme;
     private TokenType tokenType;
 
     public Token(String lexeme, TokenType tokenType) {
@@ -12,10 +12,6 @@ public class Token {
     // May be used for replacing id with keyword
     public void setTokenType(TokenType tokenType) {
         this.tokenType = tokenType;
-    }
-
-    public void setLexeme(String lexeme) {
-        this.lexeme = lexeme;
     }
 
     public String getLexeme() {

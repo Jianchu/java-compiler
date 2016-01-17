@@ -160,54 +160,41 @@ public class Scanner {
         }
     }
 
-    private Token getLastToken() {
-        return _tokens.get(_tokens.size() - 1);
-    }
-
-    private void setToken(Token token, String lexeme, TokenType tokenType) {
-        token.setLexeme(lexeme);
-        token.setTokenType(tokenType);
-    }
-
     private Function scanRangle = new Function() {
-
-        public void run() {
-            Token lastToken = getLastToken();
-
-            switch (lastToken.getTokenType()) {
-            case RANGLE:
-                setToken(lastToken, ">>", TokenType.DBRANGLE);
-                break;
-            case DBRANGLE:
-                setToken(lastToken, ">>>", TokenType.TPRANGLE);
-                break;
-            default:
-                _tokens.add(new Token(">", TokenType.RANGLE));
-                break;
+        public void run() throws IOException {
+            TokenType tokenType = TokenType.RANGLE;
+            _sb.append(">");
+            for (;;) {
+                _next = _in.read();
+                if (_next == '>' && tokenType.equals(TokenType.RANGLE)) {
+                    tokenType = TokenType.DBRANGLE;
+                } else if (_next == '>' && tokenType.equals(TokenType.DBRANGLE)) {
+                    tokenType = TokenType.TPRANGLE;
+                } else if (_next == '=' && tokenType.equals(TokenType.RANGLE)) {
+                    tokenType = TokenType.GEQ;
+                } else if (_next == '=' && tokenType.equals(TokenType.DBRANGLE)) {
+                    tokenType = TokenType.RSHIFT_EQ;
+                } else if (_next == '=' && tokenType.equals(TokenType.TPRANGLE)) {
+                    tokenType = TokenType.URSHIFT_EQ;
+                } else {
+                    break;
+                }
+                _sb.append(_next);
             }
+            _tokens.add(new Token(_sb.toString(), tokenType));
         }
     };
 
     private Function scanAssign = new Function() {
 
-        public void run() {
-            Token lastToken = getLastToken();
-
-            switch (lastToken.getTokenType()) {
-            case ASSIGN:
-                setToken(lastToken, "==", TokenType.EQUAL);
-                break;
-            case RANGLE:
-                setToken(lastToken, ">=", TokenType.GEQ);
-                break;
-            case DBRANGLE:
-                setToken(lastToken, ">>=", TokenType.RSHIFT_EQ);
-                break;
-            case TPRANGLE:
-                setToken(lastToken, ">>>=", TokenType.URSHIFT_EQ);
+        public void run() throws IOException {
+            _next = _in.read();
+            switch (_next) {
+            case '=':
+                _tokens.add(new Token("==", TokenType.EQUAL));
                 break;
             default:
-                _tokens.add(new Token("=", TokenType.EQUAL));
+                _tokens.add(new Token("=", TokenType.ASSIGN));
                 break;
             }
         }
