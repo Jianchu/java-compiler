@@ -39,10 +39,10 @@ public class ScannerTest {
     }
     
     @Test 
-    public void testIntFail() {
-//    	thrown.expect(IllegalIDException.class);
+    public void testIntFail() throws Exception {
+    	thrown.expect(IllegalIDException.class);
     	String num = "123c";
-    	inputSetUp(num);
+    	inputSetUpException(num);
     }
 
     @Test
@@ -63,21 +63,30 @@ public class ScannerTest {
     }
     
     @Test
-    public void testCharFail() {
+    public void testCharFail() throws Exception {
     	String in = "\'sa\'";
-    	List<Token> tokens = inputSetUp(in);
+    	thrown.expect(IllegalCharException.class);
+    	List<Token> tokens = inputSetUpException(in);
     }
     
     @Test
-    public void testCharEscapeFail() {
+    public void testCharEscapeFail() throws Exception {
     	String in = "\'\\a\'";
-    	List<Token> tokens = inputSetUp(in);
+    	thrown.expect(IllegalCharException.class);
+    	List<Token> tokens = inputSetUpException(in);
     }
     
     public List<Token> inputSetUp(String num) {
     	StringReader sr = new StringReader(num);
     	scan = new Scanner(sr);
     	List<Token> tokens = scan.scan();
+    	return tokens;
+    }
+    
+    public List<Token> inputSetUpException(String num) throws Exception {
+    	StringReader sr = new StringReader(num);
+    	scan = new Scanner(sr);
+    	List<Token> tokens = scan.scanThrow();
     	return tokens;
     }
     

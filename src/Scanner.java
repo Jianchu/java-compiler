@@ -134,6 +134,17 @@ public class Scanner {
 
         return _tokens;
     }
+    
+    /**
+     * For Testing. --Z
+     * @return
+     * @throws Exception
+     */
+    public List<Token> scanThrow() throws Exception {
+    	_tokens = new ArrayList<Token>();
+    	scanStart();
+    	return _tokens;
+    }
 
     private void scanStart() throws Exception {
         _next = _in.read();
