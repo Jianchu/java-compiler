@@ -192,6 +192,7 @@ public class Scanner {
             switch (_next) {
             case '=':
                 _tokens.add(new Token("==", TokenType.EQUAL));
+                _next = _in.read();
                 break;
             default:
                 _tokens.add(new Token("=", TokenType.ASSIGN));
