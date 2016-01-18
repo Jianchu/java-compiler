@@ -21,7 +21,11 @@ public class ScannerTest {
     public void setUp() throws Exception {
     	
     }
-
+    
+    /*
+     * For integers
+     */
+    
     @Test
     public void testInt() {
     	String num = "123712";
@@ -44,7 +48,10 @@ public class ScannerTest {
     	String num = "123c";
     	inputSetUpException(num);
     }
-
+    
+    /*
+     * Characters
+     */
     @Test
     public void testChar() {
     	String in = "\'c\'";
@@ -75,6 +82,32 @@ public class ScannerTest {
     	thrown.expect(IllegalCharException.class);
     	List<Token> tokens = inputSetUpException(in);
     }
+    
+    /* 
+     * Strings
+     */
+    
+    @Test
+    public void testString() throws Exception {
+    	String in = "\"asdf\"";
+    	List<Token> tokens = inputSetUp(in);
+    	assertEquals(1, tokens.size());
+    	assertEquals(in, tokens.get(0).getLexeme());
+    }
+    
+    @Test
+    public void testStringEscape() throws Exception {
+    	String in = "\"as\tdf\"";
+    	List<Token> tokens = inputSetUp(in);
+//    	printTokens(tokens);
+    	assertEquals(3, tokens.size());
+    	assertEquals(in, tokens.get(0).getLexeme());
+    }
+    
+    
+    /*
+     * Basic setup
+     */
     
     public List<Token> inputSetUp(String num) {
     	StringReader sr = new StringReader(num);

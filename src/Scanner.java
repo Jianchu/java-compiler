@@ -419,6 +419,8 @@ public class Scanner {
     
     /**
      * scanning character literals
+     * @throws IOException
+     * @throws IllegalCharException
      */
     private void scanChar() throws IOException, IllegalCharException {
     	_sb.append((char) _next);
