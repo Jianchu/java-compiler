@@ -440,6 +440,11 @@ public class Scanner {
     	_next = _in.read();
     }
     
+    /**
+     * scanning string literals
+     * @throws IOException
+     * @throws IllegalCharException
+     */
     private void scanString() throws IOException, IllegalCharException  {
     	_sb.append((char) _next);
     	_next = _in.read();
@@ -454,6 +459,12 @@ public class Scanner {
     	_next = _in.read();
     }
     
+    /**
+     * Helper for reading a single character and putting it in _sb.
+     * Used by scanChar() and scanString(). Not to be confused with scanChar().
+     * @throws IOException
+     * @throws IllegalCharException
+     */
     private void readChar() throws IOException, IllegalCharException {
     	// single character
     	if ('\\' == _next) {
