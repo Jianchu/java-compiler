@@ -171,6 +171,8 @@ public class Scanner {
             } else if ('\'' == (char) _next) {
             	// character literals
             	scanChar();
+            } else if ('\"' == (char) _next) {
+            	scanString();
             } else if (sepMap.containsKey((char) _next)) {
             	//find TokenType.
             	scanSeparators();
@@ -424,7 +426,7 @@ public class Scanner {
     	// single character
     	if ('\\' == _next) {
     		// escape character
-    		scanEscape();
+    		readEscape();
     	} else {
     		// normal character
     		_sb.append((char) _next);
@@ -441,13 +443,17 @@ public class Scanner {
     	_next = _in.read();
     }
     
+    private void scanString()  {
+    	
+    }
+    
     /**
      * reading escape character.
      * Octal and Unicode Escape not implemented.
      * @throws IOException
      * @throws IllegalCharException
      */
-    private void scanEscape() throws IOException, IllegalCharException {
+    private void readEscape() throws IOException, IllegalCharException {
     	_sb.append((char) _next);
     	_next = _in.read();
     	if (!ESCAPES.contains((char) _next)) {
