@@ -400,6 +400,7 @@ public class Scanner {
      * NOTE: 
      * 		1. leaving size check for parser.
      * 		2. No Octal, Hex or Long.
+     * 		3. Keeping the string as "\'c\'" for now.
      * @throws IOException
      * @throws IllegalIDException 
      */
@@ -424,13 +425,7 @@ public class Scanner {
     	_next = _in.read();
     	
     	// single character
-    	if ('\\' == _next) {
-    		// escape character
-    		readEscape();
-    	} else {
-    		// normal character
-    		_sb.append((char) _next);
-    	}
+    	readChar();
     	
     	// terminating literal
     	_next = _in.read();
@@ -443,8 +438,29 @@ public class Scanner {
     	_next = _in.read();
     }
     
-    private void scanString()  {
+    private void scanString() throws IOException, IllegalCharException  {
+    	_sb.append((char) _next);
+    	_next = _in.read();
+    	while ('\"' != _next) {
+    		readChar();
+    		_next = _in.read();
+    	}
     	
+    	_sb.append((char) _next);
+    	_tokens.add(new Token(_sb.toString(), TokenType.CHARACTER));
+    	
+    	_next = _in.read();
+    }
+    
+    private void readChar() throws IOException, IllegalCharException {
+    	// single character
+    	if ('\\' == _next) {
+    		// escape character
+    		readEscape();
+    	} else {
+    		// normal character
+    		_sb.append((char) _next);
+    	}
     }
     
     /**
