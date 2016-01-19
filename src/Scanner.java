@@ -216,7 +216,7 @@ public class Scanner {
                 } else {
                     break;
                 }
-                _sb.append(_next);
+                _sb.append((char) _next);
             }
             _tokens.add(new Token(_sb.toString(), tokenType));
         }
