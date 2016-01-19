@@ -118,12 +118,26 @@ public class ScannerTest {
      * URSHIFT_EQ
      */
     @Test
-    public void testURSHIFT_EQ() throws Exception {
+    public void testUrshift_eq() throws Exception {
         String in = ">>>=";
         List<Token> tokens = inputSetUp(in);
-        printTokens(tokens);
         assertEquals(1, tokens.size());
         assertEquals("<>>>=, URSHIFT_EQ>", tokens.get(0).toString());
+    }
+
+    /*
+     * Id + Id
+     */
+
+    @Test
+    public void testIdplusId() throws Exception {
+        String in = "3 + 3";
+        List<Token> tokens = inputSetUp(in);
+        printTokens(tokens);
+        assertEquals(3, tokens.size());
+        assertEquals("<3, DECIMAL>", tokens.get(0).toString());
+        assertEquals("<+, PLUS>", tokens.get(1).toString());
+        assertEquals("<3, DECIMAL>", tokens.get(2).toString());
     }
 
     /*
