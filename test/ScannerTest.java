@@ -227,6 +227,94 @@ public class ScannerTest {
     }
 
     /*
+     * Slash
+     */
+
+    @Test
+    public void testSlash {
+        String in = "/";
+        List<Token> tokens = inputSetUp(in);
+        assertEquals(1, tokens.size());
+        assertEquals(TokenType.SLASH, tokens.get(0).getTokenType());
+    }
+
+    @Test
+    public void testSlashEq {
+        String in = "/=";
+        List<Token> tokens = inputSetUp(in);
+        assertEquals(1, tokens.size());
+        assertEquals(TokenType.SLASH_EQ, tokens.get(0).getTokenType());
+    }
+
+    @Test
+    public void testSlashSlash {
+        String in = "/ /";
+        List<Token> tokens = inputSetUp(in);
+        assertEquals(2, tokens.size());
+        assertEquals(TokenType.SLASH, tokens.get(0).getTokenType());
+    }
+
+    /*
+     * Comments
+     */
+
+    @Test
+    public void testComment {
+        String in = "//this is a comment";
+        List<Token> tokens = inputSetUp(in);
+        assertEquals(0, tokens.size());
+    }
+
+    @Test
+    public void testIdBeforeComment {
+        String in = "notComment //this is a comment";
+        List<Token> tokens = inputSetUp(in);
+        assertEquals(1, tokens.size());
+    }
+
+    @Test
+    public void testIdAfterComment {
+        String in = "//this is a comment\nbutNotThis";
+        List<Token> tokens = inputSetUp(in);
+        assertEquals(1, tokens.size());
+    }
+
+    @Test
+    public void testMultiComment {
+        String in = "var1//commentA\nvar2//commentB\rvar3//commentC\r\nvar4";
+        List<Token> tokens = inputSetUp(in);
+        assertEquals(4, tokens.size());
+    }
+
+    @Test
+    public void testBlockComment {
+        String in = "/* This is a block comment*/";
+        List<Token> tokens = inputSetUp(in);
+        assertEquals(0, tokens.size());
+    }
+
+    @Test
+    public void testBlockCommentNewline {
+        String in = "/* This is a block comment\n   with a newline in it */";
+        List<Token> tokens = inputSetUp(in);
+        assertEquals(0, tokens.size());
+    }
+
+    @Test
+    public void testBlockCommentStar {
+        String in = "/* This block comment* has * extra stars in it **/";
+        List<Token> tokens = inputSetUp(in);
+        assertEquals(0, tokens.size());
+    }
+
+    @Test
+    public void testCommentedBlockComment {
+        String in = "// /*\nnotAComment\n// */";
+        List<Token> tokens = inputSetUp(in);
+        assertEquals(1, tokens.size());
+    }
+
+    /*
      * Basic setup
      */
     
