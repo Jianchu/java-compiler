@@ -1,7 +1,5 @@
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
-import java.io.InputStreamReader;
-import java.io.Reader;
 import java.io.StringReader;
 import java.util.List;
 
@@ -99,11 +97,49 @@ public class ScannerTest {
     public void testStringEscape() throws Exception {
     	String in = "\"as\tdf\"";
     	List<Token> tokens = inputSetUp(in);
-//    	printTokens(tokens);
+        // printTokens(tokens);
     	assertEquals(3, tokens.size());
     	assertEquals(in, tokens.get(0).getLexeme());
     }
     
+    /*
+     * Equals
+     */
+    @Test
+    public void testEqual() throws Exception {
+        String in = "==";
+        List<Token> tokens = inputSetUp(in);
+        // printTokens(tokens);
+        assertEquals(1, tokens.size());
+        assertEquals("<==, EQUAL>", tokens.get(0).toString());
+    }
+    
+    /*
+     * URSHIFT_EQ
+     */
+    @Test
+    public void testUrshift_eq() throws Exception {
+        String in = ">>>=";
+        List<Token> tokens = inputSetUp(in);
+        assertEquals(1, tokens.size());
+        assertEquals("<>>>=, URSHIFT_EQ>", tokens.get(0).toString());
+    }
+
+    /*
+     * Id + Id
+     */
+
+    @Test
+    public void testIdplusId() throws Exception {
+        String in = "3 + 3";
+        List<Token> tokens = inputSetUp(in);
+        printTokens(tokens);
+        assertEquals(3, tokens.size());
+        assertEquals("<3, DECIMAL>", tokens.get(0).toString());
+        assertEquals("<+, PLUS>", tokens.get(1).toString());
+        assertEquals("<3, DECIMAL>", tokens.get(2).toString());
+    }
+
     /*
      * Identifiers
      */
@@ -190,7 +226,6 @@ public class ScannerTest {
         assertEquals(TokenType.NULL, tokens.get(0).getTokenType());
     }
 
-    
     /*
      * Basic setup
      */
@@ -211,7 +246,7 @@ public class ScannerTest {
     
     public void printTokens(List<Token> tokens) {
     	for (Token t : tokens) {
-    		System.out.println(t.getLexeme() + "\t");
+            System.out.println(t.toString() + "\t");
     	}
     }
 }
