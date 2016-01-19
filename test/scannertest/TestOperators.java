@@ -12,12 +12,14 @@ import scanner.TokenType;
 
 public class TestOperators {
 
+    ScannerTest scannerTest;
     @Before
     public void setUp() throws Exception {
+        scannerTest = new ScannerTest();
     }
 
-    ScannerTest scannerTest = new ScannerTest();
     
+
     /*
      * Equals
      */
@@ -25,7 +27,7 @@ public class TestOperators {
     public void testEqual() throws Exception {
         String in = "==";
         List<Token> tokens = scannerTest.inputSetUp(in);
-        // printTokens(tokens);
+        scannerTest.printTokens(tokens);
         assertEquals(1, tokens.size());
         assertEquals("<==, EQUAL>", tokens.get(0).toString());
     }
@@ -35,10 +37,11 @@ public class TestOperators {
      */
     @Test
     public void testUrshift_eq() throws Exception {
-        String in = ">>>=";
+        String in = ">>=";
         List<Token> tokens = scannerTest.inputSetUp(in);
+        // scannerTest.printTokens(tokens);
         assertEquals(1, tokens.size());
-        assertEquals("<>>>=, URSHIFT_EQ>", tokens.get(0).toString());
+        assertEquals("<>>=, RSHIFT_EQ>", tokens.get(0).toString());
     }
 
     /*
@@ -49,13 +52,25 @@ public class TestOperators {
     public void testIdplusId() throws Exception {
         String in = "3 + 3";
         List<Token> tokens = scannerTest.inputSetUp(in);
-        scannerTest.printTokens(tokens);
+        // scannerTest.printTokens(tokens);
         assertEquals(3, tokens.size());
         assertEquals("<3, DECIMAL>", tokens.get(0).toString());
         assertEquals("<+, PLUS>", tokens.get(1).toString());
         assertEquals("<3, DECIMAL>", tokens.get(2).toString());
     }
     
+    /*
+     * Increment
+     */
+    @Test
+    public void testIncrement() throws Exception {
+        String in = "++";
+        List<Token> tokens = scannerTest.inputSetUp(in);
+        scannerTest.printTokens(tokens);
+        assertEquals(1, tokens.size());
+        assertEquals("<++, INCREMENT>", tokens.get(0).toString());
+    }
+
     /*
      * Slash
      */

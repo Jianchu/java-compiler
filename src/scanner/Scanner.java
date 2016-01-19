@@ -28,6 +28,7 @@ public class Scanner {
     }
 
     public Scanner(Reader in) {
+
         _in = in;
         _sb = new StringBuilder();
         _next = -1;
@@ -203,8 +204,10 @@ public class Scanner {
 
     private RunnableScan scanRangle = new RunnableScan() {
         public void run() throws IOException {
+
             TokenType tokenType = TokenType.RANGLE;
             _sb.append((char) _next);
+
             for (;;) {
                 _next = _in.read();
                 if (_next == '>' && tokenType.equals(TokenType.RANGLE)) {
@@ -228,11 +231,12 @@ public class Scanner {
 
     private void scanTwoOptionsOp(TokenType defaultType, char secondChar,
             TokenType twoCharsType) throws IOException {
+        System.out.println((char) _next);
         TokenType tokenType = defaultType;
         _sb.append((char) _next);
         for (;;) {
             _next = _in.read();
-            if (_next == secondChar) {
+            if (_next == secondChar && tokenType.equals(defaultType)) {
                 tokenType = twoCharsType;
             } else {
                 break;
@@ -249,9 +253,9 @@ public class Scanner {
         _sb.append((char) _next);
         for (;;) {
             _next = _in.read();
-            if (_next == firstOption) {
+            if (_next == firstOption && tokenType.equals(defaultType)) {
                 tokenType = firstType;
-            } else if (_next == secondOption) {
+            } else if (_next == secondOption && tokenType.equals(defaultType)) {
                 tokenType = secondType;
             } else {
                 break;
