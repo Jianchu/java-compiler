@@ -11,6 +11,7 @@ import org.junit.rules.ExpectedException;
 
 import scanner.Scanner;
 import scanner.Token;
+import scanner.TokenType;
 import exceptions.IllegalCharException;
 import exceptions.IllegalIDException;
 
