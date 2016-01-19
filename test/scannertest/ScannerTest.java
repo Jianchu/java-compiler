@@ -1,3 +1,4 @@
+package scannertest;
 import static org.junit.Assert.assertEquals;
 
 import java.io.StringReader;
@@ -7,6 +8,11 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+
+import scanner.Scanner;
+import scanner.Token;
+import exceptions.IllegalCharException;
+import exceptions.IllegalIDException;
 
 
 public class ScannerTest {

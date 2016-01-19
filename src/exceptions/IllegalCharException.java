@@ -1,3 +1,4 @@
+package exceptions;
 
 public class IllegalCharException extends Exception {
 	public IllegalCharException() {

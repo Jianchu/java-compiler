@@ -1,6 +1,9 @@
 import java.io.FileReader;
 import java.util.List;
 
+import scanner.Scanner;
+import scanner.Token;
+
 public class Joosc {
     public static void main(String[] args) {
         if (args.length < 1) {

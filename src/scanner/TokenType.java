@@ -1,3 +1,4 @@
+package scanner;
 /**
  * Enum Type for Token types.
  * @author zanel
