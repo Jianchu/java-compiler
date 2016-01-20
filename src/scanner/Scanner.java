@@ -331,9 +331,6 @@ public class Scanner {
     private RunnableScan scanAmpersand = new RunnableScan() {
 
         public void run() throws IOException {
-            _sb.append((char) _next);
-            _tokens.add(new Token(_sb.toString(), TokenType.BITAND));
-            _next = _in.read();
             scanThreeOptionsOp(TokenType.BITAND, '&', TokenType.AND, '=',
                     TokenType.AND_EQ);
         }
