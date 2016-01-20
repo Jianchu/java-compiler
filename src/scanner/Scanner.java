@@ -64,6 +64,7 @@ public class Scanner {
         opMap.put('*', scanStar);
         opMap.put('/', scanSlash);
         opMap.put('%', scanPercent);
+        opMap.put('~', scanTilde);
     }
 
     private void initIdMap() {
@@ -204,7 +205,6 @@ public class Scanner {
 
     private RunnableScan scanRangle = new RunnableScan() {
         public void run() throws IOException {
-
             TokenType tokenType = TokenType.RANGLE;
             _sb.append((char) _next);
 
@@ -229,9 +229,31 @@ public class Scanner {
         }
     };
 
+    private RunnableScan scanLangle = new RunnableScan() {
+
+        public void run() throws IOException {
+            TokenType tokenType = TokenType.LANGLE;
+            _sb.append((char) _next);
+
+            for (;;) {
+                _next = _in.read();
+                if (_next == '<' && tokenType.equals(TokenType.LANGLE)) {
+                    tokenType = TokenType.DBLANGLE;
+                } else if (_next == '=' && tokenType.equals(TokenType.LANGLE)) {
+                    tokenType = TokenType.LEQ;
+                } else if (_next == '=' && tokenType.equals(TokenType.DBLANGLE)) {
+                    tokenType = TokenType.LSHIFT_EQ;
+                } else {
+                    break;
+                }
+                _sb.append((char) _next);
+            }
+            _tokens.add(new Token(_sb.toString(), tokenType));
+        }
+    };
+
     private void scanTwoOptionsOp(TokenType defaultType, char secondChar,
             TokenType twoCharsType) throws IOException {
-        System.out.println((char) _next);
         TokenType tokenType = defaultType;
         _sb.append((char) _next);
         for (;;) {
@@ -272,13 +294,6 @@ public class Scanner {
         }
     };
 
-    private RunnableScan scanLangle = new RunnableScan() {
-
-        public void run() throws IOException {
-            scanTwoOptionsOp(TokenType.LANGLE, '=', TokenType.LEQ);
-        }
-    };
-
     private RunnableScan scanExclamation = new RunnableScan() {
 
         public void run() throws IOException {
@@ -291,6 +306,15 @@ public class Scanner {
         public void run() throws IOException {
             _sb.append((char) _next);
             _tokens.add(new Token(_sb.toString(), TokenType.QUESTION));
+            _next = _in.read();
+        }
+    };
+
+    private RunnableScan scanTilde = new RunnableScan() {
+
+        public void run() throws IOException {
+            _sb.append((char) _next);
+            _tokens.add(new Token(_sb.toString(), TokenType.BIT_COMP));
             _next = _in.read();
         }
     };
@@ -310,6 +334,8 @@ public class Scanner {
             _sb.append((char) _next);
             _tokens.add(new Token(_sb.toString(), TokenType.BITAND));
             _next = _in.read();
+            scanThreeOptionsOp(TokenType.BITAND, '&', TokenType.AND, '=',
+                    TokenType.AND_EQ);
         }
     };
 
