@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
+import exceptions.IllegalBlockCommentException;
 import exceptions.IllegalCharException;
 import exceptions.IllegalIDException;
 
@@ -24,7 +25,7 @@ public class Scanner {
     private final Set<Character> ESCAPES;
     
     private interface RunnableScan {
-        void run() throws IOException;
+        void run() throws IOException, IllegalBlockCommentException;
     }
 
     public Scanner(Reader in) {
@@ -132,6 +133,8 @@ public class Scanner {
             	ide.printStackTrace();
             } catch (IllegalCharException ice) {
             	ice.printStackTrace();
+            } catch (IllegalBlockCommentException ibce) {
+                ibce.printStackTrace();
             } catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -375,18 +378,20 @@ public class Scanner {
     };
 
     private RunnableScan scanSlash = new RunnableScan() {
-        public void run() throws IOException {
+        public void run() throws IOException, IllegalBlockCommentException {
             _next = _in.read();
             if (_next == '/') {         // in-line comment
                 do {
                     _next = _in.read();
-                } while (_next != '\n' && _next != '\r');
-                // Note that if the line terminator is \r\n, scanStart will ignore the \n
+                } while (_next != '\n' && _next != '\r' && _next != -1);
 
-                _next = _in.read();
+                // Let scanStart deal with the character(s)
             } else if (_next == '*') {  // block comment
                 _next = _in.read();
                 for ( ; ; ) {
+                    if (_next == -1) {
+                        throw new IllegalBlockCommentException();
+                    }
                     if (_next == '*') {
                         _next = _in.read();
                         if (_next == '/') {
