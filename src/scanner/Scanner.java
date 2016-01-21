@@ -41,7 +41,8 @@ public class Scanner {
         initOpMap();
         
         sepMap = new HashMap<Character, TokenType>();        
-
+	initSepMap();
+	
         idMap = new HashMap<String, TokenType>();
         initIdMap();
         
@@ -51,6 +52,18 @@ public class Scanner {
         }
     }
 
+    private void initSepMap() {
+    	sepMap.put('(', TokenType.LPAREN);
+	sepMap.put(')', TokenType.RPAREN);
+	sepMap.put('{', TokenType.LBRACE);
+	sepMap.put('}', TokenType.RBRACE);
+	sepMap.put('[', TokenType.LBRACKET);
+	sepMap.put(']', TokenType.RBRACKET);
+	sepMap.put(';', TokenType.SEMICOLON);
+	sepMap.put(',', TokenType.COMMA);
+	sepMap.put('.', TokenType.DOT);		   
+    }
+    
     private void initOpMap() {
         opMap.put('>', scanRangle);
         opMap.put('=', scanAssign);
