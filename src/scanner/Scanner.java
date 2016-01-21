@@ -188,7 +188,8 @@ public class Scanner {
             } else if (opMap.containsKey((char) _next)) {
             	opMap.get((char) _next).run();
             } else {
-                throw new RuntimeException("input " + _next + "[" + (char)_next + "] not yet implemented");
+                throw new RuntimeException("input " + (char) _next + "["
+                        + (char) _next + "] not yet implemented");
             }
         }
     }
