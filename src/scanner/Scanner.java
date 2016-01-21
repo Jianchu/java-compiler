@@ -451,7 +451,7 @@ public class Scanner {
      */
     private void scanSeparators() throws IOException, IllegalInputCharException {
     	_sb.append((char) _next);
-    	String lexeme = _sb.toString();
+    	Character lexeme = _sb.toString().charAt(0);
     	_tokens.add(new Token(lexeme, sepMap.get(lexeme)));
     	_next = read();
     }
