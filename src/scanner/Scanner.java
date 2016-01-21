@@ -11,6 +11,7 @@ import java.util.TreeSet;
 import exceptions.IllegalBlockCommentException;
 import exceptions.IllegalCharException;
 import exceptions.IllegalIDException;
+import exceptions.IllegalInputCharException;
 
 
 public class Scanner {
@@ -25,7 +26,7 @@ public class Scanner {
     private final Set<Character> ESCAPES;
     
     private interface RunnableScan {
-        void run() throws IOException, IllegalBlockCommentException;
+        void run() throws IOException, IllegalInputCharException, IllegalBlockCommentException;
     }
 
     public Scanner(Reader in) {
@@ -120,6 +121,14 @@ public class Scanner {
         idMap.put("while", TokenType.WHILE);
     }
 
+    private int read() throws IOException, IllegalInputCharException {
+        int c = _in.read();
+        if (c < -1 || c > 127) {
+            throw new IllegalInputCharException();
+        }
+        return c;
+    }
+
     public List<Token> scan() {
         // if scan has already been called, just return the same list
         if (_tokens == null) {
@@ -135,6 +144,8 @@ public class Scanner {
             	ice.printStackTrace();
             } catch (IllegalBlockCommentException ibce) {
                 ibce.printStackTrace();
+            } catch (IllegalInputCharException iice) {
+                iice.printStackTrace();
             } catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -156,14 +167,14 @@ public class Scanner {
     }
 
     private void scanStart() throws Exception {
-        _next = _in.read();
+        _next = read();
         for ( ; ; ) {
-            /* The loop intentionally does not call _in.read() here--not all tokens are terminated with whitespace;
+            /* The loop intentionally does not call read() here--not all tokens are terminated with whitespace;
              * e.g., "scanStart();" needs to read the '(' to find the end of the ID and return.
-             * If _in.read() was called in this loop, the LPAREN will be skipped.
+             * If read() was called in this loop, the LPAREN will be skipped.
              */
             while (Character.isWhitespace(_next)) {
-                _next= _in.read();
+                _next = read();
             }
 
             if (_next == -1) { //end of file
@@ -193,10 +204,10 @@ public class Scanner {
         }
     }
 
-    private void scanId() throws IOException {
+    private void scanId() throws IOException, IllegalInputCharException {
         for ( ; ; ) {
             _sb.append((char) _next);
-            _next = _in.read();
+            _next = read();
             if (!Character.isLetterOrDigit(_next) && _next != '_' && _next != '$') {
                 String lexeme = _sb.toString();
                 TokenType type = (idMap.containsKey(lexeme) ? idMap.get(lexeme) : TokenType.ID);
@@ -207,12 +218,12 @@ public class Scanner {
     }
 
     private RunnableScan scanRangle = new RunnableScan() {
-        public void run() throws IOException {
+        public void run() throws IOException, IllegalInputCharException{
             TokenType tokenType = TokenType.RANGLE;
             _sb.append((char) _next);
 
             for (;;) {
-                _next = _in.read();
+                _next = read();
                 if (_next == '>' && tokenType.equals(TokenType.RANGLE)) {
                     tokenType = TokenType.DBRANGLE;
                 } else if (_next == '>' && tokenType.equals(TokenType.DBRANGLE)) {
@@ -234,12 +245,12 @@ public class Scanner {
 
     private RunnableScan scanLangle = new RunnableScan() {
 
-        public void run() throws IOException {
+        public void run() throws IOException, IllegalInputCharException{
             TokenType tokenType = TokenType.LANGLE;
             _sb.append((char) _next);
 
             for (;;) {
-                _next = _in.read();
+                _next = read();
                 if (_next == '<' && tokenType.equals(TokenType.LANGLE)) {
                     tokenType = TokenType.DBLANGLE;
                 } else if (_next == '=' && tokenType.equals(TokenType.LANGLE)) {
@@ -256,11 +267,11 @@ public class Scanner {
     };
 
     private void scanTwoOptionsOp(TokenType defaultType, char secondChar,
-            TokenType twoCharsType) throws IOException {
+            TokenType twoCharsType) throws IOException, IllegalInputCharException {
         TokenType tokenType = defaultType;
         _sb.append((char) _next);
         for (;;) {
-            _next = _in.read();
+            _next = read();
             if (_next == secondChar && tokenType.equals(defaultType)) {
                 tokenType = twoCharsType;
             } else {
@@ -273,11 +284,11 @@ public class Scanner {
 
     private void scanThreeOptionsOp(TokenType defaultType, char firstOption,
             TokenType firstType, char secondOption, TokenType secondType)
-            throws IOException {
+            throws IOException, IllegalInputCharException {
         TokenType tokenType = defaultType;
         _sb.append((char) _next);
         for (;;) {
-            _next = _in.read();
+            _next = read();
             if (_next == firstOption && tokenType.equals(defaultType)) {
                 tokenType = firstType;
             } else if (_next == secondOption && tokenType.equals(defaultType)) {
@@ -292,48 +303,48 @@ public class Scanner {
 
     private RunnableScan scanAssign = new RunnableScan() {
 
-        public void run() throws IOException {
+        public void run() throws IOException, IllegalInputCharException {
             scanTwoOptionsOp(TokenType.ASSIGN, '=', TokenType.EQUAL);
         }
     };
 
     private RunnableScan scanExclamation = new RunnableScan() {
 
-        public void run() throws IOException {
+        public void run() throws IOException, IllegalInputCharException {
             scanTwoOptionsOp(TokenType.NOT, '=', TokenType.NEQ);
         }
     };
 
     private RunnableScan scanQuestion = new RunnableScan() {
 
-        public void run() throws IOException {
+        public void run() throws IOException, IllegalInputCharException {
             _sb.append((char) _next);
             _tokens.add(new Token(_sb.toString(), TokenType.QUESTION));
-            _next = _in.read();
+            _next = read();
         }
     };
 
     private RunnableScan scanTilde = new RunnableScan() {
 
-        public void run() throws IOException {
+        public void run() throws IOException, IllegalInputCharException {
             _sb.append((char) _next);
             _tokens.add(new Token(_sb.toString(), TokenType.BIT_COMP));
-            _next = _in.read();
+            _next = read();
         }
     };
 
     private RunnableScan scanColon = new RunnableScan() {
 
-        public void run() throws IOException {
+        public void run() throws IOException, IllegalInputCharException {
             _sb.append((char) _next);
             _tokens.add(new Token(_sb.toString(), TokenType.COLON));
-            _next = _in.read();
+            _next = read();
         }
     };
 
     private RunnableScan scanAmpersand = new RunnableScan() {
 
-        public void run() throws IOException {
+        public void run() throws IOException, IllegalInputCharException {
             scanThreeOptionsOp(TokenType.BITAND, '&', TokenType.AND, '=',
                     TokenType.AND_EQ);
         }
@@ -341,7 +352,7 @@ public class Scanner {
 
     private RunnableScan scanVertical = new RunnableScan() {
 
-        public void run() throws IOException {
+        public void run() throws IOException, IllegalInputCharException {
             scanThreeOptionsOp(TokenType.BITOR, '|', TokenType.LOR, '=',
                     TokenType.OR_EQ);
         }
@@ -349,14 +360,14 @@ public class Scanner {
 
     private RunnableScan scanCaret = new RunnableScan() {
 
-        public void run() throws IOException {
+        public void run() throws IOException, IllegalInputCharException {
             scanTwoOptionsOp(TokenType.EXOR, '=', TokenType.EXOR_EQ);
         }
     };
 
     private RunnableScan scanPlus = new RunnableScan() {
 
-        public void run() throws IOException {
+        public void run() throws IOException, IllegalInputCharException {
             scanThreeOptionsOp(TokenType.PLUS, '+', TokenType.INCREMENT, '=',
                     TokenType.PLUS_EQ);
         }
@@ -364,7 +375,7 @@ public class Scanner {
 
     private RunnableScan scanMinus = new RunnableScan() {
 
-        public void run() throws IOException {
+        public void run() throws IOException, IllegalInputCharException {
             scanThreeOptionsOp(TokenType.MINUS, '-', TokenType.DECREMENT, '=',
                     TokenType.MINUS_EQ);
         }
@@ -372,41 +383,41 @@ public class Scanner {
 
     private RunnableScan scanStar = new RunnableScan() {
 
-        public void run() throws IOException {
+        public void run() throws IOException, IllegalInputCharException {
             scanTwoOptionsOp(TokenType.STAR, '=', TokenType.STAR_EQ);
         }
     };
 
     private RunnableScan scanSlash = new RunnableScan() {
-        public void run() throws IOException, IllegalBlockCommentException {
-            _next = _in.read();
+        public void run() throws IOException, IllegalInputCharException, IllegalBlockCommentException {
+            _next = read();
             if (_next == '/') {         // in-line comment
                 do {
-                    _next = _in.read();
+                    _next = read();
                 } while (_next != '\n' && _next != '\r' && _next != -1);
 
                 // Let scanStart deal with the character(s)
             } else if (_next == '*') {  // block comment
-                _next = _in.read();
+                _next = read();
                 for ( ; ; ) {
                     if (_next == -1) {
                         throw new IllegalBlockCommentException();
                     }
                     if (_next == '*') {
-                        _next = _in.read();
+                        _next = read();
                         if (_next == '/') {
                             break;
                         }
                     } else { // necessary since "**/" can end a comment
-                        _next = _in.read();
+                        _next = read();
                     }
                 }
 
-                _next = _in.read();
+                _next = read();
             } else if (_next == '=') {
                 _tokens.add(new Token("/=", TokenType.SLASH_EQ));
 
-                _next = _in.read();
+                _next = read();
             } else {
                 _tokens.add(new Token("/", TokenType.SLASH));
             }
@@ -415,7 +426,7 @@ public class Scanner {
 
     private RunnableScan scanPercent = new RunnableScan() {
 
-        public void run() throws IOException {
+        public void run() throws IOException, IllegalInputCharException {
             scanTwoOptionsOp(TokenType.MOD, '=', TokenType.MOD_EQ);
         }
     };
@@ -424,11 +435,11 @@ public class Scanner {
      * scanning separators
      * @throws IOException
      */
-    private void scanSeparators() throws IOException {
+    private void scanSeparators() throws IOException, IllegalInputCharException {
     	_sb.append((char) _next);
     	String lexeme = _sb.toString();
     	_tokens.add(new Token(lexeme, sepMap.get(lexeme)));
-    	_next = _in.read();
+    	_next = read();
     }
     
     /**
@@ -440,10 +451,10 @@ public class Scanner {
      * @throws IOException
      * @throws IllegalIDException 
      */
-    private void scanInteger() throws IOException, IllegalIDException {
+    private void scanInteger() throws IOException, IllegalInputCharException, IllegalIDException {
     	while (Character.isDigit(_next)) {
     		_sb.append((char) _next);
-    		_next = _in.read();
+    		_next = read();
     	}
     	_tokens.add(new Token(_sb.toString(), TokenType.DECIMAL));
     	// A proper integer must be terminated with space, operators or ';'.
@@ -458,22 +469,22 @@ public class Scanner {
      * @throws IOException
      * @throws IllegalCharException
      */
-    private void scanChar() throws IOException, IllegalCharException {
+    private void scanChar() throws IOException, IllegalInputCharException, IllegalCharException {
     	_sb.append((char) _next);
-    	_next = _in.read();
+    	_next = read();
     	
     	// single character
     	readChar();
     	
     	// terminating literal
-    	_next = _in.read();
+    	_next = read();
     	if ('\'' != _next) {
     		throw new IllegalCharException(_sb.toString() + (char) _next + '\'');
     	}
     	_sb.append((char) _next);
     	_tokens.add(new Token(_sb.toString(), TokenType.CHARACTER));
     	
-    	_next = _in.read();
+    	_next = read();
     }
     
     /**
@@ -481,18 +492,18 @@ public class Scanner {
      * @throws IOException
      * @throws IllegalCharException
      */
-    private void scanString() throws IOException, IllegalCharException  {
+    private void scanString() throws IOException, IllegalInputCharException, IllegalCharException  {
     	_sb.append((char) _next);
-    	_next = _in.read();
+    	_next = read();
     	while ('\"' != _next) {
     		readChar();
-    		_next = _in.read();
+    		_next = read();
     	}
     	
     	_sb.append((char) _next);
     	_tokens.add(new Token(_sb.toString(), TokenType.CHARACTER));
     	
-    	_next = _in.read();
+    	_next = read();
     }
     
     /**
@@ -501,7 +512,7 @@ public class Scanner {
      * @throws IOException
      * @throws IllegalCharException
      */
-    private void readChar() throws IOException, IllegalCharException {
+    private void readChar() throws IOException, IllegalInputCharException, IllegalCharException {
     	// single character
     	if ('\\' == _next) {
     		// escape character
@@ -518,9 +529,9 @@ public class Scanner {
      * @throws IOException
      * @throws IllegalCharException
      */
-    private void readEscape() throws IOException, IllegalCharException {
+    private void readEscape() throws IOException, IllegalInputCharException, IllegalCharException {
     	_sb.append((char) _next);
-    	_next = _in.read();
+    	_next = read();
     	if (!ESCAPES.contains((char) _next)) {
     		throw new IllegalCharException(_sb.toString() + (char) _next + '\'');
     	}
