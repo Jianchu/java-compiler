@@ -83,7 +83,11 @@ public class Scanner {
     }
 
     private void initIdMap() {
+    	// technically literals
+    	idMap.put("true", TokenType.TRUE);
+    	idMap.put("false", TokenType.FALSE);
         idMap.put("null", TokenType.NULL);
+        // keywords
         idMap.put("abstract", TokenType.ABSTRACT);
         idMap.put("boolean", TokenType.BOOLEAN);
         idMap.put("break", TokenType.BREAK);

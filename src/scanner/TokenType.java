@@ -9,18 +9,18 @@ public enum TokenType {
 	 * Identifiers
 	 */
 	ID,
-	
+
 	/*
 	 * White Space -- DEPRECATED
 	 * SPACE, TAB, NEWLINE,
 	 */
-	
+
 	/*
 	 * Comments -- DEPRECATED
 	 * COMMENT, BLOCK_COMMENT,
 	 */
 
-	
+
 	/*
 	 * Operators 
 	 */
@@ -28,16 +28,16 @@ public enum TokenType {
 	ASSIGN, EQUAL,
 	// >, >>, >>>, >=, >>=, >>>= (unsigned right shift assignment)
 	RANGLE, DBRANGLE, TPRANGLE, GEQ, RSHIFT_EQ, URSHIFT_EQ,
-        // <, <<, <=, <<=
-        LANGLE, DBLANGLE, LEQ, LSHIFT_EQ,
-        // ~
-        BIT_COMP,
+	// <, <<, <=, <<=
+	LANGLE, DBLANGLE, LEQ, LSHIFT_EQ,
+	// ~
+	BIT_COMP,
 	// !, !=
 	NOT, NEQ,
 	// ?, :
 	QUESTION, COLON, 
-        // &, &&, &=
-        BITAND, AND, AND_EQ,
+	// &, &&, &=
+	BITAND, AND, AND_EQ,
 	// |, ||, |=
 	BITOR, LOR, OR_EQ,
 	// ^, ^=
@@ -48,18 +48,21 @@ public enum TokenType {
 	STAR, STAR_EQ, SLASH, SLASH_EQ,
 	// %, %=
 	MOD, MOD_EQ,
-	
+
 	/*
 	 * Separators
 	 * ( ) { } [ ] ; , .
 	 */
 	LPAREN, RPAREN, LBRACE, RBRACE, LBRACKET, RBRACKET, SEMICOLON, COMMA, DOT,
-	
+
 	/*
 	 * Literals
 	 */
 	CHARACTER, STRING, DECIMAL, NULL, //Null is also in keywords
-
+	//Boolean Literals stored by value.
+	TRUE, FALSE,
+	
+	
 	/*
 	 * Keywords
 	 * 
