@@ -54,14 +54,14 @@ public class Scanner {
 
     private void initSepMap() {
     	sepMap.put('(', TokenType.LPAREN);
-	sepMap.put(')', TokenType.RPAREN);
-	sepMap.put('{', TokenType.LBRACE);
-	sepMap.put('}', TokenType.RBRACE);
-	sepMap.put('[', TokenType.LBRACKET);
-	sepMap.put(']', TokenType.RBRACKET);
-	sepMap.put(';', TokenType.SEMICOLON);
-	sepMap.put(',', TokenType.COMMA);
-	sepMap.put('.', TokenType.DOT);		   
+		sepMap.put(')', TokenType.RPAREN);
+		sepMap.put('{', TokenType.LBRACE);
+		sepMap.put('}', TokenType.RBRACE);
+		sepMap.put('[', TokenType.LBRACKET);
+		sepMap.put(']', TokenType.RBRACKET);
+		sepMap.put(';', TokenType.SEMICOLON);
+		sepMap.put(',', TokenType.COMMA);
+		sepMap.put('.', TokenType.DOT);		   
     }
     
     private void initOpMap() {
@@ -515,7 +515,7 @@ public class Scanner {
     	}
     	
     	_sb.append((char) _next);
-    	_tokens.add(new Token(_sb.toString(), TokenType.CHARACTER));
+    	_tokens.add(new Token(_sb.toString(), TokenType.STRING));
     	
     	_next = read();
     }
