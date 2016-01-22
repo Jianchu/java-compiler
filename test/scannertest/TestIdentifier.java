@@ -86,7 +86,7 @@ public class TestIdentifier {
             sb.append(keywords[i].toString()).append(" ");
         }
         String in = sb.toString();
-        in.toLowerCase();
+        in = in.toLowerCase();
         List<Token> tokens = scannerTest.inputSetUp(in);
         assertEquals(keywords.length, tokens.size());
         for (int i = 0; i < tokens.size(); i++) {
