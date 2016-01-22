@@ -32,9 +32,15 @@ public class ScannerTest {
     	return tokens;
     }
     
-    public void printTokens(List<Token> tokens) {
-    	for (Token t : tokens) {
+    public void printlnTokens(List<Token> tokens) {
+        for (Token t : tokens) {
             System.out.println(t.toString() + "\t");
-    	}
+        }
+    }
+
+    public void printTokens(List<Token> tokens) {
+        for (Token t : tokens) {
+            System.out.print(t.toString() + ", ");
+        }
     }
 }

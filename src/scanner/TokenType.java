@@ -28,16 +28,16 @@ public enum TokenType {
 	ASSIGN, EQUAL,
 	// >, >>, >>>, >=, >>=, >>>= (unsigned right shift assignment)
 	RANGLE, DBRANGLE, TPRANGLE, GEQ, RSHIFT_EQ, URSHIFT_EQ,
-    // <, <<, <=, <<=
-    LANGLE, DBLANGLE, LEQ, LSHIFT_EQ,
-    // ~
-    BIT_COMP,
+        // <, <<, <=, <<=
+        LANGLE, DBLANGLE, LEQ, LSHIFT_EQ,
+        // ~
+        BIT_COMP,
 	// !, !=
 	NOT, NEQ,
 	// ?, :
 	QUESTION, COLON, 
-    // &, &&, &=
-    BITAND, AND, AND_EQ,
+        // &, &&, &=
+        BITAND, AND, AND_EQ,
 	// |, ||, |=
 	BITOR, LOR, OR_EQ,
 	// ^, ^=
