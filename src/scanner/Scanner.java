@@ -41,7 +41,7 @@ public class Scanner {
         initOpMap();
         
         sepMap = new HashMap<Character, TokenType>();        
-	initSepMap();
+        initSepMap();
 	
         idMap = new HashMap<String, TokenType>();
         initIdMap();

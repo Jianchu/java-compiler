@@ -1,0 +1,9 @@
+\section{Implementation}
+% scanner implementation
+
+%P94, Crafting
+As explained in~\cite{fischer2009crafting}, a DFA can be implemented in two forms: \emph{table-driven}, or \emph{explicit control}. The table-driven approach, usually used by the scanner generators, utilizes an explicit transition table that could be interpreted by a universal driver program. The explicit control form, on the other hand, incorporates the transitions of the DFA directly into the control logic of the scanner program. In this project, we choose to handwrite the scanner in explicit control form for two reasons. First of all, incorporating the DFA transitions directly into control provides better performance. Secondly, the scanner produced in such manners is easier to debug and modify based on our requirements. The shortcoming of this approach is that, with the token definitions hard-coded into our program, the scanner could not be easily adapted for use elsewhere. This, however, is not a problem for the project.
+
+Java defines a set reserved keywords that cannot be used as identifiers. In this implementation of the scanner, we read keywords in the same manners as identifiers and perform a hash table lookup afterwards to determine whether it is a reserved keyword. This approach has no affect asymptotically on the performance yet results in succinct and readable code.
+
+% Handling runaway Strings.
