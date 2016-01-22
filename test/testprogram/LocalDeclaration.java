@@ -1,3 +1,5 @@
+package testprogram;
+
 public class LocalDeclaration {
   public LocalDeclaration() {}
   public void m() {

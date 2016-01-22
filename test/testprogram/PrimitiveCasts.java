@@ -1,3 +1,5 @@
+package testprogram;
+
 public class PrimitiveCasts {
   public PrimitiveCasts() {}
   public int m(byte x) {
