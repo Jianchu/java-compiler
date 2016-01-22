@@ -484,13 +484,12 @@ public class Scanner {
     
     /**
      * scanning character literals
-     * @throws IOException
-     * @throws IllegalCharException
+     * @throws Exception 
      */
-    private void scanChar() throws IOException, IllegalInputCharException, IllegalCharException {
+    private void scanChar() throws Exception {
     	_sb.append((char) _next);
     	_next = read();
-    	
+    	runawayCheck();
     	// single character
     	readChar();
     	
@@ -507,13 +506,13 @@ public class Scanner {
     
     /**
      * scanning string literals
-     * @throws IOException
-     * @throws IllegalCharException
+     * @throws Exception 
      */
-    private void scanString() throws IOException, IllegalInputCharException, IllegalCharException  {
+    private void scanString() throws Exception  {
     	_sb.append((char) _next);
     	_next = read();
     	while ('\"' != _next) {
+    		runawayCheck();
     		readChar();
     		_next = read();
     	}
@@ -525,7 +524,7 @@ public class Scanner {
     }
     
     /**
-     * Helper for reading a single character and putting it in _sb.
+     * Helper for reading _next as a single character and putting it in _sb.
      * Used by scanChar() and scanString(). Not to be confused with scanChar().
      * @throws IOException
      * @throws IllegalCharException
@@ -554,6 +553,20 @@ public class Scanner {
     		throw new IllegalCharException(_sb.toString() + (char) _next + '\'');
     	}
     	_sb.append((char) _next);
+    }
+    
+    /**
+     * Used in String and Character to check that no new line or EOF happen before quoting back.
+     * @throws Exception
+     */
+    private void runawayCheck() throws Exception {
+		if (_next == -1) {
+			// file terminated before quoting back.
+			throw new Exception("EOF with unfinished String.");
+		} else if ('\n' == _next) {
+			// runaway line
+			throw new Exception("New line with unfinished String.");
+		}
     }
     
 }

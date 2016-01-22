@@ -2,17 +2,23 @@ package scannertest;
 
 import static org.junit.Assert.assertEquals;
 
+import java.io.File;
+import java.io.FileReader;
 import java.util.List;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
+import scanner.Scanner;
 import scanner.Token;
 import scanner.TokenType;
 import exceptions.IllegalCharException;
 import exceptions.IllegalIDException;
 
 public class TestLiteral {
+	@Rule public ExpectedException thrown= ExpectedException.none();
 
     @Before
     public void setUp() throws Exception {
@@ -41,7 +47,7 @@ public class TestLiteral {
 
     @Test
     public void testIntFail() throws Exception {
-        scannerTest.thrown.expect(IllegalIDException.class);
+        thrown.expect(IllegalIDException.class);
         String num = "123c";
         scannerTest.inputSetUpException(num);
     }
@@ -69,14 +75,14 @@ public class TestLiteral {
     @Test
     public void testCharFail() throws Exception {
         String in = "\'sa\'";
-        scannerTest.thrown.expect(IllegalCharException.class);
+        thrown.expect(IllegalCharException.class);
         List<Token> tokens = scannerTest.inputSetUpException(in);
     }
 
     @Test
     public void testCharEscapeFail() throws Exception {
         String in = "\'\\a\'";
-        scannerTest.thrown.expect(IllegalCharException.class);
+        thrown.expect(IllegalCharException.class);
         List<Token> tokens = scannerTest.inputSetUpException(in);
     }
 
@@ -96,10 +102,32 @@ public class TestLiteral {
     public void testStringEscape() throws Exception {
         String in = "\"as\tdf\"";
         List<Token> tokens = scannerTest.inputSetUp(in);
-        // printTokens(tokens);
-        assertEquals(3, tokens.size());
+//        scannerTest.printTokens(tokens);
+        assertEquals(1, tokens.size());
         assertEquals(in, tokens.get(0).getLexeme());
     }
+    
+    @Test
+    public void testStringRunaway() throws Exception {
+    	thrown.expect(Exception.class);
+    	File f = new File(System.getProperty("user.dir") + "/test/testprogram/runaway_string.txt");
+    	FileReader reader = new FileReader(f);
+    	Scanner s = new Scanner(reader);
+    	List<Token> tokens = s.scanThrow();
+    	//scannerTest.printlnTokens(tokens);
+    }
+    
+    @Test
+    public void testStringEOF() throws Exception {
+    	thrown.expect(Exception.class);
+    	File f = new File(System.getProperty("user.dir") + "/test/testprogram/eof_string.txt");
+    	FileReader reader = new FileReader(f);
+    	Scanner s = new Scanner(reader);
+    	List<Token> tokens = s.scanThrow();
+    	//scannerTest.printlnTokens(tokens);
+    }
+    
+    
     
     /*
      * null

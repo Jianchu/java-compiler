@@ -1,0 +1,2 @@
+"Java does not allow a string in two lines
+ds"
