@@ -25,12 +25,16 @@ public class TestProgram {
     @Test
     public void test() throws IOException {
         for (final File fileEntry : file.listFiles()) {
+            if (fileEntry.getName().equals("super_long_string.txt")) {
+                continue;
+            }
             String content = new String(Files.readAllBytes(Paths.get(fileEntry
                     .getAbsolutePath())));
             List<Token> tokens = scannerTest.inputSetUp(content);
             System.out.println(fileEntry.getName());
-            scannerTest.printlnTokens(tokens);
+                // scannerTest.printlnTokens(tokens);
             System.out.println("***********************");
+
         }
     }
 

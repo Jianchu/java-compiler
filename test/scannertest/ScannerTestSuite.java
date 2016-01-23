@@ -8,7 +8,7 @@ import org.junit.runners.Suite;
    TestComments.class,
    TestIdentifier.class,
    TestLiteral.class,
-   TestOperators.class,
+   TestOpSp.class,
    TestProgram.class
 })
  	
