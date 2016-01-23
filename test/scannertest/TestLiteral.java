@@ -127,6 +127,14 @@ public class TestLiteral {
     	//scannerTest.printlnTokens(tokens);
     }
     
+    @Test
+    public void testEscapes() throws Exception {
+        thrown.expect(Exception.class);
+        File f = new File(System.getProperty("user.dir")
+                + "/test/testprogram/escapes.txt");
+        FileReader reader = new FileReader(f);
+        Scanner s = new Scanner(reader);
+    }
     
     
     /*
