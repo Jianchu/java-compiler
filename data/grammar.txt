@@ -1,0 +1,9 @@
+
+#all these work so that I could write comments...
+S BOF Literal EOF
+Literal IntegerLiteral
+Literal BooleanLiteral
+Literal CharacterLiteral
+Literal StringLiteral
+Literal NullLiteral
+

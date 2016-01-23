@@ -7,7 +7,7 @@
 .project
 .metadata
 .DS_Store
-/data/output.txt
+/data/gen
 
 .pdf
 *.aux
