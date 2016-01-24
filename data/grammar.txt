@@ -65,6 +65,7 @@ Modifier FINAL
 Modifier NATIVE
 
 #production for class declarations
+# no Static Initializer
 ClassDeclaration Modifiers CLASS ID Super Interfaces ClassBody
 ClassDeclaration CLASS ID Super Interfaces ClassBody
 ClassDeclaration Modifiers CLASS ID Interfaces ClassBody
@@ -82,7 +83,6 @@ ClassBody LBRACE RBRACE
 ClassBodyDeclarations ClassBodyDeclaration
 ClassBodyDeclarations ClassBodyDeclarations ClassBodyDeclaration
 ClassBodyDeclaration ClassMemberDeclaration
-ClassBodyDeclaration StaticInitializer
 ClassBodyDeclaration ConstructorDeclaration
 ClassMemberDeclaration FieldDeclaration
 ClassMemberDeclaration MethodDeclaration
@@ -112,3 +112,165 @@ FormalParameterList FormalParameterList COMMA FormalParameter
 FormalParameter Type VariableDeclaratorId
 MethodBody Block
 MethodBody SEMICOLON
+
+#production for constructor declarations 
+#no super no this
+ConstructorDeclaration Modifiers ConstructorDeclarator ConstructorBody
+ConstructorDeclaration ConstructorDeclarator
+ConstructorDeclarator SimpleName LPAREN FormalParameterList RPAREN
+ConstructorDeclarator SimpleName LPAREN RPAREN
+ConstructorBody LBRACE BlockStatements RBRACE
+ConstructorBody LBRACE RBRACE
+
+#production for interface
+#interface extends? abstract method?
+#no inferface constants
+InterfaceDeclaration Modifiers INTERFACE ID ExtendsInterfaces InterfaceBody
+InterfaceDeclaration INTERFACE ID ExtendsInterfaces InterfaceBody
+InterfaceDeclaration Modifiers INTERFACE ID InterfaceBody
+InterfaceDeclaration INTERFACE ID InterfaceBody
+ExtendsInterfaces EXTENDS InterfaceType
+ExtendsInterfaces ExtendsInterfaces COMMA InterfaceType
+InterfaceBody LBRACE RBRACE
+InterfaceBody LBRACE InterfaceMemberDeclarations RBRACE 
+InterfaceMemberDeclarations InterfaceMemberDeclaration
+InterfaceMemberDeclarations InterfaceMemberDeclarations AbstractMethodDeclaration
+AbstractMethodDeclaration MethodHeader SEMICOLON
+
+#production for arrays?
+ArrayInitializer LBRACE VariableInitializers COMMA RBRACE
+VariableInitializers VariableInitializer
+VariableInitializers VariableInitializers COMMA VariableInitializer
+
+#production for block and statement
+#assignment?
+Block LBRACE BlockStatements RBRACE
+Block LBRACE RBRACE
+BlockStatements BlockStatement
+BlockStatements BlockStatements BlockStatement
+BlockStatement LocalVariableDeclarationStatement Statement
+LocalVariableDeclarationStatement LocalVariableDeclaration
+LocalVariableDeclaration Type VariableDeclarators
+Statement StatementWithoutTrailingSubstatement
+Statement IfThenStatement
+Statement IfThenElseStatement
+Statement WhileStatement 
+Statement ForStatement
+StatementNoShortIf StatementWithoutTrailingSubstatement
+StatementNoShortIf IfThenElseStatementNoShortIf
+StatementNoShortIf WhileStatementNoShortIf
+StatementNoShortIf ForStatementNoShortIf
+StatementWithoutTrailingSubstatement Block
+StatementWithoutTrailingSubstatement EmptyStatement
+StatementWithoutTrailingSubstatement ExpressionStatement
+StatementWithoutTrailingSubstatement ReturnStatement
+EmptyStatement SEMICOLON
+ExpressionStatement StatementExpression SEMICOLON
+StatementExpression Assignment
+StatementExpression MethodInvocation
+StatementExpression ClassInstanceCreationExpression
+IfThenStatement IF LPAREN Expression RPAREN Statement
+IfThenElseStatement IF LPAREN Expression RPAREN StatementNoShortIf ELSE Statement
+IfThenElseStatementNoShortIf IF LPAREN Expression RPAREN StatementNoShortIf ELSE StatementNoShortIf
+WhileStatement WHILE LPAREN Expression RPAREN
+WhileStatementNoShortIf WHILE LPAREN Expression RPAREN
+ForStatement FOR LPAREN ForInit SEMICOLON Expression SEMICOLON ForUpdate RPAREN Statement
+ForStatement FOR LPAREN SEMICOLON Expression SEMICOLON ForUpdate RPAREN Statement
+ForStatement FOR LPAREN ForInit SEMICOLON SEMICOLON ForUpdate RPAREN Statement
+ForStatement FOR LPAREN ForInit SEMICOLON Expression SEMICOLON RPAREN Statement
+ForStatement FOR LPAREN SEMICOLON SEMICOLON ForUpdate RPAREN Statement
+ForStatement FOR LPAREN ForInit SEMICOLON SEMICOLON RPAREN Statement
+ForStatement FOR LPAREN SEMICOLON Expression SEMICOLON RPAREN Statement
+ForStatement FOR LPAREN SEMICOLON SEMICOLON RPAREN Statement
+ForStatementNoShortIf FOR LPAREN ForInit SEMICOLON Expression SEMICOLON ForUpdate RPAREN StatementNoShortIf
+ForStatementNoShortIf FOR LPAREN SEMICOLON Expression SEMICOLON ForUpdate RPAREN StatementNoShortIf 
+ForStatementNoShortIf FOR LPAREN ForInit SEMICOLON SEMICOLON ForUpdate RPAREN StatementNoShortIf 
+ForStatementNoShortIf FOR LPAREN ForInit SEMICOLON Expression SEMICOLON RPAREN StatementNoShortIf 
+ForStatementNoShortIf FOR LPAREN SEMICOLON SEMICOLON ForUpdate RPAREN StatementNoShortIf
+ForStatementNoShortIf FOR LPAREN ForInit SEMICOLON SEMICOLON RPAREN StatementNoShortIf 
+ForStatementNoShortIf FOR LPAREN SEMICOLON Expression SEMICOLON RPAREN StatementNoShortIf 
+ForStatementNoShortIf FOR LPAREN SEMICOLON SEMICOLON RPAREN StatementNoShortIf
+ForInit StatementExpressionList
+ForInit LocalVariableDeclaration
+ForUpdate StatementExpressionList
+StatementExpressionList StatementExpression
+StatementExpressionList StatementExpressionList COMMA StatementExpression
+ReturnStatement RETURN Expression SEMICOLON
+ReturnStatement RETURN SEMICOLON
+
+#production for block and expression
+#new class?
+#access array?
+# +/- UnaryExpression?
+Primary PrimaryNoNewArray
+Primary ArrayCreationExpression
+PrimaryNoNewArray Literal
+PrimaryNoNewArray this
+PrimaryNoNewArray LPAREN Expression RPAREN
+PrimaryNoNewArray ClassInstanceCreationExpression
+PrimaryNoNewArray FieldAccess
+PrimaryNoNewArray MethodInvocation
+PrimaryNoNewArray ArrayAccess
+ClassInstanceCreationExpression NEW ClassType LPAREN ArgumentList RPAREN
+ClassInstanceCreationExpression NEW ClassType LPAREN RPAREN
+ArgumentList Expression
+ArgumentList ArgumentList COMMA Expression
+ArrayCreationExpression NEW PrimitiveType DimExpr Dims
+ArrayCreationExpression NEW PrimitiveType DimExpr
+ArrayCreationExpression NEW ClassOrInterfaceType DimExpr Dims
+ArrayCreationExpression NEW ClassOrInterfaceType DimExpr
+DimExpr LBRACKET Expression RBRACKET
+Dims LBRACKET RBRACKET
+Dims Dims LBRACKET RBRACKET
+FieldAccess Primary DOT ID
+MethodInvocation Name LPAREN ArgumentList RPAREN
+MethodInvocation Name LPAREN RPAREN
+MethodInvocation Primary DOT ID LPAREN ArgumentList RPAREN
+MethodInvocation Primary DOT ID LPAREN RPAREN
+ArrayAccess Name LBRACKET Expression RBRACKET
+PrimaryNoNewArray LBRACKET Expression RBRACKET
+PostfixExpression Primary
+PostfixExpression Name
+UnaryExpression UnaryExpressionNotPlusMinus
+UnaryExpressionNotPlusMinus PostfixExpression
+UnaryExpressionNotPlusMinus BIT_COMP UnaryExpression
+UnaryExpressionNotPlusMinus NOT UnaryExpression
+UnaryExpressionNotPlusMinus CastExpression
+CastExpression LPAREN PrimitiveType Dims RPAREN UnaryExpression
+CastExpression LPAREN PrimitiveType RPAREN UnaryExpression
+CastExpression LPAREN Expression RPAREN UnaryExpressionNotPlusMinus
+CastExpression LPAREN Name Dims RPAREN UnaryExpressionNotPlusMinus
+MultiplicativeExpression UnaryExpression
+MultiplicativeExpression MultiplicativeExpression STAR UnaryExpression
+MultiplicativeExpression MultiplicativeExpression SLASH UnaryExpression
+MultiplicativeExpression MultiplicativeExpression MOD UnaryExpression
+AdditiveExpression MultiplicativeExpression
+AdditiveExpression PLUS MultiplicativeExpression
+AdditiveExpression MINUS MultiplicativeExpression
+ShiftExpression AdditiveExpression
+RelationalExpression ShiftExpression
+RelationalExpression RelationalExpression LANGLE ShiftExpression
+RelationalExpression RelationalExpression RANGLE ShiftExpression
+RelationalExpression RelationalExpression GEQ ShiftExpression
+RelationalExpression RelationalExpression LEQ ShiftExpression
+RelationalExpression RelationalExpression INSTANCEOF ReferenceType
+EqualityExpression RelationalExpression
+EqualityExpression EqualityExpression EQUAL RelationalExpression
+EqualityExpression EqualityExpression NEQ RelationalExpression
+AndExpression EqualityExpression
+ExclusiveOrExpression AndExpression
+InclusiveOrExpression ExclusiveOrExpression
+ConditionalAndExpression InclusiveOrExpression
+ConditionalAndExpression ConditionalAndExpression AND InclusiveOrExpression
+ConditionalOrExpression ConditionalAndExpression
+ConditionalOrExpression ConditionalOrExpression LOR ConditionalAndExpression
+ConditionalExpression ConditionalOrExpression
+AssignmentExpression ConditionalExpression
+AssignmentExpression Assignment
+Assignment LeftHandSide AssignmentOperator AssignmentExpression
+LeftHandSide Name
+LeftHandSide FieldAccess
+LeftHandSide ArrayAccess
+AssignmentOperator ASSIGN
+Expression AssignmentExpression
+ConstantExpression Expression
