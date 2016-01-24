@@ -1,5 +1,6 @@
-
 #all these work so that I could write comments...
+#issue: somehow represent empty string, using EPSILON for now
+
 S BOF Literal EOF
 Literal DECIMAL
 Literal BooleanLiteral
@@ -22,8 +23,92 @@ ReferenceType ClassOrInterfaceType
 ReferenceType ArrayType
 ClassOrInterfaceType ClassType
 ClassOrInterfaceType InterfaceType
-ClassType ID
-InterfaceType ID
+ClassType Name
+InterfaceType Name
 ArrayType ReferenceType LBRACKET RBRACKET
 ArrayType ID LBRACKET RBRACKET
 ArrayType ArrayType LBRACKET RBRACKET
+
+#productions for names
+Name SimpleName
+Name QualifiedName
+SimpleName ID
+QualifiedName Name DOT ID
+
+#productions for packages
+CompilationUnit PackageDeclaration
+CompilationUnit ImportDeclarations
+CompilationUnit TypeDeclarations
+CompilationUnit EPSILON
+PackageDeclaration PACKAGE Name SEMICOLON
+ImportDeclarations ImportDeclaration
+ImportDeclarations ImportDeclarations ImportDeclaration
+ImportDeclaration SingleTypeImportDeclaration
+ImportDeclaration TypeImportOnDemandDeclaration
+SingleTypeImportDeclaration IMPORT Name
+TypeImportOnDemandDeclaration Name DOT STAR SEMICOLON
+TypeDeclarations TypeDeclaration
+TypeDeclarations TypeDeclarations TypeDeclaration
+TypeDeclaration ClassDeclaration
+TypeDeclaration InterfaceDeclaration
+TypeDeclaration SEMICOLON
+
+#productions for modifiers: 
+#no private, synchronized, transient, volatile in joos 1W
+Modifiers Modifier
+Modifiers Modifiers Modifier
+Modifier PUBLIC
+Modifier PROTECTED
+Modifier STATIC
+Modifier ABSTRACT
+Modifier FINAL
+Modifier NATIVE
+
+#production for class declarations
+ClassDeclaration Modifiers CLASS ID Super Interfaces ClassBody
+ClassDeclaration CLASS ID Super Interfaces ClassBody
+ClassDeclaration Modifiers CLASS ID Interfaces ClassBody
+ClassDeclaration Modifiers CLASS ID Super ClassBody
+ClassDeclaration CLASS ID Interfaces ClassBody
+ClassDeclaration CLASS ID Super ClassBody
+ClassDeclaration Modifiers CLASS ID ClassBody
+ClassDeclaration CLASS ID ClassBody
+Super EXTENDS ClassType
+Interfaces IMPLEMENTS InterfaceTypeList
+InterfaceTypeList InterfaceType
+InterfaceTypeList InterfaceTypeList COMMA InterfaceType
+ClassBody LBRACE ClassBodyDeclarations RBRACE
+ClassBody LBRACE RBRACE
+ClassBodyDeclarations ClassBodyDeclaration
+ClassBodyDeclarations ClassBodyDeclarations ClassBodyDeclaration
+ClassBodyDeclaration ClassMemberDeclaration
+ClassBodyDeclaration StaticInitializer
+ClassBodyDeclaration ConstructorDeclaration
+ClassMemberDeclaration FieldDeclaration
+ClassMemberDeclaration MethodDeclaration
+
+#production for field declarations
+#no multiple variables per declaration
+FieldDeclaration Modifiers Type VariableDeclarators SEMICOLON
+FieldDeclaration Type VariableDeclarator SEMICOLON
+VariableDeclarator VariableDeclaratorId
+VariableDeclaratorId VariableDeclaratorId ASSIGN VariableInitializer
+VariableDeclaratorId ID
+VariableDeclaratorId VariableDeclaratorId LBRACKET RBRACKET
+VariableInitializer Expression
+VariableInitializer ArrayInitializer
+
+#production for method declarations
+#no throw
+MethodDeclaration MethodHeader MethodBody
+MethodHeader Modifiers Type MethodDeclarator
+MethodHeader Modifiers VOID MethodDeclarator
+MethodHeader Type MethodDeclarator
+MethodHeader VOID MethodDeclarator
+MethodDeclarator ID LPAREN FormalParameterList RPAREN
+MethodDeclarator ID LPAREN RPAREN
+FormalParameterList FormalParameter
+FormalParameterList FormalParameterList COMMA FormalParameter
+FormalParameter Type VariableDeclaratorId
+MethodBody Block
+MethodBody SEMICOLON
