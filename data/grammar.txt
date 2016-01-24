@@ -7,3 +7,22 @@ Literal CharacterLiteral
 Literal StringLiteral
 Literal NullLiteral
 
+#productions for type
+Type PrimitiveType
+Type ReferenceType
+PrimitiveType BOOLEAN
+PrimitiveType IntegralType
+IntegralType INT
+IntegralType BYTE
+IntegralType CHAR
+IntegralType SHORT
+ReferenceType ClassOrInterfaceType
+ReferenceType ArrayType
+ClassOrInterfaceType ClassOrInterfaceType.ClassOrInterfaceType
+ClassOrInterfaceType ClassType
+ClassOrInterfaceType InterfaceType
+ClassType ID
+InterfaceType ID
+ArrayType ReferenceType LBRACKET RBRACKET
+ArrayType ID LBRACKET RBRACKET
+ArrayType ArrayType LBRACKET RBRACKET
