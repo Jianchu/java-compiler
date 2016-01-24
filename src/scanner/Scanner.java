@@ -494,7 +494,6 @@ public class Scanner {
     	readChar();
     	
     	// terminating literal
-    	_next = read();
     	if ('\'' != _next) {
     		throw new IllegalCharException(_sb.toString() + (char) _next + '\'');
     	}
@@ -514,7 +513,6 @@ public class Scanner {
     	while ('\"' != _next) {
     		runawayCheck();
     		readChar();
-    		_next = read();
     	}
     	
     	_sb.append((char) _next);
@@ -537,22 +535,42 @@ public class Scanner {
     	} else {
     		// normal character
     		_sb.append((char) _next);
+    		_next = read();
     	}
     }
     
     /**
-     * reading escape character.
-     * Octal and Unicode Escape not implemented.
+     * reading escape character. INCLUDING OCTAL ESCAPE!!!
+     * Unicode Escape not implemented.
      * @throws IOException
      * @throws IllegalCharException
      */
     private void readEscape() throws IOException, IllegalInputCharException, IllegalCharException {
     	_sb.append((char) _next);
     	_next = read();
-    	if (!ESCAPES.contains((char) _next)) {
+    	
+    	//octal
+    	if (_next >= '0' && _next <= '3') {    		
+    		_sb.append((char) _next);
+    		_next = read();
+    		for (int i = 0; i < 2 && _next >= '0' && _next <= '7'; i++) {
+    			_sb.append((char) _next);
+    			_next = read();
+    		}
+    	} else if (_next >= '4' && _next <= '9' ){
+    		_sb.append((char) _next);
+    		_next = read();
+    		if (_next >= '0' && _next <= '7') {
+    			_sb.append((char) _next);
+    			_next = read();
+    		}
+    		
+    	} else if (ESCAPES.contains((char) _next)) {
+        	_sb.append((char) _next);
+        	_next = read();
+    	} else {
     		throw new IllegalCharException(_sb.toString() + (char) _next + '\'');
     	}
-    	_sb.append((char) _next);
     }
     
     /**
