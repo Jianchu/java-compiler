@@ -1,7 +1,10 @@
 #all these work so that I could write comments...
-#issue: somehow represent empty string, using EPSILON for now
+#issue1: somehow represent empty string, using EPSILON for now
+#issue2: no comments
 
-S BOF Literal EOF
+S BOF CompilationUnit EOF
+
+#productions for literal
 Literal DECIMAL
 Literal BooleanLiteral
 BooleanLiteral TRUE
@@ -25,8 +28,9 @@ ClassOrInterfaceType ClassType
 ClassOrInterfaceType InterfaceType
 ClassType Name
 InterfaceType Name
-ArrayType ReferenceType LBRACKET RBRACKET
-ArrayType ID LBRACKET RBRACKET
+ArrayType PrimitiveType LBRACKET RBRACKET
+ArrayType Name LBRACKET RBRACKET
+#do we need the last one?
 ArrayType ArrayType LBRACKET RBRACKET
 
 #productions for names
@@ -45,8 +49,8 @@ ImportDeclarations ImportDeclaration
 ImportDeclarations ImportDeclarations ImportDeclaration
 ImportDeclaration SingleTypeImportDeclaration
 ImportDeclaration TypeImportOnDemandDeclaration
-SingleTypeImportDeclaration IMPORT Name
-TypeImportOnDemandDeclaration Name DOT STAR SEMICOLON
+SingleTypeImportDeclaration IMPORT Name SEMICOLON
+TypeImportOnDemandDeclaration IMPORT Name DOT STAR SEMICOLON
 TypeDeclarations TypeDeclaration
 TypeDeclarations TypeDeclarations TypeDeclaration
 TypeDeclaration ClassDeclaration
@@ -55,6 +59,7 @@ TypeDeclaration SEMICOLON
 
 #productions for modifiers: 
 #no private, synchronized, transient, volatile in joos 1W
+#how to make constraint for "one of"?
 Modifiers Modifier
 Modifiers Modifiers Modifier
 Modifier PUBLIC
@@ -89,14 +94,14 @@ ClassMemberDeclaration MethodDeclaration
 
 #production for field declarations
 #no multiple variables per declaration
-FieldDeclaration Modifiers Type VariableDeclarators SEMICOLON
+#no array initializer
+FieldDeclaration Modifiers Type VariableDeclarator SEMICOLON
 FieldDeclaration Type VariableDeclarator SEMICOLON
 VariableDeclarator VariableDeclaratorId
 VariableDeclaratorId VariableDeclaratorId ASSIGN VariableInitializer
 VariableDeclaratorId ID
 VariableDeclaratorId VariableDeclaratorId LBRACKET RBRACKET
 VariableInitializer Expression
-VariableInitializer ArrayInitializer
 
 #production for method declarations
 #no throw
@@ -137,20 +142,15 @@ InterfaceMemberDeclarations InterfaceMemberDeclaration
 InterfaceMemberDeclarations InterfaceMemberDeclarations AbstractMethodDeclaration
 AbstractMethodDeclaration MethodHeader SEMICOLON
 
-#production for arrays?
-ArrayInitializer LBRACE VariableInitializers COMMA RBRACE
-VariableInitializers VariableInitializer
-VariableInitializers VariableInitializers COMMA VariableInitializer
-
 #production for block and statement
-#assignment?
 Block LBRACE BlockStatements RBRACE
 Block LBRACE RBRACE
 BlockStatements BlockStatement
 BlockStatements BlockStatements BlockStatement
-BlockStatement LocalVariableDeclarationStatement Statement
-LocalVariableDeclarationStatement LocalVariableDeclaration
-LocalVariableDeclaration Type VariableDeclarators
+BlockStatement LocalVariableDeclarationStatement 
+BlockStatement Statement
+LocalVariableDeclarationStatement LocalVariableDeclaration SEMICOLON
+LocalVariableDeclaration Type VariableDeclarator
 Statement StatementWithoutTrailingSubstatement
 Statement IfThenStatement
 Statement IfThenElseStatement
@@ -169,11 +169,14 @@ ExpressionStatement StatementExpression SEMICOLON
 StatementExpression Assignment
 StatementExpression MethodInvocation
 StatementExpression ClassInstanceCreationExpression
+
 IfThenStatement IF LPAREN Expression RPAREN Statement
 IfThenElseStatement IF LPAREN Expression RPAREN StatementNoShortIf ELSE Statement
 IfThenElseStatementNoShortIf IF LPAREN Expression RPAREN StatementNoShortIf ELSE StatementNoShortIf
-WhileStatement WHILE LPAREN Expression RPAREN
-WhileStatementNoShortIf WHILE LPAREN Expression RPAREN
+
+WhileStatement WHILE LPAREN Expression RPAREN Statement
+WhileStatementNoShortIf WHILE LPAREN Expression RPAREN StatementNoShortIf
+
 ForStatement FOR LPAREN ForInit SEMICOLON Expression SEMICOLON ForUpdate RPAREN Statement
 ForStatement FOR LPAREN SEMICOLON Expression SEMICOLON ForUpdate RPAREN Statement
 ForStatement FOR LPAREN ForInit SEMICOLON SEMICOLON ForUpdate RPAREN Statement
@@ -193,12 +196,13 @@ ForStatementNoShortIf FOR LPAREN SEMICOLON SEMICOLON RPAREN StatementNoShortIf
 ForInit StatementExpressionList
 ForInit LocalVariableDeclaration
 ForUpdate StatementExpressionList
+
 StatementExpressionList StatementExpression
 StatementExpressionList StatementExpressionList COMMA StatementExpression
 ReturnStatement RETURN Expression SEMICOLON
 ReturnStatement RETURN SEMICOLON
 
-#production for block and expression
+#production for expression
 #new class?
 #access array?
 # +/- UnaryExpression?
@@ -228,7 +232,8 @@ MethodInvocation Name LPAREN RPAREN
 MethodInvocation Primary DOT ID LPAREN ArgumentList RPAREN
 MethodInvocation Primary DOT ID LPAREN RPAREN
 ArrayAccess Name LBRACKET Expression RBRACKET
-PrimaryNoNewArray LBRACKET Expression RBRACKET
+ArrayAccess PrimaryNoNewArray LBRACKET Expression RBRACKET
+
 PostfixExpression Primary
 PostfixExpression Name
 UnaryExpression UnaryExpressionNotPlusMinus
