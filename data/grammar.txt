@@ -20,7 +20,6 @@ IntegralType CHAR
 IntegralType SHORT
 ReferenceType ClassOrInterfaceType
 ReferenceType ArrayType
-ClassOrInterfaceType ClassOrInterfaceType.ClassOrInterfaceType
 ClassOrInterfaceType ClassType
 ClassOrInterfaceType InterfaceType
 ClassType ID
