@@ -1,11 +1,13 @@
 
 #all these work so that I could write comments...
 S BOF Literal EOF
-Literal IntegerLiteral
+Literal DECIMAL
 Literal BooleanLiteral
-Literal CharacterLiteral
-Literal StringLiteral
-Literal NullLiteral
+BooleanLiteral TRUE
+BooleanLiteral FALSE
+Literal CHARACTER
+Literal STRING
+Literal NULL
 
 #productions for type
 Type PrimitiveType
