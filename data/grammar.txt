@@ -37,10 +37,17 @@ SimpleName ID
 QualifiedName Name DOT ID
 
 #productions for packages
+CompilationUnit PackageDeclaration ImportDeclarations TypeDeclarations
+CompilationUnit ImportDeclarations TypeDeclarations
+CompilationUnit PackageDeclaration TypeDeclarations
+CompilationUnit PackageDeclaration ImportDeclarations
+CompilationUnit TypeDeclarations
 CompilationUnit PackageDeclaration
 CompilationUnit ImportDeclarations
-CompilationUnit TypeDeclarations
-CompilationUnit EPSILON
+
+#do we need the following one?
+#CompilationUnit EPSILON
+
 PackageDeclaration PACKAGE Name SEMICOLON
 ImportDeclarations ImportDeclaration
 ImportDeclarations ImportDeclarations ImportDeclaration
@@ -232,22 +239,26 @@ ArrayAccess Name LBRACKET Expression RBRACKET
 ArrayAccess PrimaryNoNewArray LBRACKET Expression RBRACKET
 PostfixExpression Primary
 PostfixExpression Name
+
 UnaryExpression UnaryExpressionNotPlusMinus
 UnaryExpressionNotPlusMinus PostfixExpression
 UnaryExpressionNotPlusMinus BIT_COMP UnaryExpression
 UnaryExpressionNotPlusMinus NOT UnaryExpression
 UnaryExpressionNotPlusMinus CastExpression
+
 CastExpression LPAREN PrimitiveType Dims RPAREN UnaryExpression
 CastExpression LPAREN PrimitiveType RPAREN UnaryExpression
 CastExpression LPAREN Expression RPAREN UnaryExpressionNotPlusMinus
 CastExpression LPAREN Name Dims RPAREN UnaryExpressionNotPlusMinus
+
+
 MultiplicativeExpression UnaryExpression
 MultiplicativeExpression MultiplicativeExpression STAR UnaryExpression
 MultiplicativeExpression MultiplicativeExpression SLASH UnaryExpression
 MultiplicativeExpression MultiplicativeExpression MOD UnaryExpression
 AdditiveExpression MultiplicativeExpression
-AdditiveExpression PLUS MultiplicativeExpression
-AdditiveExpression MINUS MultiplicativeExpression
+AdditiveExpression AdditiveExpression PLUS MultiplicativeExpression
+AdditiveExpression AdditiveExpression MINUS MultiplicativeExpression
 ShiftExpression AdditiveExpression
 RelationalExpression ShiftExpression
 RelationalExpression RelationalExpression LANGLE ShiftExpression
