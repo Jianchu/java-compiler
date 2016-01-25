@@ -212,25 +212,23 @@ ReturnStatement RETURN SEMICOLON
 # +/- UnaryExpression?
 #no assignment?
 Primary PrimaryNoNewArray
-Primary ArrayCreationExpression
+Primary ArrayCreationExpressions
 PrimaryNoNewArray Literal
-PrimaryNoNewArray this
+PrimaryNoNewArray THIS
 PrimaryNoNewArray LPAREN Expression RPAREN
 PrimaryNoNewArray ClassInstanceCreationExpression
 PrimaryNoNewArray FieldAccess
 PrimaryNoNewArray MethodInvocation
 PrimaryNoNewArray ArrayAccess
-ClassInstanceCreationExpression NEW ClassType LPAREN ArgumentList RPAREN
-ClassInstanceCreationExpression NEW ClassType LPAREN RPAREN
+ClassInstanceCreationExpression NEW name LPAREN ArgumentList RPAREN
+ClassInstanceCreationExpression NEW name LPAREN RPAREN
 ArgumentList Expression
 ArgumentList ArgumentList COMMA Expression
-
 ArrayCreationExpression NEW PrimitiveType DimExpr
 ArrayCreationExpression NEW ClassOrInterfaceType DimExpr
 DimExpr LBRACKET Expression RBRACKET
 Dims LBRACKET RBRACKET
 FieldAccess Primary DOT ID
-
 MethodInvocation Name LPAREN ArgumentList RPAREN
 MethodInvocation Name LPAREN RPAREN
 MethodInvocation Primary DOT ID LPAREN ArgumentList RPAREN
@@ -239,19 +237,15 @@ ArrayAccess Name LBRACKET Expression RBRACKET
 ArrayAccess PrimaryNoNewArray LBRACKET Expression RBRACKET
 PostfixExpression Primary
 PostfixExpression Name
-
 UnaryExpression UnaryExpressionNotPlusMinus
 UnaryExpressionNotPlusMinus PostfixExpression
 UnaryExpressionNotPlusMinus BIT_COMP UnaryExpression
 UnaryExpressionNotPlusMinus NOT UnaryExpression
 UnaryExpressionNotPlusMinus CastExpression
-
 CastExpression LPAREN PrimitiveType Dims RPAREN UnaryExpression
 CastExpression LPAREN PrimitiveType RPAREN UnaryExpression
 CastExpression LPAREN Expression RPAREN UnaryExpressionNotPlusMinus
 CastExpression LPAREN Name Dims RPAREN UnaryExpressionNotPlusMinus
-
-
 MultiplicativeExpression UnaryExpression
 MultiplicativeExpression MultiplicativeExpression STAR UnaryExpression
 MultiplicativeExpression MultiplicativeExpression SLASH UnaryExpression
@@ -279,4 +273,3 @@ ConditionalOrExpression ConditionalOrExpression LOR ConditionalAndExpression
 ConditionalExpression ConditionalOrExpression
 AssignmentExpression ConditionalExpression
 Expression AssignmentExpression
-ConstantExpression Expression
