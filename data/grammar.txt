@@ -36,6 +36,7 @@ SimpleName ID
 QualifiedName Name DOT ID
 
 #productions for packages
+#do we need CompilationUnit EPSILON?
 CompilationUnit PackageDeclaration ImportDeclarations TypeDeclarations
 CompilationUnit ImportDeclarations TypeDeclarations
 CompilationUnit PackageDeclaration TypeDeclarations
@@ -43,10 +44,6 @@ CompilationUnit PackageDeclaration ImportDeclarations
 CompilationUnit TypeDeclarations
 CompilationUnit PackageDeclaration
 CompilationUnit ImportDeclarations
-
-#do we need the following one?
-#CompilationUnit EPSILON
-
 PackageDeclaration PACKAGE Name SEMICOLON
 ImportDeclarations ImportDeclaration
 ImportDeclarations ImportDeclarations ImportDeclaration
@@ -74,6 +71,7 @@ Modifier NATIVE
 
 #production for class declarations
 # no Static Initializer
+# interface declaration in ClassMemberDeclaration? 
 ClassDeclaration Modifiers CLASS ID Super Interfaces ClassBody
 ClassDeclaration CLASS ID Super Interfaces ClassBody
 ClassDeclaration Modifiers CLASS ID Interfaces ClassBody
@@ -94,6 +92,7 @@ ClassBodyDeclaration ClassMemberDeclaration
 ClassBodyDeclaration ConstructorDeclaration
 ClassMemberDeclaration FieldDeclaration
 ClassMemberDeclaration MethodDeclaration
+ClassMemberDeclaration SEMICOLON
 
 #production for field declarations
 #no multiple variables per declaration
@@ -109,6 +108,7 @@ VariableInitializer Expression
 
 #production for method declarations
 #no throw
+#parameter with modifiers?
 MethodDeclaration MethodHeader MethodBody
 MethodHeader Modifiers Type MethodDeclarator
 MethodHeader Modifiers VOID MethodDeclarator
@@ -145,12 +145,13 @@ InterfaceBody LBRACE InterfaceMemberDeclarations RBRACE
 InterfaceMemberDeclarations InterfaceMemberDeclarations InterfaceMemberDeclaration
 InterfaceMemberDeclarations InterfaceMemberDeclaration
 InterfaceMemberDeclaration AbstractMethodDeclaration
+InterfaceMemberDeclaration SEMICOLON
 AbstractMethodDeclaration MethodHeader SEMICOLON
 VariableInitializers VariableInitializer
-VariableInitializers VariableInitializers VariableInitializer
-
+VariableInitializers VariableInitializers COMMA VariableInitializer
 
 #production for block and statement
+#local variable with modifiers?
 Block LBRACE BlockStatements RBRACE
 Block LBRACE RBRACE
 BlockStatements BlockStatement
@@ -159,7 +160,6 @@ BlockStatement LocalVariableDeclarationStatement
 BlockStatement Statement
 LocalVariableDeclarationStatement LocalVariableDeclaration SEMICOLON
 LocalVariableDeclaration Type VariableDeclarator
-
 Statement StatementWithoutTrailingSubstatement
 Statement IfThenStatement
 Statement IfThenElseStatement
@@ -178,14 +178,11 @@ ExpressionStatement StatementExpression SEMICOLON
 StatementExpression Assignment
 StatementExpression MethodInvocation
 StatementExpression ClassInstanceCreationExpression
-
 IfThenStatement IF LPAREN Expression RPAREN Statement
 IfThenElseStatement IF LPAREN Expression RPAREN StatementNoShortIf ELSE Statement
 IfThenElseStatementNoShortIf IF LPAREN Expression RPAREN StatementNoShortIf ELSE StatementNoShortIf
-
 WhileStatement WHILE LPAREN Expression RPAREN Statement
 WhileStatementNoShortIf WHILE LPAREN Expression RPAREN StatementNoShortIf
-
 ForStatement FOR LPAREN ForInit SEMICOLON Expression SEMICOLON ForUpdate RPAREN Statement
 ForStatement FOR LPAREN SEMICOLON Expression SEMICOLON ForUpdate RPAREN Statement
 ForStatement FOR LPAREN ForInit SEMICOLON SEMICOLON ForUpdate RPAREN Statement
