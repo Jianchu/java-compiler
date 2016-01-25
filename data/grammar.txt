@@ -213,7 +213,7 @@ ReturnStatement RETURN SEMICOLON
 # +/- UnaryExpression?
 #no assignment?
 Primary PrimaryNoNewArray
-Primary ArrayCreationExpressions
+Primary ArrayCreationExpression
 PrimaryNoNewArray Literal
 PrimaryNoNewArray THIS
 PrimaryNoNewArray LPAREN Expression RPAREN
