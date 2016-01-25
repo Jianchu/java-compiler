@@ -1,6 +1,5 @@
 #all these work so that I could write comments...
-#issue1: somehow represent empty string, using EPSILON for now
-#issue2: no comments
+#issue: no comments
 
 S BOF CompilationUnit EOF
 
@@ -200,7 +199,6 @@ ForStatementNoShortIf FOR LPAREN SEMICOLON SEMICOLON RPAREN StatementNoShortIf
 ForInit StatementExpressionList
 ForInit LocalVariableDeclaration
 ForUpdate StatementExpressionList
-
 StatementExpressionList StatementExpression
 StatementExpressionList StatementExpressionList COMMA StatementExpression
 ReturnStatement RETURN Expression SEMICOLON
@@ -220,8 +218,8 @@ PrimaryNoNewArray ClassInstanceCreationExpression
 PrimaryNoNewArray FieldAccess
 PrimaryNoNewArray MethodInvocation
 PrimaryNoNewArray ArrayAccess
-ClassInstanceCreationExpression NEW name LPAREN ArgumentList RPAREN
-ClassInstanceCreationExpression NEW name LPAREN RPAREN
+ClassInstanceCreationExpression NEW Name LPAREN ArgumentList RPAREN
+ClassInstanceCreationExpression NEW Name LPAREN RPAREN
 ArgumentList Expression
 ArgumentList ArgumentList COMMA Expression
 ArrayCreationExpression NEW PrimitiveType DimExpr
@@ -273,3 +271,4 @@ ConditionalOrExpression ConditionalOrExpression LOR ConditionalAndExpression
 ConditionalExpression ConditionalOrExpression
 AssignmentExpression ConditionalExpression
 Expression AssignmentExpression
+
