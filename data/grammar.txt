@@ -1,22 +1,22 @@
-#all these work so that I could write comments...
-#issue: no comments
-
 S BOF CompilationUnit EOF
 
 #productions for literal
-Literal DECIMAL
+Literal IntegerLiteral
+IntegerLiteral DECIMAL
 Literal BooleanLiteral
 BooleanLiteral TRUE
 BooleanLiteral FALSE
 Literal CHARACTER
 Literal STRING
-Literal NULL
+Literal NullLiteral
+NullLiteral NULL
 
 #productions for type
 Type PrimitiveType
 Type ReferenceType
 PrimitiveType BOOLEAN
-PrimitiveType IntegralType
+PrimitiveType NumericType
+NumericType IntegralType
 IntegralType INT
 IntegralType BYTE
 IntegralType CHAR
@@ -100,11 +100,12 @@ ClassMemberDeclaration MethodDeclaration
 #no array initializer
 FieldDeclaration Modifiers Type VariableDeclarator SEMICOLON
 FieldDeclaration Type VariableDeclarator SEMICOLON
+VariableDeclarator VariableDeclaratorId ASSIGN VariableInitializer
 VariableDeclarator VariableDeclaratorId
-VariableDeclaratorId VariableDeclaratorId ASSIGN VariableInitializer
 VariableDeclaratorId ID
 VariableDeclaratorId VariableDeclaratorId LBRACKET RBRACKET
 VariableInitializer Expression
+
 
 #production for method declarations
 #no throw
@@ -124,7 +125,7 @@ MethodBody SEMICOLON
 #production for constructor declarations 
 #no super no this
 ConstructorDeclaration Modifiers ConstructorDeclarator ConstructorBody
-ConstructorDeclaration ConstructorDeclarator
+ConstructorDeclaration ConstructorDeclarator ConstructorBody
 ConstructorDeclarator SimpleName LPAREN FormalParameterList RPAREN
 ConstructorDeclarator SimpleName LPAREN RPAREN
 ConstructorBody LBRACE BlockStatements RBRACE
@@ -140,10 +141,14 @@ InterfaceDeclaration INTERFACE ID InterfaceBody
 ExtendsInterfaces EXTENDS InterfaceType
 ExtendsInterfaces ExtendsInterfaces COMMA InterfaceType
 InterfaceBody LBRACE RBRACE
-InterfaceBody LBRACE InterfaceMemberDeclarations RBRACE 
+InterfaceBody LBRACE InterfaceMemberDeclarations RBRACE
+InterfaceMemberDeclarations InterfaceMemberDeclarations InterfaceMemberDeclaration
 InterfaceMemberDeclarations InterfaceMemberDeclaration
-InterfaceMemberDeclarations InterfaceMemberDeclarations AbstractMethodDeclaration
+InterfaceMemberDeclaration AbstractMethodDeclaration
 AbstractMethodDeclaration MethodHeader SEMICOLON
+VariableInitializers VariableInitializer
+VariableInitializers VariableInitializers VariableInitializer
+
 
 #production for block and statement
 Block LBRACE BlockStatements RBRACE
@@ -154,6 +159,7 @@ BlockStatement LocalVariableDeclarationStatement
 BlockStatement Statement
 LocalVariableDeclarationStatement LocalVariableDeclaration SEMICOLON
 LocalVariableDeclaration Type VariableDeclarator
+
 Statement StatementWithoutTrailingSubstatement
 Statement IfThenStatement
 Statement IfThenElseStatement
@@ -269,6 +275,11 @@ ConditionalAndExpression ConditionalAndExpression AND InclusiveOrExpression
 ConditionalOrExpression ConditionalAndExpression
 ConditionalOrExpression ConditionalOrExpression LOR ConditionalAndExpression
 ConditionalExpression ConditionalOrExpression
+AssignmentExpression Assignment
+Assignment LeftHandSide AssignmentOperator AssignmentExpression
+LeftHandSide Name
+LeftHandSide FieldAccess
+LeftHandSide ArrayAccess
+AssignmentOperator ASSIGN
 AssignmentExpression ConditionalExpression
 Expression AssignmentExpression
-
