@@ -24,14 +24,11 @@ IntegralType CHAR
 IntegralType SHORT
 ReferenceType ClassOrInterfaceType
 ReferenceType ArrayType
-ClassOrInterfaceType ClassType
-ClassOrInterfaceType InterfaceType
-ClassType Name
-InterfaceType Name
-ArrayType PrimitiveType LBRACKET RBRACKET
-ArrayType Name LBRACKET RBRACKET
-#do we need the last one?
-ArrayType ArrayType LBRACKET RBRACKET
+ClassOrInterfaceType Name
+ClassType ClassOrInterfaceType
+InterfaceType ClassOrInterfaceType
+ArrayType PrimitiveType Dims
+ArrayType Name Dims
 
 #productions for names
 Name SimpleName
@@ -220,14 +217,13 @@ ClassInstanceCreationExpression NEW ClassType LPAREN ArgumentList RPAREN
 ClassInstanceCreationExpression NEW ClassType LPAREN RPAREN
 ArgumentList Expression
 ArgumentList ArgumentList COMMA Expression
-ArrayCreationExpression NEW PrimitiveType DimExpr Dims
+
 ArrayCreationExpression NEW PrimitiveType DimExpr
-ArrayCreationExpression NEW ClassOrInterfaceType DimExpr Dims
 ArrayCreationExpression NEW ClassOrInterfaceType DimExpr
 DimExpr LBRACKET Expression RBRACKET
 Dims LBRACKET RBRACKET
-Dims Dims LBRACKET RBRACKET
 FieldAccess Primary DOT ID
+
 MethodInvocation Name LPAREN ArgumentList RPAREN
 MethodInvocation Name LPAREN RPAREN
 MethodInvocation Primary DOT ID LPAREN ArgumentList RPAREN
