@@ -206,6 +206,7 @@ ReturnStatement RETURN SEMICOLON
 #new class?
 #access array?
 # +/- UnaryExpression?
+#no assignment?
 Primary PrimaryNoNewArray
 Primary ArrayCreationExpression
 PrimaryNoNewArray Literal
@@ -233,7 +234,6 @@ MethodInvocation Primary DOT ID LPAREN ArgumentList RPAREN
 MethodInvocation Primary DOT ID LPAREN RPAREN
 ArrayAccess Name LBRACKET Expression RBRACKET
 ArrayAccess PrimaryNoNewArray LBRACKET Expression RBRACKET
-
 PostfixExpression Primary
 PostfixExpression Name
 UnaryExpression UnaryExpressionNotPlusMinus
@@ -271,11 +271,5 @@ ConditionalOrExpression ConditionalAndExpression
 ConditionalOrExpression ConditionalOrExpression LOR ConditionalAndExpression
 ConditionalExpression ConditionalOrExpression
 AssignmentExpression ConditionalExpression
-AssignmentExpression Assignment
-Assignment LeftHandSide AssignmentOperator AssignmentExpression
-LeftHandSide Name
-LeftHandSide FieldAccess
-LeftHandSide ArrayAccess
-AssignmentOperator ASSIGN
 Expression AssignmentExpression
 ConstantExpression Expression
