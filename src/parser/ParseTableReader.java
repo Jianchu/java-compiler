@@ -13,7 +13,7 @@ import scanner.TokenType;
 
 public class ParseTableReader {
 	
-	List<String []> productions;
+	List<List<TokenType>> productions;
 	int stateSize;
 	ParseActions[] parseTable;
 	
@@ -21,7 +21,7 @@ public class ParseTableReader {
 		FileReader fr = new FileReader(f);
 		BufferedReader br = new BufferedReader(fr);
 		
-		productions = new ArrayList<String[]>();
+		productions = new ArrayList<List<TokenType>>();
 		
 		String line = null;
 		br.readLine(); 	//number of terminals
@@ -35,7 +35,11 @@ public class ParseTableReader {
 					// non- terminals, do nothing
 				} else {
 					// production rules
-					productions.add(line.split(" "));
+					List<TokenType> rule = new ArrayList<TokenType>();
+					for (String s : line.split(" ")) {
+						rule.add(TokenType.valueOf(s));
+					}
+					productions.add(rule);
 				}
 			}
 		}
@@ -68,7 +72,7 @@ public class ParseTableReader {
 		return parseTable;
 	}
 	
-	public List<String []> getProductionRules() {
+	public List<List<TokenType>> getProductionRules() {
 		return productions;
 	}
 	
