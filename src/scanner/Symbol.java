@@ -230,5 +230,10 @@ public enum Symbol {
 	VariableInitializer,
 	VariableInitializers,
 	WhileStatement,
-	WhileStatementNoShortIf
+	WhileStatementNoShortIf,
+	
+	/*
+	 * BOF, EOF 
+	 */
+	BOF, EOF
 }

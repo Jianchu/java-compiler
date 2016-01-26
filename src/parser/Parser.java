@@ -1,11 +1,13 @@
 package parser;
 
 import java.io.File;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 
 import scanner.Token;
+import scanner.Scanner;
 import scanner.Symbol;
 
 public class Parser {
@@ -25,7 +27,7 @@ public class Parser {
 		
 	}
 	
-	public void parse() throws Exception {
+	public ParseTree parse() throws Exception {
 		Stack<ParseTree> nodeStack = new Stack<ParseTree>();
 		Stack<Integer> stateStack = new Stack<Integer>();
 		
@@ -63,6 +65,28 @@ public class Parser {
 				tokens.add(0, node);
 			}
 		}
+		
+		return nodeStack.pop(); 
+	}
+	
+	/**
+	 * For testing purpose only.
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		Scanner scanner = new Scanner(new StringReader("i = 1"));
+		List<Token> tokens = scanner.scan();
+		// adding BOF and EOF by hand for experiment
+		tokens.add(0, new Token("", Symbol.BOF));
+		tokens.add(new Token("", Symbol.EOF));
+		try {
+			Parser parser = new Parser(tokens);
+			ParseTree t = parser.parse();
+	
+		} catch (Exception e) {
+			System.exit(1);
+		}
+		
 	}
 	
 
