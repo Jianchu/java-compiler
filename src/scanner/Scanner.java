@@ -21,8 +21,8 @@ public class Scanner {
     private List<Token> _tokens;
     
     private final Map<Character, RunnableScan> opMap;
-    private final Map<Character, TokenType> sepMap;
-    private final Map<String, TokenType> idMap;
+    private final Map<Character, Symbol> sepMap;
+    private final Map<String, Symbol> idMap;
     private final Set<Character> ESCAPES;
     
     private interface RunnableScan {
@@ -40,10 +40,10 @@ public class Scanner {
         opMap = new HashMap<Character, RunnableScan>();
         initOpMap();
         
-        sepMap = new HashMap<Character, TokenType>();        
+        sepMap = new HashMap<Character, Symbol>();        
         initSepMap();
 	
-        idMap = new HashMap<String, TokenType>();
+        idMap = new HashMap<String, Symbol>();
         initIdMap();
         
         ESCAPES = new TreeSet<Character>();
@@ -53,15 +53,15 @@ public class Scanner {
     }
 
     private void initSepMap() {
-    	sepMap.put('(', TokenType.LPAREN);
-		sepMap.put(')', TokenType.RPAREN);
-		sepMap.put('{', TokenType.LBRACE);
-		sepMap.put('}', TokenType.RBRACE);
-		sepMap.put('[', TokenType.LBRACKET);
-		sepMap.put(']', TokenType.RBRACKET);
-		sepMap.put(';', TokenType.SEMICOLON);
-		sepMap.put(',', TokenType.COMMA);
-		sepMap.put('.', TokenType.DOT);		   
+    	sepMap.put('(', Symbol.LPAREN);
+		sepMap.put(')', Symbol.RPAREN);
+		sepMap.put('{', Symbol.LBRACE);
+		sepMap.put('}', Symbol.RBRACE);
+		sepMap.put('[', Symbol.LBRACKET);
+		sepMap.put(']', Symbol.RBRACKET);
+		sepMap.put(';', Symbol.SEMICOLON);
+		sepMap.put(',', Symbol.COMMA);
+		sepMap.put('.', Symbol.DOT);		   
     }
     
     private void initOpMap() {
@@ -84,58 +84,58 @@ public class Scanner {
 
     private void initIdMap() {
     	// technically literals
-    	idMap.put("true", TokenType.TRUE);
-    	idMap.put("false", TokenType.FALSE);
-        idMap.put("null", TokenType.NULL);
+    	idMap.put("true", Symbol.TRUE);
+    	idMap.put("false", Symbol.FALSE);
+        idMap.put("null", Symbol.NULL);
         // keywords
-        idMap.put("abstract", TokenType.ABSTRACT);
-        idMap.put("boolean", TokenType.BOOLEAN);
-        idMap.put("break", TokenType.BREAK);
-        idMap.put("byte", TokenType.BYTE);
-        idMap.put("case", TokenType.CASE);
-        idMap.put("catch", TokenType.CATCH);
-        idMap.put("char", TokenType.CHAR);
-        idMap.put("class", TokenType.CLASS);
-        idMap.put("const", TokenType.CONST);
-        idMap.put("continue", TokenType.CONTINUE);
-        idMap.put("default", TokenType.DEFAULT);
-        idMap.put("do", TokenType.DO);
-        idMap.put("double", TokenType.DOUBLE);
-        idMap.put("else", TokenType.ELSE);
-        idMap.put("extends", TokenType.EXTENDS);
-        idMap.put("final", TokenType.FINAL);
-        idMap.put("finally", TokenType.FINALLY);
-        idMap.put("float", TokenType.FLOAT);
-        idMap.put("for", TokenType.FOR);
-        idMap.put("goto", TokenType.GOTO);
-        idMap.put("if", TokenType.IF);
-        idMap.put("implements", TokenType.IMPLEMENTS);
-        idMap.put("import", TokenType.IMPORT);
-        idMap.put("instanceof", TokenType.INSTANCEOF);
-        idMap.put("int", TokenType.INT);
-        idMap.put("interface", TokenType.INTERFACE);
-        idMap.put("long", TokenType.LONG);
-        idMap.put("native", TokenType.NATIVE);
-        idMap.put("new", TokenType.NEW);
-        idMap.put("package", TokenType.PACKAGE);
-        idMap.put("private", TokenType.PRIVATE);
-        idMap.put("protected", TokenType.PROTECTED);
-        idMap.put("public", TokenType.PUBLIC);
-        idMap.put("return", TokenType.RETURN);
-        idMap.put("short", TokenType.SHORT);
-        idMap.put("static", TokenType.STATIC);
-        idMap.put("strictfp", TokenType.STRICTFP);
-        idMap.put("super", TokenType.SUPER);
-        idMap.put("switch", TokenType.SWITCH);
-        idMap.put("synchronized", TokenType.SYNCHRONIZED);
-        idMap.put("this", TokenType.THIS);
-        idMap.put("throw", TokenType.THROW);
-        idMap.put("throws", TokenType.THROWS);
-        idMap.put("transient", TokenType.TRANSIENT);
-        idMap.put("try", TokenType.TRY);
-        idMap.put("void", TokenType.VOID);
-        idMap.put("volatile", TokenType.VOLATILE);
-        idMap.put("while", TokenType.WHILE);
+        idMap.put("abstract", Symbol.ABSTRACT);
+        idMap.put("boolean", Symbol.BOOLEAN);
+        idMap.put("break", Symbol.BREAK);
+        idMap.put("byte", Symbol.BYTE);
+        idMap.put("case", Symbol.CASE);
+        idMap.put("catch", Symbol.CATCH);
+        idMap.put("char", Symbol.CHAR);
+        idMap.put("class", Symbol.CLASS);
+        idMap.put("const", Symbol.CONST);
+        idMap.put("continue", Symbol.CONTINUE);
+        idMap.put("default", Symbol.DEFAULT);
+        idMap.put("do", Symbol.DO);
+        idMap.put("double", Symbol.DOUBLE);
+        idMap.put("else", Symbol.ELSE);
+        idMap.put("extends", Symbol.EXTENDS);
+        idMap.put("final", Symbol.FINAL);
+        idMap.put("finally", Symbol.FINALLY);
+        idMap.put("float", Symbol.FLOAT);
+        idMap.put("for", Symbol.FOR);
+        idMap.put("goto", Symbol.GOTO);
+        idMap.put("if", Symbol.IF);
+        idMap.put("implements", Symbol.IMPLEMENTS);
+        idMap.put("import", Symbol.IMPORT);
+        idMap.put("instanceof", Symbol.INSTANCEOF);
+        idMap.put("int", Symbol.INT);
+        idMap.put("interface", Symbol.INTERFACE);
+        idMap.put("long", Symbol.LONG);
+        idMap.put("native", Symbol.NATIVE);
+        idMap.put("new", Symbol.NEW);
+        idMap.put("package", Symbol.PACKAGE);
+        idMap.put("private", Symbol.PRIVATE);
+        idMap.put("protected", Symbol.PROTECTED);
+        idMap.put("public", Symbol.PUBLIC);
+        idMap.put("return", Symbol.RETURN);
+        idMap.put("short", Symbol.SHORT);
+        idMap.put("static", Symbol.STATIC);
+        idMap.put("strictfp", Symbol.STRICTFP);
+        idMap.put("super", Symbol.SUPER);
+        idMap.put("switch", Symbol.SWITCH);
+        idMap.put("synchronized", Symbol.SYNCHRONIZED);
+        idMap.put("this", Symbol.THIS);
+        idMap.put("throw", Symbol.THROW);
+        idMap.put("throws", Symbol.THROWS);
+        idMap.put("transient", Symbol.TRANSIENT);
+        idMap.put("try", Symbol.TRY);
+        idMap.put("void", Symbol.VOID);
+        idMap.put("volatile", Symbol.VOLATILE);
+        idMap.put("while", Symbol.WHILE);
     }
 
     private int read() throws IOException, IllegalInputCharException {
@@ -228,7 +228,7 @@ public class Scanner {
             _next = read();
             if (!Character.isLetterOrDigit(_next) && _next != '_' && _next != '$') {
                 String lexeme = _sb.toString();
-                TokenType type = (idMap.containsKey(lexeme) ? idMap.get(lexeme) : TokenType.ID);
+                Symbol type = (idMap.containsKey(lexeme) ? idMap.get(lexeme) : Symbol.ID);
                 _tokens.add(new Token(lexeme, type));
                 return;
             }
@@ -237,21 +237,21 @@ public class Scanner {
 
     private RunnableScan scanRangle = new RunnableScan() {
         public void run() throws IOException, IllegalInputCharException{
-            TokenType tokenType = TokenType.RANGLE;
+            Symbol tokenType = Symbol.RANGLE;
             _sb.append((char) _next);
 
             for (;;) {
                 _next = read();
-                if (_next == '>' && tokenType.equals(TokenType.RANGLE)) {
-                    tokenType = TokenType.DBRANGLE;
-                } else if (_next == '>' && tokenType.equals(TokenType.DBRANGLE)) {
-                    tokenType = TokenType.TPRANGLE;
-                } else if (_next == '=' && tokenType.equals(TokenType.RANGLE)) {
-                    tokenType = TokenType.GEQ;
-                } else if (_next == '=' && tokenType.equals(TokenType.DBRANGLE)) {
-                    tokenType = TokenType.RSHIFT_EQ;
-                } else if (_next == '=' && tokenType.equals(TokenType.TPRANGLE)) {
-                    tokenType = TokenType.URSHIFT_EQ;
+                if (_next == '>' && tokenType.equals(Symbol.RANGLE)) {
+                    tokenType = Symbol.DBRANGLE;
+                } else if (_next == '>' && tokenType.equals(Symbol.DBRANGLE)) {
+                    tokenType = Symbol.TPRANGLE;
+                } else if (_next == '=' && tokenType.equals(Symbol.RANGLE)) {
+                    tokenType = Symbol.GEQ;
+                } else if (_next == '=' && tokenType.equals(Symbol.DBRANGLE)) {
+                    tokenType = Symbol.RSHIFT_EQ;
+                } else if (_next == '=' && tokenType.equals(Symbol.TPRANGLE)) {
+                    tokenType = Symbol.URSHIFT_EQ;
                 } else {
                     break;
                 }
@@ -264,17 +264,17 @@ public class Scanner {
     private RunnableScan scanLangle = new RunnableScan() {
 
         public void run() throws IOException, IllegalInputCharException{
-            TokenType tokenType = TokenType.LANGLE;
+            Symbol tokenType = Symbol.LANGLE;
             _sb.append((char) _next);
 
             for (;;) {
                 _next = read();
-                if (_next == '<' && tokenType.equals(TokenType.LANGLE)) {
-                    tokenType = TokenType.DBLANGLE;
-                } else if (_next == '=' && tokenType.equals(TokenType.LANGLE)) {
-                    tokenType = TokenType.LEQ;
-                } else if (_next == '=' && tokenType.equals(TokenType.DBLANGLE)) {
-                    tokenType = TokenType.LSHIFT_EQ;
+                if (_next == '<' && tokenType.equals(Symbol.LANGLE)) {
+                    tokenType = Symbol.DBLANGLE;
+                } else if (_next == '=' && tokenType.equals(Symbol.LANGLE)) {
+                    tokenType = Symbol.LEQ;
+                } else if (_next == '=' && tokenType.equals(Symbol.DBLANGLE)) {
+                    tokenType = Symbol.LSHIFT_EQ;
                 } else {
                     break;
                 }
@@ -284,9 +284,9 @@ public class Scanner {
         }
     };
 
-    private void scanTwoOptionsOp(TokenType defaultType, char secondChar,
-            TokenType twoCharsType) throws IOException, IllegalInputCharException {
-        TokenType tokenType = defaultType;
+    private void scanTwoOptionsOp(Symbol defaultType, char secondChar,
+            Symbol twoCharsType) throws IOException, IllegalInputCharException {
+        Symbol tokenType = defaultType;
         _sb.append((char) _next);
         for (;;) {
             _next = read();
@@ -300,10 +300,10 @@ public class Scanner {
         _tokens.add(new Token(_sb.toString(), tokenType));
     }
 
-    private void scanThreeOptionsOp(TokenType defaultType, char firstOption,
-            TokenType firstType, char secondOption, TokenType secondType)
+    private void scanThreeOptionsOp(Symbol defaultType, char firstOption,
+            Symbol firstType, char secondOption, Symbol secondType)
             throws IOException, IllegalInputCharException {
-        TokenType tokenType = defaultType;
+        Symbol tokenType = defaultType;
         _sb.append((char) _next);
         for (;;) {
             _next = read();
@@ -322,14 +322,14 @@ public class Scanner {
     private RunnableScan scanAssign = new RunnableScan() {
 
         public void run() throws IOException, IllegalInputCharException {
-            scanTwoOptionsOp(TokenType.ASSIGN, '=', TokenType.EQUAL);
+            scanTwoOptionsOp(Symbol.ASSIGN, '=', Symbol.EQUAL);
         }
     };
 
     private RunnableScan scanExclamation = new RunnableScan() {
 
         public void run() throws IOException, IllegalInputCharException {
-            scanTwoOptionsOp(TokenType.NOT, '=', TokenType.NEQ);
+            scanTwoOptionsOp(Symbol.NOT, '=', Symbol.NEQ);
         }
     };
 
@@ -337,7 +337,7 @@ public class Scanner {
 
         public void run() throws IOException, IllegalInputCharException {
             _sb.append((char) _next);
-            _tokens.add(new Token(_sb.toString(), TokenType.QUESTION));
+            _tokens.add(new Token(_sb.toString(), Symbol.QUESTION));
             _next = read();
         }
     };
@@ -346,7 +346,7 @@ public class Scanner {
 
         public void run() throws IOException, IllegalInputCharException {
             _sb.append((char) _next);
-            _tokens.add(new Token(_sb.toString(), TokenType.BIT_COMP));
+            _tokens.add(new Token(_sb.toString(), Symbol.BIT_COMP));
             _next = read();
         }
     };
@@ -355,7 +355,7 @@ public class Scanner {
 
         public void run() throws IOException, IllegalInputCharException {
             _sb.append((char) _next);
-            _tokens.add(new Token(_sb.toString(), TokenType.COLON));
+            _tokens.add(new Token(_sb.toString(), Symbol.COLON));
             _next = read();
         }
     };
@@ -363,46 +363,46 @@ public class Scanner {
     private RunnableScan scanAmpersand = new RunnableScan() {
 
         public void run() throws IOException, IllegalInputCharException {
-            scanThreeOptionsOp(TokenType.BITAND, '&', TokenType.AND, '=',
-                    TokenType.AND_EQ);
+            scanThreeOptionsOp(Symbol.BITAND, '&', Symbol.AND, '=',
+                    Symbol.AND_EQ);
         }
     };
 
     private RunnableScan scanVertical = new RunnableScan() {
 
         public void run() throws IOException, IllegalInputCharException {
-            scanThreeOptionsOp(TokenType.BITOR, '|', TokenType.LOR, '=',
-                    TokenType.OR_EQ);
+            scanThreeOptionsOp(Symbol.BITOR, '|', Symbol.LOR, '=',
+                    Symbol.OR_EQ);
         }
     };
 
     private RunnableScan scanCaret = new RunnableScan() {
 
         public void run() throws IOException, IllegalInputCharException {
-            scanTwoOptionsOp(TokenType.EXOR, '=', TokenType.EXOR_EQ);
+            scanTwoOptionsOp(Symbol.EXOR, '=', Symbol.EXOR_EQ);
         }
     };
 
     private RunnableScan scanPlus = new RunnableScan() {
 
         public void run() throws IOException, IllegalInputCharException {
-            scanThreeOptionsOp(TokenType.PLUS, '+', TokenType.INCREMENT, '=',
-                    TokenType.PLUS_EQ);
+            scanThreeOptionsOp(Symbol.PLUS, '+', Symbol.INCREMENT, '=',
+                    Symbol.PLUS_EQ);
         }
     };
 
     private RunnableScan scanMinus = new RunnableScan() {
 
         public void run() throws IOException, IllegalInputCharException {
-            scanThreeOptionsOp(TokenType.MINUS, '-', TokenType.DECREMENT, '=',
-                    TokenType.MINUS_EQ);
+            scanThreeOptionsOp(Symbol.MINUS, '-', Symbol.DECREMENT, '=',
+                    Symbol.MINUS_EQ);
         }
     };
 
     private RunnableScan scanStar = new RunnableScan() {
 
         public void run() throws IOException, IllegalInputCharException {
-            scanTwoOptionsOp(TokenType.STAR, '=', TokenType.STAR_EQ);
+            scanTwoOptionsOp(Symbol.STAR, '=', Symbol.STAR_EQ);
         }
     };
 
@@ -433,11 +433,11 @@ public class Scanner {
 
                 _next = read();
             } else if (_next == '=') {
-                _tokens.add(new Token("/=", TokenType.SLASH_EQ));
+                _tokens.add(new Token("/=", Symbol.SLASH_EQ));
 
                 _next = read();
             } else {
-                _tokens.add(new Token("/", TokenType.SLASH));
+                _tokens.add(new Token("/", Symbol.SLASH));
             }
         }
     };
@@ -445,7 +445,7 @@ public class Scanner {
     private RunnableScan scanPercent = new RunnableScan() {
 
         public void run() throws IOException, IllegalInputCharException {
-            scanTwoOptionsOp(TokenType.MOD, '=', TokenType.MOD_EQ);
+            scanTwoOptionsOp(Symbol.MOD, '=', Symbol.MOD_EQ);
         }
     };
     
@@ -474,7 +474,7 @@ public class Scanner {
     		_sb.append((char) _next);
     		_next = read();
     	}
-    	_tokens.add(new Token(_sb.toString(), TokenType.DECIMAL));
+    	_tokens.add(new Token(_sb.toString(), Symbol.DECIMAL));
     	// A proper integer must be terminated with space, operators or ';'.
     	// check for illegal identifiers.
     	if (Character.isLetter(_next) || _next == '_' || _next == '$') {
@@ -498,7 +498,7 @@ public class Scanner {
     		throw new IllegalCharException(_sb.toString() + (char) _next + '\'');
     	}
     	_sb.append((char) _next);
-    	_tokens.add(new Token(_sb.toString(), TokenType.CHARACTER));
+    	_tokens.add(new Token(_sb.toString(), Symbol.CHARACTER));
     	
     	_next = read();
     }
@@ -516,7 +516,7 @@ public class Scanner {
     	}
     	
     	_sb.append((char) _next);
-    	_tokens.add(new Token(_sb.toString(), TokenType.STRING));
+    	_tokens.add(new Token(_sb.toString(), Symbol.STRING));
     	
     	_next = read();
     }

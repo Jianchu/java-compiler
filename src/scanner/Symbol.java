@@ -4,7 +4,7 @@ package scanner;
  * @author zanel
  *
  */
-public enum TokenType {
+public enum Symbol {
 	/*
 	 * Identifiers
 	 */

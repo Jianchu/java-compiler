@@ -9,11 +9,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import scanner.TokenType;
+import scanner.Symbol;
 
 public class ParseTableReader {
 	
-	List<List<TokenType>> productions;
+	List<List<Symbol>> productions;
 	int stateSize;
 	ParseActions[] parseTable;
 	
@@ -21,7 +21,7 @@ public class ParseTableReader {
 		FileReader fr = new FileReader(f);
 		BufferedReader br = new BufferedReader(fr);
 		
-		productions = new ArrayList<List<TokenType>>();
+		productions = new ArrayList<List<Symbol>>();
 		
 		String line = null;
 		br.readLine(); 	//number of terminals
@@ -35,9 +35,9 @@ public class ParseTableReader {
 					// non- terminals, do nothing
 				} else {
 					// production rules
-					List<TokenType> rule = new ArrayList<TokenType>();
+					List<Symbol> rule = new ArrayList<Symbol>();
 					for (String s : line.split(" ")) {
-						rule.add(TokenType.valueOf(s));
+						rule.add(Symbol.valueOf(s));
 					}
 					productions.add(rule);
 				}
@@ -72,7 +72,7 @@ public class ParseTableReader {
 		return parseTable;
 	}
 	
-	public List<List<TokenType>> getProductionRules() {
+	public List<List<Symbol>> getProductionRules() {
 		return productions;
 	}
 	
@@ -102,7 +102,7 @@ public class ParseTableReader {
 		
 		ParseActions[] pt = ptr.getParseActions();
 		try {
-			String action = pt[9].getAction(TokenType.MINUS).toString();
+			String action = pt[9].getAction(Symbol.MINUS).toString();
 			System.out.println(action);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -112,23 +112,23 @@ public class ParseTableReader {
 
 
 class ParseActions {
-	Map<TokenType, Action> actions;
+	Map<Symbol, Action> actions;
 	
 	public ParseActions() {
-		actions = new TreeMap<TokenType, Action>();
+		actions = new TreeMap<Symbol, Action>();
 	}
 	
 
 	
 	public void addParseAction(String symbol, String action, String num) throws Exception {
-		actions.put(TokenType.valueOf(symbol), new Action(action, num));
+		actions.put(Symbol.valueOf(symbol), new Action(action, num));
 	}
 	
 	public void addParseAction(String[] tokens) throws Exception {
 		addParseAction(tokens[0], tokens[1], tokens[2]);
 	}
 	
-	public Action getAction(TokenType symbol) throws Exception {
+	public Action getAction(Symbol symbol) throws Exception {
 		Action action = actions.get(symbol);
 		if (action != null) {
 			return action;

@@ -4,15 +4,15 @@ package scanner;
 public class Token {
 
     private final String lexeme;
-    private TokenType tokenType;
+    private Symbol tokenType;
 
-    public Token(String lexeme, TokenType tokenType) {
+    public Token(String lexeme, Symbol tokenType) {
         this.lexeme = lexeme;
         this.tokenType = tokenType;
     }
 
     // May be used for replacing id with keyword
-    public void setTokenType(TokenType tokenType) {
+    public void setTokenType(Symbol tokenType) {
         this.tokenType = tokenType;
     }
 
@@ -20,7 +20,7 @@ public class Token {
         return this.lexeme;
     }
 
-    public TokenType getTokenType() {
+    public Symbol getTokenType() {
         return this.tokenType;
     }
 

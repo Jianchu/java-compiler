@@ -13,7 +13,7 @@ import org.junit.rules.ExpectedException;
 
 import scanner.Scanner;
 import scanner.Token;
-import scanner.TokenType;
+import scanner.Symbol;
 import exceptions.IllegalCharException;
 import exceptions.IllegalIDException;
 
@@ -147,6 +147,6 @@ public class TestLiteral {
         String in = "null";
         List<Token> tokens = scannerTest.inputSetUp(in);
         assertEquals(1, tokens.size());
-        assertEquals(TokenType.NULL, tokens.get(0).getTokenType());
+        assertEquals(Symbol.NULL, tokens.get(0).getTokenType());
     }
 }

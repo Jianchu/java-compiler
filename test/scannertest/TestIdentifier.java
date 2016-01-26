@@ -8,7 +8,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import scanner.Token;
-import scanner.TokenType;
+import scanner.Symbol;
 
 public class TestIdentifier {
 
@@ -26,7 +26,7 @@ public class TestIdentifier {
         List<Token> tokens = scannerTest.inputSetUp(in);
         assertEquals(1, tokens.size());
         assertEquals(in, tokens.get(0).getLexeme());
-        assertEquals(TokenType.ID, tokens.get(0).getTokenType());
+        assertEquals(Symbol.ID, tokens.get(0).getTokenType());
     }
 
     @Test
@@ -35,7 +35,7 @@ public class TestIdentifier {
         List<Token> tokens = scannerTest.inputSetUp(in);
         assertEquals(1, tokens.size());
         assertEquals(in, tokens.get(0).getLexeme());
-        assertEquals(TokenType.ID, tokens.get(0).getTokenType());
+        assertEquals(Symbol.ID, tokens.get(0).getTokenType());
     }
 
     @Test
@@ -44,7 +44,7 @@ public class TestIdentifier {
         List<Token> tokens = scannerTest.inputSetUp(in);
         assertEquals(1, tokens.size());
         assertEquals(in, tokens.get(0).getLexeme());
-        assertEquals(TokenType.ID, tokens.get(0).getTokenType());
+        assertEquals(Symbol.ID, tokens.get(0).getTokenType());
     }
 
     @Test
@@ -54,7 +54,7 @@ public class TestIdentifier {
         assertEquals(6, tokens.size());
         for (int i = 0; i < tokens.size(); i++) {
             assertEquals("id" + i, tokens.get(i).getLexeme());
-            assertEquals(TokenType.ID, tokens.get(i).getTokenType());
+            assertEquals(Symbol.ID, tokens.get(i).getTokenType());
         }
     }
 
@@ -71,15 +71,15 @@ public class TestIdentifier {
 
     @Test
     public void testKeywords() {
-        TokenType[] keywords = {
-            TokenType.ABSTRACT, TokenType.BOOLEAN, TokenType.BREAK, TokenType.BYTE, TokenType.CASE, TokenType.CATCH,
-            TokenType.CHAR, TokenType.CLASS, TokenType.CONST, TokenType.CONTINUE, TokenType.DEFAULT, TokenType.DO,
-            TokenType.DOUBLE, TokenType.ELSE, TokenType.EXTENDS, TokenType.FINAL, TokenType.FINALLY, TokenType.FLOAT,
-            TokenType.FOR, TokenType.GOTO, TokenType.IF, TokenType.IMPLEMENTS, TokenType.IMPORT, TokenType.INSTANCEOF,
-            TokenType.INT, TokenType.INTERFACE, TokenType.LONG, TokenType.NATIVE, TokenType.NEW, TokenType.PACKAGE,
-            TokenType.PRIVATE, TokenType.PROTECTED, TokenType.PUBLIC, TokenType.RETURN, TokenType.SHORT, TokenType.STATIC,
-            TokenType.STRICTFP, TokenType.SUPER, TokenType.SWITCH, TokenType.SYNCHRONIZED, TokenType.THIS, TokenType.THROW,
-            TokenType.THROWS, TokenType.TRANSIENT, TokenType.TRY, TokenType.VOID, TokenType.VOLATILE, TokenType.WHILE
+        Symbol[] keywords = {
+            Symbol.ABSTRACT, Symbol.BOOLEAN, Symbol.BREAK, Symbol.BYTE, Symbol.CASE, Symbol.CATCH,
+            Symbol.CHAR, Symbol.CLASS, Symbol.CONST, Symbol.CONTINUE, Symbol.DEFAULT, Symbol.DO,
+            Symbol.DOUBLE, Symbol.ELSE, Symbol.EXTENDS, Symbol.FINAL, Symbol.FINALLY, Symbol.FLOAT,
+            Symbol.FOR, Symbol.GOTO, Symbol.IF, Symbol.IMPLEMENTS, Symbol.IMPORT, Symbol.INSTANCEOF,
+            Symbol.INT, Symbol.INTERFACE, Symbol.LONG, Symbol.NATIVE, Symbol.NEW, Symbol.PACKAGE,
+            Symbol.PRIVATE, Symbol.PROTECTED, Symbol.PUBLIC, Symbol.RETURN, Symbol.SHORT, Symbol.STATIC,
+            Symbol.STRICTFP, Symbol.SUPER, Symbol.SWITCH, Symbol.SYNCHRONIZED, Symbol.THIS, Symbol.THROW,
+            Symbol.THROWS, Symbol.TRANSIENT, Symbol.TRY, Symbol.VOID, Symbol.VOLATILE, Symbol.WHILE
  };
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < keywords.length; i++) {
