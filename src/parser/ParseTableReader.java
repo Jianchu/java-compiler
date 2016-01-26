@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import scanner.TokenType;
 
 public class ParseTableReader {
 	
@@ -97,7 +98,7 @@ public class ParseTableReader {
 		
 		ParseActions[] pt = ptr.getParseActions();
 		try {
-			String action = pt[9].getAction("-").toString();
+			String action = pt[9].getAction(TokenType.MINUS).toString();
 			System.out.println(action);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -107,23 +108,23 @@ public class ParseTableReader {
 
 
 class ParseActions {
-	Map<String, Action> actions;
+	Map<TokenType, Action> actions;
 	
 	public ParseActions() {
-		actions = new TreeMap<String, Action>();
+		actions = new TreeMap<TokenType, Action>();
 	}
 	
 
 	
 	public void addParseAction(String symbol, String action, String num) throws Exception {
-		actions.put(symbol, new Action(action, num));
+		actions.put(TokenType.valueOf(symbol), new Action(action, num));
 	}
 	
 	public void addParseAction(String[] tokens) throws Exception {
 		addParseAction(tokens[0], tokens[1], tokens[2]);
 	}
 	
-	public Action getAction(String symbol) throws Exception {
+	public Action getAction(TokenType symbol) throws Exception {
 		Action action = actions.get(symbol);
 		if (action != null) {
 			return action;
