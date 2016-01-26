@@ -139,8 +139,8 @@ class ParseActions {
 }
 
 class Action {
-	public ShiftReduce act;
-	public int actNum;
+	ShiftReduce act;
+	int actNum;
 	
 	public Action(String action, String num) throws Exception {
 		if (action.equals("shift")) {
@@ -152,6 +152,14 @@ class Action {
 		}
 		
 		actNum = Integer.parseInt(num);
+	}
+	
+	public ShiftReduce getShiftReduce() {
+		return act;
+	}
+	
+	public int getNum() {
+		return actNum;
 	}
 	
 	@Override
