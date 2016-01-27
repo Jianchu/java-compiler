@@ -63,7 +63,7 @@ public class Parser {
 				
 				for (int i = 0; i < rule.size()-1; i++) {
 					stateStack.pop();
-					node.addChild(nodeStack.pop());
+					node.addChildToHead(nodeStack.pop());
 				}
 				tokens.add(0, node);
 			}
@@ -72,24 +72,4 @@ public class Parser {
 		nodeStack.pop();
 		return nodeStack.pop(); 
 	}
-	
-	/**
-	 * For testing purpose only.
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		Scanner scanner = new Scanner(new StringReader("i = 1"));
-		List<Token> tokens = scanner.scan();
-		try {
-			File parseIn = new File(System.getProperty("user.dir") + "/data/test.lr1");
-			Parser parser = new Parser(tokens, parseIn);
-			ParseTree t = parser.parse();
-			System.out.println(t.getTokenType());
-		} catch (Exception e) {
-		    e.printStackTrace();
-		    System.exit(1);
-		}
-	}
-	
-
 }

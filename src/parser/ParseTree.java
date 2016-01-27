@@ -30,6 +30,10 @@ public class ParseTree extends Token{
 		children.add(subTree);
 	}
 	
+	public void addChildToHead(ParseTree subTree) {
+		children.add(0, subTree);
+	}
+	
 	public void addChildren(List<ParseTree> subTrees) {
 		children.addAll(subTrees);
 	}
@@ -43,7 +47,7 @@ public class ParseTree extends Token{
 	}
 	
 	public void pprint(int indent) {
-		int distance = 15;
+		int distance = 5;
 		for (int i = 0; i < indent; i++) {
 			System.out.print(" ");
 		}
