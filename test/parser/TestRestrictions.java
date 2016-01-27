@@ -16,7 +16,8 @@ public class TestRestrictions {
      *     All characters in the input program must be in the range of 7-bit ASCII (0 to 127).
      * checked in parser:
      *     No multidimensional array types or array creation expressions are allowed.
-     *     A method or constructor must not contain explicit this() or super() calls. 
+     *     A method or constructor must not contain explicit this() or super() calls.
+     *     The type void may only be used as the return type of a method. 
      * in issue:
      *     A class/interface must be declared in a .java file with the same base name as the class/interface.
      */
@@ -88,18 +89,6 @@ public class TestRestrictions {
         File f = new File(
                 System.getProperty("user.dir")
                 + "/test/testprogram/restrictions/NativeMethodMustBeStatic.txt");
-        Scanner scanner = new Scanner(new FileReader(f));
-        List<Token> tokens = scanner.scan();
-        Parser par = new Parser(tokens, grammar);
-        ParseTree t = par.parse();
-        t.pprint();
-    }
-
-    //The type void may only be used as the return type of a method.
-    @Test
-    public void testTypeVoidOnlyForReturn() throws Exception {
-        File f = new File(System.getProperty("user.dir")
-                + "/test/testprogram/restrictions/TypeVoidOnlyForReturn.txt");
         Scanner scanner = new Scanner(new FileReader(f));
         List<Token> tokens = scanner.scan();
         Parser par = new Parser(tokens, grammar);
