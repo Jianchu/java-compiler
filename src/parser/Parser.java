@@ -33,6 +33,7 @@ public class Parser {
 		
 		Token bof = tokens.remove(HEAD);
 		Action action = parseTable[START].getAction(bof.getTokenType());
+		
 		if (action.getShiftReduce() == ShiftReduce.SHIFT) {
 			stateStack.push(action.getNum());
 			nodeStack.push(new ParseTree(bof));
@@ -43,6 +44,7 @@ public class Parser {
 		while (tokens.size() > 0) {
 			Token a = tokens.get(HEAD);
 			action = parseTable[stateStack.peek()].getAction(a.getTokenType());
+			
 			if (action.getShiftReduce() == ShiftReduce.SHIFT) {
 				// shift
 				stateStack.push(action.getNum());
@@ -66,6 +68,7 @@ public class Parser {
 			}
 		}
 		
+		nodeStack.pop();
 		return nodeStack.pop(); 
 	}
 	
@@ -82,9 +85,11 @@ public class Parser {
 		try {
 			Parser parser = new Parser(tokens);
 			ParseTree t = parser.parse();
-	
+			System.out.println(t.getTokenType());
+//			t.pprint();
 		} catch (Exception e) {
-			System.exit(1);
+		    e.printStackTrace();
+		    System.exit(1);
 		}
 		
 	}

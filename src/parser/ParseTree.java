@@ -37,4 +37,19 @@ public class ParseTree extends Token{
 	public List<ParseTree> getChildren() {
 		return children;
 	}
+	
+	public void pprint() {
+		pprint(0);
+	}
+	
+	public void pprint(int indent) {
+		int distance = 15;
+		for (int i = 0; i < indent; i++) {
+			System.out.print(" ");
+		}
+		System.out.println(this.getTokenType());
+		for (ParseTree child : children) {
+			child.pprint(indent + distance);
+		}
+	}
 }
