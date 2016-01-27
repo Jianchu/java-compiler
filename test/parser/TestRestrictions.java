@@ -14,7 +14,7 @@ public class TestRestrictions {
     /*
      * checked in scanner:
      *     All characters in the input program must be in the range of 7-bit ASCII (0 to 127).
-     * checked in parser:
+     * checked in parser (grammar):
      *     No multidimensional array types or array creation expressions are allowed.
      *     A method or constructor must not contain explicit this() or super() calls.
      *     The type void may only be used as the return type of a method. 
