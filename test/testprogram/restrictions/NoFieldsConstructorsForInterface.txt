@@ -1,0 +1,9 @@
+package testprogram.restrictions;
+
+public interface NoFieldsConstructorsForInterface {
+    int a = 1;
+
+    NoFieldsConstructorsForInterface() {
+        
+    }
+}

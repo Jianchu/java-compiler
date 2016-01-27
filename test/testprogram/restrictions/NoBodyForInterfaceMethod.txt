@@ -1,0 +1,7 @@
+package testprogram.restrictions;
+
+public interface NoBodyForInterfaceMethod {
+    public void method() {
+        
+    }
+}
