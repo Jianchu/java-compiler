@@ -3,6 +3,7 @@ import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -149,7 +150,7 @@ public class Scanner {
     public List<Token> scan() {
         // if scan has already been called, just return the same list
         if (_tokens == null) {
-            _tokens = new ArrayList<Token>();
+            _tokens = new LinkedList<Token>();
             try {
                 // need to use the return value. --Z
                 scanStart();

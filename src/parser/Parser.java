@@ -2,7 +2,6 @@ package parser;
 
 import java.io.File;
 import java.io.StringReader;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 
@@ -17,14 +16,16 @@ public class Parser {
 	
 	final int START = 0, HEAD = 0;
 	
-	public Parser(List<Token> tokenList) throws Exception {
+	public Parser(List<Token> tokenList, File grammar) throws Exception {
 		tokens = tokenList;
 		// grammar file. point to data/test.lr1 for now.
-		File parseIn = new File(System.getProperty("user.dir") + "/data/test.lr1");
-		ParseTableReader ptr = new ParseTableReader(parseIn);
+		ParseTableReader ptr = new ParseTableReader(grammar);
 		parseTable = ptr.getParseActions();
 		productionRules = ptr.getProductionRules();
 		
+		//augment token list
+		tokens.add(0, new Token("", Symbol.BOF));
+		tokens.add(new Token("", Symbol.EOF));
 	}
 	
 	public ParseTree parse() throws Exception {
@@ -79,19 +80,15 @@ public class Parser {
 	public static void main(String[] args) {
 		Scanner scanner = new Scanner(new StringReader("i = 1"));
 		List<Token> tokens = scanner.scan();
-		// adding BOF and EOF by hand for experiment
-		tokens.add(0, new Token("", Symbol.BOF));
-		tokens.add(new Token("", Symbol.EOF));
 		try {
-			Parser parser = new Parser(tokens);
+			File parseIn = new File(System.getProperty("user.dir") + "/data/test.lr1");
+			Parser parser = new Parser(tokens, parseIn);
 			ParseTree t = parser.parse();
 			System.out.println(t.getTokenType());
-//			t.pprint();
 		} catch (Exception e) {
 		    e.printStackTrace();
 		    System.exit(1);
 		}
-		
 	}
 	
 
