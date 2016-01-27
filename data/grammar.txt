@@ -1,15 +1,13 @@
 S BOF CompilationUnit EOF
 
 #productions for literal
-Literal IntegerLiteral
-IntegerLiteral DECIMAL
+Literal DECIMAL
 Literal BooleanLiteral
 BooleanLiteral TRUE
 BooleanLiteral FALSE
 Literal CHARACTER
 Literal STRING
-Literal NullLiteral
-NullLiteral NULL
+Literal NULL
 
 #productions for type
 Type PrimitiveType
@@ -44,9 +42,11 @@ CompilationUnit PackageDeclaration ImportDeclarations
 CompilationUnit TypeDeclarations
 CompilationUnit PackageDeclaration
 CompilationUnit ImportDeclarations
+CompilationUnit
 PackageDeclaration PACKAGE Name SEMICOLON
 ImportDeclarations ImportDeclaration
 ImportDeclarations ImportDeclarations ImportDeclaration
+
 ImportDeclaration SingleTypeImportDeclaration
 ImportDeclaration TypeImportOnDemandDeclaration
 SingleTypeImportDeclaration IMPORT Name SEMICOLON
@@ -102,7 +102,7 @@ FieldDeclaration Type VariableDeclarator SEMICOLON
 VariableDeclarator VariableDeclaratorId ASSIGN VariableInitializer
 VariableDeclarator VariableDeclaratorId
 VariableDeclaratorId ID
-VariableDeclaratorId VariableDeclaratorId LBRACKET RBRACKET
+#VariableDeclaratorId VariableDeclaratorId LBRACKET RBRACKET
 VariableInitializer Expression
 
 
@@ -115,7 +115,7 @@ MethodHeader Modifiers VOID MethodDeclarator
 MethodHeader Type MethodDeclarator
 MethodHeader VOID MethodDeclarator
 MethodDeclarator ID LPAREN FormalParameterList RPAREN
-MethodDeclarator ID LPAREN RPAREN
+#MethodDeclarator ID LPAREN RPAREN
 FormalParameterList FormalParameter
 FormalParameterList FormalParameterList COMMA FormalParameter
 FormalParameter Type VariableDeclaratorId
@@ -239,6 +239,7 @@ ArrayAccess PrimaryNoNewArray LBRACKET Expression RBRACKET
 PostfixExpression Primary
 PostfixExpression Name
 UnaryExpression UnaryExpressionNotPlusMinus
+UnaryExpression MINUS UnaryExpression
 UnaryExpressionNotPlusMinus PostfixExpression
 UnaryExpressionNotPlusMinus BIT_COMP UnaryExpression
 UnaryExpressionNotPlusMinus NOT UnaryExpression
@@ -273,10 +274,10 @@ ConditionalOrExpression ConditionalAndExpression
 ConditionalOrExpression ConditionalOrExpression LOR ConditionalAndExpression
 ConditionalExpression ConditionalOrExpression
 AssignmentExpression Assignment
+AssignmentExpression ConditionalExpression
 Assignment LeftHandSide AssignmentOperator AssignmentExpression
 LeftHandSide Name
 LeftHandSide FieldAccess
 LeftHandSide ArrayAccess
 AssignmentOperator ASSIGN
-AssignmentExpression ConditionalExpression
 Expression AssignmentExpression
