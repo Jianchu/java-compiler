@@ -44,6 +44,20 @@ public class Parser {
 		
 		while (tokens.size() > 0) {
 			Token a = tokens.get(HEAD);
+			
+			/* for debugging only.
+			try {
+				action = parseTable[stateStack.peek()].getAction(a.getTokenType());
+			} catch (Exception e) {
+				System.out.println(a);
+				System.out.println("Stack:");
+				while (!nodeStack.isEmpty()) {
+					nodeStack.pop().pprint(5);
+				}
+				throw e;
+			}
+			*/
+			
 			action = parseTable[stateStack.peek()].getAction(a.getTokenType());
 			
 			if (action.getShiftReduce() == ShiftReduce.SHIFT) {
