@@ -115,7 +115,7 @@ MethodHeader Modifiers VOID MethodDeclarator
 MethodHeader Type MethodDeclarator
 MethodHeader VOID MethodDeclarator
 MethodDeclarator ID LPAREN FormalParameterList RPAREN
-#MethodDeclarator ID LPAREN RPAREN
+MethodDeclarator ID LPAREN RPAREN
 FormalParameterList FormalParameter
 FormalParameterList FormalParameterList COMMA FormalParameter
 FormalParameter Type VariableDeclaratorId
