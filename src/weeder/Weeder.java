@@ -26,6 +26,8 @@ public class Weeder {
             weed(parseTree, Symbol.ClassDeclaration);
         } else if (parseTree.getTokenType().equals(Symbol.MethodDeclaration)) {
 
+        } else if (parseTree.getTokenType().equals(Symbol.FieldDeclaration)) {
+            weed(parseTree, Symbol.FieldDeclaration);
         }
         for (ParseTree child : parseTree.getChildren()) {
             visitParseTree(child);
@@ -50,7 +52,11 @@ public class Weeder {
 
             break;
         case FieldDeclaration:
-
+            for (ParseTree child : node.getChildren()) {
+                if (child.getTokenType().equals(Symbol.Modifiers)) {
+                    visitModifier(child, Symbol.FieldDeclaration);
+                }
+            }
             break;
         }
     }
@@ -65,7 +71,6 @@ public class Weeder {
                 if (child.getTokenType().equals(Symbol.ConstructorDeclaration)) {
                     constructorFlag = true;
                 }
-                // System.out.println(child.getTokenType());
                 st.push(child);
             }
         }
@@ -95,6 +100,9 @@ public class Weeder {
                     } else if(symbol.equals(Symbol.FINAL) && modifiersSet.contains(Symbol.ABSTRACT)) {
                         throw new WeedException("A class cannot be both abstract and final.");
                     }
+                } else if (parent.equals(Symbol.FieldDeclaration) && symbol.equals(Symbol.FINAL)) {
+                    // Check: No field can be final.
+                    throw new WeedException("No field can be final.");
                 }
                 if (!symbol.equals(Symbol.Modifiers) && !symbol.equals(Symbol.Modifier)) {
                     modifiersSet.add(symbol);
