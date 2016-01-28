@@ -17,14 +17,16 @@ public class TestRestrictions {
      * checked in parser (grammar):
      *     No multidimensional array types or array creation expressions are allowed.
      *     A method or constructor must not contain explicit this() or super() calls.
-     *     The type void may only be used as the return type of a method. 
+     *     The type void may only be used as the return type of a method.
+     *     An interface cannot contain fields or constructors. 
+     *     A formal parameter of a method must not have an initializer.
+     *     An interface method cannot have a body.
      * in issue:
      *     A class/interface must be declared in a .java file with the same base name as the class/interface.
      */
-
-
     File grammar;
 
+    //
     @Before
     public void setUp() {
         grammar = new File(System.getProperty("user.dir")
@@ -96,31 +98,7 @@ public class TestRestrictions {
         t.pprint();
     }
     
-    // A formal parameter of a method must not have an initializer.
-    @Test
-    public void testParametersMustNotHaveInitializer() throws Exception {
-        File f = new File(
-                System.getProperty("user.dir")
-                        + "/test/testprogram/restrictions/ParametersMustNotHaveInitializer.txt");
-        Scanner scanner = new Scanner(new FileReader(f));
-        List<Token> tokens = scanner.scan();
-        Parser par = new Parser(tokens, grammar);
-        ParseTree t = par.parse();
-        t.pprint();
-    }
 
-    //An interface cannot contain fields or constructors.
-    @Test
-    public void testNoFieldsConstructorsForInterface() throws Exception {
-        File f = new File(
-                System.getProperty("user.dir")
-                        + "/test/testprogram/restrictions/NoFieldsConstructorsForInterface.txt");
-        Scanner scanner = new Scanner(new FileReader(f));
-        List<Token> tokens = scanner.scan();
-        Parser par = new Parser(tokens, grammar);
-        ParseTree t = par.parse();
-        t.pprint();
-    }
 
     // An interface method cannot be static, final, or native.
     @Test
@@ -135,17 +113,7 @@ public class TestRestrictions {
         t.pprint();
     }
 
-    //An interface method cannot have a body.
-    @Test
-    public void testNoStaticNoBodyForInterfaceMethod() throws Exception {
-        File f = new File(System.getProperty("user.dir")
-                + "/test/testprogram/restrictions/NoBodyForInterfaceMethod.txt");
-        Scanner scanner = new Scanner(new FileReader(f));
-        List<Token> tokens = scanner.scan();
-        Parser par = new Parser(tokens, grammar);
-        ParseTree t = par.parse();
-        t.pprint();
-    }
+
 
     //No field can be final.
     @Test

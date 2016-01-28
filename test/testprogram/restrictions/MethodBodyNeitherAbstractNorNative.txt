@@ -4,6 +4,6 @@ public abstract class MethodBodyNeitherAbstractNorNative {
     abstract void abstractMethod() {
     }
     
-    native NativeMethod() {
+    native void NativeMethod() {
     }
 }
