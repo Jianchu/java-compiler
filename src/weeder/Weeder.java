@@ -51,6 +51,10 @@ public class Weeder {
             visitModifier(modifierNode, Symbol.ClassDeclaration);
             break;
         case MethodDeclaration:
+            // TODO: refine this part
+            // modifierNode = findNode(node, Symbol.MethodHeader);
+            // visitModifier(modifierNode, Symbol.MethodHeader);
+            // ParseTree methodHeader = modifierNode;
             ParseTree methodHeader = null;
             for (ParseTree child : node.getChildren()) {
                 if (child.getTokenType().equals(Symbol.MethodHeader)) {
