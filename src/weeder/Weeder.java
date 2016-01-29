@@ -16,71 +16,47 @@ public class Weeder {
 
     public Weeder(ParseTree parseTree) throws Exception {
         this.parseTree = parseTree;
-        visitParseTree();
+        weed();
     }
     
-    private void visitParseTree() throws WeedException {
+    private void weed() throws WeedException {
         visitParseTree(parseTree);
     }
 
     private void visitParseTree(ParseTree parseTree) throws WeedException {
+        ParseTree modifierNode;
         if (parseTree.getTokenType().equals(Symbol.ClassDeclaration)) {
-            weed(parseTree, Symbol.ClassDeclaration);
+            ParseTree ConstructorNode = findNode(parseTree,Symbol.ConstructorDeclaration);
+            if (!ConstructorNode.getTokenType().equals(Symbol.ConstructorDeclaration)) {
+                throw new WeedException("Every class must contain at least one explicit constructor.");
+            }
+            modifierNode = findNode(parseTree, Symbol.Modifiers);
+            visitModifier(modifierNode, Symbol.ClassDeclaration);
+            // weed(parseTree, Symbol.ClassDeclaration);
         } else if (parseTree.getTokenType().equals(Symbol.MethodDeclaration)) {
-            weed(parseTree, Symbol.MethodDeclaration);
+            modifierNode = findNode(parseTree, Symbol.MethodHeader);
+            visitModifier(modifierNode, Symbol.MethodHeader);
+            ParseTree methodHeader = modifierNode;
+            if (findNode(parseTree, Symbol.MethodBody).getTokenType().equals(Symbol.MethodBody)) {
+                visitModifier(methodHeader, Symbol.MethodDeclaration);
+            }
+            //weed(parseTree, Symbol.MethodDeclaration);
         } else if (parseTree.getTokenType().equals(Symbol.FieldDeclaration)) {
-            weed(parseTree, Symbol.FieldDeclaration);
+            modifierNode = findNode(parseTree, Symbol.Modifiers);
+            visitModifier(modifierNode, Symbol.FieldDeclaration);
         } else if (parseTree.getTokenType().equals(Symbol.InterfaceDeclaration)) {
-            weed(parseTree, Symbol.InterfaceDeclaration);
+            ParseTree methodHeaderNode = findNode(parseTree,Symbol.MethodHeader);
+            if (methodHeaderNode.getTokenType().equals(Symbol.MethodHeader)) {
+                visitModifier(methodHeaderNode, Symbol.InterfaceDeclaration);
+            }
         }
         for (ParseTree child : parseTree.getChildren()) {
             visitParseTree(child);
         }
     }
 
-    private void weed(ParseTree node, Symbol symbol) throws WeedException {
-        ParseTree modifierNode;
-        switch (symbol) {
-        case ClassDeclaration:
-            ParseTree ConstructorNode = findNode(parseTree,Symbol.ConstructorDeclaration);
-            if (!ConstructorNode.getTokenType().equals(Symbol.ConstructorDeclaration)) {
-                throw new WeedException(
-                        "Every class must contain at least one explicit constructor.");
-            }
-            modifierNode = findNode(node, Symbol.Modifiers);
-            visitModifier(modifierNode, Symbol.ClassDeclaration);
-            break;
-        case MethodDeclaration:
-            // TODO: refine this part
-            // modifierNode = findNode(node, Symbol.MethodHeader);
-            // visitModifier(modifierNode, Symbol.MethodHeader);
-            // ParseTree methodHeader = modifierNode;
-            ParseTree methodHeader = null;
-            for (ParseTree child : node.getChildren()) {
-                if (child.getTokenType().equals(Symbol.MethodHeader)) {
-                    methodHeader = child;
-                    visitModifier(child, Symbol.MethodHeader);
-                } else if (child.getTokenType().equals(Symbol.MethodBody)) {
-                    visitModifier(methodHeader, Symbol.MethodDeclaration);
-                }
-            }
-            break;
-        case InterfaceDeclaration:
-            ParseTree methodHeaderNode = findNode(node, Symbol.MethodHeader);
-            if (methodHeaderNode.getTokenType().equals(Symbol.MethodHeader)) {
-                visitModifier(methodHeaderNode, Symbol.InterfaceDeclaration);
-            }
-
-            break;
-        case FieldDeclaration:
-            modifierNode = findNode(node, Symbol.Modifiers);
-            visitModifier(modifierNode, Symbol.FieldDeclaration);
-            break;
-        }
-    }
-
     private ParseTree findNode(ParseTree node, Symbol goal) {
-        Queue queue = new LinkedList();
+        Queue<ParseTree> queue = new LinkedList<ParseTree>();
         queue.add(node);
         while (!queue.isEmpty()) {
             ParseTree currentNode = (ParseTree) queue.remove();
@@ -98,7 +74,7 @@ public class Weeder {
             throws WeedException {
         System.out.println(modifierNode.getChildren());
 
-        Stack st = new Stack();
+        Stack<ParseTree> st = new Stack<ParseTree>();
         Set<Symbol> modifiersSet = new HashSet<Symbol>();
         st.push(modifierNode);
         while (!st.isEmpty()) {
