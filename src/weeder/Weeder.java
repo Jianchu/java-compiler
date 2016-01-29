@@ -25,7 +25,6 @@ public class Weeder {
     
     private void weed() throws WeedException {
         ParseTree ClassDecNode = findNode(parseTree, Symbol.ClassDeclaration);
-        ParseTree InterfaceDecNode = findNode(parseTree,Symbol.InterfaceDeclaration);
         if (ClassDecNode != null) {
             for (ParseTree child: ClassDecNode.getChildren()) {
                 if (child.getTokenType().equals(Symbol.Modifiers)) {
@@ -36,7 +35,8 @@ public class Weeder {
                     this.className = child.getLexeme();
                 }
             }
-        } else if (InterfaceDecNode != null) {
+        } else {
+            ParseTree InterfaceDecNode = findNode(parseTree,Symbol.InterfaceDeclaration);
             ParseTree methodHeaderNode = findNode(InterfaceDecNode,Symbol.MethodHeader);
             if (methodHeaderNode != null) {
                 visitModifier(methodHeaderNode, Symbol.InterfaceDeclaration);
