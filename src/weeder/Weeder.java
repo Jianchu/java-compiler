@@ -36,9 +36,11 @@ public class Weeder {
             }
         } else {
             ParseTree InterfaceDecNode = findNode(parseTree,Symbol.InterfaceDeclaration);
-            ParseTree methodHeaderNode = findNode(InterfaceDecNode,Symbol.MethodHeader);
-            if (methodHeaderNode != null) {
-                visitModifier(methodHeaderNode, Symbol.InterfaceDeclaration);
+            if (InterfaceDecNode != null) {
+                ParseTree methodHeaderNode = findNode(InterfaceDecNode,Symbol.MethodHeader);
+                if (methodHeaderNode != null) {
+                    visitModifier(methodHeaderNode, Symbol.InterfaceDeclaration);
+                }
             }
         }
     }
@@ -55,10 +57,14 @@ public class Weeder {
                 for (ParseTree child : currentNode.getChildren()) {
                     if (checkNodeType(child, Symbol.FieldDeclaration)) {
                         modifierNode = findNode(child, Symbol.Modifiers);
-                        visitModifier(modifierNode, Symbol.FieldDeclaration);
+                        if (modifierNode != null) {
+                            visitModifier(modifierNode, Symbol.FieldDeclaration);
+                        }
                     } else if (checkNodeType(child, Symbol.MethodDeclaration)) {
                         modifierNode = findNode(child, Symbol.Modifiers);
-                        visitModifier(modifierNode, Symbol.MethodHeader);
+                        if (modifierNode != null) {
+                            visitModifier(modifierNode, Symbol.MethodHeader);
+                        }
                         if (findNode(child, Symbol.Block) != null) {
                             visitModifier(modifierNode, Symbol.MethodDeclaration);
                         }
@@ -96,6 +102,7 @@ public class Weeder {
         stack.push(modifierNode);
         while (!stack.isEmpty()) {
             ParseTree currentNode = (ParseTree) stack.pop();
+            // System.out.println(currentNode);
             for (ParseTree child : currentNode.getChildren()) {
                 Symbol symbol = child.getTokenType();
                 // Check: Duplicated modifer.
@@ -105,6 +112,7 @@ public class Weeder {
                 if (!symbol.equals(Symbol.Modifiers) && !symbol.equals(Symbol.Modifier)) {
                     modifiersSet.add(symbol);
                 }
+                // System.out.println(child);
                 stack.push(child);
             }
         }
