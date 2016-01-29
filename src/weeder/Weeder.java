@@ -22,16 +22,16 @@ public class Weeder {
         this.parseTree = parseTree;
         weed();
     }
-    
+
     private void weed() throws WeedException {
         ParseTree ClassDecNode = findNode(parseTree, Symbol.ClassDeclaration);
         if (ClassDecNode != null) {
             for (ParseTree child: ClassDecNode.getChildren()) {
-                if (child.getTokenType().equals(Symbol.Modifiers)) {
+                if (checkNodeType(child, Symbol.Modifiers)) {
                     visitModifier(child, Symbol.ClassDeclaration);
-                } else if (child.getTokenType().equals(Symbol.ClassBody)) {
+                } else if (checkNodeType(child, Symbol.ClassBody)) {
                     visitClassBody(child);
-                } else if (child.getTokenType().equals(Symbol.ID)) {
+                } else if (checkNodeType(child, Symbol.ID)) {
                     this.className = child.getLexeme();
                 }
             }
@@ -54,23 +54,21 @@ public class Weeder {
             while (!queue.isEmpty()) {
                 ParseTree currentNode = (ParseTree) queue.remove();
                 for (ParseTree child : currentNode.getChildren()) {
-                    if (child.getTokenType().equals(Symbol.FieldDeclaration)) {
+                    if (checkNodeType(child, Symbol.FieldDeclaration)) {
                         modifierNode = findNode(child, Symbol.Modifiers);
                         visitModifier(modifierNode, Symbol.FieldDeclaration);
-                    } else if (child.getTokenType().equals(Symbol.MethodDeclaration)) {
+                    } else if (checkNodeType(child, Symbol.MethodDeclaration)) {
                         modifierNode = findNode(child, Symbol.Modifiers);
                         visitModifier(modifierNode, Symbol.MethodHeader);
                         if (findNode(child, Symbol.Block) != null) {
                             visitModifier(modifierNode, Symbol.MethodDeclaration);
                         }
-                    } else if (child.getTokenType().equals(Symbol.ConstructorDeclaration)) {
+                    } else if (checkNodeType(child, Symbol.ConstructorDeclaration)) {
                         constructorDecs.add(child);
                     }
-                    if (!child.getTokenType().equals(Symbol.FieldDeclaration)
-                            && !child.getTokenType().equals(
-                                    Symbol.MethodDeclaration)
-                            && !child.getTokenType().equals(
-                                    Symbol.ConstructorDeclaration)) {
+                    if (!checkNodeType(child, Symbol.FieldDeclaration)
+                            && !checkNodeType(child, Symbol.MethodDeclaration)
+                            && !checkNodeType(child, Symbol.ConstructorDeclaration)) {
                         queue.add(child);
                     }
                 }
@@ -162,12 +160,19 @@ public class Weeder {
         while (!queue.isEmpty()) {
             ParseTree currentNode = (ParseTree) queue.remove();
             for (ParseTree child : currentNode.getChildren()) {
-                if (child.getTokenType().equals(goal)) {
+                if ((checkNodeType(child, goal))) {
                     return child;
                 }
                 queue.add(child);
             }
         }
         return null;
+    }
+
+    private boolean checkNodeType(ParseTree node, Symbol symbol) {
+        if (node.getTokenType().equals(symbol)) {
+            return true;
+        }
+        return false;
     }
 }
