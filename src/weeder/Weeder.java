@@ -15,6 +15,8 @@ import exceptions.WeedException;
 public class Weeder {
 
     final private ParseTree parseTree;
+    private String className;
+    private boolean isAbstractClass = false;
 
     public Weeder(ParseTree parseTree) throws Exception {
         this.parseTree = parseTree;
@@ -30,6 +32,8 @@ public class Weeder {
                     visitModifier(child, Symbol.ClassDeclaration);
                 } else if (child.getTokenType().equals(Symbol.ClassBody)) {
                     visitClassBody(child);
+                } else if (child.getTokenType().equals(Symbol.ID)) {
+                    this.className = child.getLexeme();
                 }
             }
         } else if (InterfaceDecNode != null) {
@@ -76,6 +80,17 @@ public class Weeder {
         if (constructorDecs.isEmpty() || ClassBodyDecNode == null) {
             throw new WeedException("Every class must contain at least one explicit constructor.");
         }
+        visitConstructorDec(constructorDecs);
+    }
+
+    private void visitConstructorDec(List<ParseTree> constructorDecs) throws WeedException {
+        for (ParseTree constructorDec : constructorDecs) {
+            System.out.println(findNode(constructorDec, Symbol.ID).getLexeme());
+            // Check: Constructor's name has to be same as class's name.
+             if (!findNode(constructorDec, Symbol.ID).getLexeme().equals(className)) {
+                 throw new WeedException("Constructor's name has to be same as class's name.");
+             }
+        }
     }
 
     private void visitModifier(ParseTree modifierNode, Symbol parent)
@@ -111,6 +126,8 @@ public class Weeder {
                 // Check: A static method cannot be final.
             } else if (modifiersSet.contains(Symbol.STATIC) && modifiersSet.contains(Symbol.FINAL)) {
                 throw new WeedException("A static method cannot be final.");
+            } else if (modifiersSet.contains(Symbol.ABSTRACT) && !this.isAbstractClass) {
+                throw new WeedException("class contains abstract Method must be abstract");
             }
         } else if (parent.equals(Symbol.MethodDeclaration)) {
          // Check: A method has a body if and only if it is neither abstract nor native.
@@ -129,6 +146,9 @@ public class Weeder {
                 throw new WeedException("An interface method cannot be static, final, or native.");
             }
         } else if (parent.equals(Symbol.ClassDeclaration)) {
+            if (modifiersSet.contains(Symbol.ABSTRACT)) {
+                this.isAbstractClass = true;
+            }
             // Check: A class cannot be both abstract and final.
             if (modifiersSet.contains(Symbol.FINAL) && modifiersSet.contains(Symbol.ABSTRACT)) {
                 throw new WeedException("A class cannot be both abstract and final.");
