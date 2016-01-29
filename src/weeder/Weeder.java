@@ -1,7 +1,9 @@
 package weeder;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Queue;
 import java.util.Set;
 import java.util.Stack;
@@ -20,53 +22,60 @@ public class Weeder {
     }
     
     private void weed() throws WeedException {
-        visitParseTree(parseTree);
-    }
-
-    private void visitParseTree(ParseTree parseTree) throws WeedException {
-        ParseTree modifierNode;
-        if (parseTree.getTokenType().equals(Symbol.ClassDeclaration)) {
-            ParseTree ConstructorNode = findNode(parseTree,Symbol.ConstructorDeclaration);
-            // Check: Every class must contain at least one explicit constructor.
-            if (!ConstructorNode.getTokenType().equals(Symbol.ConstructorDeclaration)) {
-                throw new WeedException("Every class must contain at least one explicit constructor.");
+        ParseTree ClassDecNode = findNode(parseTree, Symbol.ClassDeclaration);
+        ParseTree InterfaceDecNode = findNode(parseTree,Symbol.InterfaceDeclaration);
+        if (ClassDecNode != null) {
+            for (ParseTree child: ClassDecNode.getChildren()) {
+                if (child.getTokenType().equals(Symbol.Modifiers)) {
+                    visitModifier(child, Symbol.ClassDeclaration);
+                } else if (child.getTokenType().equals(Symbol.ClassBody)) {
+                    visitClassBody(child);
+                }
             }
-            modifierNode = findNode(parseTree, Symbol.Modifiers);
-            visitModifier(modifierNode, Symbol.ClassDeclaration);
-        } else if (parseTree.getTokenType().equals(Symbol.MethodDeclaration)) {
-            modifierNode = findNode(parseTree, Symbol.MethodHeader);
-            visitModifier(modifierNode, Symbol.MethodHeader);
-            ParseTree methodHeader = modifierNode;
-            if (findNode(parseTree, Symbol.MethodBody).getTokenType().equals(Symbol.MethodBody)) {
-                visitModifier(methodHeader, Symbol.MethodDeclaration);
-            }
-        } else if (parseTree.getTokenType().equals(Symbol.FieldDeclaration)) {
-            modifierNode = findNode(parseTree, Symbol.Modifiers);
-            visitModifier(modifierNode, Symbol.FieldDeclaration);
-        } else if (parseTree.getTokenType().equals(Symbol.InterfaceDeclaration)) {
-            ParseTree methodHeaderNode = findNode(parseTree,Symbol.MethodHeader);
-            if (methodHeaderNode.getTokenType().equals(Symbol.MethodHeader)) {
+        } else if (InterfaceDecNode != null) {
+            ParseTree methodHeaderNode = findNode(InterfaceDecNode,Symbol.MethodHeader);
+            if (methodHeaderNode != null) {
                 visitModifier(methodHeaderNode, Symbol.InterfaceDeclaration);
             }
         }
-        for (ParseTree child : parseTree.getChildren()) {
-            visitParseTree(child);
-        }
     }
-
-    private ParseTree findNode(ParseTree node, Symbol goal) {
-        Queue<ParseTree> queue = new LinkedList<ParseTree>();
-        queue.add(node);
-        while (!queue.isEmpty()) {
-            ParseTree currentNode = (ParseTree) queue.remove();
-            for (ParseTree child : currentNode.getChildren()) {
-                if (child.getTokenType().equals(goal)) {
-                    return child;
+    
+    private void visitClassBody(ParseTree classBodyNode) throws WeedException {
+        ParseTree ClassBodyDecNode = findNode(classBodyNode, Symbol.ClassBodyDeclarations);
+        ParseTree modifierNode;
+        List<ParseTree> constructorDecs = new ArrayList<ParseTree>();
+        if (ClassBodyDecNode != null) {
+            Queue<ParseTree> queue = new LinkedList<ParseTree>();
+            queue.add(classBodyNode);
+            while (!queue.isEmpty()) {
+                ParseTree currentNode = (ParseTree) queue.remove();
+                for (ParseTree child : currentNode.getChildren()) {
+                    if (child.getTokenType().equals(Symbol.FieldDeclaration)) {
+                        modifierNode = findNode(child, Symbol.Modifiers);
+                        visitModifier(modifierNode, Symbol.FieldDeclaration);
+                    } else if (child.getTokenType().equals(Symbol.MethodDeclaration)) {
+                        modifierNode = findNode(child, Symbol.Modifiers);
+                        visitModifier(modifierNode, Symbol.MethodHeader);
+                        if (findNode(child, Symbol.Block) != null) {
+                            visitModifier(modifierNode, Symbol.MethodDeclaration);
+                        }
+                    } else if (child.getTokenType().equals(Symbol.ConstructorDeclaration)) {
+                        constructorDecs.add(child);
+                    }
+                    if (!child.getTokenType().equals(Symbol.FieldDeclaration)
+                            && !child.getTokenType().equals(
+                                    Symbol.MethodDeclaration)
+                            && !child.getTokenType().equals(
+                                    Symbol.ConstructorDeclaration)) {
+                        queue.add(child);
+                    }
                 }
-                queue.add(child);
             }
         }
-        return node;
+        // Check: Every class must contain at least one explicit constructor.
+        if (constructorDecs.isEmpty() || ClassBodyDecNode == null) {
+            throw new WeedException("Every class must contain at least one explicit constructor.");
+        }
     }
 
     private void visitModifier(ParseTree modifierNode, Symbol parent)
@@ -125,5 +134,20 @@ public class Weeder {
                 throw new WeedException("A class cannot be both abstract and final.");
             }
         } 
+    }
+
+    private ParseTree findNode(ParseTree node, Symbol goal) {
+        Queue<ParseTree> queue = new LinkedList<ParseTree>();
+        queue.add(node);
+        while (!queue.isEmpty()) {
+            ParseTree currentNode = (ParseTree) queue.remove();
+            for (ParseTree child : currentNode.getChildren()) {
+                if (child.getTokenType().equals(goal)) {
+                    return child;
+                }
+                queue.add(child);
+            }
+        }
+        return null;
     }
 }
