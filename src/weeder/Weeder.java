@@ -20,10 +20,9 @@ public class Weeder {
 
     public Weeder(ParseTree parseTree) throws Exception {
         this.parseTree = parseTree;
-        weed();
     }
 
-    private void weed() throws WeedException {
+    public void weed() throws WeedException {
         ParseTree ClassDecNode = findNode(parseTree, Symbol.ClassDeclaration);
         if (ClassDecNode != null) {
             for (ParseTree child: ClassDecNode.getChildren()) {
@@ -83,7 +82,6 @@ public class Weeder {
 
     private void visitConstructorDec(List<ParseTree> constructorDecs) throws WeedException {
         for (ParseTree constructorDec : constructorDecs) {
-            System.out.println(findNode(constructorDec, Symbol.ID).getLexeme());
             // Check: Constructor's name has to be same as class's name.
              if (!findNode(constructorDec, Symbol.ID).getLexeme().equals(className)) {
                  throw new WeedException("Constructor's name has to be same as class's name.");
@@ -93,11 +91,11 @@ public class Weeder {
 
     private void visitModifier(ParseTree modifierNode, Symbol parent)
             throws WeedException {
-        Stack<ParseTree> st = new Stack<ParseTree>();
+        Stack<ParseTree> stack = new Stack<ParseTree>();
         Set<Symbol> modifiersSet = new HashSet<Symbol>();
-        st.push(modifierNode);
-        while (!st.isEmpty()) {
-            ParseTree currentNode = (ParseTree) st.pop();
+        stack.push(modifierNode);
+        while (!stack.isEmpty()) {
+            ParseTree currentNode = (ParseTree) stack.pop();
             for (ParseTree child : currentNode.getChildren()) {
                 Symbol symbol = child.getTokenType();
                 // Check: Duplicated modifer.
@@ -107,7 +105,7 @@ public class Weeder {
                 if (!symbol.equals(Symbol.Modifiers) && !symbol.equals(Symbol.Modifier)) {
                     modifiersSet.add(symbol);
                 }
-                st.push(child);
+                stack.push(child);
             }
         }
 
