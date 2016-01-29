@@ -1,9 +1,8 @@
 package testprogram.restrictions;
 
-public interface NoStaticFinalNativeForInterfaceMethod {
-    static void method1() {
 
-    }
+public interface NoStaticFinalNativeForInterfaceMethod {
+    static void method1();
     final void method2();
     native void method3();
 }
