@@ -39,9 +39,11 @@ public class Weeder {
     private void weed(ParseTree node, Symbol symbol) throws WeedException {
         switch (symbol) {
         case ClassDeclaration:
-            // System.out.println(node.getTokenType());
-            visitClass(node);
-
+            ParseTree ConstructorNode = findNode(node, Symbol.ConstructorDeclaration);
+            if (!ConstructorNode.getTokenType().equals(Symbol.ConstructorDeclaration)) {
+                throw new WeedException(
+                        "Every class must contain at least one explicit constructor.");
+            }
             for (ParseTree child : node.getChildren()) {
                 if (child.getTokenType().equals(Symbol.Modifiers)) {
                     visitModifier(child, Symbol.ClassDeclaration);
@@ -51,7 +53,6 @@ public class Weeder {
         case MethodDeclaration:
             ParseTree methodHeader = null;
             for (ParseTree child : node.getChildren()) {
-                // System.out.println(child.getTokenType());
                 if (child.getTokenType().equals(Symbol.MethodHeader)) {
                     methodHeader = child;
                     visitModifier(child, Symbol.MethodHeader);
@@ -74,26 +75,6 @@ public class Weeder {
                 }
             }
             break;
-        }
-    }
-
-    private void visitClass(ParseTree classNode) throws WeedException {
-        Stack st = new Stack();
-        st.push(classNode);
-        boolean constructorFlag = false;
-        while (!st.isEmpty()) {
-            ParseTree currentNode = (ParseTree) st.pop();
-            for (ParseTree child : currentNode.getChildren()) {
-                if (child.getTokenType().equals(Symbol.ConstructorDeclaration)) {
-                    constructorFlag = true;
-                }
-                st.push(child);
-            }
-        }
-        if (!constructorFlag) {
-         // Check: every class must contain at least one explicit constructor.
-            throw new WeedException(
-                    "Every class must contain at least one explicit constructor.");
         }
     }
     
@@ -122,7 +103,6 @@ public class Weeder {
         while (!st.isEmpty()) {
             ParseTree currentNode = (ParseTree) st.pop();
             for (ParseTree child : currentNode.getChildren()) {
-                // System.out.println(child.getTokenType());
                 Symbol symbol = child.getTokenType();
                 if (modifiersSet.contains(symbol)) {
                     // Check: Duplicated modifer.
@@ -144,6 +124,7 @@ public class Weeder {
                     } else if (symbol.equals(Symbol.FINAL) && modifiersSet.contains(Symbol.STATIC)) {
                         throw new WeedException("A static method cannot be final.");
                     }
+                    // Check: An interface method cannot be static, final, or native.
                 } else if (parent.equals(Symbol.InterfaceDeclaration)) {
                     if (symbol.equals(Symbol.STATIC)
                             || symbol.equals(Symbol.FINAL)
@@ -153,7 +134,6 @@ public class Weeder {
                 }
                 if (!symbol.equals(Symbol.Modifiers) && !symbol.equals(Symbol.Modifier)) {
                     modifiersSet.add(symbol);
-                    // System.out.println(symbol);
                 }
                 st.push(child);
             }
@@ -169,8 +149,8 @@ public class Weeder {
                     && !modifiersSet.contains(Symbol.STATIC)) {
                 throw new WeedException("A native method must be static.");
             }
+            // Check: A method has a body if and only if it is neither abstract nor native.
         } else if (parent.equals(Symbol.MethodDeclaration)) {
-            // System.out.println(modifiersSet);
             if (modifiersSet.contains(Symbol.ABSTRACT) || modifiersSet.contains(Symbol.NATIVE)) {
                 throw new WeedException("A method has a body if and only if it is neither abstract nor native.");
             }
