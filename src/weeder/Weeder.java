@@ -1,6 +1,8 @@
 package weeder;
 
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.Set;
 import java.util.Stack;
 
@@ -37,18 +39,16 @@ public class Weeder {
     }
 
     private void weed(ParseTree node, Symbol symbol) throws WeedException {
+        ParseTree modifierNode;
         switch (symbol) {
         case ClassDeclaration:
-            ParseTree ConstructorNode = findNode(node, Symbol.ConstructorDeclaration);
+            ParseTree ConstructorNode = findNode(parseTree,Symbol.ConstructorDeclaration);
             if (!ConstructorNode.getTokenType().equals(Symbol.ConstructorDeclaration)) {
                 throw new WeedException(
                         "Every class must contain at least one explicit constructor.");
             }
-            for (ParseTree child : node.getChildren()) {
-                if (child.getTokenType().equals(Symbol.Modifiers)) {
-                    visitModifier(child, Symbol.ClassDeclaration);
-                }
-            }
+            modifierNode = findNode(node, Symbol.Modifiers);
+            visitModifier(modifierNode, Symbol.ClassDeclaration);
             break;
         case MethodDeclaration:
             ParseTree methodHeader = null;
@@ -69,25 +69,22 @@ public class Weeder {
 
             break;
         case FieldDeclaration:
-            for (ParseTree child : node.getChildren()) {
-                if (child.getTokenType().equals(Symbol.Modifiers)) {
-                    visitModifier(child, Symbol.FieldDeclaration);
-                }
-            }
+            modifierNode = findNode(node, Symbol.Modifiers);
+            visitModifier(modifierNode, Symbol.FieldDeclaration);
             break;
         }
     }
-    
+
     private ParseTree findNode(ParseTree node, Symbol goal) {
-        Stack st = new Stack();
-        st.push(node);
-        while (!st.isEmpty()) {
-            ParseTree currentNode = (ParseTree) st.pop();
+        Queue queue = new LinkedList();
+        queue.add(node);
+        while (!queue.isEmpty()) {
+            ParseTree currentNode = (ParseTree) queue.remove();
             for (ParseTree child : currentNode.getChildren()) {
                 if (child.getTokenType().equals(goal)) {
                     return child;
                 }
-                st.push(child);
+                queue.add(child);
             }
         }
         return node;
