@@ -74,6 +74,9 @@ public final class TestAll extends java.lang.Thread implements
 }
 
 abstract class abs {
+    public abs() {
+
+    }
     public abstract int m();
 
     public static native int m(int i);
