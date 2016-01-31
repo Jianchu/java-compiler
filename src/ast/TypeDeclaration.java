@@ -21,5 +21,5 @@ public class TypeDeclaration extends BodyDeclaration{
 	List<Name> superInterfaces;
 	
 	// field or method declarations, but no type delcarations
-	List<BodyDeclaration> bodies;
+	List<BodyDeclaration> members;
 }
