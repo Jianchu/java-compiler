@@ -244,11 +244,10 @@ UnaryExpressionNotPlusMinus PostfixExpression
 #UnaryExpressionNotPlusMinus BIT_COMP UnaryExpression
 UnaryExpressionNotPlusMinus NOT UnaryExpression
 UnaryExpressionNotPlusMinus CastExpression
-CastExpression LPAREN PrimitiveType Dims RPAREN UnaryExpression
 CastExpression LPAREN PrimitiveType RPAREN UnaryExpression
-CastExpression LPAREN Expression RPAREN UnaryExpressionNotPlusMinus
-#TODO: following line is not allowed
+CastExpression LPAREN PrimitiveType Dims RPAREN UnaryExpression
 CastExpression LPAREN Name Dims RPAREN UnaryExpressionNotPlusMinus
+CastExpression LPAREN Expression RPAREN UnaryExpressionNotPlusMinus
 MultiplicativeExpression UnaryExpression
 MultiplicativeExpression MultiplicativeExpression STAR UnaryExpression
 MultiplicativeExpression MultiplicativeExpression SLASH UnaryExpression

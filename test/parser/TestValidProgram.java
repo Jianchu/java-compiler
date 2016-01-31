@@ -24,7 +24,7 @@ public class TestValidProgram {
     @Before
     public void setUp() {
         grammar = new File(System.getProperty("user.dir") + "/data/gen/grammar.lr1");
-        files = new File(System.getProperty("user.dir") + "/assignment_testcases/a1");
+        files = new File(System.getProperty("user.dir") + "/test/assignment_testcases/a1");
 
     }
 

@@ -60,6 +60,7 @@ public class Weeder {
     private void visitClassBody(ParseTree classBodyNode) throws WeedException {
         ParseTree ClassBodyDecNode = findNode(classBodyNode, Symbol.ClassBodyDeclarations);
         ParseTree modifierNode;
+        ParseTree blockNode;
         List<ParseTree> constructorDecs = new ArrayList<ParseTree>();
         if (ClassBodyDecNode != null) {
             Queue<ParseTree> queue = new LinkedList<ParseTree>();
@@ -83,8 +84,13 @@ public class Weeder {
                         } else {
                             throw new WeedException("No package private method");
                         }
-                        if (findNode(child, Symbol.Block) != null) {
+                        blockNode = findNode(child, Symbol.Block);
+                        if (blockNode != null) {
                             visitModifier(modifierNode, Symbol.MethodDeclaration);
+                            ParseTree castNode = findNode(blockNode, Symbol.CastExpression);
+                            if (castNode != null) {
+                                visitCast(castNode);
+                            }
                         } else {
                             visitModifier(modifierNode, Symbol.Block);
                         }
@@ -104,6 +110,43 @@ public class Weeder {
             throw new WeedException("Every class must contain at least one explicit constructor.");
         }
         visitConstructorDec(constructorDecs);
+    }
+
+    private void visitCast(ParseTree castNode) throws WeedException {
+        Stack<ParseTree> stack = new Stack<ParseTree>();
+        ParseTree castTypeNode = null;
+        for (ParseTree child : castNode.getChildren()) {
+            if (checkNodeType(child, Symbol.PrimitiveType)
+                    || checkNodeType(child, Symbol.Name)
+                    || checkNodeType(child, Symbol.Expression)) {
+                castTypeNode = child;
+            }
+        }
+        if (castTypeNode != null) {
+            stack.push(castTypeNode);
+        }
+        while (!stack.isEmpty()) {
+            ParseTree currentNode = (ParseTree) stack.pop();
+            for (ParseTree child : currentNode.getChildren()) {
+                    // Check: Method invocation not allowed as type in cast.
+                if (checkNodeType(child, Symbol.MethodInvocation)) {
+                    throw new WeedException(
+                                "Method invocation not allowed as type in cast.");
+                    // Check: Cast to a nonstatic field is not allowed.
+                } else if (checkNodeType(child, Symbol.NEW)) {
+                    throw new WeedException(
+                                "Cast to a nonstatic field is not allowed.");
+                    // Check: Cast to array value is not allowed.
+                } else if (checkNodeType(child, Symbol.ArrayAccess)) {
+                    throw new WeedException(
+                            "Cast to array value is not allowed.");
+                    // Check: Cast to an expression is not allowed
+                } else if (checkNodeType(child, Symbol.Primary)) {
+                    throw new WeedException("Cast to an expression is not allowed");
+                }
+                stack.push(child);
+            }
+        }
     }
 
     private void visitConstructorDec(List<ParseTree> constructorDecs) throws WeedException {
@@ -193,6 +236,7 @@ public class Weeder {
                 throw new WeedException("No package private classes");
             }
         } else if (parent.equals(Symbol.Block)) {
+            // Check: A non-abstract method must have a body.
             if (!modifiersSet.contains(Symbol.ABSTRACT)
                     && !modifiersSet.contains(Symbol.NATIVE)) {
                 throw new WeedException("A non-abstract method must have a body.");
