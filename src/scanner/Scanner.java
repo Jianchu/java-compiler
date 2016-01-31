@@ -203,6 +203,8 @@ public class Scanner {
             
             if (Character.isLetter(_next)) {
                 scanId();
+            } else if ('0' == (char) _next) {
+            	scanZero();
             } else if (Character.isDigit(_next)) {
             	// integer literals
             	scanInteger();
@@ -461,6 +463,13 @@ public class Scanner {
     	_next = read();
     }
     
+    private void scanZero() throws IOException, IllegalInputCharException, IllegalIDException {
+    	_tokens.add(new Token("0", Symbol.DECIMAL));
+        _next = read();
+    	if (Character.isLetterOrDigit(_next) || _next == '_' || _next == '$') {
+    		throw new IllegalIDException("0" + (char) _next);
+    	}
+    }
     /**
      * scanning integer literals
      * NOTE: 
@@ -558,7 +567,7 @@ public class Scanner {
     			_sb.append((char) _next);
     			_next = read();
     		}
-    	} else if (_next >= '4' && _next <= '9' ){
+    	} else if (_next >= '4' && _next <= '7' ){
     		_sb.append((char) _next);
     		_next = read();
     		if (_next >= '0' && _next <= '7') {
