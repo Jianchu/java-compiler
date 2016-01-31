@@ -132,12 +132,15 @@ public class Weeder {
                 if (checkNodeType(child, Symbol.MethodInvocation)) {
                     throw new WeedException(
                                 "Method invocation not allowed as type in cast.");
+                    // Check: Cast to a nonstatic field is not allowed.
                 } else if (checkNodeType(child, Symbol.NEW)) {
                     throw new WeedException(
                                 "Cast to a nonstatic field is not allowed.");
+                    // Check: Cast to array value is not allowed.
                 } else if (checkNodeType(child, Symbol.ArrayAccess)) {
                     throw new WeedException(
                             "Cast to array value is not allowed.");
+                    // Check: Cast to an expression is not allowed
                 } else if (checkNodeType(child, Symbol.Primary)) {
                     throw new WeedException("Cast to an expression is not allowed");
                 }
@@ -233,6 +236,7 @@ public class Weeder {
                 throw new WeedException("No package private classes");
             }
         } else if (parent.equals(Symbol.Block)) {
+            // Check: A non-abstract method must have a body.
             if (!modifiersSet.contains(Symbol.ABSTRACT)
                     && !modifiersSet.contains(Symbol.NATIVE)) {
                 throw new WeedException("A non-abstract method must have a body.");
