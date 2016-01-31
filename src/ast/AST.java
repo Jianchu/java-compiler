@@ -1,16 +1,7 @@
-package parser;
+package ast;
 
 public class AST {
-	/**
-	 * All nodes must directly or indirectly extend ASTNode
-	 * @author zanel
-	 *
-	 */
-	public static abstract class ASTNode {
-		public int accept(Visitor v) {
-			return v.visit(this);
-		}
-	}
+
 	
 	/*
 	 * Literals
