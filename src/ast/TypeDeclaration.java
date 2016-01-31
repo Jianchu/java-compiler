@@ -7,10 +7,19 @@ import java.util.List;
  * @author zanel
  *
  */
-public class TypeDeclaration {
+public class TypeDeclaration extends BodyDeclaration{
+	// interface or class
 	boolean isInterface;
+	
 	List<Modifier> modifiers;
 	String id;
+	
+	// extends 
 	Name superClass;
-	Name superInterfaces;
+	
+	// implements
+	List<Name> superInterfaces;
+	
+	// field or method declarations, but no type delcarations
+	List<BodyDeclaration> bodies;
 }
