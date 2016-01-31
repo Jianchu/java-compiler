@@ -52,7 +52,7 @@ ImportDeclaration TypeImportOnDemandDeclaration
 SingleTypeImportDeclaration IMPORT Name SEMICOLON
 TypeImportOnDemandDeclaration IMPORT Name DOT STAR SEMICOLON
 TypeDeclarations TypeDeclaration
-TypeDeclarations TypeDeclarations TypeDeclaration
+#TypeDeclarations TypeDeclarations TypeDeclaration
 TypeDeclaration ClassDeclaration
 TypeDeclaration InterfaceDeclaration
 TypeDeclaration SEMICOLON
@@ -201,7 +201,7 @@ ForStatementNoShortIf FOR LPAREN SEMICOLON Expression SEMICOLON RPAREN Statement
 ForStatementNoShortIf FOR LPAREN SEMICOLON SEMICOLON RPAREN StatementNoShortIf
 ForInit StatementExpressionList
 ForInit LocalVariableDeclaration
-ForUpdate StatementExpressionList
+ForUpdate StatementExpression
 StatementExpressionList StatementExpression
 StatementExpressionList StatementExpressionList COMMA StatementExpression
 ReturnStatement RETURN Expression SEMICOLON
@@ -241,12 +241,13 @@ PostfixExpression Name
 UnaryExpression UnaryExpressionNotPlusMinus
 UnaryExpression MINUS UnaryExpression
 UnaryExpressionNotPlusMinus PostfixExpression
-UnaryExpressionNotPlusMinus BIT_COMP UnaryExpression
+#UnaryExpressionNotPlusMinus BIT_COMP UnaryExpression
 UnaryExpressionNotPlusMinus NOT UnaryExpression
 UnaryExpressionNotPlusMinus CastExpression
 CastExpression LPAREN PrimitiveType Dims RPAREN UnaryExpression
 CastExpression LPAREN PrimitiveType RPAREN UnaryExpression
 CastExpression LPAREN Expression RPAREN UnaryExpressionNotPlusMinus
+#TODO: following line is not allowed
 CastExpression LPAREN Name Dims RPAREN UnaryExpressionNotPlusMinus
 MultiplicativeExpression UnaryExpression
 MultiplicativeExpression MultiplicativeExpression STAR UnaryExpression

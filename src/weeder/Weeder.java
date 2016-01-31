@@ -24,9 +24,11 @@ public class Weeder {
 
     public void weed() throws WeedException {
         ParseTree ClassDecNode = findNode(parseTree, Symbol.ClassDeclaration);
+        boolean noModifier = true;
         if (ClassDecNode != null) {
             for (ParseTree child: ClassDecNode.getChildren()) {
                 if (checkNodeType(child, Symbol.Modifiers)) {
+                    noModifier = false;
                     visitModifier(child, Symbol.ClassDeclaration);
                 } else if (checkNodeType(child, Symbol.ClassBody)) {
                     visitClassBody(child);
@@ -36,12 +38,22 @@ public class Weeder {
             }
         } else {
             ParseTree InterfaceDecNode = findNode(parseTree,Symbol.InterfaceDeclaration);
+            for (ParseTree child : InterfaceDecNode.getChildren()) {
+                if (checkNodeType(child, Symbol.Modifiers)) {
+                    noModifier = false;
+                }
+            }
             if (InterfaceDecNode != null) {
                 ParseTree methodHeaderNode = findNode(InterfaceDecNode,Symbol.MethodHeader);
                 if (methodHeaderNode != null) {
+
                     visitModifier(methodHeaderNode, Symbol.InterfaceDeclaration);
                 }
             }
+        }
+        // Check: No package private classes.
+        if (noModifier) {
+            throw new WeedException("No package private classes");
         }
     }
     
@@ -59,14 +71,22 @@ public class Weeder {
                         modifierNode = findNode(child, Symbol.Modifiers);
                         if (modifierNode != null) {
                             visitModifier(modifierNode, Symbol.FieldDeclaration);
+                            // Check: No package private field.
+                        } else if (modifierNode == null) {
+                            throw new WeedException("No package private field");
                         }
                     } else if (checkNodeType(child, Symbol.MethodDeclaration)) {
                         modifierNode = findNode(child, Symbol.Modifiers);
                         if (modifierNode != null) {
                             visitModifier(modifierNode, Symbol.MethodHeader);
+                            // Check: No package private method.
+                        } else {
+                            throw new WeedException("No package private method");
                         }
                         if (findNode(child, Symbol.Block) != null) {
                             visitModifier(modifierNode, Symbol.MethodDeclaration);
+                        } else {
+                            visitModifier(modifierNode, Symbol.Block);
                         }
                     } else if (checkNodeType(child, Symbol.ConstructorDeclaration)) {
                         constructorDecs.add(child);
@@ -130,18 +150,29 @@ public class Weeder {
                 // Check: A static method cannot be final.
             } else if (modifiersSet.contains(Symbol.STATIC) && modifiersSet.contains(Symbol.FINAL)) {
                 throw new WeedException("A static method cannot be final.");
+                // Check: Class contains abstract Method must be abstract.
             } else if (modifiersSet.contains(Symbol.ABSTRACT) && !this.isAbstractClass) {
                 throw new WeedException("class contains abstract Method must be abstract");
+                // Check: No package private method.
+            } else if (!modifiersSet.contains(Symbol.PUBLIC)
+                    && !modifiersSet.contains(Symbol.PROTECTED)) {
+                throw new WeedException("No package private method");
             }
         } else if (parent.equals(Symbol.MethodDeclaration)) {
          // Check: A method has a body if and only if it is neither abstract nor native.
             if (modifiersSet.contains(Symbol.ABSTRACT) || modifiersSet.contains(Symbol.NATIVE)) {
                 throw new WeedException("A method has a body if and only if it is neither abstract nor native.");
             }
-        } else if (parent.equals(Symbol.FieldDeclaration)
-                && modifiersSet.contains(Symbol.FINAL)) {
-            // Check: No field can be final.
-            throw new WeedException("No field can be final.");
+        } else if (parent.equals(Symbol.FieldDeclaration)) {
+            if (modifiersSet.contains(Symbol.FINAL)) {
+                // Check: No field can be final.
+                throw new WeedException("No field can be final.");
+                // Check: No package private field.
+            } else if (!modifiersSet.contains(Symbol.PROTECTED)
+                    && !modifiersSet.contains(Symbol.PUBLIC)) {
+                throw new WeedException("No package private field");
+            }
+
         } else if (parent.equals(Symbol.InterfaceDeclaration)) {
             if (modifiersSet.contains(Symbol.STATIC)
                     || modifiersSet.contains(Symbol.FINAL)
@@ -156,8 +187,17 @@ public class Weeder {
             // Check: A class cannot be both abstract and final.
             if (modifiersSet.contains(Symbol.FINAL) && modifiersSet.contains(Symbol.ABSTRACT)) {
                 throw new WeedException("A class cannot be both abstract and final.");
+                // Check: No package private classes.
+            } else if (!modifiersSet.contains(Symbol.PUBLIC)
+                    && !modifiersSet.contains(Symbol.PROTECTED)) {
+                throw new WeedException("No package private classes");
             }
-        } 
+        } else if (parent.equals(Symbol.Block)) {
+            if (!modifiersSet.contains(Symbol.ABSTRACT)
+                    && !modifiersSet.contains(Symbol.NATIVE)) {
+                throw new WeedException("A non-abstract method must have a body.");
+            }
+        }
     }
 
     private ParseTree findNode(ParseTree node, Symbol goal) {
