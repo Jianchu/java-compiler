@@ -6,4 +6,8 @@ public class CompilationUnit extends ASTNode{
 	PackageDeclaration pkg;
 	List<ImportDeclaration> imports;
 	List<TypeDeclaration> types;
+	
+	public void addTypeDeclaraiton(TypeDeclaration typeDcl) {
+		
+	}
 }
