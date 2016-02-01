@@ -21,7 +21,13 @@ public class ScannerTest {
     public List<Token> inputSetUp(String num) {
     	StringReader sr = new StringReader(num);
     	scan = new Scanner(sr);
-    	List<Token> tokens = scan.scan();
+    	List<Token> tokens = null;
+    	try {
+    		tokens = scan.scan();
+    	} catch (Exception e) {
+    		e.printStackTrace();
+    	}
+    	
     	return tokens;
     }
     

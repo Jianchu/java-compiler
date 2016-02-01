@@ -147,27 +147,11 @@ public class Scanner {
         return c;
     }
 
-    public List<Token> scan() {
+    public List<Token> scan() throws Exception {
         // if scan has already been called, just return the same list
         if (_tokens == null) {
             _tokens = new LinkedList<Token>();
-            try {
-                // need to use the return value. --Z
-                scanStart();
-            } catch (IOException ioe) {
-                // handle IOException
-            } catch (IllegalIDException ide) {
-            	ide.printStackTrace();
-            } catch (IllegalCharException ice) {
-            	ice.printStackTrace();
-            } catch (IllegalBlockCommentException ibce) {
-                ibce.printStackTrace();
-            } catch (IllegalInputCharException iice) {
-                iice.printStackTrace();
-            } catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+            scanStart();
         }
 
         return _tokens;
@@ -476,14 +460,24 @@ public class Scanner {
      * 		1. leaving size check for parser.
      * 		2. No Octal, Hex or Long.
      * 		3. Keeping the string as "\'c\'" for now.
-     * @throws IOException
-     * @throws IllegalIDException 
+     * @throws Exception
      */
-    private void scanInteger() throws IOException, IllegalInputCharException, IllegalIDException {
+    private void scanInteger() throws Exception {
     	while (Character.isDigit(_next)) {
     		_sb.append((char) _next);
     		_next = read();
     	}
+    	
+    	try {
+    		String intStr = _sb.toString();
+    		if (_tokens.get(_tokens.size() -1).getTokenType() == Symbol.MINUS) {
+    			intStr = "-" + _sb.toString();
+    		}
+    		Integer.parseInt(intStr);
+    	} catch (NumberFormatException e) {
+    		throw e;
+    	}
+    	
     	_tokens.add(new Token(_sb.toString(), Symbol.DECIMAL));
     	// A proper integer must be terminated with space, operators or ';'.
     	// check for illegal identifiers.

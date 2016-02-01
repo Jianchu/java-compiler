@@ -32,7 +32,7 @@ public class TestProgram {
                     .getAbsolutePath())));
             List<Token> tokens = scannerTest.inputSetUp(content);
             System.out.println(fileEntry.getName());
-            scannerTest.printlnTokens(tokens);
+//            scannerTest.printlnTokens(tokens);
             System.out.println("***********************");
 
         }
