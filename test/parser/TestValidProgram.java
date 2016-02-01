@@ -30,7 +30,7 @@ public class TestValidProgram {
     @Test
     public void testProgram() throws FileNotFoundException {
         for (final File fileEntry : files.listFiles()) {
-            System.out.println(fileEntry);
+            System.out.println(fileEntry.getName().split("\\.")[0]);
             if (fileEntry.getName().contains("Je_")) {
                 assertEquals(42, test(fileEntry));
             } else {
@@ -41,11 +41,12 @@ public class TestValidProgram {
 
     public int test(File input) {
         try {
+
             scanner.Scanner scanner = new scanner.Scanner(new FileReader(input));
             List<Token> tokens = scanner.scan();
             Parser parser = new Parser(tokens, grammar);
             ParseTree parseTree = parser.parse();
-            Weeder weeder = new Weeder(parseTree);
+            Weeder weeder = new Weeder(parseTree, input.getName().substring(0, input.getName().lastIndexOf('.')));
             weeder.weed();
         } catch (Exception e) {
             return 42;
