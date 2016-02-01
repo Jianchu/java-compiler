@@ -1,12 +1,10 @@
 package parser;
 
 import java.io.File;
-import java.io.StringReader;
 import java.util.List;
 import java.util.Stack;
 
 import scanner.Token;
-import scanner.Scanner;
 import scanner.Symbol;
 
 public class Parser {
