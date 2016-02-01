@@ -11,12 +11,9 @@ public class AST {
 	}
 	
 	private ASTNode buildTree(ParseTree pt) {
-		switch (pt.getTokenType()) {
-		case CompilationUnit:
-		default:
-			break;
-		}
-		pt.getChildren();
+		
+		ASTBuilder.parseCompilationUnit(pt);
+		
 		return null;
 	}
 	
