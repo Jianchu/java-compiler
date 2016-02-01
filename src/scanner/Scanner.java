@@ -468,6 +468,9 @@ public class Scanner {
     		_next = read();
     	}
     	
+    	
+    	// This needs to be in the parser or weeder.
+    	// missing case 1 - 2147483648
     	try {
     		String intStr = _sb.toString();
     		if (_tokens.get(_tokens.size() -1).getTokenType() == Symbol.MINUS) {
