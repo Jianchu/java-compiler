@@ -6,7 +6,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.List;
-import java.util.Scanner;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -32,8 +31,7 @@ public class TestValidProgram {
     public void testProgram() throws FileNotFoundException {
         for (final File fileEntry : files.listFiles()) {
             System.out.println(fileEntry);
-            String content = new Scanner(fileEntry).useDelimiter("\\Z").next();
-            if (content.contains("EXCEPTION")) {
+            if (fileEntry.getName().contains("Je_")) {
                 assertEquals(42, test(fileEntry));
             } else {
                 assertEquals(0, test(fileEntry));
