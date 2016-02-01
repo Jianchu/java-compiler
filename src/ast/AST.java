@@ -1,42 +1,28 @@
 package ast;
 
-public class AST {
+import parser.ParseTree;
+import scanner.Symbol;
 
+public class AST {
 	
-	/*
-	 * Literals
-	 */
-	private static class ValueLiteral extends ASTNode {
-		public String value;
-		public ValueLiteral(String val) {
-			value = val;
+	
+	public AST(ParseTree pt) {
+		
+	}
+	
+	private ASTNode buildTree(ParseTree pt) {
+		switch (pt.getTokenType()) {
+		case CompilationUnit:
+		default:
+			break;
 		}
-	}
-	
-	public static class IntegerLiteral extends ValueLiteral {
-		public IntegerLiteral(String val) {
-			super(val);
-		}
-	}
-	
-	public static class StringLiteral extends ValueLiteral {
-		public StringLiteral(String val) { super(val); }
-	}
-	
-	public static class BooleanLiteral extends ASTNode {
-		public boolean value;
-		public BooleanLiteral(boolean tf) {
-			value = tf;
-		}
-	}
-	
-	public static class NullLiteral extends ASTNode{
+		pt.getChildren();
+		return null;
 	}
 	
 	
-	
+
 	public static void main(String[] args) {
-		IntegerLiteral il = new AST.IntegerLiteral("12");
 		
 	}
 	
