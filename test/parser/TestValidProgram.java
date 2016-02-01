@@ -70,8 +70,7 @@ public class TestValidProgram {
 //      int i = 0;
 //      for (final File fileEntry : files.listFiles()) {
 //
-//          String content = new Scanner(fileEntry).useDelimiter("\\Z").next();
-//          if (content.contains("EXCEPTION")) {
+//          if (fileEntry.getName().contains("Je_")) {
 //              parameters[i][0] = 42;
 //              parameters[i][1] = fileEntry;
 //          } else {
