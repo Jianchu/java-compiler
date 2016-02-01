@@ -16,11 +16,14 @@ public class Weeder {
 
     final private ParseTree parseTree;
     private String className;
+    private String fileName;
     private boolean isAbstractClass = false;
 
-    public Weeder(ParseTree parseTree) throws Exception {
+    public Weeder(ParseTree parseTree, String fileName) throws Exception {
         this.parseTree = parseTree;
+        this.fileName = fileName;
     }
+
 
     public void weed() throws WeedException {
         ParseTree ClassDecNode = findNode(parseTree, Symbol.ClassDeclaration);
@@ -34,6 +37,10 @@ public class Weeder {
                     visitClassBody(child);
                 } else if (checkNodeType(child, Symbol.ID)) {
                     this.className = child.getLexeme();
+                    if (!this.className.equals(this.fileName)) {
+                        throw new WeedException(
+                                "Class's name has to be same as file's name");
+                    }
                 }
             }
         } else {
@@ -41,6 +48,12 @@ public class Weeder {
             for (ParseTree child : InterfaceDecNode.getChildren()) {
                 if (checkNodeType(child, Symbol.Modifiers)) {
                     noModifier = false;
+                } else if (checkNodeType(child, Symbol.ID)) {
+                    this.className = child.getLexeme();
+                    if (!this.className.equals(this.fileName)) {
+                        throw new WeedException(
+                                "Interface's name has to be same as file's name");
+                    }
                 }
             }
             if (InterfaceDecNode != null) {
