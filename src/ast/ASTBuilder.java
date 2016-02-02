@@ -2,10 +2,11 @@ package ast;
 
 import java.util.List;
 
+import exceptions.ASTException;
 import parser.ParseTree;
 
 public class ASTBuilder {
-	public static CompilationUnit parseCompilationUnit(ParseTree pt) {
+	public static CompilationUnit parseCompilationUnit(ParseTree pt) throws ASTException {
 		
 		CompilationUnit cu = new CompilationUnit();
 		List<ParseTree> subTrees = pt.getChildren();

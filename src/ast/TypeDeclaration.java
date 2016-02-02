@@ -2,6 +2,7 @@ package ast;
 
 import java.util.List;
 
+import exceptions.ASTException;
 import parser.ParseTree;
 
 /**
@@ -25,7 +26,7 @@ public class TypeDeclaration extends BodyDeclaration{
 	// field or method declarations, but no type delcarations
 	List<BodyDeclaration> members;
 	
-	public TypeDeclaration(ParseTree pt) {
+	public TypeDeclaration(ParseTree pt) throws ASTException {
 		for (ParseTree child : pt.getChildren()) {
 			switch(child.getTokenType()) {
 			case PackageDeclaration:
@@ -34,7 +35,8 @@ public class TypeDeclaration extends BodyDeclaration{
 				break;
 			case TypeDeclarations:
 				break;
-				
+			default:
+				throw new ASTException("Unexpected node type.");	
 			}
 		}
 	}
