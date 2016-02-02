@@ -26,6 +26,16 @@ public class TypeDeclaration extends BodyDeclaration{
 	List<BodyDeclaration> members;
 	
 	public TypeDeclaration(ParseTree pt) {
-		
+		for (ParseTree child : pt.getChildren()) {
+			switch(child.getTokenType()) {
+			case PackageDeclaration:
+				break;
+			case ImportDeclarations:
+				break;
+			case TypeDeclarations:
+				break;
+				
+			}
+		}
 	}
 }
