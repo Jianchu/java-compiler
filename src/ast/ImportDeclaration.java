@@ -10,6 +10,7 @@ public class ImportDeclaration {
 	boolean onDemand;
 	
 	public ImportDeclaration(ParseTree pt) throws ASTException {
+		onDemand = false;
 		for (ParseTree child : pt.getChildren()) {
 			switch(child.getTokenType()) {
 			case ImportDeclarations:
@@ -17,8 +18,10 @@ public class ImportDeclaration {
 				break;
 			case ImportDeclaration:
 				ParseTree singleOrDemand = child.getChildren().get(0);
-				if (singleOrDemand.getTokenType() == Symbol.SingleTypeImportDeclaration) {
-					
+				ParseTree nameTree = ASTBuilder.findChild(child, Symbol.Name);
+				name = Name.parseName(nameTree);
+				if (singleOrDemand.getTokenType() == Symbol.TypeImportOnDemandDeclaration) {
+					onDemand = true;
 				}
 				break;
 			default:
