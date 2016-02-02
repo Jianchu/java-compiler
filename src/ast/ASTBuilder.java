@@ -17,18 +17,11 @@ public class ASTBuilder {
 			case PackageDeclaration:
 				break;
 			case TypeDeclaration:
-				TypeDeclaration td = parseTypeDeclaration(pt);
-//				cu.addTypeDeclaraiton();
+				TypeDeclaration td = new TypeDeclaration(t);
 				break;
 			}
 		}
 		
-		return null;
-	}
-	
-	public static TypeDeclaration parseTypeDeclaration(ParseTree pt) {
-		
-		Block body = (Block) parseStatement(pt);
 		return null;
 	}
 	

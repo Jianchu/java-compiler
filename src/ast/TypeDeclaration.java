@@ -2,6 +2,8 @@ package ast;
 
 import java.util.List;
 
+import parser.ParseTree;
+
 /**
  * Either a class declaration or interface.
  * @author zanel
@@ -12,14 +14,18 @@ public class TypeDeclaration extends BodyDeclaration{
 	boolean isInterface;
 	
 	List<Modifier> modifiers;
-	String id;
+	SimpleName id;
 	
 	// extends 
-	Name superClass;
+	Type superClass;
 	
 	// implements
-	List<Name> superInterfaces;
+	List<Type> superInterfaces;
 	
 	// field or method declarations, but no type delcarations
 	List<BodyDeclaration> members;
+	
+	public TypeDeclaration(ParseTree pt) {
+		
+	}
 }
