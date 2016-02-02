@@ -29,12 +29,6 @@ public class TypeDeclaration extends BodyDeclaration{
 	public TypeDeclaration(ParseTree pt) throws ASTException {
 		for (ParseTree child : pt.getChildren()) {
 			switch(child.getTokenType()) {
-			case PackageDeclaration:
-				break;
-			case ImportDeclarations:
-				break;
-			case TypeDeclarations:
-				break;
 			default:
 				throw new ASTException("Unexpected node type.");	
 			}

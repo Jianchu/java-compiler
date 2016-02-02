@@ -20,6 +20,8 @@ public class ASTBuilder {
 			case TypeDeclaration:
 				TypeDeclaration td = new TypeDeclaration(t);
 				break;
+			default:
+				throw new ASTException("Unexpected node type.");	
 			}
 		}
 		

@@ -1,10 +1,14 @@
 package ast;
 
+import parser.ParseTree;
+
 /**
  * A name is either a simple name or qualified name.
  * @author zanel
  *
  */
-public class Name {
-
+public abstract class Name extends ASTNode {
+	public static Name parseName(ParseTree pt) {
+		return null;
+	}
 }
