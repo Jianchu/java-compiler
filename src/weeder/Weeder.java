@@ -100,10 +100,11 @@ public class Weeder {
                         blockNode = findNode(child, Symbol.Block);
                         if (blockNode != null) {
                             visitModifier(modifierNode, Symbol.MethodDeclaration);
-                            ParseTree castNode = findNode(blockNode, Symbol.CastExpression);
-                            if (castNode != null) {
-                                visitCast(castNode);
-                            }
+//                            ParseTree castNode = findNode(blockNode, Symbol.CastExpression);
+//                            if (castNode != null) {
+//                                visitCast(castNode);
+//                            }
+                            visitBlock(blockNode);
                         } else {
                             visitModifier(modifierNode, Symbol.Block);
                         }
@@ -123,6 +124,59 @@ public class Weeder {
             throw new WeedException("Every class must contain at least one explicit constructor.");
         }
         visitConstructorDec(constructorDecs);
+    }
+
+    private void visitBlock(ParseTree blockNode) throws WeedException {
+        Queue<ParseTree> queue = new LinkedList<ParseTree>();
+        queue.add(blockNode);
+        while (!queue.isEmpty()) {
+            ParseTree currentNode = (ParseTree) queue.remove();
+            for (ParseTree child : currentNode.getChildren()) {
+                if (checkNodeType(child, Symbol.UnaryExpression)) {
+                    visitUnary(child, false);
+                } else {
+                    queue.add(child);
+                }
+            }
+        }
+    }
+
+    private void visitUnary(ParseTree unaryNode, boolean minusSibling) throws WeedException {
+        boolean isNegative = false;
+        for (ParseTree child : unaryNode.getChildren()) {
+            if (checkNodeType(child, Symbol.MINUS)) {
+                isNegative = true;
+            }
+        }
+        Queue<ParseTree> queue = new LinkedList<ParseTree>();
+        queue.add(unaryNode);
+        while (!queue.isEmpty()) {
+            ParseTree currentNode = (ParseTree) queue.remove();
+            for (ParseTree child : currentNode.getChildren()) {
+                if (checkNodeType(child, Symbol.UnaryExpression)) {
+                    if (isNegative) {
+                        visitUnary(child, true);
+                    } else {
+                        visitUnary(child, false);
+                    }
+                    
+                } else if (checkNodeType(child, Symbol.DECIMAL)) {
+                    String value = child.getLexeme();
+                    if (minusSibling) {
+                        value = "-" + value;
+                    }
+                    try {
+                        Integer.parseInt(value);
+                    } catch (NumberFormatException e) {
+                        throw e;
+                    }
+                } else if (checkNodeType(child, Symbol.CastExpression)) {
+                    visitCast(child);
+                } else {
+                    queue.add(child);
+                }
+            }
+        }
     }
 
     private void visitCast(ParseTree castNode) throws WeedException {
