@@ -199,11 +199,11 @@ ForStatementNoShortIf FOR LPAREN SEMICOLON SEMICOLON ForUpdate RPAREN StatementN
 ForStatementNoShortIf FOR LPAREN ForInit SEMICOLON SEMICOLON RPAREN StatementNoShortIf 
 ForStatementNoShortIf FOR LPAREN SEMICOLON Expression SEMICOLON RPAREN StatementNoShortIf 
 ForStatementNoShortIf FOR LPAREN SEMICOLON SEMICOLON RPAREN StatementNoShortIf
-ForInit StatementExpressionList
+ForInit StatementExpression
 ForInit LocalVariableDeclaration
 ForUpdate StatementExpression
-StatementExpressionList StatementExpression
-StatementExpressionList StatementExpressionList COMMA StatementExpression
+#StatementExpressionList StatementExpression
+#StatementExpressionList StatementExpressionList COMMA StatementExpression
 ReturnStatement RETURN Expression SEMICOLON
 ReturnStatement RETURN SEMICOLON
 
