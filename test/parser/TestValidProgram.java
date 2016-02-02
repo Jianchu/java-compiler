@@ -30,7 +30,7 @@ public class TestValidProgram {
     @Test
     public void testProgram() throws FileNotFoundException {
         for (final File fileEntry : files.listFiles()) {
-            System.out.println(fileEntry.getName().split("\\.")[0]);
+            System.out.println(fileEntry.getName().substring(0, fileEntry.getName().lastIndexOf('.')));
             if (fileEntry.getName().contains("Je_")) {
                 assertEquals(42, test(fileEntry));
             } else {
