@@ -1,5 +1,6 @@
 package ast;
 
+import exceptions.ASTException;
 import parser.ParseTree;
 import scanner.Symbol;
 
@@ -10,7 +11,7 @@ public class AST {
 		
 	}
 	
-	private ASTNode buildTree(ParseTree pt) {
+	private ASTNode buildTree(ParseTree pt) throws ASTException {
 		
 		ASTBuilder.parseCompilationUnit(pt);
 		
