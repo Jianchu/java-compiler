@@ -5,12 +5,11 @@ import parser.ParseTree;
 import scanner.Symbol;
 
 public class ImportDeclaration {
-	ImportDeclaration next;
-	Name name;
-	boolean onDemand;
+	ImportDeclaration next = null;
+	Name name = null;
+	boolean onDemand = false;
 	
 	public ImportDeclaration(ParseTree pt) throws ASTException {
-		onDemand = false;
 		for (ParseTree child : pt.getChildren()) {
 			switch(child.getTokenType()) {
 			case ImportDeclarations:
@@ -29,4 +28,15 @@ public class ImportDeclaration {
 			}
 		}
 	}
+	
+	public boolean hasNext() {
+		return next == null;
+	}
+	
+	public ImportDeclaration next() {
+		return next;
+	}
+	
+	
+	
 }
