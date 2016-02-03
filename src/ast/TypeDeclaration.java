@@ -85,9 +85,10 @@ public class TypeDeclaration extends BodyDeclaration{
 			case Super:
 				// parse extends
 				ParseTree classType = ASTBuilder.findChild(child, Symbol.ClassType);
-				
+				// TODO: parse classtype
 				break;
 			case Interfaces:
+				// TODO: interfacetype
 				break;
 			case  ClassBody:
 				break;

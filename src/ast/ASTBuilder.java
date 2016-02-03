@@ -1,5 +1,6 @@
 package ast;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import exceptions.ASTException;
@@ -45,5 +46,15 @@ public class ASTBuilder {
 			}
 		}
 		return null;
+	}
+	
+	public static <E extends Next<E>> List<E> getList(E elem) {
+		List<E> result = new LinkedList<E>();
+		result.add(elem);
+		while (elem.hasNext()) {
+			elem = elem.next();
+			result.add(elem);
+		}
+		return result;
 	}
 }
