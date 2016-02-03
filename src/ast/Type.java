@@ -1,5 +1,5 @@
 package ast;
 
-public class Type {
+public abstract class Type extends ASTNode{
 
 }
