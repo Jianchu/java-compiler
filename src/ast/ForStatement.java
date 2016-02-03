@@ -6,10 +6,10 @@ import exceptions.ASTException;
 
 public class ForStatement extends Statement{
 
-    public Expression forInit;
-    public Expression forCondition;
-    public Expression forUpdate;
-    public Statement forBody;
+    private Expression forInit;
+    private Expression forCondition;
+    private Expression forUpdate;
+    private Statement forBody;
 
     public ForStatement(ParseTree forNode) throws ASTException {
         for (ParseTree child : forNode.getChildren()) {
@@ -19,7 +19,7 @@ public class ForStatement extends Statement{
                     if (checkNodeType(forInitChild, Symbol.StatementExpression)) {
                         this.forInit = ASTBuilder.parseExpression(child);
                     } else if (checkNodeType(forInitChild, Symbol.LocalVariableDeclaration)) {
-                        // need local variable dec?
+                        //need local variable dec?
                     }
                 }
                 break;
@@ -27,7 +27,8 @@ public class ForStatement extends Statement{
                 this.forCondition = ASTBuilder.parseExpression(child);
                 break;
             case ForUpdate:
-                this.forUpdate = ASTBuilder.parseExpression(child);
+                // send StatementExpression to parseExpression
+                this.forUpdate = ASTBuilder.parseExpression(child.getChildren().get(0));
                 break;
             case Statement:
             case StatementNoShortIf:
@@ -50,12 +51,4 @@ public class ForStatement extends Statement{
     public Statement getForBody() {
         return this.forBody;
     }
-
-    private boolean checkNodeType(ParseTree node, Symbol symbol) {
-        if (node.getTokenType().equals(symbol)) {
-            return true;
-        }
-        return false;
-    }
-
 }
