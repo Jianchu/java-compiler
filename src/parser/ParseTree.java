@@ -42,6 +42,10 @@ public class ParseTree extends Token{
 		return children;
 	}
 	
+	public ParseTree getFirstChild() {
+		return children.get(0);
+	}
+	
 	public void pprint() {
 		pprint(0);
 	}
