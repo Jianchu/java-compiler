@@ -5,6 +5,7 @@ import java.util.List;
 
 import exceptions.ASTException;
 import parser.ParseTree;
+import scanner.Symbol;
 
 /**
  * Either a class declaration or interface.
@@ -16,7 +17,7 @@ public class TypeDeclaration extends BodyDeclaration{
 	boolean isInterface = false;
 	
 	List<Modifier> modifiers = new LinkedList<Modifier>();
-	SimpleName id;
+	String id;
 	
 	// extends 
 	Type superClass;
@@ -56,7 +57,7 @@ public class TypeDeclaration extends BodyDeclaration{
 		ParseTree child = pt.getChildren().get(0);
 		switch (child.getTokenType()) {
 		case ClassDeclaration:
-			
+			parseClassDeclaration(child);
 		case InterfaceDeclaration:
 			isInterface = true;
 			break;
@@ -65,17 +66,26 @@ public class TypeDeclaration extends BodyDeclaration{
 		}
 	}
 	
-	private void parseClassDeclaration(ParseTree pt) {
+	private void parseClassDeclaration(ParseTree pt) throws ASTException {
 		for (ParseTree child : pt.getChildren()) {
 			switch (child.getTokenType()) {
 			case Modifiers:
 				// parse modifiers
+				Modifier nextMod = new Modifier(child);
+				modifiers.add(nextMod);
+				while (nextMod.next != null) {
+					nextMod = nextMod.next;
+					modifiers.add(nextMod);
+				}
 				break;
 			case ID:
 				// parse name
+				id = ASTBuilder.parseID(child);
 				break;
 			case Super:
 				// parse extends
+				ParseTree classType = ASTBuilder.findChild(child, Symbol.ClassType);
+				
 				break;
 			case Interfaces:
 				break;

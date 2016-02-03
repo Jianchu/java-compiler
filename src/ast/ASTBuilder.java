@@ -23,6 +23,13 @@ public class ASTBuilder {
 		return null;
 	}
 	
+	public static String parseID(ParseTree pt) throws ASTException {
+		if (pt.getTokenType() != Symbol.ID) 
+			throw new ASTException();
+		return pt.getLexeme();
+		
+	}
+	
 	/**
 	 * Helper method for finding a child of specific type.
 	 * Uses linear search. 

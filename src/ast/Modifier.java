@@ -10,7 +10,7 @@ public class Modifier {
 	public static final int FINAL = 5;
 	public static final int NATIVE = 6;
 	
-	Modifier next;
+	public Modifier next;
 	private int mod;
 	public Modifier(ParseTree pt) {
 		for (ParseTree child : pt.getChildren()) {

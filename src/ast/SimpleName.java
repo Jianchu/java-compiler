@@ -1,5 +1,15 @@
 package ast;
 
-public class SimpleName extends Name {
+import parser.ParseTree;
 
+public class SimpleName extends Name {
+	String id;
+	
+	public SimpleName(ParseTree pt) {
+		id = pt.getChildren().get(0).getLexeme();
+	}
+	
+	public SimpleName(String name) {
+		id = name;
+	}
 }
