@@ -51,4 +51,8 @@ public class ForStatement extends Statement{
     public Statement getForBody() {
         return this.forBody;
     }
+
+    public Expression getForInit() {
+        return this.forInit;
+    }
 }
