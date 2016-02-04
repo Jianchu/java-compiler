@@ -10,6 +10,7 @@ import scanner.Symbol;
 public class MethodDeclaration extends BodyDeclaration{
 	List<Modifier> modifiers = new LinkedList<Modifier>();
 	boolean isConstructor = false;
+	boolean isAbstract = false;
 	Type returnType = null;	//what about void
 	String id;
 	
@@ -18,7 +19,8 @@ public class MethodDeclaration extends BodyDeclaration{
 	Block body = null;
 	
 	public MethodDeclaration(ParseTree pt) throws ASTException {
-		if (pt.getTokenType() == Symbol.MethodDeclaration) {
+		if (pt.getTokenType() == Symbol.MethodDeclaration
+				|| pt.getTokenType() == Symbol.AbstractMethodDeclaration) {
 			for (ParseTree child : pt.getChildren()) {
 				switch (child.getTokenType()) {
 				case MethodHeader:
@@ -26,6 +28,10 @@ public class MethodDeclaration extends BodyDeclaration{
 					break;
 				case MethodBody:
 					body = (Block) ASTBuilder.parseStatement(child.getFirstChild());
+					break;
+				case SEMICOLON:
+					// only appears in AbstractMethodDeclaration
+					isAbstract = true;
 					break;
 				default:
 					throw new ASTException();

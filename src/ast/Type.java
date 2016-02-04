@@ -1,5 +1,8 @@
 package ast;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import exceptions.ASTException;
 import parser.ParseTree;
 import scanner.Symbol;
@@ -42,5 +45,20 @@ public abstract class Type extends ASTNode{
 		throw new ASTException();
 	}
 	
+	public static List<Type> parseInterfaceTypeList(ParseTree pt) throws ASTException {
+		List<Type> result = new LinkedList<Type>();
+		for (ParseTree child : pt.getChildren()) {
+			switch(child.getTokenType()) {
+			case InterfaceTypeList:
+				result.addAll(parseInterfaceTypeList(child));
+				break;
+			case InterfaceType:
+				result.add(parseType(child));
+			default:
+				break;
+			}
+		}
+		return result;
+	}
 	
 }

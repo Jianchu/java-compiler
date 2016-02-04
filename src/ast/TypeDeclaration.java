@@ -26,7 +26,7 @@ public class TypeDeclaration extends BodyDeclaration{
 	List<Type> interfaces = new LinkedList<Type>();
 	
 	// field or method declarations, but no type delcarations
-	List<BodyDeclaration> members;
+	List<BodyDeclaration> members = new LinkedList<BodyDeclaration>();
 	
 	TypeDeclaration next;
 	
@@ -56,16 +56,22 @@ public class TypeDeclaration extends BodyDeclaration{
 	private void parseSingleType(ParseTree pt) throws ASTException {
 		ParseTree child = pt.getChildren().get(0);
 		switch (child.getTokenType()) {
-		case ClassDeclaration:
-			parseClassDeclaration(child);
 		case InterfaceDeclaration:
 			isInterface = true;
+			// intentional fallthrough
+		case ClassDeclaration:
+			parseClassDeclaration(child);
 			break;
 		default:
 			throw new ASTException("Unexpected node type.");
 		}
 	}
 	
+	/**
+	 * works for both Class and Interface
+	 * @param pt
+	 * @throws ASTException
+	 */
 	private void parseClassDeclaration(ParseTree pt) throws ASTException {
 		for (ParseTree child : pt.getChildren()) {
 			switch (child.getTokenType()) {
@@ -82,23 +88,91 @@ public class TypeDeclaration extends BodyDeclaration{
 				// parse name
 				id = ASTBuilder.parseID(child);
 				break;
+			
+			/*
+			 * class specific
+			 */
 			case Super:
 				// parse extends
-				superClass = Type.parseType(child);
+				superClass = Type.parseType(child.findChild(Symbol.ClassType));
 				break;
 			case Interfaces:
-				interfaces.add(Type.parseType(child));
+				// problem
+				interfaces.addAll(Type.parseInterfaceTypeList(child.findChild(Symbol.InterfaceTypeList)));
 				break;
 			case ClassBody:
 				// TODO: parse class body
 				parseClassBody(child);
 				break;
+			
+			/*
+			 * Interface specific
+			 */
+			case ExtendsInterfaces:
+				interfaces.addAll(Type.parseInterfaceTypeList(pt.findChild(Symbol.InterfaceTypeList)));
+				break;
+			case InterfaceBody:
+				parseInterfaceBody(child);
+				break;
 			}
 		}
 	}
 	
-	private void parseClassBody(ParseTree pt) {
-		
+
+	private void parseInterfaceBody(ParseTree pt) throws ASTException {
+		ParseTree declarations = pt.findChild(Symbol.InterfaceMemberDeclarations);
+		if  (declarations != null) {
+			parseInterfaceMemberDeclarations(declarations);
+		}
+	}
+	
+	private void parseInterfaceMemberDeclarations(ParseTree pt) {
+		for (ParseTree child : pt.getChildren()) {
+			switch(child.getTokenType()) {
+			case InterfaceMemberDeclarations:
+				parseInterfaceMemberDeclarations(child);
+				break;
+			case InterfaceMemberDeclaration:
+				child.findChild(Symbol.AbstractMethodDeclaration);
+				break;
+			}
+		}
+	}
+	
+	
+	private void parseClassBody(ParseTree pt) throws ASTException {
+		ParseTree declarations = pt.findChild(Symbol.ClassBodyDeclarations);
+		if  (declarations != null) {
+			parseClassBodyDeclarations(declarations);
+		}
+	}
+	
+	private void parseClassBodyDeclarations(ParseTree pt) throws ASTException {
+		for (ParseTree child : pt.getChildren()) {
+			switch(child.getTokenType()) {
+			case ClassBodyDeclarations:
+				parseClassBodyDeclarations(child);
+				break;
+			case ClassBodyDeclaration:
+				ParseTree member = child.getFirstChild();
+				if (member.getTokenType() == Symbol.ClassMemberDeclaration) {
+					ParseTree fieldOrMethod = member.getFirstChild();
+					switch(fieldOrMethod.getTokenType()) {
+					case FieldDeclaration:
+						members.add(new FieldDeclaration(fieldOrMethod));
+						break;
+					case MethodDeclaration:
+						members.add(new MethodDeclaration(fieldOrMethod));
+						break;
+					default:
+						break;
+					}
+				} else if (member.getTokenType() == Symbol.ConstructorDeclaration) {
+					members.add(new MethodDeclaration(member));
+				}
+				break;
+			}
+		}
 	}
 	
 }

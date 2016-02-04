@@ -139,8 +139,8 @@ InterfaceDeclaration Modifiers INTERFACE ID ExtendsInterfaces InterfaceBody
 InterfaceDeclaration INTERFACE ID ExtendsInterfaces InterfaceBody
 InterfaceDeclaration Modifiers INTERFACE ID InterfaceBody
 InterfaceDeclaration INTERFACE ID InterfaceBody
-ExtendsInterfaces EXTENDS InterfaceType
-ExtendsInterfaces ExtendsInterfaces COMMA InterfaceType
+ExtendsInterfaces EXTENDS InterfaceTypeList
+#ExtendsInterfaces ExtendsInterfaces COMMA InterfaceType
 InterfaceBody LBRACE RBRACE
 InterfaceBody LBRACE InterfaceMemberDeclarations RBRACE
 InterfaceMemberDeclarations InterfaceMemberDeclarations InterfaceMemberDeclaration
