@@ -56,10 +56,11 @@ public class TypeDeclaration extends BodyDeclaration{
 	private void parseSingleType(ParseTree pt) throws ASTException {
 		ParseTree child = pt.getChildren().get(0);
 		switch (child.getTokenType()) {
-		case ClassDeclaration:
-			parseClassDeclaration(child);
 		case InterfaceDeclaration:
 			isInterface = true;
+			// intentional fallthrough
+		case ClassDeclaration:
+			parseClassDeclaration(child);
 			break;
 		default:
 			throw new ASTException("Unexpected node type.");
@@ -87,20 +88,57 @@ public class TypeDeclaration extends BodyDeclaration{
 				// parse name
 				id = ASTBuilder.parseID(child);
 				break;
+			
+			/*
+			 * class specific
+			 */
 			case Super:
 				// parse extends
-				superClass = Type.parseType(child);
+				superClass = Type.parseType(child.findChild(Symbol.ClassType));
 				break;
 			case Interfaces:
-				interfaces.add(Type.parseType(child));
+				// problem
+				interfaces.addAll(Type.parseInterfaceTypeList(child.findChild(Symbol.InterfaceTypeList)));
 				break;
 			case ClassBody:
 				// TODO: parse class body
 				parseClassBody(child);
 				break;
+			
+			/*
+			 * Interface specific
+			 */
+			case ExtendsInterfaces:
+				interfaces.addAll(Type.parseInterfaceTypeList(pt.findChild(Symbol.InterfaceTypeList)));
+				break;
+			case InterfaceBody:
+				parseInterfaceBody(child);
+				break;
 			}
 		}
 	}
+	
+
+	private void parseInterfaceBody(ParseTree pt) throws ASTException {
+		ParseTree declarations = pt.findChild(Symbol.InterfaceMemberDeclarations);
+		if  (declarations != null) {
+			parseInterfaceMemberDeclarations(declarations);
+		}
+	}
+	
+	private void parseInterfaceMemberDeclarations(ParseTree pt) {
+		for (ParseTree child : pt.getChildren()) {
+			switch(child.getTokenType()) {
+			case InterfaceMemberDeclarations:
+				parseInterfaceMemberDeclarations(child);
+				break;
+			case InterfaceMemberDeclaration:
+				child.findChild(Symbol.AbstractMethodDeclaration);
+				break;
+			}
+		}
+	}
+	
 	
 	private void parseClassBody(ParseTree pt) throws ASTException {
 		ParseTree declarations = pt.findChild(Symbol.ClassBodyDeclarations);
