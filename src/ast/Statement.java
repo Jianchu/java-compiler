@@ -21,10 +21,10 @@ public abstract class Statement extends ASTNode {
         case ForStatement:
             return new ForStatement(realStatement);
         case StatementWithoutTrailingSubstatement:
+            // return null for empty statement and "return;"
             return getStatementNoTrailing(realStatement);
         }
         throw new ASTException();
-        // return null for empty statement and "return;"
     }
 
     private static Statement getStatementNoTrailing(ParseTree statementNoTrailingNode) throws ASTException {
@@ -39,7 +39,6 @@ public abstract class Statement extends ASTNode {
             break;
         case ExpressionStatement:
             statement = new ExpressionStatement(realStatement);
-            // call expression?
             break;
         case ReturnStatement:
             statement = new ReturnStatement(realStatement);

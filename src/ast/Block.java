@@ -15,11 +15,10 @@ import exceptions.ASTException;
  */
 public class Block extends Statement {
     // a block is just a list of statements
-    // maybe we should use Object rather than statement
-    private List<ASTNode> statements;
+    private List<Statement> statements;
 
     public Block(ParseTree blockNode) throws ASTException {
-        statements = new ArrayList<ASTNode>();
+        statements = new ArrayList<Statement>();
         visitBlockStatement(blockNode);
     }
 
@@ -31,10 +30,10 @@ public class Block extends Statement {
             for (ParseTree child : currentNode.getChildren()) {
                 if (checkNodeType(child, Symbol.BlockStatement)) {
                     for (ParseTree blockStatementChild : child.getChildren()) {
-                        if (checkNodeType(child, Symbol.LocalVariableDeclaration)) {
-                            statements.add(new VariableDeclaration(child));
-                        } else if (checkNodeType(child, Symbol.Statement)) {
-                            Statement statement = ASTBuilder.parseStatement(child);
+                        if (checkNodeType(blockStatementChild, Symbol.LocalVariableDeclaration)) {
+                            statements.add(new VariableDeclarationStatement(blockStatementChild));
+                        } else if (checkNodeType(blockStatementChild, Symbol.Statement)) {
+                            Statement statement = ASTBuilder.parseStatement(blockStatementChild);
                             statements.add(statement);
                         }
                     }
@@ -46,7 +45,7 @@ public class Block extends Statement {
         }
     }
 
-    public List<ASTNode> getBlockStatements() {
+    public List<Statement> getBlockStatements() {
         return this.statements;
     }
 }

@@ -15,7 +15,7 @@ public class ASTBuilder {
 	}
 	//parameter should be Statement or StatementNoShortIf
 	public static Statement parseStatement(ParseTree pt) throws ASTException {
-        Statement st = Statement.visitStatement(pt);
+            Statement st = Statement.visitStatement(pt);
 		return st;
 	}
 	

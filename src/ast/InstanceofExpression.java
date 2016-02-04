@@ -5,12 +5,13 @@ import java.util.List;
 import exceptions.ASTException;
 import parser.ParseTree;
 
-public class PrefixExpression extends Expression {
-    // op must be NOT
+public class InstanceofExpression extends Expression {
     Expression expr;
+    Type type;
 
-    public PrefixExpression(ParseTree pt) throws ASTException {
+    public InstanceofExpression(ParseTree pt) throws ASTException{
         List<ParseTree> subtrees = pt.getChildren();
         expr = Expression.parseExpression(subtrees.get(0));
+        type = Type.parseType(subtrees.get(2));
     }
 }
