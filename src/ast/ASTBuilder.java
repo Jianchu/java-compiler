@@ -13,7 +13,7 @@ public class ASTBuilder {
 		CompilationUnit cu = new CompilationUnit(pt);
 		return cu;
 	}
-	
+	//parameter should be Statement or StatementNoShortIf
 	public static Statement parseStatement(ParseTree pt) throws ASTException {
 		Statement st = Statement.getStatement(pt);
 		return st;
