@@ -14,9 +14,9 @@ public class ASTBuilder {
 		return cu;
 	}
 	
-	public static Statement parseStatement(ParseTree pt) {
-		
-		return null;
+	public static Statement parseStatement(ParseTree pt) throws ASTException {
+		Statement st = Statement.getStatement(pt);
+		return st;
 	}
 	
 	public static Expression parseExpression(ParseTree pt) {
