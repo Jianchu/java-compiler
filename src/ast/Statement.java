@@ -38,7 +38,7 @@ public abstract class Statement extends ASTNode {
         return null;
     }
 
-    private static Statement getStatementNoTrailing(ParseTree statementNoTrailingNode) {
+    private static Statement getStatementNoTrailing(ParseTree statementNoTrailingNode) throws ASTException {
         Statement statement;
         ParseTree realStatement = statementNoTrailingNode.getChildren().get(0);
         switch(realStatement.getTokenType()) {

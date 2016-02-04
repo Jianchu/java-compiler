@@ -7,6 +7,7 @@ import java.util.Queue;
 
 import parser.ParseTree;
 import scanner.Symbol;
+import exceptions.ASTException;
 
 
 /**
@@ -17,12 +18,12 @@ public class Block extends Statement {
     // maybe we should use Object rather than statement
     private List<Statement> statements;
 
-    public Block(ParseTree blockNode) {
+    public Block(ParseTree blockNode) throws ASTException {
         statements = new ArrayList<Statement>();
         visitBlockStatement(blockNode);
     }
 
-    private void visitBlockStatement(ParseTree blockNode) {
+    private void visitBlockStatement(ParseTree blockNode) throws ASTException {
         Queue<ParseTree> queue = new LinkedList<ParseTree>();
         queue.add(blockNode);
         while (!queue.isEmpty()) {
