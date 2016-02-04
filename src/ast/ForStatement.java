@@ -22,7 +22,7 @@ public class ForStatement extends Statement{
                     if (checkNodeType(forInitChild, Symbol.StatementExpression)) {
                         this.forInit = ASTBuilder.parseExpression(child);
                     } else if (checkNodeType(forInitChild, Symbol.LocalVariableDeclaration)) {
-                        this.forInit = new VariableDeclaration(forInitChild);
+                        this.forInit = new VariableDeclarationStatement(forInitChild);
                     }
                 }
                 break;
