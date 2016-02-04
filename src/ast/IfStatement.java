@@ -16,6 +16,7 @@ public class IfStatement extends Statement{
         if (elseNode != null) {
             hasElse = true;
         }
+        // not sure what will happen...
         int ithChild = 0;
         for (ParseTree child : ifNode.getChildren()) {
             switch (child.getTokenType()) {

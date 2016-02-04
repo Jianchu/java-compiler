@@ -15,7 +15,7 @@ import exceptions.ASTException;
  */
 public class Block extends Statement {
     // a block is just a list of statements
-    // maybe we should use Object rather than statement
+    // maybe we should use ASTNode rather than statement? Same as forInit
     private List<ASTNode> statements;
 
     public Block(ParseTree blockNode) throws ASTException {
