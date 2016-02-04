@@ -12,7 +12,7 @@ public class IfStatement extends Statement{
     private boolean hasElse = false;
 
     public IfStatement(ParseTree ifNode) throws ASTException {
-        ParseTree elseNode = ASTBuilder.findChild(ifNode, Symbol.ELSE);
+        ParseTree elseNode = ifNode.findChild(Symbol.ELSE);
         if (elseNode != null) {
             hasElse = true;
         }

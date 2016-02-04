@@ -8,7 +8,7 @@ public class ReturnStatement extends Statement {
     private Expression returnExpression;
 
     public ReturnStatement(ParseTree returnNode) {
-        ParseTree expressionNode = ASTBuilder.findChild(returnNode, Symbol.Expression);
+        ParseTree expressionNode = returnNode.findChild(Symbol.Expression);
         // don't check null intentionally
         this.returnExpression = ASTBuilder.parseExpression(expressionNode);
     }

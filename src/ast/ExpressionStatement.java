@@ -8,9 +8,8 @@ public class ExpressionStatement extends Statement{
     private Expression statementExpression;
 
     public ExpressionStatement(ParseTree expressionStatementNode) {
-        ParseTree StatementExpressionNode = ASTBuilder.findChild(
-                expressionStatementNode,
-                Symbol.StatementExpression);
+        ParseTree StatementExpressionNode = expressionStatementNode
+                .findChild(Symbol.StatementExpression);
         if (StatementExpressionNode != null) {
             statementExpression = ASTBuilder
                     .parseExpression(StatementExpressionNode);
