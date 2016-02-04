@@ -13,7 +13,7 @@ import org.junit.Test;
 import scanner.Token;
 import weeder.Weeder;
 
-public class TestValidProgram {
+public class IterativeTestMarmoset {
 
     File grammar;
     static File files;
@@ -53,33 +53,4 @@ public class TestValidProgram {
         }
         return 0;
     }
-    
-
-//    public TestValidProgram(File input, int expectedResult) {
-//        this.input = input;
-//        this.expectedResult = expectedResult;
-//    }
-    
-//  @Rule
-//  public ExpectedException thrown = ExpectedException.none();
-//
-//  @Parameterized.Parameters
-//  public static Collection testA1() throws FileNotFoundException {
-//      files = new File(System.getProperty("user.dir")
-//              + "/assignment_testcases/a1");
-//      Object[][] parameters = new Object[320][2];
-//      int i = 0;
-//      for (final File fileEntry : files.listFiles()) {
-//
-//          if (fileEntry.getName().contains("Je_")) {
-//              parameters[i][0] = 42;
-//              parameters[i][1] = fileEntry;
-//          } else {
-//              parameters[i][0] = 0;
-//              parameters[i][1] = fileEntry;
-//          }
-//          i++;
-//      }
-//      return Arrays.asList(parameters);
-//  }
 }
