@@ -9,7 +9,7 @@ public abstract class Statement extends ASTNode {
     private static Statement statement = null;
     private static Expression statementExpression = null;
 
-    private static void visitStatement(ParseTree statementNode)
+    public static Statement visitStatement(ParseTree statementNode)
             throws ASTException {
         ParseTree realStatement = statementNode.getChildren().get(0);
         switch (realStatement.getTokenType()) {
@@ -29,6 +29,7 @@ public abstract class Statement extends ASTNode {
         case StatementWithoutTrailingSubstatement:
             statement = getStatementNoTrailing(realStatement);
         }
+        return statement;
         // return null for empty statement and "return;"
     }
 
@@ -43,10 +44,7 @@ public abstract class Statement extends ASTNode {
             // return null?
             break;
         case ExpressionStatement:
-            ParseTree statementExpr = realStatement.findChild(Symbol.StatementExpression);
-            if (statementExpr != null) {
-                statementExpression = ASTBuilder.parseExpression(statementExpr);
-            }
+            statement = new ExpressionStatement(realStatement);
             // call expression?
             break;
         case ReturnStatement:
@@ -55,17 +53,6 @@ public abstract class Statement extends ASTNode {
         }
         // return null for empty statement and "return;"
         return statement;
-    }
-
-    public static Statement getStatement(ParseTree statementNode) throws ASTException {
-        visitStatement(statementNode);
-        return statement;
-    }
-
-    // This is not good...
-    public static Expression getStatementExpression(ParseTree statementNode) throws ASTException {
-        visitStatement(statementNode);
-        return statementExpression;
     }
 
     protected boolean checkNodeType(ParseTree node, Symbol symbol) {
