@@ -26,7 +26,7 @@ public class TypeDeclaration extends BodyDeclaration{
 	List<Type> interfaces = new LinkedList<Type>();
 	
 	// field or method declarations, but no type delcarations
-	List<BodyDeclaration> members;
+	List<BodyDeclaration> members = new LinkedList<BodyDeclaration>();
 	
 	TypeDeclaration next;
 	
@@ -66,6 +66,11 @@ public class TypeDeclaration extends BodyDeclaration{
 		}
 	}
 	
+	/**
+	 * works for both Class and Interface
+	 * @param pt
+	 * @throws ASTException
+	 */
 	private void parseClassDeclaration(ParseTree pt) throws ASTException {
 		for (ParseTree child : pt.getChildren()) {
 			switch (child.getTokenType()) {
@@ -97,8 +102,39 @@ public class TypeDeclaration extends BodyDeclaration{
 		}
 	}
 	
-	private void parseClassBody(ParseTree pt) {
-		
+	private void parseClassBody(ParseTree pt) throws ASTException {
+		ParseTree declarations = pt.findChild(Symbol.ClassBodyDeclarations);
+		if  (declarations != null) {
+			parseClassBodyDeclarations(declarations);
+		}
+	}
+	
+	private void parseClassBodyDeclarations(ParseTree pt) throws ASTException {
+		for (ParseTree child : pt.getChildren()) {
+			switch(child.getTokenType()) {
+			case ClassBodyDeclarations:
+				parseClassBodyDeclarations(child);
+				break;
+			case ClassBodyDeclaration:
+				ParseTree member = child.getFirstChild();
+				if (member.getTokenType() == Symbol.ClassMemberDeclaration) {
+					ParseTree fieldOrMethod = member.getFirstChild();
+					switch(fieldOrMethod.getTokenType()) {
+					case FieldDeclaration:
+						members.add(new FieldDeclaration(fieldOrMethod));
+						break;
+					case MethodDeclaration:
+						members.add(new MethodDeclaration(fieldOrMethod));
+						break;
+					default:
+						break;
+					}
+				} else if (member.getTokenType() == Symbol.ConstructorDeclaration) {
+					members.add(new MethodDeclaration(member));
+				}
+				break;
+			}
+		}
 	}
 	
 }
