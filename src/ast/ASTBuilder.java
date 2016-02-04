@@ -3,9 +3,9 @@ package ast;
 import java.util.LinkedList;
 import java.util.List;
 
-import exceptions.ASTException;
 import parser.ParseTree;
 import scanner.Symbol;
+import exceptions.ASTException;
 
 public class ASTBuilder {
 	public static CompilationUnit parseCompilationUnit(ParseTree pt) throws ASTException {
@@ -14,8 +14,11 @@ public class ASTBuilder {
 		return cu;
 	}
 	//parameter should be Statement or StatementNoShortIf
+	//statement could be one of statements or expression
 	public static Statement parseStatement(ParseTree pt) throws ASTException {
 		Statement st = Statement.getStatement(pt);
+		//how to deal with the following situation?
+		Expression ep = Statement.getStatementExpression(pt);
 		return st;
 	}
 	

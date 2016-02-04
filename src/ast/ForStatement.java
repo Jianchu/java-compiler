@@ -6,7 +6,9 @@ import exceptions.ASTException;
 
 public class ForStatement extends Statement{
 
-    private Expression forInit;
+    // type for forInit? It could be VariableDeclaration or StatementExpression.
+
+    private ASTNode forInit;
     private Expression forCondition;
     private Expression forUpdate;
     private Statement forBody;
@@ -19,6 +21,7 @@ public class ForStatement extends Statement{
                     if (checkNodeType(forInitChild, Symbol.StatementExpression)) {
                         this.forInit = ASTBuilder.parseExpression(child);
                     } else if (checkNodeType(forInitChild, Symbol.LocalVariableDeclaration)) {
+                        this.forInit = new VariableDeclaration(forInitChild);
                         //need local variable dec?
                     }
                 }
@@ -52,7 +55,7 @@ public class ForStatement extends Statement{
         return this.forBody;
     }
 
-    public Expression getForInit() {
+    public ASTNode getForInit() {
         return this.forInit;
     }
 }

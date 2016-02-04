@@ -5,7 +5,7 @@ import scanner.Symbol;
 
 public class ReturnStatement extends Statement {
 
-    private Expression returnExpression;
+    private Expression returnExpression = null;
 
     public ReturnStatement(ParseTree returnNode) {
         ParseTree expressionNode = returnNode.findChild(Symbol.Expression);

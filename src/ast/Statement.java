@@ -6,16 +6,11 @@ import exceptions.ASTException;
 
 public abstract class Statement extends ASTNode {
 
+    private static Statement statement = null;
+    private static Expression statementExpression = null;
 
-    protected boolean checkNodeType(ParseTree node, Symbol symbol) {
-        if (node.getTokenType().equals(symbol)) {
-            return true;
-        }
-        return false;
-    }
-
-    protected static Statement getStatement(ParseTree statementNode) throws ASTException {
-        Statement statement;
+    public static Statement visitStatement(ParseTree statementNode)
+            throws ASTException {
         ParseTree realStatement = statementNode.getChildren().get(0);
         switch (realStatement.getTokenType()) {
         case IfThenStatement:
@@ -34,12 +29,12 @@ public abstract class Statement extends ASTNode {
         case StatementWithoutTrailingSubstatement:
             statement = getStatementNoTrailing(realStatement);
         }
-        // should return null?
-        return null;
+        return statement;
+        // return null for empty statement and "return;"
     }
 
     private static Statement getStatementNoTrailing(ParseTree statementNoTrailingNode) throws ASTException {
-        Statement statement;
+        Statement statement = null;
         ParseTree realStatement = statementNoTrailingNode.getChildren().get(0);
         switch(realStatement.getTokenType()) {
         case Block:
@@ -49,13 +44,21 @@ public abstract class Statement extends ASTNode {
             // return null?
             break;
         case ExpressionStatement:
+            statement = new ExpressionStatement(realStatement);
             // call expression?
             break;
         case ReturnStatement:
             statement = new ReturnStatement(realStatement);
             break;
         }
-        // should return null?
-        return null;
+        // return null for empty statement and "return;"
+        return statement;
+    }
+
+    protected boolean checkNodeType(ParseTree node, Symbol symbol) {
+        if (node.getTokenType().equals(symbol)) {
+            return true;
+        }
+        return false;
     }
 }
