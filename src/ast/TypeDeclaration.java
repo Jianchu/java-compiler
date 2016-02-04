@@ -91,6 +91,7 @@ public class TypeDeclaration extends BodyDeclaration{
 				break;
 			case ClassBody:
 				// TODO: parse class body
+				parseClassBody(child);
 				break;
 			}
 		}
