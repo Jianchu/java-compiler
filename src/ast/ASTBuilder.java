@@ -14,11 +14,8 @@ public class ASTBuilder {
 		return cu;
 	}
 	//parameter should be Statement or StatementNoShortIf
-	//statement could be one of statements or expression
 	public static Statement parseStatement(ParseTree pt) throws ASTException {
-		Statement st = Statement.getStatement(pt);
-		//how to deal with the following situation?
-		Expression ep = Statement.getStatementExpression(pt);
+        Statement st = Statement.visitStatement(pt);
 		return st;
 	}
 	

@@ -6,9 +6,6 @@ import exceptions.ASTException;
 
 public abstract class Statement extends ASTNode {
 
-    private static Statement statement = null;
-    private static Expression statementExpression = null;
-
     public static Statement visitStatement(ParseTree statementNode)
             throws ASTException {
         ParseTree realStatement = statementNode.getChildren().get(0);
@@ -16,20 +13,17 @@ public abstract class Statement extends ASTNode {
         case IfThenStatement:
         case IfThenElseStatement:
         case IfThenElseStatementNoShortIf:
-            statement = new IfStatement(realStatement);
-            break;
+            return new IfStatement(realStatement);
         case WhileStatement:
         case WhileStatementNoShortIf:
-            statement = new WhileStatement(realStatement);
-            break;
+            return new WhileStatement(realStatement);
         case ForStatementNoShortIf:
         case ForStatement:
-            statement = new ForStatement(realStatement);
-            break;
+            return new ForStatement(realStatement);
         case StatementWithoutTrailingSubstatement:
-            statement = getStatementNoTrailing(realStatement);
+            return getStatementNoTrailing(realStatement);
         }
-        return statement;
+        throw new ASTException();
         // return null for empty statement and "return;"
     }
 
