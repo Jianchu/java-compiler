@@ -128,8 +128,9 @@ ConstructorDeclaration Modifiers ConstructorDeclarator ConstructorBody
 ConstructorDeclaration ConstructorDeclarator ConstructorBody
 ConstructorDeclarator SimpleName LPAREN FormalParameterList RPAREN
 ConstructorDeclarator SimpleName LPAREN RPAREN
-ConstructorBody LBRACE BlockStatements RBRACE
-ConstructorBody LBRACE RBRACE
+ConstructorBody Block
+#ConstructorBody LBRACE BlockStatements RBRACE
+#ConstructorBody LBRACE RBRACE
 
 #production for interface
 #interface extends? abstract method?

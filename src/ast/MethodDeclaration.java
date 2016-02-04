@@ -19,18 +19,18 @@ public class MethodDeclaration extends BodyDeclaration{
 	
 	public MethodDeclaration(ParseTree pt) throws ASTException {
 		if (pt.getTokenType() == Symbol.MethodDeclaration) {
-		for (ParseTree child : pt.getChildren()) {
-			switch (child.getTokenType()) {
-			case MethodHeader:
-				parseMethodHeader(child);
-				break;
-			case MethodBody:
-				body = (Block) ASTBuilder.parseStatement(child.getFirstChild());
-				break;
-			default:
-				throw new ASTException();
+			for (ParseTree child : pt.getChildren()) {
+				switch (child.getTokenType()) {
+				case MethodHeader:
+					parseMethodHeader(child);
+					break;
+				case MethodBody:
+					body = (Block) ASTBuilder.parseStatement(child.getFirstChild());
+					break;
+				default:
+					throw new ASTException();
+				}
 			}
-		}
 		} else if (pt.getTokenType() == Symbol.ConstructorDeclaration) {
 			isConstructor = true;
 			for (ParseTree child : pt.getChildren()) {
@@ -41,7 +41,7 @@ public class MethodDeclaration extends BodyDeclaration{
 				case ConstructorDeclarator:
 					parseConstructorDeclarator(child);
 				case ConstructorBody:
-					body = (Block) ASTBuilder.parseStatement(child);
+					body = (Block) ASTBuilder.parseStatement(child.getFirstChild());
 					break;
 				default:
 					throw new ASTException();
