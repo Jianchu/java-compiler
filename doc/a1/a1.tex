@@ -1,25 +1,29 @@
-\documentclass{report}
+\documentclass[notitlepage]{report}
 \usepackage{graphicx}
-\title{Assignment 1 Technical Report}
-\author{team}
+
+\title{CS444/644 Assignment 1 Technical Report}
+\author{Ho-Yi Fung, Jianchu Li, Zhiyuan Lin}
 \date{}
 
 \begin{document}
 
-\maketitle
+{\let\newpage\relax\maketitle}
+\begin{abstract}
+bleh bleh bleh
+\end{abstract}
+
+
 \tableofcontents
 
 
 
 \include{intro}
 
-\chapter{Scanner}
+\include{design}
 
-\include{scanner_design}
+\include{implementation}
 
-\include{scanner_implementation}
-
-\section{Testing}
+\chapter{Testing}
 
 
 \chapter{Conclusion}
