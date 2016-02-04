@@ -32,14 +32,16 @@ public class ASTBuilder {
 	}
 	
 	/**
+	 * Deprecated: please use ParseTree.findChild();
+	 * 
 	 * Helper method for finding a child of specific type.
 	 * Uses linear search. 
 	 * Please only use when you know for certain from certain a node would exist, and only appear once.
 	 * e.g. finding Name in "SingleTypeImportDeclaration IMPORT Name SEMICOLON"
 	 * @param pt
 	 * @return a child node of the type
-	 */
-	public static ParseTree findChild(ParseTree pt, Symbol sym) {
+
+		public static ParseTree findChild(ParseTree pt, Symbol sym) {
 		for (ParseTree child : pt.getChildren()) {
 			if (child.getTokenType() == sym) {
 				return child;
@@ -47,6 +49,7 @@ public class ASTBuilder {
 		}
 		return null;
 	}
+		 */
 	
 	public static <E extends Next<E>> List<E> getList(E elem) {
 		List<E> result = new LinkedList<E>();

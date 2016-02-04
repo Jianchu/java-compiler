@@ -27,6 +27,8 @@ public class FieldDeclaration extends BodyDeclaration{
 			case VariableDeclarator:
 				parseVariableDeclarator(child);
 				break;
+			default:
+				break;
 			}
 		}
 	}
@@ -39,6 +41,8 @@ public class FieldDeclaration extends BodyDeclaration{
 				break;
 			case VariableInitializer:
 				initializer = ASTBuilder.parseExpression(child.getFirstChild());
+				break;
+			default:
 				break;
 			}
 		}

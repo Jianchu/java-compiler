@@ -6,6 +6,7 @@ import scanner.Symbol;
 
 /**
  * Class or interface type
+ * This form includes both compound and simple name
  * @author zanel
  *
  */
