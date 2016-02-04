@@ -62,6 +62,7 @@ public abstract class Statement extends ASTNode {
         return statement;
     }
 
+    // This is not good...
     public static Expression getStatementExpression(ParseTree statementNode) throws ASTException {
         visitStatement(statementNode);
         return statementExpression;
