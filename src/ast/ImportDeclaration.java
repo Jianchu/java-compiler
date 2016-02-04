@@ -17,7 +17,7 @@ public class ImportDeclaration {
 				break;
 			case ImportDeclaration:
 				ParseTree singleOrDemand = child.getChildren().get(0);
-				ParseTree nameTree = ASTBuilder.findChild(child, Symbol.Name);
+				ParseTree nameTree = child.findChild(Symbol.Name);
 				name = Name.parseName(nameTree);
 				if (singleOrDemand.getTokenType() == Symbol.TypeImportOnDemandDeclaration) {
 					onDemand = true;

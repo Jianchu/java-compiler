@@ -2,7 +2,7 @@ package ast;
 
 import parser.ParseTree;
 
-public class Modifier {
+public class Modifier implements Next{
 	public static final int PUBLIC = 1;
 	public static final int PROTECTED = 2;
 	public static final int STATIC = 3;
@@ -40,5 +40,13 @@ public class Modifier {
 		case NATIVE:
 			mod = this.NATIVE;
 		}
+	}
+	
+	public boolean hasNext() {
+		return next == null;
+	}
+	
+	public Modifier next() {
+		return next;
 	}
 }

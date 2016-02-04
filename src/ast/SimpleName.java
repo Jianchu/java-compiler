@@ -2,6 +2,7 @@ package ast;
 
 import parser.ParseTree;
 
+
 public class SimpleName extends Name {
 	String id;
 	

@@ -20,10 +20,10 @@ public class TypeDeclaration extends BodyDeclaration{
 	String id;
 	
 	// extends 
-	Type superClass;
+	Type superClass = null;
 	
 	// implements
-	List<Type> superInterfaces;
+	List<Type> interfaces = new LinkedList<Type>();
 	
 	// field or method declarations, but no type delcarations
 	List<BodyDeclaration> members;
@@ -84,16 +84,20 @@ public class TypeDeclaration extends BodyDeclaration{
 				break;
 			case Super:
 				// parse extends
-				ParseTree classType = ASTBuilder.findChild(child, Symbol.ClassType);
-				// TODO: parse classtype
+				superClass = Type.parseType(child);
 				break;
 			case Interfaces:
-				// TODO: interfacetype
+				interfaces.add(Type.parseType(child));
 				break;
-			case  ClassBody:
+			case ClassBody:
+				// TODO: parse class body
 				break;
 			}
 		}
+	}
+	
+	private void parseClassBody(ParseTree pt) {
+		
 	}
 	
 }

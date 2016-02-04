@@ -42,6 +42,14 @@ public class ParseTree extends Token{
 		return children;
 	}
 	
+	public ParseTree findChild(Symbol sym) {
+		for (ParseTree child : children) {
+			if (child.getTokenType() == sym) {
+				return child;
+			}
+		}
+		return null;
+	}
 	public ParseTree getFirstChild() {
 		return children.get(0);
 	}
