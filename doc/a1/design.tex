@@ -1,9 +1,51 @@
 \chapter{Design}
 \section{Scanner}
-section for scanner design.
+We wanted to keep the scanner as simple as possible, and leave the complicated things for the parser or weeder.
+So, to start, we first sketched out the transitions for the Joos DFA.
+
+The first decision we made was how to differentiate between identifiers, keywords, null literals, and boolean literals.
+One possible way to do it would be to have states for each keyword, null, and boolean,
+  but since there are over fifty such elements, this would very quickly complicate the scanning process.
+So, instead, we would simply have one state for anything that could be an identifier
+  (i.e., everything that starts with a letter and contains only alphanumeric characters, underscores, or dollar signs),
+  then perform a second scan of the lexeme (by checking for equality) to determine which type the token should be.
+
+After sketching out the DFA, we realised that we did not need to backtrack at all when running the Maximal Munch algorithm:
+  the only states that were non-accepting and between accepting states were those associated with a block comment,
+  and since a slash (/) followed by an asterisk (*) could not form a valid Joos program,
+  it was simplier to fail the scanning than backtrack.
+
+Another thing we decided was that since both strings and characters could contain escape characters,
+  we would build a secondary DFA for escape characeters rather independently build it into both string and character scanning.
+
+We also decided the scanner would ensure that every character of input was a seven-bit ASCII value,
+  as the scanner reads one character of input at a time.
 
 \section{Parser}
+We also wanted to keep the parser simple, so we only cared about the production rules, leaving the meaning for the weeder.
+
+We found a copy of the grammar for the first edition of Java, as suggestion,
+  and adapted it for Joos by eliminating rules that contain features not available in the simplified language.
+
+We decided that, rather than embed the grammar directly into the code, we would keep it in a separate file so that,
+  should it be required, the grammar could be regenerated without affect the rest of the code.
 
 \section{Weeder}
+Now that the parser has output a parse tree, the weeder would ensure that the meaning fits the specifications of the language.
+
+For example, the list of modifiers had to be checked to ensure that there were no duplicate modifiers (e.g., \verb|final final|)
+  and no contradictary ones (e.g., \verb|abstract final| method).
+Modifiers might also be affected by other modifiers elsewhere; for example, a class must be abstract if any method within is.
+
+The weeder was also when the name of the class or interface was checked against the name of the file for equality
+  in addition to being compared with the constructor (which must be explicit for classes).
+
+In addition, casting rules (e.g., no casting to an expression) were checked,
+  and the range of integers had to fit in an \verb|int|.
 
 \section{Abstract Syntax Tree}
+The AST was split into a hierarchy under a CompilationUnit:
+  a CompilationUnit contains some Declarations, would could contain Names, Types, other Declarations, or Statements;
+  Statements could contain other Statements or Expressions; and Expressions could contain other Expressions or Literals.
+
+
