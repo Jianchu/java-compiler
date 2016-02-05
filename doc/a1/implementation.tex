@@ -1,11 +1,54 @@
 \chapter{Implementation}
 
+This project is implemented in Java 8.
+
 \section{Scanner}
+\label{scanner_implementation}
 % scanner implementation
 
 %P94, Crafting
-As explained in~\cite{fischer2009crafting}, a DFA can be implemented in two forms: \emph{table-driven}, or \emph{explicit control}. The table-driven approach, usually used by the scanner generators, utilizes an explicit transition table that could be interpreted by a universal driver program. The explicit control form, on the other hand, incorporates the transitions of the DFA directly into the control logic of the scanner program. In this project, we choose to handwrite the scanner in explicit control form for two reasons. First of all, incorporating the DFA transitions directly into control provides better performance. Secondly, the scanner produced in such manners is easier to debug and modify based on our requirements. The shortcoming of this approach is that, with the token definitions hard-coded into our program, the scanner could not be easily adapted for use elsewhere. This, however, is not a problem for the project.
+As explained in~\cite{fischer2009crafting}, a DFA can be implemented in two forms: \emph{table-driven}, or \emph{explicit control}. The table-driven approach, usually used by the scanner generators, utilizes an explicit transition table that could be interpreted by a universal driver program. The explicit control form, on the other hand, incorporates the transitions of the DFA directly into the control logic of the scanner program. In this project, we choose to handwrite the scanner in explicit control form for two reasons. First of all, incorporating the DFA transitions directly into control provides better performance. Secondly, the scanner produced in such manners is easier to debug and modify based on our requirements. The shortcoming of this approach is that, with the token definitions hard-coded into our program, the scanner could not be easily adapted for use elsewhere. This, however, is not a problem for the project. 
+Another benefit of the explicit control implementation is that there was no need to backtrack when running the Maximal Munch algorithm:
+  the only states that were non-accepting and between accepting states were those associated with a block comment,
+  and since a slash (/) followed by an asterisk (*) could not form a valid Joos program, the scanner would simply raise an lexical error when such situation arises.
 
-Java defines a set reserved keywords that cannot be used as identifiers. In this implementation of the scanner, we read keywords in the same manners as identifiers and perform a hash table lookup afterwards to determine whether it is a reserved keyword. This approach has no affect asymptotically on the performance yet results in succinct and readable code.
+Each token created by the scanner is assigned a type. We list every possible type in an Java enum type called \emph{Symbol}. This enum also contains symbols that will later be used for building parse tree.
+
+Another thing we decided was that since both strings and characters could contain escape characters,
+  we would build a secondary DFA for escape characeters rather independently build it into both string and character scanning.
+
+
+
 
 % Handling runaway Strings.
+
+
+\section{Parser}
+
+We decided that, rather than embedding the grammar directly into the code, we would keep it in a separate file so that,
+  should it be required, the grammar could be regenerated without affecting the rest of the code.
+
+ %Implementation of parse table in Java
+To make parse table access as fast as possible, the parse table is implemented practically as an array of hash maps (under a Java class called \emph{ParseActions}. An array is used because each state in the parse table is represented as an integer. Given the current state $s$ and the next symbol $t$, we first access the $s$-th hash map in the array, and then retrieve the action value with key $t$. If the hash map does not contain the key $t$, an error is raised. 
+
+\section{Weeder}
+
+\section{Abstract Syntax Tree }
+The abstract syntax tree is constructed based on the parse tree (also sometimes called concrete syntax tree) from the previous stages. The parse tree is traverse once using recursive depth first search.
+
+With more than 40 nodes types and a complex type hierarchy, later stages such as type checking could have a lot of interacts with the AST nodes. To help better organize the code, the Visitor pattern is applied here. The pattern makes it easy to encode a logical operation (a phase of compilation) for different AST node types under different methods in one file. An example of the \emph{Visitor} interface is provided in figure~\ref{visitor}. The \emph{Visitor} interface will be implemented by future phases.
+
+\begin{figure}
+
+\begin{lstlisting}[language=Java, frame=single]  % Start your code-block
+
+public interface Visitor {
+	public int visit(Statement s);
+	public int visit(Expression e);
+	public int visit(Literal l);
+	...
+}
+\end{lstlisting}
+\caption{Example of Visitor Interface}
+\label{visitor}
+\end{figure}

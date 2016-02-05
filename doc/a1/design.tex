@@ -1,47 +1,80 @@
 \chapter{Design}
 \section{Scanner}
-We wanted to keep the scanner as simple as possible, and leave the complicated things for the parser or weeder.
-So, to start, we first sketched out the transitions for the Joos DFA.
+The first step of our design process was to sketch out the transitions for the Joos scanner DFA. We made the design decision to keep the scanner as simple as possible and create a clear separation of functions, leaving the more complicated checking and syntactic analysis for the parser or weeder. 
 
-The first decision we made was how to differentiate between identifiers, keywords, null literals, and boolean literals.
-One possible way to do it would be to have states for each keyword, null, and boolean,
-  but since there are over fifty such elements, this would very quickly complicate the scanning process.
-So, instead, we would simply have one state for anything that could be an identifier
+One of the first challenges we faced was how to differentiate between identifiers, keywords, null literals, and boolean literals, as the Java language specification defines a set of reserved keywords that cannot be used as identifiers. One possible way to implement this would be to have states for each keyword, null, and boolean,
+  but since there are over fifty such elements, this would result in a very large DFA and affects readability of our code.
+So, instead, we would simply have one accepting state for anything that could be an identifier
   (i.e., everything that starts with a letter and contains only alphanumeric characters, underscores, or dollar signs),
-  then perform a second scan of the lexeme (by checking for equality) to determine which type the token should be.
+  then perform a second scan of the lexeme (by checking for equality) to determine which type the token should be. In other words, we read keywords in the same manners as identifiers and perform a hash table lookup afterwards to determine whether it is a reserved keyword. This approach has no effects asymptotically on the performance yet results in succinct and readable code.
 
-After sketching out the DFA, we realised that we did not need to backtrack at all when running the Maximal Munch algorithm:
-  the only states that were non-accepting and between accepting states were those associated with a block comment,
-  and since a slash (/) followed by an asterisk (*) could not form a valid Joos program,
-  it was simplier to fail the scanning than backtrack.
-
-Another thing we decided was that since both strings and characters could contain escape characters,
-  we would build a secondary DFA for escape characeters rather independently build it into both string and character scanning.
-
-We also decided the scanner would ensure that every character of input was a seven-bit ASCII value,
+Another important matter at this stage was to decide what qualifies as a lexical error in our scanner. A lexical error arises when a character sequence could be recognized by the scanner as a valid token. In the scanner, we deal with the following lexical errors:
+\begin{enumerate}
+	\item invalid characters: the scanner would ensure that every character of input was a seven-bit ASCII value,
   as the scanner reads one character of input at a time.
+	\item invalid octal escapes: an octal escape in a string or character must be checked so that it does not exceed the ASCII limit. 
+	\item runaway strings, characters and comments: String literals in Java must not span multiple lines. An error should be raised when an end-of-line (or end-of-file) character is detected within the string body. This type of error is called runaway strings. The same kind of problem can arise for characters and block comments (with EOF) too. 
+	%what else?
+\end{enumerate}
 
 \section{Parser}
-We also wanted to keep the parser simple, so we only cared about the production rules, leaving the meaning for the weeder.
+%We also wanted to keep the parser simple, so we only cared about the production rules, leaving the meaning for the weeder.
+%We found a copy of the grammar for the first edition of Java, as suggestion, and adapted it for Joos by eliminating rules that contain features not available in the simplified language.
 
-We found a copy of the grammar for the first edition of Java, as suggestion,
-  and adapted it for Joos by eliminating rules that contain features not available in the simplified language.
+We have decide to implement a table-driven LR(1) parser in this project. The table-driven approach separates the code from the parse table. It allows for easy update of the grammar. Although SLR(1) and LALR(1) would result in a smaller parse table, we have decided that it is more important to keep the grammar correct as LR(1), and this is unlikely to become the bottleneck of our program. Besides should it be necessary, we could easily switch to SLR(1) or LALR(1) with the table-driven approach.
 
-We decided that, rather than embed the grammar directly into the code, we would keep it in a separate file so that,
-  should it be required, the grammar could be regenerated without affect the rest of the code.
+ The context free grammar was created based on the LALR(1) grammar in~\cite{gosling2000java} and the Joos 1W requirements~\cite{joos1w}. Product rules that were unnecessary under Joos 1W specification were removed. Small modifications were also made to the grammar to ensure correctness and compactness of the parse tree. The context free grammar was then passed into the \emph{Jlalr1} generator to produce the parse table.
+
+It is important for later stages that parser not only checks the grammar but also constructs a valid parse tree. The generic table-driven parser implements the following algorithm from~\cite{fischer2009crafting} and is listed in Algorithm~\ref{parser}.
+ 
+\begin{algorithm}                      % enter the algorithm environment
+\caption{Driver for LR(1) parser}          % give the algorithm a caption
+\label{parser}                           % and a label for \ref{} commands later in the document
+\begin{algorithmic}
+\State BOF = tokens.removeHead()  
+%\State \Comment removeHead() returns the first element of the token list and return it
+\State stateStack.push(parseTable[startState][BOF])
+\State nodeStack.push(BOF)
+\State accepted = false
+
+\While {the list of tokens is not empty}
+	\State action = parseTable[stateStack.top()][tokens.peek()]
+	\If {action == shift $s$}
+		\State stateStack.push($s$)
+		\State nodeStack.push(tokens.removeHead())
+	\ElsIf {action == reduce $A \rightarrow \gamma$}
+		\Comment reduce
+		\State stateStack.pop($|\gamma|$)
+		\State oldNodes = nodeStack.pop($|\gamma|$)
+		\State newNode = Node($A$)
+		\State add every node from \emph{oldNodes} as child node of \emph{newNode}
+		\State tokens.prepend(newNode)
+	\Else 
+		\State Error()
+	\EndIf
+\EndWhile
+\State EOFNode = nodeStack.pop()
+\State \Return nodeStack.pop()	\Comment root of parse tree
+
+\end{algorithmic}
+\end{algorithm}
+ 
+It was also decided that the parser does not do any checking beyond the grammar. Whatever errors that could not be checked by the scanner and the grammar are left for the weeder to deal with.
 
 \section{Weeder}
-Now that the parser has output a parse tree, the weeder would ensure that the meaning fits the specifications of the language.
+Now that the parser has output a parse tree, the weeder would ensure that the meaning fits the specifications of the language. The weeder deals with stntax errors that were complicated to specify in the grammar.
 
 For example, the list of modifiers had to be checked to ensure that there were no duplicate modifiers (e.g., \verb|final final|)
-  and no contradictary ones (e.g., \verb|abstract final| method).
-Modifiers might also be affected by other modifiers elsewhere; for example, a class must be abstract if any method within is.
+  and no contradictory ones (e.g., \verb|abstract final| method).
+Modifiers might also be affected by other modifiers elsewhere; for example, a class must be abstract if any method within is. Also a method must have a body if it is not abstract or native.
 
 The weeder was also when the name of the class or interface was checked against the name of the file for equality
   in addition to being compared with the constructor (which must be explicit for classes).
 
 In addition, casting rules (e.g., no casting to an expression) were checked,
   and the range of integers had to fit in an \verb|int|.
+
+It was also desired that the weeder only traverse the parse tree once, in order to ensure the efficiency of our program.
 
 \section{Abstract Syntax Tree}
 The AST was split into a hierarchy under a CompilationUnit:
