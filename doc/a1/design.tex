@@ -68,7 +68,7 @@ It was also decided that the parser would not perform any checking beyond the gr
 \section{Weeder}
 \label{weeder_design}
 
-Now that the parser has output a parse tree, the weeder would ensure that the meaning fits the specifications of the language. The weeder deals with stntax errors that were complicated to specify in the grammar.
+Now that the parser has output a parse tree, the weeder would ensure that the meaning fits the specifications of the language. The weeder deals with stntax errors that were too complicated to specify in the grammar.
 
 For example, the list of modifiers had to be checked to ensure that there were no duplicate modifiers (e.g., \verb|final final|)
   and no contradictory ones (e.g., \verb|abstract final| method).
