@@ -18,7 +18,7 @@ import scanner.Symbol;
 public abstract class Type extends ASTNode{
 	
 	/**
-	 * This method parse three kinds of parse tree nodes:
+	 * This method parse four types of parse tree nodes:
 	 * 	Type,
 	 * 	ClassType,
 	 *  InterfaceType,
@@ -35,12 +35,19 @@ public abstract class Type extends ASTNode{
 			if (PrimitiveOrRef.getTokenType() == Symbol.PrimitiveType) {
 				return new PrimitiveType(PrimitiveOrRef);
 			} else if (PrimitiveOrRef.getTokenType() == Symbol.ReferenceType) {
-				return new SimpleType(PrimitiveOrRef);
+				return parseType(PrimitiveOrRef);
 			}
 			break;
+
+		case ReferenceType:
+			return parseType(pt.getFirstChild());
+
 		case ClassType:
 		case InterfaceType:
 			return new SimpleType(pt.getFirstChild());
+		
+		case ArrayType:
+			return new ArrayType(pt);
 		}
 		throw new ASTException();
 	}

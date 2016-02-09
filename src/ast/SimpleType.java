@@ -15,10 +15,15 @@ public class SimpleType extends Type{
 	
 	public SimpleType(ParseTree pt) throws ASTException {
 		// the node should be ClassOrInterfaceType
-		if (pt.getTokenType() != Symbol.ClassOrInterfaceType)
+		switch(pt.getTokenType()) {
+		case ClassOrInterfaceType:
+			name = Name.parseName(pt.getFirstChild());
+		case ClassType:
+		case InterfaceType:
+			name = Name.parseName(pt.getFirstChild().getFirstChild());
+		default:
 			throw new ASTException();
-		
-		name = Name.parseName(pt.getFirstChild());
+		}
 	}
 	
 	public SimpleType(Name type) {

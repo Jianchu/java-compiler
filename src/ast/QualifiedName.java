@@ -4,8 +4,8 @@ import exceptions.ASTException;
 import parser.ParseTree;
 
 public class QualifiedName extends Name{
-	Name qualifier;
-	String id;
+	Name qualifier = null;
+	String id = null;
 	
 	public QualifiedName(ParseTree pt) throws ASTException {
 		for (ParseTree child : pt.getChildren()) {
