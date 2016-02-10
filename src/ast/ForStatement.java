@@ -20,22 +20,22 @@ public class ForStatement extends Statement{
             case ForInit:
                 for (ParseTree forInitChild : child.getChildren()) {
                     if (checkNodeType(forInitChild, Symbol.StatementExpression)) {
-                        this.forInit = ASTBuilder.parseExpression(child);
+                        this.forInit = Expression.parseExpression(child);
                     } else if (checkNodeType(forInitChild, Symbol.LocalVariableDeclaration)) {
                         this.forInit = new VariableDeclarationStatement(forInitChild);
                     }
                 }
                 break;
             case Expression:
-                this.forCondition = ASTBuilder.parseExpression(child);
+                this.forCondition = Expression.parseExpression(child);
                 break;
             case ForUpdate:
                 // send StatementExpression to parseExpression
-                this.forUpdate = ASTBuilder.parseExpression(child.getChildren().get(0));
+                this.forUpdate = Expression.parseExpression(child.getChildren().get(0));
                 break;
             case Statement:
             case StatementNoShortIf:
-                this.forBody = ASTBuilder.parseStatement(child);
+                this.forBody = Statement.parseStatement(child);
                 break;
             default:
                 throw new ASTException("Unexpected symbol");

@@ -6,7 +6,8 @@ import exceptions.ASTException;
 
 public abstract class Statement extends ASTNode {
 
-    public static Statement visitStatement(ParseTree statementNode)
+
+    public static Statement parseStatement(ParseTree statementNode)
             throws ASTException {
         ParseTree realStatement = statementNode.getChildren().get(0);
         switch (realStatement.getTokenType()) {

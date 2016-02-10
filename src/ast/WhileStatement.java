@@ -12,11 +12,11 @@ public class WhileStatement extends Statement{
         for (ParseTree child : whileNode.getChildren()) {
             switch (child.getTokenType()) {
             case Expression:
-                this.whileCondition = ASTBuilder.parseExpression(child);
+                this.whileCondition = Expression.parseExpression(child);
                 break;
             case Statement:
             case StatementNoShortIf:
-                this.whileStatement = ASTBuilder.parseStatement(child);
+                this.whileStatement = Statement.parseStatement(child);
                 break;
             default:
                 throw new ASTException("Unexpected symbol");

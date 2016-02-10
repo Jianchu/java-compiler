@@ -33,7 +33,8 @@ public class Block extends Statement {
                         if (checkNodeType(blockStatementChild, Symbol.LocalVariableDeclaration)) {
                             statements.add(new VariableDeclarationStatement(blockStatementChild));
                         } else if (checkNodeType(blockStatementChild, Symbol.Statement)) {
-                            Statement statement = ASTBuilder.parseStatement(blockStatementChild);
+                            Statement statement = Statement
+                                    .parseStatement(blockStatementChild);
                             statements.add(statement);
                         }
                     }

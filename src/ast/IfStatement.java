@@ -21,20 +21,20 @@ public class IfStatement extends Statement{
         for (ParseTree child : ifNode.getChildren()) {
             switch (child.getTokenType()) {
             case Expression:
-                this.ifCondition = ASTBuilder.parseExpression(child);
+                this.ifCondition = Expression.parseExpression(child);
                 break;
             case StatementNoShortIf:
                 if (ithChild == 4) {
-                    this.ifStatement = ASTBuilder.parseStatement(child);
+                    this.ifStatement = Statement.parseStatement(child);
                 } else if (ithChild == 6) {
-                    this.elseStatement = ASTBuilder.parseStatement(child);
+                    this.elseStatement = Statement.parseStatement(child);
                 }
                 break;
             case Statement:
                 if (hasElse) {
-                    this.elseStatement = ASTBuilder.parseStatement(child);
+                    this.elseStatement = Statement.parseStatement(child);
                 } else {
-                    this.ifStatement = ASTBuilder.parseStatement(child);
+                    this.ifStatement = Statement.parseStatement(child);
                 }
                 break;
             default:
