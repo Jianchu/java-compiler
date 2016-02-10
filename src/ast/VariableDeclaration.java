@@ -47,14 +47,14 @@ public class VariableDeclaration extends ASTNode {
 		}
 	}
 	
-	private void parseVariableDeclarator(ParseTree pt) {
+	private void parseVariableDeclarator(ParseTree pt) throws ASTException {
 		for (ParseTree child : pt.getChildren()) {
 			switch(child.getTokenType()) {
 			case VariableDeclaratorId:
 				id = child.getFirstChild().getFirstChild().getLexeme();
 				break;
 			case VariableInitializer:
-				initializer = ASTBuilder.parseExpression(child.getFirstChild());
+				initializer = Expression.parseExpression(child.getFirstChild());
 				break;
 			default:
 				break;

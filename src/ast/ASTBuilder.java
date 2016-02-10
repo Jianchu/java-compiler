@@ -8,6 +8,7 @@ import scanner.Symbol;
 import exceptions.ASTException;
 
 public class ASTBuilder {
+	/*
 	public static CompilationUnit parseCompilationUnit(ParseTree pt) throws ASTException {
 		
 		CompilationUnit cu = new CompilationUnit(pt);
@@ -23,6 +24,7 @@ public class ASTBuilder {
 //		parseExpression(pt);
 		return null;
 	}
+	*/
 	
 	public static String parseID(ParseTree pt) throws ASTException {
 		if (pt.getTokenType() != Symbol.ID) 

@@ -12,9 +12,7 @@ public class AST {
 	}
 	
 	private ASTNode buildTree(ParseTree pt) throws ASTException {
-		
-		ASTBuilder.parseCompilationUnit(pt);
-		
+				
 		return null;
 	}
 	

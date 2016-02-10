@@ -27,7 +27,7 @@ public class MethodDeclaration extends BodyDeclaration{
 					parseMethodHeader(child);
 					break;
 				case MethodBody:
-					body = (Block) ASTBuilder.parseStatement(child.getFirstChild());
+					body = (Block) Statement.visitStatement(child.getFirstChild());
 					break;
 				case SEMICOLON:
 					// only appears in AbstractMethodDeclaration
@@ -47,7 +47,7 @@ public class MethodDeclaration extends BodyDeclaration{
 				case ConstructorDeclarator:
 					parseConstructorDeclarator(child);
 				case ConstructorBody:
-					body = (Block) ASTBuilder.parseStatement(child.getFirstChild());
+					body = (Block) Statement.visitStatement(child.getFirstChild());
 					break;
 				default:
 					throw new ASTException();
