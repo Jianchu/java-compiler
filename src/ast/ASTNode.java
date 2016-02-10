@@ -9,6 +9,7 @@ import exceptions.ASTException;
  */
 public abstract class ASTNode {
 	
+	ASTNode parentNode = null;
 	
 	/**
 	 * Not implemented by default.
@@ -18,5 +19,13 @@ public abstract class ASTNode {
 	 */
 	public int accept(Visitor v) throws ASTException {
 		throw new ASTException("method not implemented");
+	}
+	
+	public void setParent(ASTNode parent) {
+		parentNode = parent;
+	}
+	
+	public ASTNode getParent() {
+		return parentNode;
 	}
 }
