@@ -20,7 +20,7 @@ public class MethodInvocation extends Expression {
                 arglist = Expression.parseArglist(subtrees.get(2));
             }
         } else {
-            id = ASTBuilder.parseID(subtrees.get(2));
+            id = ASTHelper.parseID(subtrees.get(2));
             arglist = null;
             if (subtrees.size() == 6) {
                 arglist = Expression.parseArglist(subtrees.get(4));

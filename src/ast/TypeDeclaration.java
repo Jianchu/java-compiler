@@ -86,7 +86,7 @@ public class TypeDeclaration extends BodyDeclaration{
 				break;
 			case ID:
 				// parse name
-				id = ASTBuilder.parseID(child);
+				id = ASTHelper.parseID(child);
 				break;
 			
 			/*

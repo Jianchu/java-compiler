@@ -13,7 +13,7 @@ public class QualifiedName extends Name{
 			case Name:
 				qualifier = Name.parseName(child);
 			case ID:
-				id = ASTBuilder.parseID(child);
+				id = ASTHelper.parseID(child);
 			}
 		}
 	}

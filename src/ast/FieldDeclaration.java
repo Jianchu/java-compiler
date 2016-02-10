@@ -19,7 +19,7 @@ public class FieldDeclaration extends BodyDeclaration{
 			switch (child.getTokenType()) {
 			case Modifiers:
 				Modifier nextMod = new Modifier(child);
-				modifiers.addAll(ASTBuilder.getList(nextMod));
+				modifiers.addAll(ASTHelper.getList(nextMod));
 				break;
 			case Type:
 				type = Type.parseType(child);

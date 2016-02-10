@@ -42,7 +42,7 @@ public class MethodDeclaration extends BodyDeclaration{
 			for (ParseTree child : pt.getChildren()) {
 				switch (child.getTokenType()) {
 				case Modifiers:
-					modifiers.addAll(ASTBuilder.getList(new Modifier(child)));
+					modifiers.addAll(ASTHelper.getList(new Modifier(child)));
 					break;
 				case ConstructorDeclarator:
 					parseConstructorDeclarator(child);
@@ -62,7 +62,7 @@ public class MethodDeclaration extends BodyDeclaration{
 		for (ParseTree child : pt.getChildren()) {
 			switch(child.getTokenType()) {
 			case Modifiers:
-				modifiers.addAll(ASTBuilder.getList(new Modifier(child)));
+				modifiers.addAll(ASTHelper.getList(new Modifier(child)));
 				break;
 			case Type:
 				returnType = Type.parseType(child);
@@ -82,7 +82,7 @@ public class MethodDeclaration extends BodyDeclaration{
 		for (ParseTree child : pt.getChildren()) {
 			switch(child.getTokenType()) {
 			case SimpleName:
-				id = ASTBuilder.parseID(child.getFirstChild());
+				id = ASTHelper.parseID(child.getFirstChild());
 				break;
 			case FormalParameterList:
 				parseFormalParameterList(child);
@@ -99,7 +99,7 @@ public class MethodDeclaration extends BodyDeclaration{
 		for (ParseTree child : pt.getChildren()) {
 			switch(child.getTokenType()) {
 			case ID:
-				id = ASTBuilder.parseID(child);
+				id = ASTHelper.parseID(child);
 				break;
 			case FormalParameterList:
 				parseFormalParameterList(child);

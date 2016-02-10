@@ -42,6 +42,13 @@ public class ParseTree extends Token{
 		return children;
 	}
 	
+	/**
+	 * Helper method for finding a child of specific type.
+	 * Uses linear search. 
+	 * Please only use when you know for certain from certain a node would exist, and only appear once.
+	 * e.g. finding Name in "SingleTypeImportDeclaration IMPORT Name SEMICOLON"
+	 * @return a child node of the type
+	 */
 	public ParseTree findChild(Symbol sym) {
 		for (ParseTree child : children) {
 			if (child.getTokenType() == sym) {
