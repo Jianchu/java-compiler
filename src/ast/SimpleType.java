@@ -18,9 +18,11 @@ public class SimpleType extends Type{
 		switch(pt.getTokenType()) {
 		case ClassOrInterfaceType:
 			name = Name.parseName(pt.getFirstChild());
+			break;
 		case ClassType:
 		case InterfaceType:
 			name = Name.parseName(pt.getFirstChild().getFirstChild());
+			break;
 		default:
 			throw new ASTException();
 		}

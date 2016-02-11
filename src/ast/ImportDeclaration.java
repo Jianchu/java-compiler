@@ -30,7 +30,7 @@ public class ImportDeclaration {
 	}
 	
 	public boolean hasNext() {
-		return next == null;
+		return next != null;
 	}
 	
 	public ImportDeclaration next() {

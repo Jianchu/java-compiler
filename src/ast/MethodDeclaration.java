@@ -46,8 +46,12 @@ public class MethodDeclaration extends BodyDeclaration{
 					break;
 				case ConstructorDeclarator:
 					parseConstructorDeclarator(child);
+					break;
 				case ConstructorBody:
-					body = (Block) Statement.parseStatement(child.getFirstChild());
+					ParseTree block = child.findChild(Symbol.BlockStatements);
+					if (block != null) {
+						body = (Block) Statement.parseStatement(block);
+					}
 					break;
 				default:
 					throw new ASTException();

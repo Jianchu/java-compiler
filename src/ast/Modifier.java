@@ -29,21 +29,27 @@ public class Modifier implements Next{
 		switch(child.getTokenType()) {
 		case PUBLIC:
 			mod = this.PUBLIC;
+			break;
 		case PROTECTED:
 			mod = this.PROTECTED;
+			break;
 		case STATIC:
 			mod = this.STATIC;
+			break;
 		case ABSTRACT:
 			mod = this.ABSTRACT;
+			break;
 		case FINAL:
 			mod = this.FINAL;
+			break;
 		case NATIVE:
 			mod = this.NATIVE;
+			break;
 		}
 	}
 	
 	public boolean hasNext() {
-		return next == null;
+		return next != null;
 	}
 	
 	public Modifier next() {

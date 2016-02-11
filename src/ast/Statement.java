@@ -25,7 +25,7 @@ public abstract class Statement extends ASTNode {
             // return null for empty statement and "return;"
             return getStatementNoTrailing(realStatement);
         }
-        throw new ASTException();
+        throw new ASTException("unexpected symbol " + realStatement.getTokenType());
     }
 
     private static Statement getStatementNoTrailing(ParseTree statementNoTrailingNode) throws ASTException {

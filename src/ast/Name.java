@@ -18,6 +18,7 @@ public abstract class Name extends Expression {
 				return new QualifiedName(child);
 			}
 		}
+		System.out.println(pt.getTokenType());
 		throw new ASTException();
 	}
 }

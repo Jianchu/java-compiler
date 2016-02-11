@@ -41,7 +41,8 @@ public abstract class Type extends ASTNode{
 
 		case ReferenceType:
 			return parseType(pt.getFirstChild());
-
+		case ClassOrInterfaceType:
+			return new SimpleType(pt);
 		case ClassType:
 		case InterfaceType:
 			return new SimpleType(pt.getFirstChild());

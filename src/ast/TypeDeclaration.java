@@ -37,7 +37,7 @@ public class TypeDeclaration extends BodyDeclaration{
 				next = new TypeDeclaration(child);
 				break;
 			case TypeDeclaration:
-				parseSingleType(pt);
+				parseSingleType(child);
 				break;
 			default:
 				throw new ASTException("Unexpected node type.");	
@@ -46,7 +46,7 @@ public class TypeDeclaration extends BodyDeclaration{
 	}
 	
 	public boolean hasNext() {
-		return next == null;
+		return next != null;
 	}
 	
 	public TypeDeclaration next() {
@@ -63,7 +63,7 @@ public class TypeDeclaration extends BodyDeclaration{
 			parseClassDeclaration(child);
 			break;
 		default:
-			throw new ASTException("Unexpected node type.");
+			throw new ASTException("Unexpected node type." + child.getTokenType());
 		}
 	}
 	
