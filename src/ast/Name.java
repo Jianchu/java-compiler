@@ -10,15 +10,14 @@ import parser.ParseTree;
  */
 public abstract class Name extends Expression {
 	public static Name parseName(ParseTree pt) throws ASTException {
-		for (ParseTree child : pt.getChildren()) {
-			switch (child.getTokenType()) {
-			case SimpleName:
-				return new SimpleName(child);
-			case QualifiedName:
-				return new QualifiedName(child);
-			}
+		switch(pt.getTokenType()) {
+		case Name:
+			parseName(pt.getFirstChild());
+		case SimpleName:
+			return new SimpleName(pt);
+		case QualifiedName:
+			return new QualifiedName(pt);
 		}
-		System.out.println(pt.getTokenType());
 		throw new ASTException();
 	}
 }
