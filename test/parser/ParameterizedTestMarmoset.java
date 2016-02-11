@@ -1,7 +1,5 @@
 package parser;
 
-import static org.junit.Assert.assertEquals;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -16,6 +14,7 @@ import org.junit.runners.Parameterized;
 
 import scanner.Token;
 import weeder.Weeder;
+import ast.AST;
 
 @RunWith(Parameterized.class)
 public class ParameterizedTestMarmoset {
@@ -58,8 +57,25 @@ public class ParameterizedTestMarmoset {
     
     @Test
     public void testMarmoset() {
-        int result = test(input);
-        assertEquals(expectedResult, result);
+        int result = 0;
+        // assertEquals(expectedResult, result);
+        try {
+
+            scanner.Scanner scanner = new scanner.Scanner(new FileReader(input));
+            List<Token> tokens = scanner.scan();
+            Parser parser = new Parser(tokens, grammar);
+            ParseTree parseTree = parser.parse();
+            Weeder weeder = new Weeder(parseTree, input.getName().substring(0,
+                    input.getName().lastIndexOf('.')));
+            weeder.weed();
+            AST ast = new AST(parseTree);
+        } catch (Exception e) {
+            result = 42;
+            if (result != expectedResult) {
+                e.printStackTrace();
+                System.exit(1);
+            }
+        }
     }
 
     
@@ -72,6 +88,7 @@ public class ParameterizedTestMarmoset {
             Weeder weeder = new Weeder(parseTree, input.getName().substring(0,
                     input.getName().lastIndexOf('.')));
             weeder.weed();
+            AST ast = new AST(parseTree);
         } catch (Exception e) {
             return 42;
         }
