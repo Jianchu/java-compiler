@@ -2,6 +2,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.util.List;
 
+import ast.AST;
 import parser.ParseTree;
 import parser.Parser;
 import scanner.Scanner;
@@ -27,6 +28,7 @@ public class Joosc {
             ParseTree parseTree = parser.parse();
             Weeder weeder = new Weeder(parseTree, input.getName().substring(0, input.getName().lastIndexOf('.')));
             weeder.weed();
+			AST ast = new AST(parseTree);
         } catch (Exception e) {
             System.err.println(e);
             System.exit(42);
