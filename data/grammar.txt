@@ -126,8 +126,8 @@ MethodBody SEMICOLON
 #no super no this
 ConstructorDeclaration Modifiers ConstructorDeclarator ConstructorBody
 ConstructorDeclaration ConstructorDeclarator ConstructorBody
-ConstructorDeclarator SimpleName LPAREN FormalParameterList RPAREN
-ConstructorDeclarator SimpleName LPAREN RPAREN
+ConstructorDeclarator ID LPAREN FormalParameterList RPAREN
+ConstructorDeclarator ID LPAREN RPAREN
 ConstructorBody Block
 #ConstructorBody LBRACE BlockStatements RBRACE
 #ConstructorBody LBRACE RBRACE
