@@ -9,10 +9,10 @@ public class ForStatement extends Statement{
     // type for forInit? It could be VariableDeclaration or StatementExpression.
     // So use ASTNode for now
 
-    private ASTNode forInit;
-    private Expression forCondition;
-    private Expression forUpdate;
-    private Statement forBody;
+    public ASTNode forInit;
+    public Expression forCondition;
+    public Expression forUpdate;
+    public Statement forBody;
 
     public ForStatement(ParseTree forNode) throws ASTException {
         for (ParseTree child : forNode.getChildren()) {
@@ -43,19 +43,19 @@ public class ForStatement extends Statement{
         }
     }
 
-    public Expression getForCondition() {
-        return this.forCondition;
-    }
-
-    public Expression getForUpdate() {
-        return this.forUpdate;
-    }
-
-    public Statement getForBody() {
-        return this.forBody;
-    }
-
-    public ASTNode getForInit() {
-        return this.forInit;
-    }
+    // public Expression getForCondition() {
+    // return this.forCondition;
+    // }
+    //
+    // public Expression getForUpdate() {
+    // return this.forUpdate;
+    // }
+    //
+    // public Statement getForBody() {
+    // return this.forBody;
+    // }
+    //
+    // public ASTNode getForInit() {
+    // return this.forInit;
+    // }
 }

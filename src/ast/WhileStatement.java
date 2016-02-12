@@ -5,8 +5,8 @@ import exceptions.ASTException;
 
 public class WhileStatement extends Statement{
 
-    private Expression whileCondition;
-    private Statement whileStatement;
+    public Expression whileCondition;
+    public Statement whileStatement;
 
     public WhileStatement(ParseTree whileNode) throws ASTException {
         for (ParseTree child : whileNode.getChildren()) {
@@ -24,11 +24,11 @@ public class WhileStatement extends Statement{
         }
     }
 
-    public Expression getWhileCondition() {
-        return this.whileCondition;
-    }
-
-    public Statement getWhileStatement() {
-        return this.whileStatement;
-    }
+    // public Expression getWhileCondition() {
+    // return this.whileCondition;
+    // }
+    //
+    // public Statement getWhileStatement() {
+    // return this.whileStatement;
+    // }
 }

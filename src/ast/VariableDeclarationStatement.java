@@ -5,7 +5,7 @@ import scanner.Symbol;
 import exceptions.ASTException;
 
 public class VariableDeclarationStatement extends Statement {
-    private VariableDeclaration varDeclar;
+    public VariableDeclaration varDeclar;
 
     public VariableDeclarationStatement(ParseTree variableDecNode) throws ASTException {
         ParseTree localVariableDecStatement = variableDecNode.findChild(Symbol.LocalVariableDeclaration);
@@ -14,7 +14,7 @@ public class VariableDeclarationStatement extends Statement {
         }
     }
     
-    public VariableDeclaration getVariableDec() {
-        return this.varDeclar;
-    }
+    // public VariableDeclaration getVariableDec() {
+    // return this.varDeclar;
+    // }
 }

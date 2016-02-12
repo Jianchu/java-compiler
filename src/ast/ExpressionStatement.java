@@ -1,12 +1,12 @@
 package ast;
 
-import exceptions.ASTException;
 import parser.ParseTree;
 import scanner.Symbol;
+import exceptions.ASTException;
 
 public class ExpressionStatement extends Statement{
 
-    private Expression statementExpression;
+    public Expression statementExpression;
 
     public ExpressionStatement(ParseTree expressionStatementNode) throws ASTException {
         ParseTree StatementExpressionNode = expressionStatementNode
@@ -17,8 +17,8 @@ public class ExpressionStatement extends Statement{
         }
     }
 
-    public Expression getStatementExpression() {
-        return this.statementExpression;
-    }
+    // public Expression getStatementExpression() {
+    // return this.statementExpression;
+    // }
 
 }

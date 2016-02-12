@@ -1,12 +1,12 @@
 package ast;
 
-import exceptions.ASTException;
 import parser.ParseTree;
 import scanner.Symbol;
+import exceptions.ASTException;
 
 public class ReturnStatement extends Statement {
 
-    private Expression returnExpression = null;
+    public Expression returnExpression = null;
 
     public ReturnStatement(ParseTree returnNode) throws ASTException {
         ParseTree expressionNode = returnNode.findChild(Symbol.Expression);

@@ -6,9 +6,9 @@ import exceptions.ASTException;
 
 public class IfStatement extends Statement{
 
-    private Expression ifCondition;
-    private Statement ifStatement;
-    private Statement elseStatement;
+    public Expression ifCondition;
+    public Statement ifStatement;
+    public Statement elseStatement;
     private boolean hasElse = false;
 
     public IfStatement(ParseTree ifNode) throws ASTException {
@@ -44,16 +44,16 @@ public class IfStatement extends Statement{
         }
     }
 
-    public Expression getIfCondition() {
-        return this.ifCondition;
-    }
-
-    public Statement getIfStatement() {
-        return this.ifStatement;
-    }
-
-    public Statement getElseStatement() {
-        return this.elseStatement;
-    }
+    // public Expression getIfCondition() {
+    // return this.ifCondition;
+    // }
+    //
+    // public Statement getIfStatement() {
+    // return this.ifStatement;
+    // }
+    //
+    // public Statement getElseStatement() {
+    // return this.elseStatement;
+    // }
 
 }

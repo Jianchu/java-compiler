@@ -15,7 +15,7 @@ import exceptions.ASTException;
  */
 public class Block extends Statement {
     // a block is just a list of statements
-    private List<Statement> statements;
+    public List<Statement> statements;
 
     public Block(ParseTree blockNode) throws ASTException {
         statements = new ArrayList<Statement>();
@@ -46,8 +46,8 @@ public class Block extends Statement {
         }
     }
 
-    public List<Statement> getBlockStatements() {
-        return this.statements;
-    }
+    // public List<Statement> getBlockStatements() {
+    // return this.statements;
+    // }
 }
 
