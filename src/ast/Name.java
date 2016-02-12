@@ -12,13 +12,12 @@ public abstract class Name extends Expression {
 	public static Name parseName(ParseTree pt) throws ASTException {
 		switch(pt.getTokenType()) {
 		case Name:
-			parseName(pt.getFirstChild());
-			break;
+			return parseName(pt.getFirstChild());
 		case SimpleName:
 			return new SimpleName(pt);
 		case QualifiedName:
 			return new QualifiedName(pt);
 		}
-		throw new ASTException();
+		throw new ASTException("unexpected: " + pt.getTokenType());
 	}
 }
