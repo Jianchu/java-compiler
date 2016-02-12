@@ -10,8 +10,10 @@ public class BooleanLiteral extends Expression {
 		switch(pt.getFirstChild().getTokenType()) {
 		case TRUE:
 			value = true;
+			break;
 		case FALSE:
 			value = false;
+			break;
 		default:
 			throw new ASTException();
 		}

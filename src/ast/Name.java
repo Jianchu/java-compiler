@@ -13,6 +13,7 @@ public abstract class Name extends Expression {
 		switch(pt.getTokenType()) {
 		case Name:
 			parseName(pt.getFirstChild());
+			break;
 		case SimpleName:
 			return new SimpleName(pt);
 		case QualifiedName:

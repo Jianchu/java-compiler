@@ -27,7 +27,10 @@ public class MethodDeclaration extends BodyDeclaration{
 					parseMethodHeader(child);
 					break;
 				case MethodBody:
-					body = (Block) Statement.parseStatement(child.getFirstChild());
+					ParseTree block = child.findChild(Symbol.BlockStatements);
+					if (block != null) {
+						body = (Block) Statement.parseStatement(child.getFirstChild());
+					}
 					break;
 				case SEMICOLON:
 					// only appears in AbstractMethodDeclaration

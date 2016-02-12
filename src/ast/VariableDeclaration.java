@@ -38,7 +38,7 @@ public class VariableDeclaration extends ASTNode {
 					type = Type.parseType(child);
 					break;
 				case VariableDeclaratorId:
-					id = ASTHelper.parseID(child);
+					id = ASTHelper.parseID(child.getFirstChild());
 					break;
 				default:
 					break;

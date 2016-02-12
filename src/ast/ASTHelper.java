@@ -11,7 +11,7 @@ public class ASTHelper {
 	
 	public static String parseID(ParseTree pt) throws ASTException {
 		if (pt.getTokenType() != Symbol.ID) 
-			throw new ASTException();
+			throw new ASTException("unexpected symbol " + pt.getTokenType());
 		return pt.getLexeme();
 		
 	}

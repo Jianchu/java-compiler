@@ -19,7 +19,7 @@ public class SimpleType extends Type{
 		case ClassOrInterfaceType:
 			name = Name.parseName(pt.getFirstChild());
 			break;
-		case ClassType:
+		case ClassType:	//fall through
 		case InterfaceType:
 			name = Name.parseName(pt.getFirstChild().getFirstChild());
 			break;

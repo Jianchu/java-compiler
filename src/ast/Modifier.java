@@ -20,6 +20,7 @@ public class Modifier implements Next{
 				break;
 			case Modifier:
 				parseSingleModifier(child);
+				break;
 			}
 		}
 	}

@@ -32,13 +32,10 @@ public abstract class Type extends ASTNode{
 		switch (pt.getTokenType()) {
 		case Type:
 			ParseTree PrimitiveOrRef = pt.getChildren().get(0);
-			if (PrimitiveOrRef.getTokenType() == Symbol.PrimitiveType) {
-				return new PrimitiveType(PrimitiveOrRef);
-			} else if (PrimitiveOrRef.getTokenType() == Symbol.ReferenceType) {
-				return parseType(PrimitiveOrRef);
-			}
-			break;
-
+			return parseType(PrimitiveOrRef);
+			
+		case PrimitiveType:
+			return new PrimitiveType(pt);
 		case ReferenceType:
 			return parseType(pt.getFirstChild());
 		case ClassOrInterfaceType:
@@ -50,7 +47,7 @@ public abstract class Type extends ASTNode{
 		case ArrayType:
 			return new ArrayType(pt);
 		}
-		throw new ASTException();
+		throw new ASTException("unexpected: " + pt.getTokenType());
 	}
 	
 	public static List<Type> parseInterfaceTypeList(ParseTree pt) throws ASTException {

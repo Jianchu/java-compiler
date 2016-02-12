@@ -58,7 +58,7 @@ public class TypeDeclaration extends BodyDeclaration{
 		switch (child.getTokenType()) {
 		case InterfaceDeclaration:
 			isInterface = true;
-			// intentional fallthrough
+			// intentional fall through
 		case ClassDeclaration:
 			parseClassDeclaration(child);
 			break;

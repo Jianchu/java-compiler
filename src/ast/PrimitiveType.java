@@ -11,6 +11,7 @@ public class PrimitiveType extends Type {
 		switch (child.getTokenType()) {
 		case BOOLEAN:
 			type = Value.BOOLEAN;
+			break;
 		case NumericType:
 			ParseTree Integral = child.getFirstChild();
 			switch(Integral.getTokenType()) {

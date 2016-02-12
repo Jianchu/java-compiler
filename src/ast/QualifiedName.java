@@ -12,8 +12,10 @@ public class QualifiedName extends Name{
 			switch (child.getTokenType()) {
 			case Name:
 				qualifier = Name.parseName(child);
+				break;
 			case ID:
 				id = ASTHelper.parseID(child);
+				break;
 			}
 		}
 	}
