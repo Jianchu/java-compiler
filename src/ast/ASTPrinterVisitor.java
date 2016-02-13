@@ -139,7 +139,11 @@ public class ASTPrinterVisitor implements Visitor{
 		
 	}
 	public void visit(QualifiedName node) throws ASTException {
-
+            printIndent(node.getClass().getSimpleName());
+            indent += DISTANCE;
+            String fullName = String.join(".", node.fullName);
+            printIndent(fullName);
+            indent -= DISTANCE;	    
 	}
 	// qualified type class not used
 	public void visit(ReturnStatement node) {
