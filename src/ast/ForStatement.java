@@ -9,7 +9,7 @@ public class ForStatement extends Statement{
     // type for forInit? It could be VariableDeclaration or StatementExpression.
     // So use ASTNode for now
 
-    public ASTNode forInit;
+    public Expression forInit;
     public Expression forCondition;
     public Expression forUpdate;
     public Statement forBody;
@@ -22,7 +22,7 @@ public class ForStatement extends Statement{
                     if (checkNodeType(forInitChild, Symbol.StatementExpression)) {
                         this.forInit = Expression.parseExpression(child);
                     } else if (checkNodeType(forInitChild, Symbol.LocalVariableDeclaration)) {
-                        this.forInit = new VariableDeclarationStatement(forInitChild);
+                        this.forInit = new VariableDeclarationExpression(forInitChild);
                     }
                 }
                 break;
