@@ -4,7 +4,7 @@ import exceptions.ASTException;
 import parser.ParseTree;
 import scanner.Symbol;
 
-public class PackageDeclaration {
+public class PackageDeclaration extends ASTNode{
 	public Name name;
 	public PackageDeclaration(ParseTree pt) throws ASTException {
 		for (ParseTree child : pt.getChildren()) {
@@ -13,4 +13,9 @@ public class PackageDeclaration {
 			}
 		}
 	}
+	
+	public void accept(Visitor v) throws ASTException {
+		v.visit(this);
+	}
+	
 }

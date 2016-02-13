@@ -4,7 +4,7 @@ import exceptions.ASTException;
 import parser.ParseTree;
 import scanner.Symbol;
 
-public class ImportDeclaration {
+public class ImportDeclaration extends ASTNode {
 	public ImportDeclaration next = null;
 	public Name name = null;
 	public boolean onDemand = false;
@@ -37,6 +37,8 @@ public class ImportDeclaration {
 		return next;
 	}
 	
-	
+	public void accept(Visitor v) throws ASTException {
+		v.visit(this);
+	}
 	
 }

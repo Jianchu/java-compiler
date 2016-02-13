@@ -27,4 +27,8 @@ public class MethodInvocation extends Expression {
             }
         }
     }
+    
+	public void accept(Visitor v) throws ASTException {
+		v.visit(this);
+	}
 }

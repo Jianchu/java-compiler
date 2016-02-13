@@ -31,4 +31,7 @@ public class WhileStatement extends Statement{
     // public Statement getWhileStatement() {
     // return this.whileStatement;
     // }
+	public void accept(Visitor v) throws ASTException {
+		v.visit(this);
+	}
 }

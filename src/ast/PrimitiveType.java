@@ -1,5 +1,6 @@
 package ast;
 
+import exceptions.ASTException;
 import parser.ParseTree;
 import scanner.Symbol;
 
@@ -38,5 +39,9 @@ public class PrimitiveType extends Type {
 		BYTE,
 		CHAR,
 		SHORT
+	}
+	
+	public void accept(Visitor v) throws ASTException {
+		v.visit(this);
 	}
 }

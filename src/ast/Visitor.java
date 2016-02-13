@@ -1,44 +1,47 @@
 package ast;
 
+import exceptions.ASTException;
+
 public interface Visitor {
-//	public int visit(ASTNode astNode);
 	
-	public boolean visit(ArrayAccess node);
-	public boolean visit(ArrayCreationExpression node);
-	public boolean visit(ArrayType node);
-	public boolean visit(AssignmentExpression node);
-	public boolean visit(Block node);
-	public boolean visit(BodyDeclaration node);
-	public boolean visit(BooleanLiteral node);
-	public boolean visit(CastExpression node);
-	public boolean visit(CharacterLiteral node);
-	public boolean visit(ClassInstanceCreationExpression node);
-	public boolean visit(CompilationUnit node);
-	public boolean visit(ExpressionStatement node);
-	public boolean visit(FieldAccessExpression node);
-	public boolean visit(FieldAccess node);
-	public boolean visit(ForStatement node);
-	public boolean visit(IfStatement node);
-	public boolean visit(ImportDeclaration node);
-	public boolean visit(InfixExpression node);
-	public boolean visit(InstanceofExpression node);
-	public boolean visit(IntegerLiteral node);
-	public boolean visit(MethodDeclaration node);
-	public boolean visit(MethodInvocation node);
-	public boolean visit(Modifier node);
-	public boolean visit(NullLiteral node);
-	public boolean visit(PackageDeclaration node);
-	public boolean visit(PrefixExpression node);
-	public boolean visit(PrimitiveType node);
-	public boolean visit(QualifiedName node);
+	
+	
+	public void visit(ArrayAccess node)  throws ASTException;
+	public void visit(ArrayCreationExpression node) throws ASTException;
+	public void visit(ArrayType node) throws ASTException;
+	public void visit(AssignmentExpression node) throws ASTException;
+	public void visit(Block node) throws ASTException;
+	public void visit(BodyDeclaration node) throws ASTException;
+	public void visit(BooleanLiteral node) throws ASTException;
+	public void visit(CastExpression node) throws ASTException;
+	public void visit(CharacterLiteral node) throws ASTException;
+	public void visit(ClassInstanceCreationExpression node) throws ASTException;
+	public void visit(CompilationUnit node) throws ASTException;
+	public void visit(ExpressionStatement node) throws ASTException;
+	public void visit(FieldAccessExpression node) throws ASTException;
+	public void visit(FieldAccess node) throws ASTException;
+	public void visit(ForStatement node) throws ASTException;
+	public void visit(IfStatement node) throws ASTException;
+	public void visit(ImportDeclaration node) throws ASTException;
+	public void visit(InfixExpression node) throws ASTException;
+	public void visit(InstanceofExpression node) throws ASTException;
+	public void visit(IntegerLiteral node) throws ASTException;
+	public void visit(MethodDeclaration node) throws ASTException;
+	public void visit(MethodInvocation node) throws ASTException;
+	public void visit(Modifier node) throws ASTException;
+	public void visit(NullLiteral node) throws ASTException;
+	public void visit(PackageDeclaration node) throws ASTException;
+	public void visit(PrefixExpression node) throws ASTException;
+	public void visit(PrimitiveType node) throws ASTException;
+	public void visit(QualifiedName node) throws ASTException;
 	// qualified type class not used
-	public boolean visit(ReturnStatement node);
-	public boolean visit(SimpleName node);
-	public boolean visit(SimpleType node);
-	public boolean visit(StringLiteral node);
-	public boolean visit(ThisExpression node);
-	public boolean visit(TypeDeclaration node);
-	public boolean visit(VariableDeclaration node);
-	public boolean visit(VariableDeclarationStatement node);
-	public boolean visit(WhileStatement node);
+	public void visit(ReturnStatement node) throws ASTException;
+	public void visit(SimpleName node) throws ASTException;
+	public void visit(SimpleType node) throws ASTException;
+	public void visit(StringLiteral node) throws ASTException;
+	public void visit(ThisExpression node) throws ASTException;
+	public void visit(TypeDeclaration node) throws ASTException;
+	public void visit(VariableDeclaration node) throws ASTException;
+	public void visit(VariableDeclarationStatement node) throws ASTException;
+	public void visit(WhileStatement node) throws ASTException;
 }

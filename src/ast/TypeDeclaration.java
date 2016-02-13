@@ -175,4 +175,8 @@ public class TypeDeclaration extends BodyDeclaration{
 		}
 	}
 	
+	public void accept(Visitor v) throws ASTException {
+		v.visit(this);
+	}
+	
 }

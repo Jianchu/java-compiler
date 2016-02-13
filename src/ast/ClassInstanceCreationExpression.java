@@ -17,4 +17,8 @@ public class ClassInstanceCreationExpression extends Expression {
             arglist = Expression.parseArglist(subtrees.get(3));
         }
     }
+    
+	public void accept(Visitor v) throws ASTException {
+		v.visit(this);
+	}
 }

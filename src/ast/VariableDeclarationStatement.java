@@ -17,4 +17,8 @@ public class VariableDeclarationStatement extends Statement {
     // public VariableDeclaration getVariableDec() {
     // return this.varDeclar;
     // }
+    
+	public void accept(Visitor v) throws ASTException {
+		v.visit(this);
+	}
 }

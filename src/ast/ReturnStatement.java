@@ -13,4 +13,8 @@ public class ReturnStatement extends Statement {
         // don't check null intentionally
         this.returnExpression = Expression.parseExpression(expressionNode);
     }
+    
+	public void accept(Visitor v) throws ASTException {
+		v.visit(this);
+	}
 }

@@ -14,4 +14,8 @@ public class InstanceofExpression extends Expression {
         expr = Expression.parseExpression(subtrees.get(0));
         type = Type.parseType(subtrees.get(2));
     }
+    
+	public void accept(Visitor v) throws ASTException {
+		v.visit(this);
+	}
 }

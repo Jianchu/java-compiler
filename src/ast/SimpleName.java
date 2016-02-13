@@ -3,6 +3,7 @@ package ast;
 import java.util.LinkedList;
 import java.util.List;
 
+import exceptions.ASTException;
 import parser.ParseTree;
 
 
@@ -21,5 +22,9 @@ public class SimpleName extends Name {
 		List<String> full = new LinkedList<String>();
 		full.add(id);
 		return full;
+	}
+	
+	public void accept(Visitor v) throws ASTException {
+		v.visit(this);
 	}
 }

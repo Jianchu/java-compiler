@@ -13,6 +13,11 @@ public class ArrayType extends Type {
 			break;
 		case Name:
 			type = new SimpleType(Name.parseName(child));
+			break;
 		}
+	}
+	
+	public void accept(Visitor v) throws ASTException {
+		v.visit(this);
 	}
 }

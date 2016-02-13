@@ -17,9 +17,7 @@ public abstract class ASTNode {
 	 * @return
 	 * @throws ASTException
 	 */
-	public int accept(Visitor v) throws ASTException {
-		throw new ASTException("method not implemented");
-	}
+	public abstract void accept(Visitor v) throws ASTException;
 	
 	public void setParent(ASTNode parent) {
 		parentNode = parent;

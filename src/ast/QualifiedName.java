@@ -40,4 +40,7 @@ public class QualifiedName extends Name{
 	public List<String> getFullName() {
 		return fullName;
 	}
+	public void accept(Visitor v) throws ASTException {
+		v.visit(this);
+	}
 }

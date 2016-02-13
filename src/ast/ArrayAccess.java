@@ -14,4 +14,8 @@ public class ArrayAccess extends Expression {
         array = Expression.parseExpression(subtrees.get(0));
         index = Expression.parseExpression(subtrees.get(2));
     }
+    
+	public void accept(Visitor v) throws ASTException {
+		v.visit(this);
+	}
 }

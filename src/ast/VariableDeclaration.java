@@ -61,4 +61,8 @@ public class VariableDeclaration extends ASTNode {
 			}
 		}
 	}
+	
+	public void accept(Visitor v) throws ASTException {
+		v.visit(this);
+	}
 }

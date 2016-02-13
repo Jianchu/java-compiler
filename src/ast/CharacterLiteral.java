@@ -1,5 +1,6 @@
 package ast;
 
+import exceptions.ASTException;
 import parser.ParseTree;
 
 public class CharacterLiteral extends Expression{
@@ -7,5 +8,9 @@ public class CharacterLiteral extends Expression{
 	public CharacterLiteral(ParseTree pt) {
 		String charStr = pt.getLexeme();
 		value = charStr.substring(1, charStr.length()-1);
+	}
+	
+	public void accept(Visitor v) throws ASTException {
+		v.visit(this);
 	}
 }

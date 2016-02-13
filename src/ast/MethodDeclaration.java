@@ -132,4 +132,8 @@ public class MethodDeclaration extends BodyDeclaration{
 		}
 	}
 	
+	public void accept(Visitor v) throws ASTException {
+		v.visit(this);
+	}
+	
 }

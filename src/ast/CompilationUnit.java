@@ -41,4 +41,8 @@ public class CompilationUnit extends ASTNode{
 			}
 		}
 	}
+	
+	public void accept(Visitor v) throws ASTException {
+		v.visit(this);
+	}
 }

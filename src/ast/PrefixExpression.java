@@ -13,4 +13,8 @@ public class PrefixExpression extends Expression {
         List<ParseTree> subtrees = pt.getChildren();
         expr = Expression.parseExpression(subtrees.get(0));
     }
+    
+	public void accept(Visitor v) throws ASTException {
+		v.visit(this);
+	}
 }

@@ -27,4 +27,8 @@ public class CastExpression extends Expression {
             unary = Expression.parseExpression(subtrees.get(3));
         }
     }
+    
+	public void accept(Visitor v) throws ASTException {
+		v.visit(this);
+	}
 }

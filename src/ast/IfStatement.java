@@ -55,5 +55,7 @@ public class IfStatement extends Statement{
     // public Statement getElseStatement() {
     // return this.elseStatement;
     // }
-
+	public void accept(Visitor v) throws ASTException {
+		v.visit(this);
+	}
 }

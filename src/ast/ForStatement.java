@@ -58,4 +58,8 @@ public class ForStatement extends Statement{
     // public ASTNode getForInit() {
     // return this.forInit;
     // }
+    
+	public void accept(Visitor v) throws ASTException {
+		v.visit(this);
+	}
 }

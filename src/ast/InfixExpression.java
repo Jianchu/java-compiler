@@ -39,4 +39,8 @@ public class InfixExpression extends Expression {
         lhs = Expression.parseExpression(subtrees.get(0));
         rhs = Expression.parseExpression(subtrees.get(2));
     }
+    
+	public void accept(Visitor v) throws ASTException {
+		v.visit(this);
+	}
 }

@@ -32,4 +32,7 @@ public class SimpleType extends Type{
 		name = type;
 	}
 	
+	public void accept(Visitor v) throws ASTException {
+		v.visit(this);
+	}
 }

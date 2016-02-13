@@ -49,5 +49,9 @@ public class Block extends Statement {
     // public List<Statement> getBlockStatements() {
     // return this.statements;
     // }
+    
+	public void accept(Visitor v) throws ASTException {
+		v.visit(this);
+	}
 }
 
