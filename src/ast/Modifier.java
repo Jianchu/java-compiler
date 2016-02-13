@@ -1,6 +1,7 @@
 package ast;
 
 import parser.ParseTree;
+import exceptions.ASTException;
 
 public class Modifier implements Next{
 	public static final int PUBLIC = 1;
@@ -56,4 +57,8 @@ public class Modifier implements Next{
 	public Modifier next() {
 		return next;
 	}
+
+    public void accept(Visitor v) throws ASTException {
+        v.visit(this);
+    }
 }
