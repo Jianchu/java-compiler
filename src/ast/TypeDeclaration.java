@@ -79,8 +79,8 @@ public class TypeDeclaration extends BodyDeclaration{
 				// parse modifiers
 				Modifier nextMod = new Modifier(child);
 				modifiers.add(nextMod);
-				while (nextMod.next != null) {
-					nextMod = nextMod.next;
+				while (nextMod.hasNext()) {
+					nextMod = nextMod.next();
 					modifiers.add(nextMod);
 				}
 				break;

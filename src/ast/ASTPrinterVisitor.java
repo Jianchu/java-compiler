@@ -122,7 +122,7 @@ public class ASTPrinterVisitor implements Visitor{
 	    printIndent(node.getClass().getSimpleName());
 	    indent += DISTANCE;
 	    //print string?
-	    printIndent(Integer.toString(node.mod));
+	    printIndent(node.toString());
 	    indent -= DISTANCE;
 	}
 	public void visit(NullLiteral node) {
