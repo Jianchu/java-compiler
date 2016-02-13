@@ -1,5 +1,7 @@
 package ast;
 
+import java.util.List;
+
 import exceptions.ASTException;
 import parser.ParseTree;
 
@@ -20,4 +22,6 @@ public abstract class Name extends Expression {
 		}
 		throw new ASTException("unexpected: " + pt.getTokenType());
 	}
+	
+	public abstract List<String> getFullName();
 }
