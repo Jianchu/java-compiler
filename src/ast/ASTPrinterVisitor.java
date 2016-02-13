@@ -30,7 +30,8 @@ public class ASTPrinterVisitor implements Visitor{
 		printIndent(node.getClass().getSimpleName());
 		
 		indent += DISTANCE;
-		node.pkg.accept(this);
+		if (node.pkg != null)
+			node.pkg.accept(this);
 		
 		for (ImportDeclaration im : node.imports) {
 				im.accept(this);
@@ -151,6 +152,11 @@ public class ASTPrinterVisitor implements Visitor{
 	public void visit(VariableDeclarationStatement node) {
 		
 	}
+	
+	public void visit(VariableDeclarationExpression node) {
+		
+	}
+
 	public void visit(WhileStatement node) {
 		
 	}

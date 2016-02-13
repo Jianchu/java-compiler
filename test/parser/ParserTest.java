@@ -33,7 +33,7 @@ public class ParserTest {
 	
 	@Test
 	public void testGrammar() throws Exception {
-		File f = new File(System.getProperty("user.dir") + "/test/testprogram/StringLiterals.java");
+		File f = new File(System.getProperty("user.dir") + "/test/testprogram/TestAll.java");
 		Scanner scanner = new Scanner(new FileReader(f));
 		List<Token> tokens = scanner.scan();
 		Parser par = new Parser(tokens, grammar);

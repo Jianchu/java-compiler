@@ -1,5 +1,6 @@
 package testprogram;
 
+
 interface A {
     
 }

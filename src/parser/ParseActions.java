@@ -27,7 +27,7 @@ public class ParseActions {
 		if (action != null) {
 			return action;
 		} else {
-			throw new Exception("can't find such action.");
+			throw new Exception("can't find such action. Next symbol: " + symbol);
 		}
 	}
 }

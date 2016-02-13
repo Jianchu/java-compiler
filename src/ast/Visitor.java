@@ -42,6 +42,7 @@ public interface Visitor {
 	public void visit(ThisExpression node) throws ASTException;
 	public void visit(TypeDeclaration node) throws ASTException;
 	public void visit(VariableDeclaration node) throws ASTException;
+	public void visit(VariableDeclarationExpression node) throws ASTException;
 	public void visit(VariableDeclarationStatement node) throws ASTException;
 	public void visit(WhileStatement node) throws ASTException;
 }
