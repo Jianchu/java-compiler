@@ -8,7 +8,7 @@ import parser.ParseTree;
  *
  */
 public class IntegerLiteral extends Expression {
-	String value;
+	public String value;
 	public IntegerLiteral(ParseTree pt) {
 		value = pt.getLexeme();
 	}

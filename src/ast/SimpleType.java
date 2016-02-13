@@ -11,7 +11,7 @@ import scanner.Symbol;
  *
  */
 public class SimpleType extends Type{
-	Name name;
+	public Name name;
 	
 	public SimpleType(ParseTree pt) throws ASTException {
 		// the node should be ClassOrInterfaceType

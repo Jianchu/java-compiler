@@ -4,7 +4,7 @@ import parser.ParseTree;
 
 
 public class SimpleName extends Name {
-	String id;
+	public String id;
 	
 	public SimpleName(ParseTree pt) {
 		id = pt.getChildren().get(0).getLexeme();

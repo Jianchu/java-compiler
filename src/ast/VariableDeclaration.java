@@ -13,9 +13,9 @@ import scanner.Symbol;
  *
  */
 public class VariableDeclaration extends ASTNode {
-	Type type = null;
-	String id = null;
-	Expression initializer = null;
+	public Type type = null;
+	public String id = null;
+	public Expression initializer = null;
 	
 	public VariableDeclaration(ParseTree pt) throws ASTException {		
 		if (pt.getTokenType() == Symbol.LocalVariableDeclaration) {	

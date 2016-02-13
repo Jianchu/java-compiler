@@ -10,8 +10,8 @@ public class Modifier implements Next{
 	public static final int FINAL = 5;
 	public static final int NATIVE = 6;
 	
-	public Modifier next;
-	private int mod;
+	public Modifier next = null;
+	public int mod = 0;
 	public Modifier(ParseTree pt) {
 		for (ParseTree child : pt.getChildren()) {
 			switch (child.getTokenType()) {

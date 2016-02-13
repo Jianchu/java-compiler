@@ -4,7 +4,7 @@ import parser.ParseTree;
 import scanner.Symbol;
 
 public class PrimitiveType extends Type {
-	Value type;
+	public Value type;
 	
 	public PrimitiveType(ParseTree pt) {
 		ParseTree child = pt.getFirstChild();

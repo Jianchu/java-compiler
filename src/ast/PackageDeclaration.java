@@ -5,7 +5,7 @@ import parser.ParseTree;
 import scanner.Symbol;
 
 public class PackageDeclaration {
-	Name name;
+	public Name name;
 	public PackageDeclaration(ParseTree pt) throws ASTException {
 		for (ParseTree child : pt.getChildren()) {
 			if (child.getTokenType() == Symbol.Name) {

@@ -5,9 +5,9 @@ import parser.ParseTree;
 import scanner.Symbol;
 
 public class ImportDeclaration {
-	ImportDeclaration next = null;
-	Name name = null;
-	boolean onDemand = false;
+	public ImportDeclaration next = null;
+	public Name name = null;
+	public boolean onDemand = false;
 	
 	public ImportDeclaration(ParseTree pt) throws ASTException {
 		for (ParseTree child : pt.getChildren()) {

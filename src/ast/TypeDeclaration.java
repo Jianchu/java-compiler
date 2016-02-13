@@ -14,21 +14,21 @@ import scanner.Symbol;
  */
 public class TypeDeclaration extends BodyDeclaration{
 	// interface or class
-	boolean isInterface = false;
+	public boolean isInterface = false;
 	
-	List<Modifier> modifiers = new LinkedList<Modifier>();
-	String id;
+	public List<Modifier> modifiers = new LinkedList<Modifier>();
+	public String id = null;
 	
 	// extends 
-	Type superClass = null;
+	public Type superClass = null;
 	
 	// implements
-	List<Type> interfaces = new LinkedList<Type>();
+	public List<Type> interfaces = new LinkedList<Type>();
 	
 	// field or method declarations, but no type delcarations
-	List<BodyDeclaration> members = new LinkedList<BodyDeclaration>();
+	public List<BodyDeclaration> members = new LinkedList<BodyDeclaration>();
 	
-	TypeDeclaration next;
+	public TypeDeclaration next = null;
 	
 	public TypeDeclaration(ParseTree pt) throws ASTException {
 		for (ParseTree child : pt.getChildren()) {

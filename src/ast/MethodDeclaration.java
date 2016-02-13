@@ -8,11 +8,11 @@ import parser.ParseTree;
 import scanner.Symbol;
 
 public class MethodDeclaration extends BodyDeclaration{
-	List<Modifier> modifiers = new LinkedList<Modifier>();
-	boolean isConstructor = false;
-	boolean isAbstract = false;
-	Type returnType = null;	//what about void
-	String id;
+	public List<Modifier> modifiers = new LinkedList<Modifier>();
+	public boolean isConstructor = false;
+	public boolean isAbstract = false;
+	public Type returnType = null;	//what about void
+	public String id;
 	
 	// parameters are just variable declarations without initializers assignment
 	List<VariableDeclaration> parameters = new LinkedList<VariableDeclaration>();

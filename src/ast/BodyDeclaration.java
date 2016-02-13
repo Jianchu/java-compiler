@@ -8,6 +8,6 @@ package ast;
  * @author zanel
  *
  */
-public class BodyDeclaration extends ASTNode{
+public abstract class BodyDeclaration extends ASTNode{
 	
 }

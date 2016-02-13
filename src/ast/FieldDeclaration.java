@@ -9,10 +9,10 @@ import exceptions.ASTException;
 
 public class FieldDeclaration extends BodyDeclaration{
 	// zero or more
-	List<Modifier> modifiers = new LinkedList<Modifier>();
-	Type type = null; 
-	String id = null;
-	Expression initializer = null;
+	public List<Modifier> modifiers = new LinkedList<Modifier>();
+	public Type type = null; 
+	public String id = null;
+	public Expression initializer = null;
 	
 	public FieldDeclaration(ParseTree pt) throws ASTException {
 		for (ParseTree child : pt.getChildren()) {

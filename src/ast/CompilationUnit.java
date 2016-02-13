@@ -7,9 +7,9 @@ import exceptions.ASTException;
 import parser.ParseTree;
 
 public class CompilationUnit extends ASTNode{
-	PackageDeclaration pkg = null;
-	List<ImportDeclaration> imports = new LinkedList<ImportDeclaration>();
-	List<TypeDeclaration> types = new LinkedList<TypeDeclaration>();
+	public PackageDeclaration pkg = null;
+	public List<ImportDeclaration> imports = new LinkedList<ImportDeclaration>();
+	public List<TypeDeclaration> types = new LinkedList<TypeDeclaration>();
 	
 	public CompilationUnit(ParseTree pt) throws ASTException {
 		List<ParseTree> subTrees = pt.getChildren();

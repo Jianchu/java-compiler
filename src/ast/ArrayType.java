@@ -4,7 +4,7 @@ import exceptions.ASTException;
 import parser.ParseTree;
 
 public class ArrayType extends Type {
-	Type type;
+	public Type type;
 	public ArrayType(ParseTree pt) throws ASTException {
 		ParseTree child = pt.getFirstChild();
 		switch(child.getTokenType()) {
