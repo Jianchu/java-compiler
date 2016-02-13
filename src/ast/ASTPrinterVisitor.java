@@ -123,9 +123,6 @@ public class ASTPrinterVisitor implements Visitor{
 	    indent += DISTANCE;
 	    //print string?
 	    printIndent(Integer.toString(node.mod));
-	    if (node.hasNext()) {
-	        node.next.accept(this);
-	    }
 	    indent -= DISTANCE;
 	}
 	public void visit(NullLiteral node) {

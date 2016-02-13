@@ -11,7 +11,7 @@ public class Modifier implements Next{
 	public static final int FINAL = 5;
 	public static final int NATIVE = 6;
 	
-	public Modifier next = null;
+	private Modifier next = null;
 	public int mod = 0;
 	public Modifier(ParseTree pt) {
 		for (ParseTree child : pt.getChildren()) {
@@ -57,7 +57,27 @@ public class Modifier implements Next{
 	public Modifier next() {
 		return next;
 	}
-
+	
+	@Override
+	public String toString(){
+		switch(mod) {
+		case PUBLIC:
+			return "public";
+		case PROTECTED:
+			return "protected";
+		case STATIC:
+			return "static";
+		case ABSTRACT:
+			return "abstract";
+		case FINAL:
+			return "final";
+		case NATIVE:
+			return "native";
+		default:
+			throw new RuntimeException("unrecoginzed modifier");
+		}
+	}
+	
     public void accept(Visitor v) throws ASTException {
         v.visit(this);
     }
