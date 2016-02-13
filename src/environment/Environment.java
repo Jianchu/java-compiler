@@ -1,4 +1,4 @@
-package name;
+package environment;
 
 import java.util.Map;
 
