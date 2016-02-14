@@ -8,7 +8,7 @@ import parser.ParseTree;
 
 
 public class SimpleName extends Name {
-	public String id;
+	private String id;
 	
 	public SimpleName(ParseTree pt) {
 		id = pt.getChildren().get(0).getLexeme();
@@ -22,6 +22,11 @@ public class SimpleName extends Name {
 		List<String> full = new LinkedList<String>();
 		full.add(id);
 		return full;
+	}
+	
+	@Override
+	public String toString() {
+		return id;
 	}
 	
 	public void accept(Visitor v) throws ASTException {

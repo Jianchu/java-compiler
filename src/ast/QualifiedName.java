@@ -7,11 +7,11 @@ import exceptions.ASTException;
 import parser.ParseTree;
 
 public class QualifiedName extends Name{
-	public Name qualifier = null;
-	public String id = null;
+	private Name qualifier = null;
+	private String id = null;
 	
 	// the list could be length 0
-	public List<String> fullName = new LinkedList<String>();
+	private List<String> fullName = new LinkedList<String>();
 	
 	public QualifiedName(ParseTree pt) throws ASTException {
 		for (ParseTree child : pt.getChildren()) {
@@ -40,6 +40,12 @@ public class QualifiedName extends Name{
 	public List<String> getFullName() {
 		return fullName;
 	}
+	
+	@Override
+	public String toString() {
+		return String.join(".", fullName);
+	}
+	
 	public void accept(Visitor v) throws ASTException {
 		v.visit(this);
 	}

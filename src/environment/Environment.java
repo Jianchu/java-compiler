@@ -17,6 +17,6 @@ public class Environment {
 	Map<String, TypeDeclaration> types;
 	Map<String, MethodDeclaration> methods;
 	
-	Map<String, ImportDeclaration> imports;
-	Map<String, PackageDeclaration> pkg;
+	// imports and files from the same package are listed in the global class environment.
+	
 }

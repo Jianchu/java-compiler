@@ -138,7 +138,7 @@ public class ASTPrinterVisitor implements Visitor{
 	public void visit(QualifiedName node) throws ASTException {
             printIndent(node.getClass().getSimpleName());
             indent += DISTANCE;
-            String fullName = String.join(".", node.fullName);
+            String fullName = node.toString();
             printIndent(fullName);
             indent -= DISTANCE;	    
 	}
@@ -149,7 +149,7 @@ public class ASTPrinterVisitor implements Visitor{
 	public void visit(SimpleName node) {
 	    printIndent(node.getClass().getSimpleName());
             indent += DISTANCE;
-            printIndent(node.id);
+            printIndent(node.toString());
             indent -= DISTANCE;
 	}
 	public void visit(SimpleType node) {
