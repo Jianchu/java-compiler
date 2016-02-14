@@ -8,7 +8,7 @@ import scanner.Symbol;
  * No modifiers for local variables?
  * repeat code from field declaration... 
  * 
- * takes in both LocalVariableDeclarator and FormalParameter
+ * takes in both LocalVariableDeclaraton and FormalParameter
  * @author zanel
  *
  */

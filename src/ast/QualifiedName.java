@@ -6,6 +6,12 @@ import java.util.List;
 import exceptions.ASTException;
 import parser.ParseTree;
 
+/**
+ * getters are provided for this class. 
+ * do not attempt to make the fields public.
+ * @author zanel
+ *
+ */
 public class QualifiedName extends Name{
 	private Name qualifier = null;
 	private String id = null;
