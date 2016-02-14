@@ -4,6 +4,7 @@ import ast.*;
 
 import exceptions.ASTException;
 /**
+ * See section 8.5.3 of Crafting a Compiler
  * semantic checking. uses both TopDeclVisitor and TypeVisitor
  * @author zanel
  *
