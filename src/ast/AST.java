@@ -12,7 +12,7 @@ import scanner.Symbol;
 import scanner.Token;
 
 public class AST {
-	CompilationUnit root;
+	public CompilationUnit root;
 	
 	public AST(ParseTree pt) throws ASTException {
 		root = new CompilationUnit(pt);
