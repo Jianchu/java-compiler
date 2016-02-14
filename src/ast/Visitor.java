@@ -20,6 +20,7 @@ public interface Visitor {
 	public void visit(ExpressionStatement node) throws ASTException;
 	public void visit(FieldAccessExpression node) throws ASTException;
 	public void visit(FieldAccess node) throws ASTException;
+	public void visit(FieldDeclaration node) throws ASTException;
 	public void visit(ForStatement node) throws ASTException;
 	public void visit(IfStatement node) throws ASTException;
 	public void visit(ImportDeclaration node) throws ASTException;
