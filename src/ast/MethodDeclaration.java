@@ -88,8 +88,8 @@ public class MethodDeclaration extends BodyDeclaration{
 	private void parseConstructorDeclarator(ParseTree pt) throws ASTException {
 		for (ParseTree child : pt.getChildren()) {
 			switch(child.getTokenType()) {
-			case SimpleName:
-				id = ASTHelper.parseID(child.getFirstChild());
+                        case ID:
+                            id = ASTHelper.parseID(child);
 				break;
 			case FormalParameterList:
 				parseFormalParameterList(child);
