@@ -75,10 +75,6 @@ public class ASTPrinterVisitor implements Visitor{
 
     }
 
-    public void visit(BodyDeclaration node) {
-
-    }
-
     public void visit(BooleanLiteral node) {
 
     }

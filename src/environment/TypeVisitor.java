@@ -5,6 +5,6 @@ package environment;
  * @author zanel
  *
  */
-public class TypeVisitor {
+public class TypeVisitor extends SemanticsVisitor {
 
 }

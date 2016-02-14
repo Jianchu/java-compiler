@@ -5,6 +5,6 @@ package environment;
  * @author zanel
  *
  */
-public class TopDeclVisitor {
+public class TopDeclVisitor extends SemanticsVisitor {
 
 }

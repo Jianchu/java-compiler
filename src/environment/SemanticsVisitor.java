@@ -5,6 +5,6 @@ package environment;
  * @author zanel
  *
  */
-public class SemanticsVisitor {
+public class SemanticsVisitor implements Visitor {
 
 }
