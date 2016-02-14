@@ -15,9 +15,11 @@ import ast.VariableDeclaration;
 public class Environment {
 	Environment enclosing;
 	
-	// put variable and field declaration both in one map.
-	// first of all because they never exist at the same time
-	// secondly it makes look up of variable name easier.
+	/* 
+	 * put variable and field declaration both in one map.
+	 * first of all because they never exist at the same time
+	 * secondly it makes look up of variable name easier.
+	 */
 	Map<String, ASTNode> variables;
 	
 	/*
@@ -27,7 +29,7 @@ public class Environment {
 	Map<String, TypeDeclaration> types;
 	Map<String, MethodDeclaration> methods;
 	
-	public Environment(Environment outer) {
+	private Environment(Environment outer) {
 		enclosing = outer;
 		variables = new HashMap<String, ASTNode>();
 		types = new HashMap<String, TypeDeclaration>();
