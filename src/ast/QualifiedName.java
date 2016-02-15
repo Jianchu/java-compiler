@@ -43,8 +43,8 @@ public class QualifiedName extends Name{
 	/**
 	 * 
 	 */
-	public List<String> getFullName() {
-		return fullName;
+	public final List<String> getFullName() {
+		return new LinkedList<String>(fullName);
 	}
 	
 	@Override

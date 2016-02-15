@@ -1,16 +1,12 @@
 package environment;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
-import java.util.Stack;
 
-import ast.ASTNode;
-import ast.FieldDeclaration;
-import ast.ImportDeclaration;
-import ast.MethodDeclaration;
-import ast.PackageDeclaration;
-import ast.TypeDeclaration;
-import ast.VariableDeclaration;
+import ast.*;
 
 public class Environment {
 	Environment enclosing;
@@ -29,7 +25,7 @@ public class Environment {
 	Map<String, TypeDeclaration> types;
 	Map<String, MethodDeclaration> methods;
 	
-	private Environment(Environment outer) {
+	public Environment(Environment outer) {
 		enclosing = outer;
 		variables = new HashMap<String, ASTNode>();
 		types = new HashMap<String, TypeDeclaration>();
@@ -51,13 +47,17 @@ public class Environment {
 		variables.put(name, declaration);
 	}
 	
+	public Environment getEnclosing() {
+		return enclosing;
+	}
 	
 	public enum Type {
-		// incomplete
+		// might be incomplete
 		GLOBAL,
 		CLASS,
 		METHOD,
-		VARIABLE
+		BLOCK
 	}
+	
 
 }

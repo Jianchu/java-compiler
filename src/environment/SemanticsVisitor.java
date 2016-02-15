@@ -1,5 +1,7 @@
 package environment;
 
+import java.util.Stack;
+
 import ast.*;
 
 import exceptions.ASTException;
@@ -10,7 +12,17 @@ import exceptions.ASTException;
  *
  */
 public class SemanticsVisitor implements Visitor {
-	public void visit(CompilationUnit node) throws ASTException {}
+	TopDeclVisitor declVisitor;
+	SymbolTable table;
+	
+	public SemanticsVisitor() {
+		table = new SymbolTable();
+		declVisitor = new TopDeclVisitor(table);
+	}
+	
+	public void visit(CompilationUnit node) throws ASTException {
+		node.accept(declVisitor);
+	}
 
 	
 	/*

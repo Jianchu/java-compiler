@@ -1,5 +1,7 @@
 package environment;
 
+import java.util.Stack;
+
 import ast.*;
 
 /**
@@ -8,6 +10,15 @@ import ast.*;
  *
  */
 public class TopDeclVisitor extends SemanticsVisitor {
+	
+	/**
+	 * So that the current environment can be shared through different visitors.
+	 * @param curr
+	 */
+	public TopDeclVisitor(SymbolTable syms)  {
+		table = syms;
+	}
+	
 	/**
 	 * Build class environment
 	 */
