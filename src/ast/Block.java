@@ -30,7 +30,8 @@ public class Block extends Statement {
             for (ParseTree child : currentNode.getChildren()) {
                 if (checkNodeType(child, Symbol.BlockStatement)) {
                     for (ParseTree blockStatementChild : child.getChildren()) {
-                        if (checkNodeType(blockStatementChild, Symbol.LocalVariableDeclaration)) {
+                        if (checkNodeType(blockStatementChild,
+                                Symbol.LocalVariableDeclarationStatement)) {
                             statements.add(new VariableDeclarationStatement(blockStatementChild));
                         } else if (checkNodeType(blockStatementChild, Symbol.Statement)) {
                             Statement statement = Statement
