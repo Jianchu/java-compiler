@@ -1,6 +1,7 @@
 package ast;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
@@ -45,6 +46,7 @@ public class Block extends Statement {
 
             }
         }
+        Collections.reverse(statements);
     }
 
     // public List<Statement> getBlockStatements() {
