@@ -7,10 +7,10 @@ import scanner.Symbol;
 import parser.ParseTree;
 
 public class CastExpression extends Expression {
-    Type type;
-    Expression expr;
-    Expression unary;
-    boolean isArray;
+    public Type type;
+    public Expression expr;
+    public Expression unary;
+    public boolean isArray;
 
     public CastExpression(ParseTree pt) throws ASTException {
         List<ParseTree> subtrees = pt.getChildren();

@@ -7,9 +7,9 @@ import scanner.Symbol;
 import parser.ParseTree;
 
 public class InfixExpression extends Expression {
-    Expression lhs;
-    Operator op;
-    Expression rhs;
+    public Expression lhs;
+    public Operator op;
+    public Expression rhs;
 
     public enum Operator {
         LOR, AND, BITOR, BITAND,
@@ -35,6 +35,7 @@ public class InfixExpression extends Expression {
           case STAR:    op = Operator.STAR;    break;
           case SLASH:   op = Operator.SLASH;   break;
           case MOD:     op = Operator.MOD;     break;
+          default: throw new ASTException("Unexpected node type " + subtrees.get(1).getTokenType());
         }
         lhs = Expression.parseExpression(subtrees.get(0));
         rhs = Expression.parseExpression(subtrees.get(2));

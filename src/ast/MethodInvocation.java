@@ -6,9 +6,9 @@ import exceptions.ASTException;
 import parser.ParseTree;
 
 public class MethodInvocation extends Expression {
-    Expression expr;
-    String id;
-    List<Expression> arglist;
+    public Expression expr;
+    public String id;
+    public List<Expression> arglist;
 
     public MethodInvocation(ParseTree pt) throws ASTException {
         List<ParseTree> subtrees = pt.getChildren();

@@ -6,8 +6,8 @@ import exceptions.ASTException;
 import parser.ParseTree;
 
 public class FieldAccess extends Expression {
-    Expression expr;
-    String id;
+    public Expression expr;
+    public String id;
 
     public FieldAccess(ParseTree pt) throws ASTException {
         List<ParseTree> subtrees = pt.getChildren();

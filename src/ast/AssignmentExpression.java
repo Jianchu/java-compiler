@@ -6,8 +6,8 @@ import exceptions.ASTException;
 import parser.ParseTree;
 
 public class AssignmentExpression extends Expression {
-    Expression lhs;
-    Expression expr;
+    public Expression lhs;
+    public Expression expr;
 
     public AssignmentExpression(ParseTree pt) throws ASTException {
         List<ParseTree> subtrees = pt.getChildren();

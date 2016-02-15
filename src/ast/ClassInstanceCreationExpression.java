@@ -6,8 +6,8 @@ import exceptions.ASTException;
 import parser.ParseTree;
 
 public class ClassInstanceCreationExpression extends Expression {
-    Expression name;
-    List<Expression> arglist;    
+    public Expression name;
+    public List<Expression> arglist;    
 
     public ClassInstanceCreationExpression(ParseTree pt) throws ASTException {
         List<ParseTree> subtrees = pt.getChildren();
