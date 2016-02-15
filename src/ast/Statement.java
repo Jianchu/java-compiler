@@ -24,6 +24,8 @@ public abstract class Statement extends ASTNode {
         case StatementWithoutTrailingSubstatement:
             // return null for empty statement and "return;"
             return getStatementNoTrailing(realStatement);
+        case Block:
+            return new Block(realStatement);
         }
         throw new ASTException("unexpected symbol " + realStatement.getTokenType());
     }
