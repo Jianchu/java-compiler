@@ -1,8 +1,7 @@
 package ast;
 
-import exceptions.ASTException;
 import parser.ParseTree;
-import scanner.Symbol;
+import exceptions.ASTException;
 
 public class PrimitiveType extends Type {
 	public Value type;
@@ -14,7 +13,8 @@ public class PrimitiveType extends Type {
 			type = Value.BOOLEAN;
 			break;
 		case NumericType:
-			ParseTree Integral = child.getFirstChild();
+			ParseTree Numeric = child.getFirstChild();
+			ParseTree Integral = Numeric.getFirstChild();
 			switch(Integral.getTokenType()) {
 			case INT:
 				type = Value.INT;
