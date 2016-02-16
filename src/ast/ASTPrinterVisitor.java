@@ -412,7 +412,10 @@ public class ASTPrinterVisitor implements Visitor{
 
     // TODO
     public void visit(WhileStatement node) {
+        printIndent(node.getClass().getSimpleName());
+        indent += DISTANCE;
 
+        indent -= DISTANCE;
     }
 
     public static void main(String[] args) throws Exception {
@@ -421,8 +424,8 @@ public class ASTPrinterVisitor implements Visitor{
         //File f = new File(System.getProperty("user.dir")+ "/test/testprogram/StringLiterals.java");
         //File f = new File(System.getProperty("user.dir")+ "/assignment_testcases/a2/J1_1_Cast_NamedTypeAsVariable.java");
         //File f = new File(System.getProperty("user.dir")+ "/assignment_testcases/a2/J1_4_MethodDeclare_DuplicateArrayTypes.java");
-        File f = new File(System.getProperty("user.dir")+ "/assignment_testcases/a1/J1_evalMethodInvocationFromParExp.java");
-        //File f = new File(System.getProperty("user.dir")+ "/assignment_testcases/a1/J1_primitivecasts.java");
+        //File f = new File(System.getProperty("user.dir")+ "/assignment_testcases/a1/J1_evalMethodInvocationFromParExp.java");
+        File f = new File(System.getProperty("user.dir")+ "/assignment_testcases/a1/J1_forAlwaysInitAsWhile.java");
 
         Scanner scanner = new Scanner(new FileReader(f));
         List<Token> tokens = scanner.scan();
