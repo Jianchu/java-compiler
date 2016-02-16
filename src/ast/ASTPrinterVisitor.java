@@ -77,7 +77,6 @@ public class ASTPrinterVisitor implements Visitor{
         indent += DISTANCE;
     }
 
-    // TODO: here.
     public void visit(Block node) throws ASTException {
         printIndent(node.getClass().getSimpleName());
         indent += DISTANCE;
@@ -102,6 +101,7 @@ public class ASTPrinterVisitor implements Visitor{
     }
 
     public void visit(ClassInstanceCreationExpression node) {
+        printIndent(node.getClass().getSimpleName());
 
     }
 
@@ -192,6 +192,7 @@ public class ASTPrinterVisitor implements Visitor{
     }
 
     public void visit(MethodInvocation node) {
+        printIndent(node.getClass().getSimpleName());
 
     }
 
@@ -290,7 +291,6 @@ public class ASTPrinterVisitor implements Visitor{
 
     }
 
-    // TODO : here
     public void visit(VariableDeclaration node) throws ASTException {
         printIndent(node.getClass().getSimpleName());
         indent += DISTANCE;
@@ -327,7 +327,7 @@ public class ASTPrinterVisitor implements Visitor{
         //File f = new File(System.getProperty("user.dir")+ "/assignment_testcases/a2/J1_4_MethodDeclare_DuplicateArrayTypes.java");
         File f = new File(
                 System.getProperty("user.dir")
-                + "/assignment_testcases/a1/J1_eagerbooleanoperations.java");
+                        + "/assignment_testcases/a1/J1_evalMethodInvocationFromParExp.java");
         Scanner scanner = new Scanner(new FileReader(f));
         List<Token> tokens = scanner.scan();
         Parser par = new Parser(tokens, grammar);
