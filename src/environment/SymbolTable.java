@@ -49,16 +49,16 @@ public class SymbolTable {
 		for (AST ast : trees) {
 			String fullName = "";
 			String pkgName = "";
-			List<String> pkgFiles = null;
+			List<String> pkgCls = null;
 			if (ast.root.pkg != null) {
 				pkgName = ast.root.pkg.name.toString();
 				fullName += pkgName + ".";
 			}
 
-			pkgFiles = globalPackages.get(pkgName);
-			if (pkgFiles == null) {
-				pkgFiles = new LinkedList<String>();
-				globalPackages.put(pkgName, pkgFiles);
+			pkgCls = globalPackages.get(pkgName);
+			if (pkgCls == null) {
+				pkgCls = new LinkedList<String>();
+				globalPackages.put(pkgName, pkgCls);
 			}
 			
 			// if no types are defined, add nothing
@@ -66,7 +66,7 @@ public class SymbolTable {
 				// only look at first one because well no private classes or interfaces
 				TypeDeclaration type = ast.root.types.get(0);
 				fullName += type.id;
-				pkgFiles.add(fullName);
+				pkgCls.add(fullName);
 				global.put(fullName, type);
 
 			}

@@ -1,11 +1,14 @@
 package environment;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 import java.util.TreeSet;
 
+
 import ast.*;
+import exceptions.NameException;
 
 /**
  * responsible for constructing symbol table
@@ -24,18 +27,22 @@ public class TopDeclVisitor extends SemanticsVisitor {
 	
 	/**
 	 * Build class environment
+	 * @throws NameException 
 	 */
-	public void visit(CompilationUnit cu) {
+	public void visit(CompilationUnit cu) throws NameException {
 		table.openScope(Environment.EnvType.COMPILATION_UNIT);	// the first ever for this file
 		Environment curr = table.currentScope();
+		
+		final Map<String, List<String>> pkgCls = SymbolTable.getAllPackages();
+		final Map<String, TypeDeclaration> global = SymbolTable.getGlobal();
 		
 		//package files
 		String pkg = "";
 		if (cu.pkg != null) {
 			pkg = cu.pkg.name.toString();
 		}
-		for (String cls : table.getAllPackages().get(pkg)) {
-			TypeDeclaration otherDecl = table.getGlobal().get(cls);
+		for (String cls : pkgCls.get(pkg)) {
+			TypeDeclaration otherDecl = global.get(cls);
 			TypeDeclaration thisDecl = null;
 			if (cu.types.size() > 0) {
 				thisDecl = cu.types.get(0);
@@ -49,11 +56,28 @@ public class TopDeclVisitor extends SemanticsVisitor {
 		//imports
 		for (ImportDeclaration importDecl : cu.imports) {
 			List<String> name = importDecl.name.getFullName();
+			String nameStr = importDecl.name.toString();
 			if (name.get(name.size() -1).equals("*")) {
 				// import on demand
+				List<String> qualifier = name.subList(0, name.size() - 1);
+				String qualifierStr = String.join(".", name);
+				List<String> clsList = pkgCls.get(qualifierStr);
+				if (clsList == null) {
+					// check that the package exist;
+					throw new NameException("Import package not recoginzed: " + nameStr);
+				}
+				
+				for (String cls : clsList) {
+					curr.addImportOnDemand(cls, global.get(cls));
+				}
 				
 			} else {
 				// single import 
+				TypeDeclaration decl = global.get(nameStr);
+				if (decl == null) {
+					throw new NameException("Import class name not recoginzed: " + nameStr);
+				}
+				curr.addSingleImport(nameStr, decl);
 			}
 			
 		}
