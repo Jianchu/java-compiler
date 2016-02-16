@@ -97,7 +97,10 @@ public class ASTPrinterVisitor implements Visitor{
     }
 
     public void visit(CharacterLiteral node) {
-
+        printIndent(node.getClass().getSimpleName());
+        indent += DISTANCE;
+        printIndent(node.value);
+        indent -= DISTANCE;
     }
 
     public void visit(ClassInstanceCreationExpression node) throws ASTException {
@@ -373,8 +376,9 @@ public class ASTPrinterVisitor implements Visitor{
         //File f = new File(System.getProperty("user.dir")+ "/test/testprogram/StringLiterals.java");
         //File f = new File(System.getProperty("user.dir")+ "/assignment_testcases/a2/J1_1_Cast_NamedTypeAsVariable.java");
         //File f = new File(System.getProperty("user.dir")+ "/assignment_testcases/a2/J1_4_MethodDeclare_DuplicateArrayTypes.java");
-        File f = new File(System.getProperty("user.dir")
-                        + "/assignment_testcases/a1/J1_evalMethodInvocationFromParExp.java");
+        File f = new File(System.getProperty("user.dir")+ "/assignment_testcases/a1/J1_evalMethodInvocationFromParExp.java");
+        //File f = new File(System.getProperty("user.dir")+ "/assignment_testcases/a1/J1_charliterals.java");
+
         Scanner scanner = new Scanner(new FileReader(f));
         List<Token> tokens = scanner.scan();
         Parser par = new Parser(tokens, grammar);
