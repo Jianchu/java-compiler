@@ -8,6 +8,7 @@ import java.util.TreeSet;
 
 
 import ast.*;
+import exceptions.ASTException;
 import exceptions.NameException;
 
 /**
@@ -27,9 +28,9 @@ public class TopDeclVisitor extends SemanticsVisitor {
 	
 	/**
 	 * Build class environment
-	 * @throws NameException 
+	 * @throws ASTException 
 	 */
-	public void visit(CompilationUnit cu) throws NameException {
+	public void visit(CompilationUnit cu) throws ASTException {
 		table.openScope(Environment.EnvType.COMPILATION_UNIT);	// the first ever for this file
 		Environment curr = table.currentScope();
 		
@@ -79,11 +80,33 @@ public class TopDeclVisitor extends SemanticsVisitor {
 				}
 				curr.addSingleImport(nameStr, decl);
 			}
-			
 		}
 		
+		// class or interface declaration
+		for (TypeDeclaration typeDecl : cu.types) {
+			// the for loop is redundant since there can only be one declaration.
+			// but I've decided to do it in a more general way, when i made the types a list...
+			typeDecl.accept(this);
+		}
+		
+		table.closeScope();
+	}
+	
+	
+	public void visit(TypeDeclaration typeDecl) throws ASTException {
+		// TODO: super class or interfaces needs an environment
+		
+		// create environments for methods and fields
+		table.openScope(Environment.EnvType.CLASS);
+		
+		for (BodyDeclaration bDecl : typeDecl.members) {
+			bDecl.accept(this);
+		}
+		
+		table.closeScope();
 		
 	}
+	
 	
 	/**
 	 * for finding files in same package. 
