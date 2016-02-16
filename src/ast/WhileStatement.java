@@ -19,7 +19,7 @@ public class WhileStatement extends Statement{
                 this.whileStatement = Statement.parseStatement(child);
                 break;
             default:
-                throw new ASTException("Unexpected symbol");
+                break;
             }
         }
     }

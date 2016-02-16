@@ -15,12 +15,13 @@ public class ForStatement extends Statement{
     public Statement forBody;
 
     public ForStatement(ParseTree forNode) throws ASTException {
+        System.out.println(forNode.getTokenType());
         for (ParseTree child : forNode.getChildren()) {
             switch (child.getTokenType()) {
             case ForInit:
                 for (ParseTree forInitChild : child.getChildren()) {
                     if (checkNodeType(forInitChild, Symbol.StatementExpression)) {
-                        this.forInit = Expression.parseExpression(child);
+                        this.forInit = Expression.parseExpression(forInitChild);
                     } else if (checkNodeType(forInitChild, Symbol.LocalVariableDeclaration)) {
                         this.forInit = new VariableDeclarationExpression(forInitChild);
                     }
@@ -38,7 +39,7 @@ public class ForStatement extends Statement{
                 this.forBody = Statement.parseStatement(child);
                 break;
             default:
-                throw new ASTException("Unexpected symbol");
+                break;
             }
         }
     }
