@@ -63,12 +63,18 @@ public class ASTPrinterVisitor implements Visitor{
 
     }
 
-    public void visit(ArrayType node) {
-
+    public void visit(ArrayType node) throws ASTException {
+        printIndent(node.getClass().getSimpleName());
+        indent += DISTANCE;
+        if (node.type != null) {
+            node.type.accept(this);
+        }
+        indent += DISTANCE;
     }
 
     public void visit(AssignmentExpression node) {
         printIndent(node.getClass().getSimpleName());
+        indent += DISTANCE;
     }
 
     // TODO: here.
@@ -297,8 +303,9 @@ public class ASTPrinterVisitor implements Visitor{
     public static void main(String[] args) throws Exception {
         File grammar = new File(System.getProperty("user.dir")
                 + "/data/grammar.lr1");
-        File f = new File(System.getProperty("user.dir")
-                + "/assignment_testcases/a2/J1_1_Cast_NamedTypeAsVariable.java");
+        //File f = new File(System.getProperty("user.dir")+ "/test/testprogram/StringLiterals.java");
+        //File f = new File(System.getProperty("user.dir")+ "/assignment_testcases/a2/J1_1_Cast_NamedTypeAsVariable.java");
+        File f = new File(System.getProperty("user.dir")+ "/assignment_testcases/a2/J1_4_MethodDeclare_DuplicateArrayTypes.java");
         Scanner scanner = new Scanner(new FileReader(f));
         List<Token> tokens = scanner.scan();
         Parser par = new Parser(tokens, grammar);
