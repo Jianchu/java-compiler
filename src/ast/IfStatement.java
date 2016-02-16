@@ -38,7 +38,7 @@ public class IfStatement extends Statement{
                 }
                 break;
             default:
-                throw new ASTException("Unexpected symbol");
+                break;
             }
             ithChild++;
         }
