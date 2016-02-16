@@ -108,8 +108,19 @@ public class ASTPrinterVisitor implements Visitor{
         indent -= DISTANCE;
     }
 
-    public void visit(CastExpression node) {
-
+    public void visit(CastExpression node) throws ASTException {
+        printIndent(node.getClass().getSimpleName());
+        indent += DISTANCE;
+        if (node.type != null) {
+            node.type.accept(this);
+        }
+        if (node.expr != null) {
+            node.expr.accept(this);
+        }
+        if (node.unary != null) {
+            node.unary.accept(this);
+        }
+        indent -= DISTANCE;
     }
 
     public void visit(CharacterLiteral node) {
@@ -401,7 +412,7 @@ public class ASTPrinterVisitor implements Visitor{
         //File f = new File(System.getProperty("user.dir")+ "/assignment_testcases/a2/J1_1_Cast_NamedTypeAsVariable.java");
         //File f = new File(System.getProperty("user.dir")+ "/assignment_testcases/a2/J1_4_MethodDeclare_DuplicateArrayTypes.java");
         File f = new File(System.getProperty("user.dir")+ "/assignment_testcases/a1/J1_evalMethodInvocationFromParExp.java");
-        //File f = new File(System.getProperty("user.dir")+ "/assignment_testcases/a1/J1_ArrayCreateAndIndex.java");
+        //File f = new File(System.getProperty("user.dir")+ "/assignment_testcases/a1/J1_primitivecasts.java");
 
         Scanner scanner = new Scanner(new FileReader(f));
         List<Token> tokens = scanner.scan();
