@@ -55,12 +55,28 @@ public class ASTPrinterVisitor implements Visitor{
         printIndent(node.getClass().getSimpleName());
     }
 
-    public void visit(ArrayAccess node) {
-
+    public void visit(ArrayAccess node) throws ASTException {
+        printIndent(node.getClass().getSimpleName());
+        indent += DISTANCE;
+        if (node.array != null) {
+            node.array.accept(this);
+        }
+        if (node.index != null) {
+            node.index.accept(this);
+        }
+        indent -= DISTANCE;
     }
 
-    public void visit(ArrayCreationExpression node) {
-
+    public void visit(ArrayCreationExpression node) throws ASTException {
+        printIndent(node.getClass().getSimpleName());
+        indent += DISTANCE;
+        if (node.type != null) {
+            node.type.accept(this);
+        }
+        if (node.expr != null) {
+            node.expr.accept(this);
+        }
+        indent -= DISTANCE;
     }
 
     public void visit(ArrayType node) throws ASTException {
@@ -377,7 +393,7 @@ public class ASTPrinterVisitor implements Visitor{
         //File f = new File(System.getProperty("user.dir")+ "/assignment_testcases/a2/J1_1_Cast_NamedTypeAsVariable.java");
         //File f = new File(System.getProperty("user.dir")+ "/assignment_testcases/a2/J1_4_MethodDeclare_DuplicateArrayTypes.java");
         File f = new File(System.getProperty("user.dir")+ "/assignment_testcases/a1/J1_evalMethodInvocationFromParExp.java");
-        //File f = new File(System.getProperty("user.dir")+ "/assignment_testcases/a1/J1_charliterals.java");
+        //File f = new File(System.getProperty("user.dir")+ "/assignment_testcases/a1/J1_ArrayCreateAndIndex.java");
 
         Scanner scanner = new Scanner(new FileReader(f));
         List<Token> tokens = scanner.scan();
