@@ -2,7 +2,9 @@ package environment;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Stack;
 
 import ast.AST;
@@ -17,14 +19,16 @@ import exceptions.ASTException;
  */
 public class SymbolTable {
 	Environment curr;
-	public static HashMap<List<String>, TypeDeclaration> global = null;
+	private static HashMap<String, TypeDeclaration> global = null;
+	private static HashMap<String, List<String>> globalPackages = null;
 	
 	public SymbolTable() {
 		curr = null;
 	}
 	
-	public void openScope() {
-		curr = new Environment(curr);
+	public void openScope(Environment.EnvType scopeType) {
+		curr = new Environment(curr, scopeType);
+		
 	}
 	
 	public void closeScope() {
@@ -40,17 +44,50 @@ public class SymbolTable {
 	 * @param trees
 	 */
 	public static void buildGlobal(List<AST> trees) {
+		global = new HashMap<String, TypeDeclaration>();
+		globalPackages = new HashMap<String, List<String>>();
 		for (AST ast : trees) {
-			List<String> fullName = new ArrayList<String>();
+			String fullName = "";
+			String pkgName = "";
+			List<String> pkgCls = null;
+			if (ast.root.pkg != null) {
+				pkgName = ast.root.pkg.name.toString();
+				fullName += pkgName + ".";
+			}
+
+			pkgCls = globalPackages.get(pkgName);
+			if (pkgCls == null) {
+				pkgCls = new LinkedList<String>();
+				globalPackages.put(pkgName, pkgCls);
+			}
 			
-			if (ast.root.pkg != null)
-				fullName.addAll(ast.root.pkg.name.getFullName());
-			if (ast.root.types.size() != 0)
-				fullName.add(ast.root.types.get(0).id);
-			
-			if (fullName.size() > 0)
-				global.put(fullName, ast.root.types.get(0));
+			// if no types are defined, add nothing
+			if (ast.root.types.size() != 0) {
+				// only look at first one because well no private classes or interfaces
+				TypeDeclaration type = ast.root.types.get(0);
+				fullName += type.id;
+				pkgCls.add(fullName);
+				global.put(fullName, type);
+
+			}
 		}
+	}
+	
+	public static Map<String, TypeDeclaration> getGlobal() {
+		if (global == null)
+			throw new RuntimeException("build global environment first.");
+		return global;
+	}
+	
+	/**
+	 * a map from package name to the classes in the package
+	 * @return
+	 */
+	public static Map<String, List<String>> getAllPackages() {
+		if (globalPackages == null)  {
+			throw new RuntimeException("build global environment first.");
+		}
+		return globalPackages;
 	}
 	
 	/**
@@ -65,4 +102,5 @@ public class SymbolTable {
 			tree.root.accept(sv);
 		}
 	}
+	
 }
