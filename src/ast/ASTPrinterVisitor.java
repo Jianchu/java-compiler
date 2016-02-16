@@ -51,8 +51,13 @@ public class ASTPrinterVisitor implements Visitor{
         indent -= DISTANCE;
     }
 
-    public void visit(ImportDeclaration node) {
+    public void visit(ImportDeclaration node) throws ASTException {
         printIndent(node.getClass().getSimpleName());
+        indent += DISTANCE;
+        if (node.name != null) {
+            node.name.accept(this);
+        }
+        indent -= DISTANCE;
     }
 
     public void visit(ArrayAccess node) throws ASTException {
@@ -145,10 +150,12 @@ public class ASTPrinterVisitor implements Visitor{
         indent -= DISTANCE;
     }
 
+    // TODO
     public void visit(ExpressionStatement node) {
 
     }
 
+    // TODO
     public void visit(FieldAccessExpression node) {
 
     }
@@ -180,6 +187,7 @@ public class ASTPrinterVisitor implements Visitor{
 
     }
 
+    // TODO
     public void visit(ForStatement node) {
 
     }
@@ -397,10 +405,12 @@ public class ASTPrinterVisitor implements Visitor{
         indent -= DISTANCE;
     }
 
+    // TODO
     public void visit(VariableDeclarationExpression node) {
 
     }
 
+    // TODO
     public void visit(WhileStatement node) {
 
     }
