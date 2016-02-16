@@ -142,8 +142,16 @@ public class ASTPrinterVisitor implements Visitor{
 
     }
 
-    public void visit(FieldAccess node) {
-
+    public void visit(FieldAccess node) throws ASTException {
+        printIndent(node.getClass().getSimpleName());
+        indent += DISTANCE;
+        if (node.expr != null) {
+            node.expr.accept(this);
+        }
+        if (node.id != null) {
+            printIndent(node.id);
+        }
+        indent -= DISTANCE;
     }
 
     public void visit(FieldDeclaration node) throws ASTException {
