@@ -87,7 +87,10 @@ public class ASTPrinterVisitor implements Visitor{
     }
 
     public void visit(BooleanLiteral node) {
-
+        printIndent(node.getClass().getSimpleName());
+        indent += DISTANCE;
+        printIndent(Boolean.toString(node.value));
+        indent -= DISTANCE;
     }
 
     public void visit(CastExpression node) {
@@ -163,7 +166,6 @@ public class ASTPrinterVisitor implements Visitor{
         indent -= DISTANCE;
     }
 
-    // TODO: here
     public void visit(MethodDeclaration node) throws ASTException {
         printIndent(node.getClass().getSimpleName());
         indent += DISTANCE;
@@ -205,8 +207,16 @@ public class ASTPrinterVisitor implements Visitor{
 
     }
 
-    public void visit(PrefixExpression node) {
-
+    public void visit(PrefixExpression node) throws ASTException {
+        printIndent(node.getClass().getSimpleName());
+        indent += DISTANCE;
+        if (node.op != null) {
+            printIndent(node.op.toString());
+        }
+        if (node.expr != null) {
+            node.expr.accept(this);
+        }
+        indent -= DISTANCE;
     }
 
     public void visit(PrimitiveType node) {
@@ -264,10 +274,19 @@ public class ASTPrinterVisitor implements Visitor{
         for (Modifier im : node.modifiers) {
             im.accept(this);
         }
+        printIndent(node.id);
+        if (node.superClass != null) {
+            node.superClass.accept(this);
+        }
+        for (Type ty : node.interfaces) {
+            ty.accept(this);
+        }
             
         for (BodyDeclaration im : node.members) {
             im.accept(this);
         }
+
+        indent -= DISTANCE;
 
     }
 
@@ -305,7 +324,10 @@ public class ASTPrinterVisitor implements Visitor{
                 + "/data/grammar.lr1");
         //File f = new File(System.getProperty("user.dir")+ "/test/testprogram/StringLiterals.java");
         //File f = new File(System.getProperty("user.dir")+ "/assignment_testcases/a2/J1_1_Cast_NamedTypeAsVariable.java");
-        File f = new File(System.getProperty("user.dir")+ "/assignment_testcases/a2/J1_4_MethodDeclare_DuplicateArrayTypes.java");
+        //File f = new File(System.getProperty("user.dir")+ "/assignment_testcases/a2/J1_4_MethodDeclare_DuplicateArrayTypes.java");
+        File f = new File(
+                System.getProperty("user.dir")
+                + "/assignment_testcases/a1/J1_eagerbooleanoperations.java");
         Scanner scanner = new Scanner(new FileReader(f));
         List<Token> tokens = scanner.scan();
         Parser par = new Parser(tokens, grammar);
