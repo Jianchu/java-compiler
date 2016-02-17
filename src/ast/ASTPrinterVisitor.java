@@ -151,13 +151,20 @@ public class ASTPrinterVisitor implements Visitor{
     }
 
     // TODO
-    public void visit(ExpressionStatement node) {
+    public void visit(ExpressionStatement node) throws Exception {
         printIndent(node.getClass().getSimpleName());
+        indent += DISTANCE;
+        if (node.statementExpression != null) {
+            node.statementExpression.accept(this);
+        }
+        indent -= DISTANCE;
     }
 
     // TODO
     public void visit(FieldAccessExpression node) {
-
+        printIndent(node.getClass().getSimpleName());
+        indent += DISTANCE;
+        indent -= DISTANCE;
     }
 
     public void visit(FieldAccess node) throws Exception {
@@ -187,9 +194,22 @@ public class ASTPrinterVisitor implements Visitor{
 
     }
 
-    // TODO
-    public void visit(ForStatement node) {
-
+    public void visit(ForStatement node) throws Exception {
+        printIndent(node.getClass().getSimpleName());
+        indent += DISTANCE;
+        if (node.forInit != null) {
+            node.forInit.accept(this);
+        }
+        if (node.forCondition != null) {
+            node.forCondition.accept(this);
+        }
+        if (node.forUpdate != null) {
+            node.forUpdate.accept(this);
+        }
+        if (node.forBody != null) {
+            node.forBody.accept(this);
+        }
+        indent -= DISTANCE;
     }
 
     public void visit(IfStatement node) throws Exception {
@@ -406,8 +426,13 @@ public class ASTPrinterVisitor implements Visitor{
     }
 
     // TODO
-    public void visit(VariableDeclarationExpression node) {
-
+    public void visit(VariableDeclarationExpression node) throws Exception {
+        printIndent(node.getClass().getSimpleName());
+        indent += DISTANCE;
+        if (node.variableDeclaration != null) {
+            node.variableDeclaration.accept(this);
+        }
+        indent -= DISTANCE;
     }
 
     public void visit(WhileStatement node) throws Exception {
@@ -429,7 +454,8 @@ public class ASTPrinterVisitor implements Visitor{
         //File f = new File(System.getProperty("user.dir")+ "/assignment_testcases/a2/J1_1_Cast_NamedTypeAsVariable.java");
         //File f = new File(System.getProperty("user.dir")+ "/assignment_testcases/a2/J1_4_MethodDeclare_DuplicateArrayTypes.java");
         //File f = new File(System.getProperty("user.dir")+ "/assignment_testcases/a1/J1_evalMethodInvocationFromParExp.java");
-        File f = new File(System.getProperty("user.dir")+ "/assignment_testcases/a1/J1_forAlwaysInitAsWhile.java");
+        File f = new File(System.getProperty("user.dir")
+                + "/assignment_testcases/a1/J1_forifstatements1.java");
 
         Scanner scanner = new Scanner(new FileReader(f));
         List<Token> tokens = scanner.scan();
