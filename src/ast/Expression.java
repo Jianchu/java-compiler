@@ -12,6 +12,7 @@ public abstract class Expression extends ASTNode{
         List<ParseTree> ptChildren = null;
         for ( ; ; ) {
             switch (pt.getTokenType()) {
+              case StatementExpression: //fall through
               case Expression: //fall through
               case AssignmentExpression: //fall through
               case ConditionalExpression: //fall through
