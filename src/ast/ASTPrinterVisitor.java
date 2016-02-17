@@ -92,9 +92,17 @@ public class ASTPrinterVisitor implements Visitor{
         indent -= DISTANCE;
     }
 
-    public void visit(AssignmentExpression node) {
+    public void visit(AssignmentExpression node) throws Exception {
         printIndent(node.getClass().getSimpleName());
         indent += DISTANCE;
+        if (node.lhs != null) {
+            node.lhs.accept(this);
+        }
+
+        if (node.expr != null) {
+            node.expr.accept(this);
+        }
+        indent -= DISTANCE;
     }
 
     public void visit(Block node) throws Exception {
@@ -150,7 +158,6 @@ public class ASTPrinterVisitor implements Visitor{
         indent -= DISTANCE;
     }
 
-    // TODO
     public void visit(ExpressionStatement node) throws Exception {
         printIndent(node.getClass().getSimpleName());
         indent += DISTANCE;
@@ -455,7 +462,7 @@ public class ASTPrinterVisitor implements Visitor{
         //File f = new File(System.getProperty("user.dir")+ "/assignment_testcases/a2/J1_4_MethodDeclare_DuplicateArrayTypes.java");
         //File f = new File(System.getProperty("user.dir")+ "/assignment_testcases/a1/J1_evalMethodInvocationFromParExp.java");
         File f = new File(System.getProperty("user.dir")
-                + "/assignment_testcases/a1/J1_forifstatements1.java");
+                + "/assignment_testcases/a1/J1_forAlwaysInitAsWhile.java");
 
         Scanner scanner = new Scanner(new FileReader(f));
         List<Token> tokens = scanner.scan();
