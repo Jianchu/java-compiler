@@ -89,7 +89,7 @@ public class ASTPrinterVisitor implements Visitor{
         if (node.type != null) {
             node.type.accept(this);
         }
-        indent += DISTANCE;
+        indent -= DISTANCE;
     }
 
     public void visit(AssignmentExpression node) {
@@ -103,6 +103,7 @@ public class ASTPrinterVisitor implements Visitor{
         for (Statement statement : node.statements) {
             statement.accept(this);
         }
+        indent -= DISTANCE;
     }
 
     public void visit(BooleanLiteral node) {
@@ -151,7 +152,7 @@ public class ASTPrinterVisitor implements Visitor{
 
     // TODO
     public void visit(ExpressionStatement node) {
-
+        printIndent(node.getClass().getSimpleName());
     }
 
     // TODO
@@ -203,7 +204,7 @@ public class ASTPrinterVisitor implements Visitor{
         if (node.elseStatement != null) {
             node.elseStatement.accept(this);
         }
-        indent += DISTANCE;
+        indent -= DISTANCE;
     }
 
     public void visit(InfixExpression node) throws Exception {
@@ -409,11 +410,15 @@ public class ASTPrinterVisitor implements Visitor{
 
     }
 
-    // TODO
-    public void visit(WhileStatement node) {
+    public void visit(WhileStatement node) throws Exception {
         printIndent(node.getClass().getSimpleName());
         indent += DISTANCE;
-
+        if (node.whileCondition != null) {
+            node.whileCondition.accept(this);
+        }
+        if (node.whileStatement != null) {
+            node.whileStatement.accept(this);
+        }
         indent -= DISTANCE;
     }
 
