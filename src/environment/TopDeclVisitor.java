@@ -108,23 +108,5 @@ public class TopDeclVisitor extends SemanticsVisitor {
 	}
 	
 	
-	/**
-	 * for finding files in same package. 
-	 * DO NOT USE. package info has been saved to globalPackages
-	 * @param pkg
-	 * @return
-	 */
-	private Set<String> findSamePackage(String pkg) {
-		Set<String> pkgFiles = new TreeSet<String>();
-		for (String f : SymbolTable.getGlobal().keySet()) {
-			if (f.startsWith(pkg) && !f.substring(pkg.length() + 1).contains(".")) {
-				// look for classes that 
-				// start with package name and has only a simple name after package name
-				// because no nested classes
-				pkgFiles.add(f);
-			}
-		}
-		return pkgFiles;
-	}
 	
 }
