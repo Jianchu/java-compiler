@@ -46,7 +46,9 @@ public class ASTPrinterVisitor implements Visitor{
         printIndent(node.getClass().getSimpleName());
         indent += DISTANCE;
         // Check null?
-        node.name.accept(this);
+        if (node.name != null) {
+            node.name.accept(this);
+        }
         indent -= DISTANCE;
     }
 
@@ -462,7 +464,7 @@ public class ASTPrinterVisitor implements Visitor{
         //File f = new File(System.getProperty("user.dir")+ "/assignment_testcases/a2/J1_4_MethodDeclare_DuplicateArrayTypes.java");
         //File f = new File(System.getProperty("user.dir")+ "/assignment_testcases/a1/J1_evalMethodInvocationFromParExp.java");
         File f = new File(System.getProperty("user.dir")
-                + "/assignment_testcases/a1/J1_forAlwaysInitAsWhile.java");
+                + "/assignment_testcases/a1/J1_arbitrarylocaldeclaration.java");
 
         Scanner scanner = new Scanner(new FileReader(f));
         List<Token> tokens = scanner.scan();
