@@ -1,5 +1,8 @@
 package environment;
 
+import java.io.File;
+import java.io.FileReader;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -10,6 +13,10 @@ import java.util.TreeSet;
 import ast.*;
 import exceptions.ASTException;
 import exceptions.NameException;
+import parser.ParseTree;
+import parser.Parser;
+import scanner.Scanner;
+import scanner.Token;
 
 /**
  * responsible for constructing symbol table
@@ -84,6 +91,7 @@ public class TopDeclVisitor extends SemanticsVisitor {
 		
 		// class or interface declaration
 		for (TypeDeclaration typeDecl : cu.types) {
+			
 			// the for loop is redundant since there can only be one declaration.
 			// but I've decided to do it in a more general way, when i made the types a list...
 			typeDecl.accept(this);
@@ -104,9 +112,31 @@ public class TopDeclVisitor extends SemanticsVisitor {
 		}
 		
 		table.closeScope();
-		
 	}
 	
+	public void visit(FieldDeclaration fDecl) throws ASTException {
+		System.out.println("chim-fucking-changa not done yet");
+	}
+	
+    public static void main(String[] args) throws Exception {
+        File grammar = new File(System.getProperty("user.dir")
+                + "/data/grammar.lr1");
+        File f = new File(System.getProperty("user.dir")+ "/test/testprogram/EnvironmentTest.java");
+        
+        Scanner scanner = new Scanner(new FileReader(f));
+        List<Token> tokens = scanner.scan();
+        Parser par = new Parser(tokens, grammar);
+        ParseTree t = par.parse();
+        // Weeder wee = new Weeder(t, "StringLiterals");
+        // wee.weed();
+        AST ast = new AST(t);
+        List<AST> allTrees = new LinkedList<AST>();
+        allTrees.add(ast);
+        SymbolTable.buildGlobal(allTrees);
+        SymbolTable table = new SymbolTable();
+        Visitor v = new SemanticsVisitor();
+        ast.root.accept(v);
+    }
 	
 	
 }

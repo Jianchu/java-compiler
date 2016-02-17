@@ -12,15 +12,14 @@ import exceptions.ASTException;
  *
  */
 public class SemanticsVisitor implements Visitor {
-	TopDeclVisitor declVisitor;
 	SymbolTable table;
 	
 	public SemanticsVisitor() {
 		table = new SymbolTable();
-		declVisitor = new TopDeclVisitor(table);
 	}
 	
 	public void visit(CompilationUnit node) throws ASTException {
+		TopDeclVisitor declVisitor = new TopDeclVisitor(table);
 		node.accept(declVisitor);
 	}
 

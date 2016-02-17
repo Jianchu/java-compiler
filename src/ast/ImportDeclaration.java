@@ -16,8 +16,8 @@ public class ImportDeclaration extends ASTNode {
 				next = new ImportDeclaration(child);
 				break;
 			case ImportDeclaration:
-				ParseTree singleOrDemand = child.getChildren().get(0);
-				ParseTree nameTree = child.findChild(Symbol.Name);
+				ParseTree singleOrDemand = child.getFirstChild();
+				ParseTree nameTree = singleOrDemand.findChild(Symbol.Name);
 				name = Name.parseName(nameTree);
 				if (singleOrDemand.getTokenType() == Symbol.TypeImportOnDemandDeclaration) {
 					onDemand = true;
