@@ -93,9 +93,9 @@ public class SymbolTable {
 	/**
 	 * example of how buildGlobal and SemanticsVisitor will be used.
 	 * @param trees
-	 * @throws ASTException 
+	 * @throws Exception 
 	 */
-	public static void buildEnvs(List<AST> trees) throws ASTException {
+	public static void buildEnvs(List<AST> trees) throws Exception {
 		buildGlobal(trees);
 		SemanticsVisitor sv = new SemanticsVisitor();
 		for (AST tree : trees) {

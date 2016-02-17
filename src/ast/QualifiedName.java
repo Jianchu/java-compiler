@@ -52,7 +52,7 @@ public class QualifiedName extends Name{
 		return String.join(".", fullName);
 	}
 	
-	public void accept(Visitor v) throws ASTException {
+	public void accept(Visitor v) throws Exception {
 		v.visit(this);
 	}
 }

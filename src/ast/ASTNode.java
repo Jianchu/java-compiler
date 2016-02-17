@@ -17,7 +17,7 @@ public abstract class ASTNode {
 	 * @return
 	 * @throws ASTException
 	 */
-	public abstract void accept(Visitor v) throws ASTException;
+	public abstract void accept(Visitor v) throws Exception;
 	
 	public void setParent(ASTNode parent) {
 		parentNode = parent;

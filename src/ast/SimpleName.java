@@ -34,7 +34,7 @@ public class SimpleName extends Name {
 		return id;
 	}
 	
-	public void accept(Visitor v) throws ASTException {
+	public void accept(Visitor v) throws Exception {
 		v.visit(this);
 	}
 }

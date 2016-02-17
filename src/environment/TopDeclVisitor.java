@@ -35,9 +35,9 @@ public class TopDeclVisitor extends SemanticsVisitor {
 	
 	/**
 	 * Build class environment
-	 * @throws ASTException 
+	 * @throws Exception 
 	 */
-	public void visit(CompilationUnit cu) throws ASTException {
+	public void visit(CompilationUnit cu) throws Exception {
 		table.openScope(Environment.EnvType.COMPILATION_UNIT);	// the first ever for this file
 		Environment curr = table.currentScope();
 		
@@ -101,7 +101,7 @@ public class TopDeclVisitor extends SemanticsVisitor {
 	}
 	
 	
-	public void visit(TypeDeclaration typeDecl) throws ASTException {
+	public void visit(TypeDeclaration typeDecl) throws Exception {
 		// TODO: super class or interfaces needs an environment
 		
 		// create environments for methods and fields
@@ -115,7 +115,7 @@ public class TopDeclVisitor extends SemanticsVisitor {
 	}
 	
 	public void visit(FieldDeclaration fDecl) throws ASTException {
-		System.out.println("chim-fucking-changa not done yet");
+		System.out.println("chimi-fucking-changa not done yet");
 	}
 	
     public static void main(String[] args) throws Exception {

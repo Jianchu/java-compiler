@@ -13,7 +13,7 @@ public class NullLiteral extends Expression {
 		
 	}
 	
-	public void accept(Visitor v) throws ASTException {
+	public void accept(Visitor v) throws Exception {
 		v.visit(this);
 	}
 }

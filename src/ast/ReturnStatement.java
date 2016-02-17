@@ -14,7 +14,7 @@ public class ReturnStatement extends Statement {
         this.returnExpression = Expression.parseExpression(expressionNode);
     }
     
-	public void accept(Visitor v) throws ASTException {
+	public void accept(Visitor v) throws Exception {
 		v.visit(this);
 	}
 }

@@ -21,7 +21,7 @@ public class PrefixExpression extends Expression {
         expr = Expression.parseExpression(subtrees.get(1));
     }
     
-	public void accept(Visitor v) throws ASTException {
+	public void accept(Visitor v) throws Exception {
 		v.visit(this);
 	}
 }

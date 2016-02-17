@@ -10,7 +10,7 @@ public class VariableDeclarationExpression extends Expression {
         this.variableDeclaration = new VariableDeclaration(variableDecNode);
     }
     
-	public void accept(Visitor v) throws ASTException {
+	public void accept(Visitor v) throws Exception {
 		v.visit(this);
 	}
 }

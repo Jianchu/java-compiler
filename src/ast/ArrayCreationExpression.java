@@ -15,7 +15,7 @@ public class ArrayCreationExpression extends Expression {
         expr = Expression.parseExpression(subtrees.get(2).getChildren().get(1));
     }
     
-	public void accept(Visitor v) throws ASTException {
+	public void accept(Visitor v) throws Exception {
 		v.visit(this);
 	}
 }

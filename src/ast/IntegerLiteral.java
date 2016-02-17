@@ -14,7 +14,7 @@ public class IntegerLiteral extends Expression {
 		value = pt.getLexeme();
 	}
 	
-	public void accept(Visitor v) throws ASTException {
+	public void accept(Visitor v) throws Exception {
 		v.visit(this);
 	}
 }

@@ -60,7 +60,7 @@ public class ForStatement extends Statement{
     // return this.forInit;
     // }
     
-	public void accept(Visitor v) throws ASTException {
+	public void accept(Visitor v) throws Exception {
 		v.visit(this);
 	}
 }

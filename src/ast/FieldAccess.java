@@ -15,7 +15,7 @@ public class FieldAccess extends Expression {
         id = ASTHelper.parseID(subtrees.get(2));
     }
     
-	public void accept(Visitor v) throws ASTException {
+	public void accept(Visitor v) throws Exception {
 		v.visit(this);
 	}
 }

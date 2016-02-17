@@ -10,7 +10,7 @@ public class CharacterLiteral extends Expression{
 		value = charStr.substring(1, charStr.length()-1);
 	}
 	
-	public void accept(Visitor v) throws ASTException {
+	public void accept(Visitor v) throws Exception {
 		v.visit(this);
 	}
 }

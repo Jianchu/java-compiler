@@ -8,7 +8,6 @@ import parser.ParseTree;
 import parser.Parser;
 import scanner.Scanner;
 import scanner.Token;
-import exceptions.ASTException;
 
 public class ASTPrinterVisitor implements Visitor{
     public int indent;
@@ -25,7 +24,7 @@ public class ASTPrinterVisitor implements Visitor{
         System.out.println(s);
     }
 
-    public void visit(CompilationUnit node) throws ASTException {
+    public void visit(CompilationUnit node) throws Exception {
         printIndent(node.getClass().getSimpleName());
 
         indent += DISTANCE;
@@ -43,7 +42,7 @@ public class ASTPrinterVisitor implements Visitor{
         indent -= DISTANCE;
     }
 
-    public void visit(PackageDeclaration node) throws ASTException {
+    public void visit(PackageDeclaration node) throws Exception {
         printIndent(node.getClass().getSimpleName());
         indent += DISTANCE;
         // Check null?
@@ -51,7 +50,7 @@ public class ASTPrinterVisitor implements Visitor{
         indent -= DISTANCE;
     }
 
-    public void visit(ImportDeclaration node) throws ASTException {
+    public void visit(ImportDeclaration node) throws Exception {
         printIndent(node.getClass().getSimpleName());
         indent += DISTANCE;
         if (node.name != null) {
@@ -60,7 +59,7 @@ public class ASTPrinterVisitor implements Visitor{
         indent -= DISTANCE;
     }
 
-    public void visit(ArrayAccess node) throws ASTException {
+    public void visit(ArrayAccess node) throws Exception {
         printIndent(node.getClass().getSimpleName());
         indent += DISTANCE;
         if (node.array != null) {
@@ -72,7 +71,7 @@ public class ASTPrinterVisitor implements Visitor{
         indent -= DISTANCE;
     }
 
-    public void visit(ArrayCreationExpression node) throws ASTException {
+    public void visit(ArrayCreationExpression node) throws Exception {
         printIndent(node.getClass().getSimpleName());
         indent += DISTANCE;
         if (node.type != null) {
@@ -84,7 +83,7 @@ public class ASTPrinterVisitor implements Visitor{
         indent -= DISTANCE;
     }
 
-    public void visit(ArrayType node) throws ASTException {
+    public void visit(ArrayType node) throws Exception {
         printIndent(node.getClass().getSimpleName());
         indent += DISTANCE;
         if (node.type != null) {
@@ -98,7 +97,7 @@ public class ASTPrinterVisitor implements Visitor{
         indent += DISTANCE;
     }
 
-    public void visit(Block node) throws ASTException {
+    public void visit(Block node) throws Exception {
         printIndent(node.getClass().getSimpleName());
         indent += DISTANCE;
         for (Statement statement : node.statements) {
@@ -113,7 +112,7 @@ public class ASTPrinterVisitor implements Visitor{
         indent -= DISTANCE;
     }
 
-    public void visit(CastExpression node) throws ASTException {
+    public void visit(CastExpression node) throws Exception {
         printIndent(node.getClass().getSimpleName());
         indent += DISTANCE;
         if (node.type != null) {
@@ -135,7 +134,7 @@ public class ASTPrinterVisitor implements Visitor{
         indent -= DISTANCE;
     }
 
-    public void visit(ClassInstanceCreationExpression node) throws ASTException {
+    public void visit(ClassInstanceCreationExpression node) throws Exception {
         printIndent(node.getClass().getSimpleName());
         indent += DISTANCE;
         if (node.name != null) {
@@ -160,7 +159,7 @@ public class ASTPrinterVisitor implements Visitor{
 
     }
 
-    public void visit(FieldAccess node) throws ASTException {
+    public void visit(FieldAccess node) throws Exception {
         printIndent(node.getClass().getSimpleName());
         indent += DISTANCE;
         if (node.expr != null) {
@@ -172,7 +171,7 @@ public class ASTPrinterVisitor implements Visitor{
         indent -= DISTANCE;
     }
 
-    public void visit(FieldDeclaration node) throws ASTException {
+    public void visit(FieldDeclaration node) throws Exception {
         printIndent(node.getClass().getSimpleName());
         indent += DISTANCE;
         for (Modifier im : node.modifiers) {
@@ -192,7 +191,7 @@ public class ASTPrinterVisitor implements Visitor{
 
     }
 
-    public void visit(IfStatement node) throws ASTException {
+    public void visit(IfStatement node) throws Exception {
         printIndent(node.getClass().getSimpleName());
         indent += DISTANCE;
         if (node.ifCondition != null) {
@@ -207,7 +206,7 @@ public class ASTPrinterVisitor implements Visitor{
         indent += DISTANCE;
     }
 
-    public void visit(InfixExpression node) throws ASTException {
+    public void visit(InfixExpression node) throws Exception {
         printIndent(node.getClass().getSimpleName());
         indent += DISTANCE;
         if (node.lhs != null) {
@@ -222,7 +221,7 @@ public class ASTPrinterVisitor implements Visitor{
         indent -= DISTANCE;
     }
 
-    public void visit(InstanceofExpression node) throws ASTException {
+    public void visit(InstanceofExpression node) throws Exception {
         printIndent(node.getClass().getSimpleName());
         indent += DISTANCE;
         if (node.expr != null) {
@@ -241,7 +240,7 @@ public class ASTPrinterVisitor implements Visitor{
         indent -= DISTANCE;
     }
 
-    public void visit(MethodDeclaration node) throws ASTException {
+    public void visit(MethodDeclaration node) throws Exception {
         printIndent(node.getClass().getSimpleName());
         indent += DISTANCE;
 
@@ -266,7 +265,7 @@ public class ASTPrinterVisitor implements Visitor{
         indent -= DISTANCE;
     }
 
-    public void visit(MethodInvocation node) throws ASTException {
+    public void visit(MethodInvocation node) throws Exception {
         printIndent(node.getClass().getSimpleName());
         indent += DISTANCE;
         if (node.expr != null) {
@@ -283,7 +282,7 @@ public class ASTPrinterVisitor implements Visitor{
         indent -= DISTANCE;
     }
 
-    public void visit(Modifier node) throws ASTException {
+    public void visit(Modifier node) throws Exception {
         printIndent(node.getClass().getSimpleName());
         indent += DISTANCE;
         printIndent(node.toString());
@@ -298,7 +297,7 @@ public class ASTPrinterVisitor implements Visitor{
         indent -= DISTANCE;
     }
 
-    public void visit(PrefixExpression node) throws ASTException {
+    public void visit(PrefixExpression node) throws Exception {
         printIndent(node.getClass().getSimpleName());
         indent += DISTANCE;
         if (node.op != null) {
@@ -317,7 +316,7 @@ public class ASTPrinterVisitor implements Visitor{
         indent -= DISTANCE;
     }
 
-    public void visit(QualifiedName node) throws ASTException {
+    public void visit(QualifiedName node) throws Exception {
         printIndent(node.getClass().getSimpleName());
         indent += DISTANCE;
         String fullName = node.toString();
@@ -326,7 +325,7 @@ public class ASTPrinterVisitor implements Visitor{
     }
 
     // qualified type class not used
-    public void visit(ReturnStatement node) throws ASTException {
+    public void visit(ReturnStatement node) throws Exception {
         printIndent(node.getClass().getSimpleName());
         indent += DISTANCE;
         node.returnExpression.accept(this);
@@ -340,7 +339,7 @@ public class ASTPrinterVisitor implements Visitor{
         indent -= DISTANCE;
     }
 
-    public void visit(SimpleType node) throws ASTException {
+    public void visit(SimpleType node) throws Exception {
         printIndent(node.getClass().getSimpleName());
         indent += DISTANCE;
         node.name.accept(this);
@@ -363,7 +362,7 @@ public class ASTPrinterVisitor implements Visitor{
         indent -= DISTANCE;
     }
 
-    public void visit(TypeDeclaration node) throws ASTException {
+    public void visit(TypeDeclaration node) throws Exception {
         printIndent(node.getClass().getSimpleName());
         indent += DISTANCE;
         for (Modifier im : node.modifiers) {
@@ -385,7 +384,7 @@ public class ASTPrinterVisitor implements Visitor{
 
     }
 
-    public void visit(VariableDeclaration node) throws ASTException {
+    public void visit(VariableDeclaration node) throws Exception {
         printIndent(node.getClass().getSimpleName());
         indent += DISTANCE;
         node.type.accept(this);
@@ -396,7 +395,7 @@ public class ASTPrinterVisitor implements Visitor{
         indent -= DISTANCE;
     }
 
-    public void visit(VariableDeclarationStatement node) throws ASTException {
+    public void visit(VariableDeclarationStatement node) throws Exception {
         printIndent(node.getClass().getSimpleName());
         indent += DISTANCE;
         if (node.varDeclar != null) {

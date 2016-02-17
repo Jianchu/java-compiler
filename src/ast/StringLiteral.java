@@ -10,7 +10,7 @@ public class StringLiteral extends Expression{
 		value = str.substring(1, str.length()-1);
 	}
 	
-	public void accept(Visitor v) throws ASTException {
+	public void accept(Visitor v) throws Exception {
 		v.visit(this);
 	}
 }
