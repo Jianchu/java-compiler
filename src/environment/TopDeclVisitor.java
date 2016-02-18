@@ -2,6 +2,7 @@ package environment;
 
 import java.io.File;
 import java.io.FileReader;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -125,8 +126,10 @@ public class TopDeclVisitor extends SemanticsVisitor {
 		}
 	}
 	
-	public void visit(Block block) {
-		System.out.println("jesus fuck");
+	public void visit(Block block) throws Exception {
+		table.openScope(Environment.EnvType.BLOCK);
+
+		table.closeScope();
 	}
 	
     public static void main(String[] args) throws Exception {
@@ -137,7 +140,7 @@ public class TopDeclVisitor extends SemanticsVisitor {
         Scanner scanner = new Scanner(new FileReader(f));
         List<Token> tokens = scanner.scan();
         Parser par = new Parser(tokens, grammar);
-        ParseTree t = par.parse();
+        ParseTree t = par.parse(); t.pprint();
         // Weeder wee = new Weeder(t, "StringLiterals");
         // wee.weed();
         AST ast = new AST(t);

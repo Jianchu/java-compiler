@@ -5,7 +5,7 @@ import scanner.Symbol;
 import exceptions.ASTException;
 
 public abstract class Statement extends ASTNode {
-
+	Statement next;
 
     public static Statement parseStatement(ParseTree statementNode)
             throws ASTException {
@@ -56,5 +56,19 @@ public abstract class Statement extends ASTNode {
             return true;
         }
         return false;
+    }
+    
+    public boolean hasNext() {
+    	return next != null;
+    }
+    
+    public Statement next() throws Exception {
+    	if (next == null)
+    		throw new Exception("no next.");
+    	return next;
+    }
+    
+    public void setNext(Statement s) {
+    	next = s;
     }
 }

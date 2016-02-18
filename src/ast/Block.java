@@ -17,12 +17,45 @@ import exceptions.ASTException;
 public class Block extends Statement {
     // a block is just a list of statements
     public List<Statement> statements;
-
+    private Statement last;
+    
     public Block(ParseTree blockNode) throws ASTException {
         statements = new ArrayList<Statement>();
-        visitBlockStatement(blockNode);
+        parseBlockStatement(blockNode);
     }
 
+    private void parseBlockStatement(ParseTree pt) throws ASTException {
+    	Statement s; // for adding next
+		
+    	// write search with recursion
+    	for (ParseTree child : pt.getChildren()) {
+    		switch(child.getTokenType()) {
+    		case BlockStatements:
+    			parseBlockStatement(child);
+    			break;
+    		case BlockStatement:
+    			parseBlockStatement(child);
+    			break;
+    		case LocalVariableDeclarationStatement:
+    			s = new VariableDeclarationStatement(child);
+    			// next is for use in TopDeclVisitor
+    			if (last != null)
+    				last.setNext(s);
+    			last = s;
+    			statements.add(s);
+    			break;
+    		case Statement:
+    			s = Statement.parseStatement(child);
+    			if (last != null)
+    				last.setNext(s);
+    			last = s;
+    			
+    			statements.add(Statement.parseStatement(child));
+    			break;
+    		}
+    	}
+    }
+    
     private void visitBlockStatement(ParseTree blockNode) throws ASTException {
         Queue<ParseTree> queue = new LinkedList<ParseTree>();
         queue.add(blockNode);
