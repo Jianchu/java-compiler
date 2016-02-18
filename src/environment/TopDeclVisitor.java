@@ -121,8 +121,12 @@ public class TopDeclVisitor extends SemanticsVisitor {
 	public void visit(MethodDeclaration mDecl) throws Exception {
 		table.currentScope().addVariable(mDecl.id, mDecl);
 		if (!mDecl.isAbstract) {
-			System.out.println("eh?");
+			mDecl.body.accept(this);
 		}
+	}
+	
+	public void visit(Block block) {
+		System.out.println("jesus fuck");
 	}
 	
     public static void main(String[] args) throws Exception {

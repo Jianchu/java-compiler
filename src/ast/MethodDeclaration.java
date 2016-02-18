@@ -54,9 +54,9 @@ public class MethodDeclaration extends BodyDeclaration{
 					parseConstructorDeclarator(child);
 					break;
 				case ConstructorBody:
-					ParseTree block = child.findChild(Symbol.BlockStatements);
+					ParseTree block = child.findChild(Symbol.Block);
 					if (block != null) {
-						body = (Block) Statement.parseStatement(block);
+						body = (Block) Statement.parseStatement(child);
 					}
 					break;
 				default:
