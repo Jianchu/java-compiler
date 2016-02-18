@@ -11,12 +11,12 @@ public class MethodDeclaration extends BodyDeclaration{
 	public List<Modifier> modifiers = new LinkedList<Modifier>();
 	public boolean isConstructor = false;
 	public boolean isAbstract = false;
-	public Type returnType = null;	//what about void
+	public Type returnType = null;	//null is void.
 	public String id;
 	
 	// parameters are just variable declarations without initializers assignment
 	List<VariableDeclaration> parameters = new LinkedList<VariableDeclaration>();
-	Block body = null;
+	public Block body = null;
 	
 	public MethodDeclaration(ParseTree pt) throws ASTException {
 		if (pt.getTokenType() == Symbol.MethodDeclaration
@@ -30,6 +30,9 @@ public class MethodDeclaration extends BodyDeclaration{
 					ParseTree block = child.findChild(Symbol.Block);
 					if (block != null) {
 						body = (Block) Statement.parseStatement(child);
+					} else {
+						// abstract method in abstract class
+						isAbstract = true;
 					}
 					break;
 				case SEMICOLON:

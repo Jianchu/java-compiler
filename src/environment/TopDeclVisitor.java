@@ -114,8 +114,15 @@ public class TopDeclVisitor extends SemanticsVisitor {
 		table.closeScope();
 	}
 	
-	public void visit(FieldDeclaration fDecl) throws ASTException {
-		System.out.println("chimi-fucking-changa not done yet");
+	public void visit(FieldDeclaration fDecl) throws Exception {
+		table.currentScope().addVariable(fDecl.id, fDecl);
+	}
+	
+	public void visit(MethodDeclaration mDecl) throws Exception {
+		table.currentScope().addVariable(mDecl.id, mDecl);
+		if (!mDecl.isAbstract) {
+			System.out.println("eh?");
+		}
 	}
 	
     public static void main(String[] args) throws Exception {
