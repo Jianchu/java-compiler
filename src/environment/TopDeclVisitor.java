@@ -128,7 +128,18 @@ public class TopDeclVisitor extends SemanticsVisitor {
 	
 	public void visit(Block block) throws Exception {
 		table.openScope(Environment.EnvType.BLOCK);
-
+		if (block.statements.size() > 0) {
+			Statement first = block.statements.get(0);
+			first.accept(this);
+		}
+		table.closeScope();
+	}
+	
+	public void visit(VariableDeclarationStatement vd) throws Exception {
+		table.openScope(Environment.EnvType.BLOCK);
+		if (vd.hasNext()) {
+			vd.next().accept(this);
+		}
 		table.closeScope();
 	}
 	
@@ -140,7 +151,7 @@ public class TopDeclVisitor extends SemanticsVisitor {
         Scanner scanner = new Scanner(new FileReader(f));
         List<Token> tokens = scanner.scan();
         Parser par = new Parser(tokens, grammar);
-        ParseTree t = par.parse(); t.pprint();
+        ParseTree t = par.parse(); 
         // Weeder wee = new Weeder(t, "StringLiterals");
         // wee.weed();
         AST ast = new AST(t);
