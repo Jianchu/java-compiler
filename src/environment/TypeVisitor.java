@@ -4,11 +4,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import ast.ArrayType;
-import ast.ClassInstanceCreationExpression;
 import ast.QualifiedName;
 import ast.SimpleName;
-import ast.SimpleType;
 import ast.TypeDeclaration;
 import exceptions.TypeLinkException;
 /**
@@ -70,27 +67,6 @@ public class TypeVisitor extends TopDeclVisitor {
         if (!global.keySet().contains(fullName)) {
             throw new TypeLinkException(
                     "The full qualified type name is not found");
-        }
-    }
-
-    @Override
-    public void visit(ArrayType node) throws Exception {
-        if (node.type != null) {
-            node.type.accept(this);
-        }
-    }
-
-    @Override
-    public void visit(SimpleType node) throws Exception {
-        if (node.name != null) {
-            node.name.accept(this);
-        }
-    }
-    
-    @Override
-    public void visit(ClassInstanceCreationExpression node) throws Exception {
-        if (node.name != null) {
-            node.name.accept(this);
         }
     }
 }
