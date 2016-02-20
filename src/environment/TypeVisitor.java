@@ -23,7 +23,7 @@ public class TypeVisitor extends TopDeclVisitor {
     // global is the map between full name of a type and it's AST node.
     // If global is just used for QualifiedName, change this to a local variable.
     private final Map<String, TypeDeclaration> global;
-    private TypeDeclaration typeDec;
+    private TypeDeclaration typeDec = null;
     
     public TypeVisitor(SymbolTable syms) {
         super(syms);
