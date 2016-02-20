@@ -4,7 +4,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import ast.*;
+import ast.QualifiedName;
+import ast.SimpleName;
+import ast.SimpleType;
+import ast.TypeDeclaration;
 import exceptions.TypeLinkException;
 /**
  * Responsible for type linking
@@ -51,15 +54,13 @@ public class TypeVisitor extends TopDeclVisitor {
     }
 
     /**
-     * problem: same package is simple name, not qualified name
-     * 
      * @param fullNames
      * @param simpleName
      * @return
      */
     private boolean checkSimpleName(Set<String> fullNames, String simpleName) {
         for (String fullName : fullNames) {
-            if (fullName.substring(fullName.lastIndexOf('.')).equals(simpleName)) {
+            if (fullName.substring(fullName.lastIndexOf('.') + 1).equals(simpleName)) {
                 return true;
             }
         }
