@@ -1,8 +1,13 @@
 package testprogram;
 
-public abstract class EnvironmentTest {
+public class EnvironmentTest {
 	  public EnvironmentTest() {}
 	  protected String x = "foo";
 	  
-	  public abstract String fuck();
+	  
+	  public void x() {
+		  String a;
+		  a = "";
+		  String b;
+	  }
 }

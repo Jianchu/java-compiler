@@ -4,9 +4,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import ast.QualifiedName;
-import ast.SimpleName;
-import ast.TypeDeclaration;
+import ast.*;
 import exceptions.TypeLinkException;
 /**
  * Responsible for type linking
@@ -28,7 +26,16 @@ public class TypeVisitor extends TopDeclVisitor {
         this.globalPackages = SymbolTable.getAllPackages();
         this.global = SymbolTable.getGlobal();
     }
-
+    
+    /**
+     * TODO: 
+     * 1. incorporate both visit(SimpleName) and visit(QualifiedName) into this method.
+     * 2. and then attach the declaration to the type, using type.attachDeclaration();
+     */
+    public void visit(SimpleType type) {
+    	
+    }
+    
     @Override
     public void visit(SimpleName node) throws Exception {
         // How can I know the type of current scope? Using null checking for
@@ -43,6 +50,13 @@ public class TypeVisitor extends TopDeclVisitor {
         }
     }
 
+    /**
+     * problem: same package is simple name, not qualified name
+     * 
+     * @param fullNames
+     * @param simpleName
+     * @return
+     */
     private boolean checkSimpleName(Set<String> fullNames, String simpleName) {
         for (String fullName : fullNames) {
             if (fullName.substring(fullName.lastIndexOf('.')).equals(simpleName)) {

@@ -46,11 +46,11 @@ public class Parser {
 			try {
 				action = parseTable[stateStack.peek()].getAction(a.getTokenType());
 			} catch (Exception e) {
-				System.out.println(a);
-				System.out.println("Stack:");
-				while (!nodeStack.isEmpty()) {
-					nodeStack.pop().pprint(5);
-				}
+//				System.err.println(a);
+//				System.err.println("Stack:");
+//				while (!nodeStack.isEmpty()) {
+//					nodeStack.pop().pprint(5);
+//				}
 				throw e;
 			}
 			/* for debugging only.

@@ -58,6 +58,7 @@ public class TopDeclVisitor extends SemanticsVisitor {
 			}
 			if (thisDecl == null || cls != thisDecl.id) {
 				// if the file from same package is not this one, add it.
+				// names in samePackage is simple.
 				curr.addSamePackage(cls, otherDecl);
 			}
 		}
@@ -105,6 +106,7 @@ public class TopDeclVisitor extends SemanticsVisitor {
 	public void visit(TypeDeclaration typeDecl) throws Exception {
 		// TODO: super class or interfaces needs an environment
 		
+		table.currentScope().addType(typeDecl.id, typeDecl);
 		// create environments for methods and fields
 		table.openScope(Environment.EnvType.CLASS);
 		
@@ -137,6 +139,7 @@ public class TopDeclVisitor extends SemanticsVisitor {
 	
 	public void visit(VariableDeclarationStatement vd) throws Exception {
 		table.openScope(Environment.EnvType.BLOCK);
+		table.currentScope().addVariable(vd.varDeclar.id, vd.varDeclar);
 		if (vd.hasNext()) {
 			vd.next().accept(this);
 		}

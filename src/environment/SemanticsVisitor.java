@@ -31,19 +31,38 @@ public class SemanticsVisitor implements Visitor {
 	public void visit(MethodDeclaration node) throws Exception {}
 	public void visit(PackageDeclaration node) throws Exception {}
 	public void visit(TypeDeclaration node) throws Exception {}
-
+	public void visit(VariableDeclaration node) throws Exception {
+	}
 	
 	/*
 	 * Statement
 	 */
 	public void visit(Block node) throws Exception {}
-	public void visit(ExpressionStatement node) throws Exception {}
-	public void visit(ForStatement node) throws Exception {}
-	public void visit(IfStatement node) throws Exception {}
-	public void visit(ReturnStatement node) throws Exception {}
-	public void visit(VariableDeclaration node) throws Exception {}
-	public void visit(VariableDeclarationStatement node) throws Exception {}
-	public void visit(WhileStatement node) throws Exception {}
+	public void visit(ExpressionStatement node) throws Exception {
+		visitNextStatement(node);
+	}
+	public void visit(ForStatement node) throws Exception {
+		visitNextStatement(node);
+	}
+	public void visit(IfStatement node) throws Exception {
+		visitNextStatement(node);
+	}
+	public void visit(ReturnStatement node) throws Exception {
+		visitNextStatement(node);
+	}
+
+	public void visit(VariableDeclarationStatement node) throws Exception {
+		visitNextStatement(node);
+	}
+	public void visit(WhileStatement node) throws Exception {
+		visitNextStatement(node);
+	}
+	
+	private void visitNextStatement(Statement node) throws Exception {
+		if (node.hasNext()) {
+			node.next().accept(this);
+		}
+	}
 	
 	/*
 	 * Type

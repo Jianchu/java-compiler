@@ -1,5 +1,6 @@
 package ast;
 
+import environment.Environment;
 import exceptions.ASTException;
 
 /**
@@ -10,7 +11,7 @@ import exceptions.ASTException;
 public abstract class ASTNode {
 	
 	ASTNode parentNode = null;
-	
+	Environment env = null;
 	/**
 	 * Not implemented by default.
 	 * @param v
@@ -26,4 +27,13 @@ public abstract class ASTNode {
 	public ASTNode getParent() {
 		return parentNode;
 	}
+	
+	public void attachEnvironment(Environment env) {
+		this.env = env;
+	}
+	
+	public Environment getEnvironment() {
+		return env;
+	}
+	
 }

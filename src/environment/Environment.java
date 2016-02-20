@@ -10,7 +10,7 @@ import ast.*;
 
 public class Environment {
 	Environment enclosing;
-	
+	EnvType type;
 	/* 
 	 * put variable and field declaration both in one map.
 	 * first of all because they never exist at the same time
@@ -33,6 +33,7 @@ public class Environment {
 	
 	public Environment(Environment outer, EnvType scopeType) {
 		enclosing = outer;
+		type = scopeType;
 		switch (scopeType) {
 		case COMPILATION_UNIT:
 			singleImports = new HashMap<String, TypeDeclaration>();

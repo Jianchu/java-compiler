@@ -17,6 +17,7 @@ import scanner.Symbol;
  */
 public abstract class Type extends ASTNode{
 	
+	TypeDeclaration decl;
 	/**
 	 * This method parse four types of parse tree nodes:
 	 * 	Type,
@@ -64,6 +65,14 @@ public abstract class Type extends ASTNode{
 			}
 		}
 		return result;
+	}
+	
+	public void attachDeclaration(TypeDeclaration typeDecl){
+		decl = typeDecl;
+	}
+	
+	public TypeDeclaration getDeclaration() {
+		return decl;
 	}
 	
 }
