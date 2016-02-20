@@ -23,6 +23,7 @@ public class TypeVisitor extends TopDeclVisitor {
     // global is the map between full name of a type and it's AST node.
     // If global is just used for QualifiedName, change this to a local variable.
     private final Map<String, TypeDeclaration> global;
+    private TypeDeclaration typeDec;
     
     public TypeVisitor(SymbolTable syms) {
         super(syms);
@@ -31,12 +32,17 @@ public class TypeVisitor extends TopDeclVisitor {
     }
     
     /**
-     * TODO: 
-     * 1. incorporate both visit(SimpleName) and visit(QualifiedName) into this method.
-     * 2. and then attach the declaration to the type, using type.attachDeclaration();
+     * TODO: 1. incorporate both visit(SimpleName) and visit(QualifiedName) into
+     * this method. 2. and then attach the declaration to the type, using
+     * type.attachDeclaration();
+     * 
+     * @throws Exception
      */
-    public void visit(SimpleType type) {
-    	
+    public void visit(SimpleType type) throws Exception {
+        if (type.name != null) {
+            type.name.accept(this);
+        }
+        type.attachDeclaration(this.typeDec);
     }
     
     @Override
@@ -45,10 +51,10 @@ public class TypeVisitor extends TopDeclVisitor {
         // now. See getCompUnitEnv.
         Environment env = getCompUnitEnv(table.curr);
         // Types are for enclosing class or interface? Key is full name?
-        if (!checkSimpleName(env.types.keySet(), node.toString())
-                && !checkSimpleName(env.singleImports.keySet(), node.toString())
-                && !checkSimpleName(env.samePackage.keySet(), node.toString())
-                && !checkSimpleName(env.importOnDemands.keySet(),node.toString())) {
+        if (!checkSimpleName(env.types, node.toString())
+                && !checkSimpleName(env.singleImports, node.toString())
+                && !checkSimpleName(env.samePackage, node.toString())
+                && !checkSimpleName(env.importOnDemands,node.toString())) {
             throw new TypeLinkException("The type name is not found");
         }
     }
@@ -58,9 +64,11 @@ public class TypeVisitor extends TopDeclVisitor {
      * @param simpleName
      * @return
      */
-    private boolean checkSimpleName(Set<String> fullNames, String simpleName) {
+    private boolean checkSimpleName(Map<String, TypeDeclaration> map, String simpleName) {
+        Set<String> fullNames = map.keySet();
         for (String fullName : fullNames) {
             if (fullName.substring(fullName.lastIndexOf('.') + 1).equals(simpleName)) {
+                this.typeDec = map.get(fullName);
                 return true;
             }
         }
