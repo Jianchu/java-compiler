@@ -15,7 +15,7 @@ public class MethodDeclaration extends BodyDeclaration{
 	public String id;
 	
 	// parameters are just variable declarations without initializers assignment
-	List<VariableDeclaration> parameters = new LinkedList<VariableDeclaration>();
+	public List<VariableDeclaration> parameters = new LinkedList<VariableDeclaration>();
 	public Block body = null;
 	
 	public MethodDeclaration(ParseTree pt) throws ASTException {

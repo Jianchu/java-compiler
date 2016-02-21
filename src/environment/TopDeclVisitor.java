@@ -45,6 +45,7 @@ public class TopDeclVisitor extends SemanticsVisitor {
 		final Map<String, List<String>> pkgCls = SymbolTable.getAllPackages();
 		final Map<String, TypeDeclaration> global = SymbolTable.getGlobal();
 		
+		//TODO: check for ambiguous names
 		//package files
 		String pkg = "";
 		if (cu.pkg != null) {
@@ -124,7 +125,14 @@ public class TopDeclVisitor extends SemanticsVisitor {
 	public void visit(MethodDeclaration mDecl) throws Exception {
 		table.currentScope().addVariable(mDecl.id, mDecl);
 		if (!mDecl.isAbstract) {
+			table.openScope(Environment.EnvType.BLOCK);
+			// extra scope for method parameters
+			for (VariableDeclaration vd : mDecl.parameters) {
+				vd.accept(this);
+			}
 			mDecl.body.accept(this);
+			
+			table.closeScope();
 		}
 	}
 	
@@ -137,13 +145,18 @@ public class TopDeclVisitor extends SemanticsVisitor {
 		table.closeScope();
 	}
 	
-	public void visit(VariableDeclarationStatement vd) throws Exception {
+	public void visit(VariableDeclarationStatement vds) throws Exception {
 		table.openScope(Environment.EnvType.BLOCK);
-		table.currentScope().addVariable(vd.varDeclar.id, vd.varDeclar);
-		if (vd.hasNext()) {
-			vd.next().accept(this);
+		vds.varDeclar.accept(this);
+		if (vds.hasNext()) {
+			vds.next().accept(this);
 		}
 		table.closeScope();
+	}
+	
+	public void visit(VariableDeclaration vd) throws Exception {
+		// TODO: type checks
+		table.currentScope().addVariable(vd.id, vd);
 	}
 	
     public static void main(String[] args) throws Exception {
