@@ -45,6 +45,15 @@ public class TypeVisitor extends TopDeclVisitor {
         type.attachDeclaration(this.typeDec);
     }
     
+    /**
+     * Name must not be ambiguous. 
+     * One thing I can think of now is that when using import on demands, 
+     * check that the type name does not appear in two packages, 
+     * e.g. java.util.* and java.awt.* both has a class named List.
+     * This is not an error when the imports are declared, but the name List is ambiguous when used.
+     * Could you read up add some checks of this sort?
+     * 
+     */
     @Override
     public void visit(SimpleName node) throws Exception {
         // How can I know the type of current scope? Using null checking for
