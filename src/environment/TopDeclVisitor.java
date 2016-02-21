@@ -2,6 +2,7 @@ package environment;
 
 import java.io.File;
 import java.io.FileReader;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -108,6 +109,12 @@ public class TopDeclVisitor extends SemanticsVisitor {
 		// TODO: super class or interfaces needs an environment
 		
 		table.currentScope().addType(typeDecl.id, typeDecl);
+		
+		// simple check 1 and 4
+		checkSuperClass(typeDecl);
+		
+		checkInterfaces(typeDecl);
+		
 		// create environments for methods and fields
 		table.openScope(Environment.EnvType.CLASS);
 		
@@ -157,6 +164,50 @@ public class TopDeclVisitor extends SemanticsVisitor {
 	public void visit(VariableDeclaration vd) throws Exception {
 		// TODO: type checks
 		table.currentScope().addVariable(vd.id, vd);
+	}
+	
+	private void checkSuperClass(TypeDeclaration typeDecl) throws Exception {
+		if (typeDecl.superClass != null) {
+			Type parent = typeDecl.superClass;
+			if (parent instanceof PrimitiveType)
+				throw new NameException("cannot extend primitive type.");
+			
+			Visitor tv = new TypeVisitor(table);
+			parent.accept(tv);	// find declaration using type visitor
+			
+			TypeDeclaration parentDecl = parent.getDeclaration();
+			if (parentDecl.id.equals(typeDecl.id)) {
+				throw new NameException("class cannot extend itself.");
+			} 
+			if (parentDecl.isInterface){
+				// simple check no.1: must be class
+				throw new NameException("must extend a class.");
+			}
+			if (parentDecl.modifiers.contains(Modifier.FINAL)) {
+				// simple check no.4: cannot extend final class
+				throw new NameException("cannot extend final class");
+			}
+		}
+	}
+	
+	private void checkInterfaces(TypeDeclaration typeDecl) throws Exception {
+		Set<TypeDeclaration> seen = new HashSet<TypeDeclaration>();
+		for (Type itf : typeDecl.interfaces) {
+			if (itf instanceof PrimitiveType)
+				throw new NameException("not an interface");
+			
+			Visitor tv = new TypeVisitor(table);
+			itf.accept(tv);
+			
+			TypeDeclaration itfDecl = itf.getDeclaration();
+			// simple check no.2
+			if (!itfDecl.isInterface)
+				throw new NameException("must implement an interface");
+			
+			// simple check no.3
+			if (seen.contains(itfDecl)) 
+				throw new NameException("cannot implement same interface twice");
+		}
 	}
 	
     public static void main(String[] args) throws Exception {
