@@ -1,6 +1,5 @@
 package environment;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -76,15 +75,15 @@ public class TypeVisitor extends TopDeclVisitor {
      * @throws TypeLinkException 
      */
     private boolean checkSimpleName(Map<String, TypeDeclaration> map, String simpleName) throws TypeLinkException {
-        Set<String> simpleNames = new HashSet<String>();
         Set<String> fullNames = map.keySet();
+        boolean simpleNameExists = false;
         TypeDeclaration typeDec = null;
         for (String fullName : fullNames) {
             if (fullName.substring(fullName.lastIndexOf('.') + 1).equals(simpleName)) {
-                if (simpleNames.contains(simpleName)) {
+                if (simpleNameExists) {
                     throw new TypeLinkException("The type " + simpleName + " is ambiguous");
                 }
-                simpleNames.add(simpleName);
+                simpleNameExists = true;
                 typeDec = map.get(fullName);
             }
         }
