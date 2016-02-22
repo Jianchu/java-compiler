@@ -4,29 +4,29 @@ import parser.ParseTree;
 import exceptions.ASTException;
 
 public class PrimitiveType extends Type {
-	public Value type;
+	public Value value;
 	
 	public PrimitiveType(ParseTree pt) {
 		ParseTree child = pt.getFirstChild();
 		switch (child.getTokenType()) {
 		case BOOLEAN:
-			type = Value.BOOLEAN;
+			value = Value.BOOLEAN;
 			break;
 		case NumericType:
 			ParseTree Numeric = child.getFirstChild();
 			ParseTree Integral = Numeric.getFirstChild();
 			switch(Integral.getTokenType()) {
 			case INT:
-				type = Value.INT;
+				value = Value.INT;
 				break;
 			case BYTE:
-				type = Value.BYTE;
+				value = Value.BYTE;
 				break;
 			case CHAR:
-				type = Value.CHAR;
+				value = Value.CHAR;
 				break;
 			case SHORT:
-				type = Value.SHORT;
+				value = Value.SHORT;
 				break;
 			}
 			

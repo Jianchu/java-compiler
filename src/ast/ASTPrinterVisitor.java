@@ -342,7 +342,7 @@ public class ASTPrinterVisitor implements Visitor{
     public void visit(PrimitiveType node) {
         printIndent(node.getClass().getSimpleName());
         indent += DISTANCE;
-        printIndent(node.type.toString());
+        printIndent(node.value.toString());
         indent -= DISTANCE;
     }
 

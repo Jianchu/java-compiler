@@ -110,9 +110,11 @@ public class TopDeclVisitor extends SemanticsVisitor {
 		
 		table.currentScope().addType(typeDecl.id, typeDecl);
 		
+		
+		
 		// simple check 1 and 4
 		checkSuperClass(typeDecl);
-		
+		// simple check 2 and 3
 		checkInterfaces(typeDecl);
 		
 		// create environments for methods and fields
@@ -130,7 +132,7 @@ public class TopDeclVisitor extends SemanticsVisitor {
 	}
 	
 	public void visit(MethodDeclaration mDecl) throws Exception {
-		table.currentScope().addVariable(mDecl.id, mDecl);
+		table.currentScope().addVariable(NameHelper.mangle(mDecl), mDecl);
 		if (!mDecl.isAbstract) {
 			table.openScope(Environment.EnvType.BLOCK);
 			// extra scope for method parameters

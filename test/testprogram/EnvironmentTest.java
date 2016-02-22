@@ -9,5 +9,6 @@ public class EnvironmentTest {
 		  String a;
 		  a = "";
 		  String b;
+		  int x = 3 ^ 5;
 	  }
 }
