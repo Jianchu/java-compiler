@@ -72,14 +72,24 @@ public class TypeVisitor extends TopDeclVisitor {
      * @param fullNames
      * @param simpleName
      * @return
+     * @throws TypeLinkException 
      */
-    private boolean checkSimpleName(Map<String, TypeDeclaration> map, String simpleName) {
+    private boolean checkSimpleName(Map<String, TypeDeclaration> map, String simpleName) throws TypeLinkException {
         Set<String> fullNames = map.keySet();
+        boolean simpleNameExists = false;
+        TypeDeclaration typeDec = null;
         for (String fullName : fullNames) {
             if (fullName.substring(fullName.lastIndexOf('.') + 1).equals(simpleName)) {
-                this.typeDec = map.get(fullName);
-                return true;
+                if (simpleNameExists) {
+                    throw new TypeLinkException("The type " + simpleName + " is ambiguous");
+                }
+                simpleNameExists = true;
+                typeDec = map.get(fullName);
             }
+        }
+        if (typeDec != null) {
+            this.typeDec = typeDec;
+            return true;
         }
         return false;
     }
