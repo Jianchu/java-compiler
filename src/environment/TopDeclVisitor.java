@@ -26,9 +26,7 @@ import scanner.Token;
  *
  */
 public class TopDeclVisitor extends SemanticsVisitor {
-	
-	private TypeDeclaration currentType; 
-	
+		
 	/**
 	 * So that the current environment can be shared through different visitors.
 	 * @param curr
@@ -112,6 +110,7 @@ public class TopDeclVisitor extends SemanticsVisitor {
 			typeDecl.accept(this);
 		}
 		
+		cu.attachEnvironment(table.currentScope());
 		table.closeScope();
 	}
 	
@@ -130,9 +129,10 @@ public class TopDeclVisitor extends SemanticsVisitor {
 			bDecl.accept(this);
 		}
 		
+		// attach the scope of fields and methods to TypeDeclaration.
+		typeDecl.attachEnvironment(table.currentScope());
 		table.closeScope();	// class
-		table.closeScope(); // super class
-		table.closeScope(); // interface
+
 	}
 	
 	public void visit(FieldDeclaration fDecl) throws Exception {
@@ -257,7 +257,7 @@ public class TopDeclVisitor extends SemanticsVisitor {
     public static void main(String[] args) throws Exception {
         File grammar = new File(System.getProperty("user.dir")
                 + "/data/grammar.lr1");
-        File f = new File(System.getProperty("user.dir")+ "/test/testprogram/EnvironmentTest.java");
+        File f = new File(System.getProperty("user.dir")+ "/test/testprogram/EnvironmentTestCase.java");
         
         Scanner scanner = new Scanner(new FileReader(f));
         List<Token> tokens = scanner.scan();
