@@ -39,6 +39,16 @@ public class CompilationUnit extends ASTNode{
 			default:
 				throw new ASTException("Unexpected node type.");	
 			}
+			
+			//fill the type declarations with their qualified name
+			for (TypeDeclaration td: types) {
+				if (pkg != null) {
+					td.setFullName(pkg.name.toString() + "." + td.id);
+				} else {
+					td.setFullName(td.id);
+				}
+			}
+			
 		}
 	}
 	

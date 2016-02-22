@@ -41,6 +41,11 @@ public class PrimitiveType extends Type {
 		SHORT
 	}
 	
+	@Override
+	public String toString() {
+		return value.toString().toLowerCase();
+	}
+	
 	public void accept(Visitor v) throws Exception {
 		v.visit(this);
 	}

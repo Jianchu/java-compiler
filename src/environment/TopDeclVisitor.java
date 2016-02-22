@@ -27,6 +27,8 @@ import scanner.Token;
  */
 public class TopDeclVisitor extends SemanticsVisitor {
 	
+	private TypeDeclaration currentType; 
+	
 	/**
 	 * So that the current environment can be shared through different visitors.
 	 * @param curr
@@ -115,8 +117,6 @@ public class TopDeclVisitor extends SemanticsVisitor {
 	
 	
 	public void visit(TypeDeclaration typeDecl) throws Exception {
-		// TODO: super class or interfaces needs an environment
-		
 		table.currentScope().addType(typeDecl.id, typeDecl);
 		
 		// covers simple checks 1,2,3,4
@@ -143,15 +143,24 @@ public class TopDeclVisitor extends SemanticsVisitor {
 	}
 	
 	public void visit(MethodDeclaration mDecl) throws Exception {
-		String mangledName = NameHelper.mangle(mDecl);
-		if (table.currentScope().methods.containsKey(mangledName)) {
-			throw new NameException("method signature repeated.");
+		// link param types, needs to do this first so that name mangler can use the info
+		for (VariableDeclaration vd : mDecl.parameters) {
+			if (vd.type instanceof SimpleType) {
+				Visitor tv = new TypeVisitor(table);
+				vd.type.accept(tv);
+			}
 		}
-
+		
+		// link return type
 		Type returnType = mDecl.returnType;
 		if (returnType != null && ! (returnType instanceof PrimitiveType)) {
 			Visitor tv = new TypeVisitor(table);
 			returnType.accept(tv);
+		}
+		
+		String mangledName = NameHelper.mangle(mDecl);
+		if (table.currentScope().methods.containsKey(mangledName)) {
+			throw new NameException("method signature repeated.");
 		}
 		
 		table.currentScope().addMethod(NameHelper.mangle(mDecl), mDecl);
@@ -188,7 +197,10 @@ public class TopDeclVisitor extends SemanticsVisitor {
 	public void visit(VariableDeclaration vd) throws Exception {
 		// Done: type linking for types
 		Visitor tv = new TypeVisitor(table);
-		vd.type.accept(tv);
+		if (vd.type instanceof SimpleType && vd.type.getDeclaration() == null) {
+			// if is simple type but has not been linked, type linking
+			vd.type.accept(tv);
+		}
 		
 		// check that a variable of the same name does not already exist
 		if (table.currentScope().lookUpVariable(vd.id) != null) {

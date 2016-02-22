@@ -28,7 +28,6 @@ public class Environment {
 	public Map<String, TypeDeclaration> importOnDemands = null;
 	public Map<String, TypeDeclaration> samePackage = null;
 	
-	
 	public Environment(Environment outer, EnvType scopeType) {
 		enclosing = outer;
 		type = scopeType;

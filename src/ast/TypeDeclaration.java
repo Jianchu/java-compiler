@@ -30,6 +30,8 @@ public class TypeDeclaration extends BodyDeclaration{
 	
 	public TypeDeclaration next = null;
 	
+	private String fullName = null;
+	
 	public TypeDeclaration(ParseTree pt) throws ASTException {
 		for (ParseTree child : pt.getChildren()) {
 			switch(child.getTokenType()) {
@@ -173,6 +175,14 @@ public class TypeDeclaration extends BodyDeclaration{
 				break;
 			}
 		}
+	}
+	
+	public void setFullName(String name) {
+		fullName = name;
+	}
+	
+	public String getFullName() {
+		return fullName;
 	}
 	
 	public void accept(Visitor v) throws Exception {
