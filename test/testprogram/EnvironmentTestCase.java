@@ -1,7 +1,7 @@
 package testprogram;
 
-public class EnvironmentTest {
-	  public EnvironmentTest() {}
+public class EnvironmentTestCase {
+	  public EnvironmentTestCase() {}
 	  protected String x = "foo";
 	  
 	  
