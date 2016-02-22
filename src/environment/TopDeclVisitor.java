@@ -46,7 +46,7 @@ public class TopDeclVisitor extends SemanticsVisitor {
 		final Map<String, List<String>> pkgCls = SymbolTable.getAllPackages();
 		final Map<String, TypeDeclaration> global = SymbolTable.getGlobal();
 		
-		//TODO: check for ambiguous names
+		//Done: check for ambiguous names
 		//package files
 		String pkg = "";
 		if (cu.pkg != null) {
@@ -66,6 +66,8 @@ public class TopDeclVisitor extends SemanticsVisitor {
 		}
 		
 		//imports
+		// check for single type import collision. e.g java.util.List, java.awt.List
+		Set<String> singleName = new TreeSet<String>();
 		for (ImportDeclaration importDecl : cu.imports) {
 			List<String> name = importDecl.name.getFullName();
 			String nameStr = importDecl.name.toString();
@@ -89,6 +91,13 @@ public class TopDeclVisitor extends SemanticsVisitor {
 				if (decl == null) {
 					throw new NameException("Import class name not recoginzed: " + nameStr);
 				}
+				String simName = name.get(name.size() - 1);
+				if (singleName.contains(simName)) {
+					throw new NameException("single import name collides.");
+				} else {
+					singleName.add(simName);
+				}
+				
 				curr.addSingleImport(nameStr, decl);
 			}
 		}
@@ -138,6 +147,12 @@ public class TopDeclVisitor extends SemanticsVisitor {
 		if (table.currentScope().methods.containsKey(mangledName)) {
 			throw new NameException("method signature repeated.");
 		}
+
+		Type returnType = mDecl.returnType;
+		if (returnType != null && ! (returnType instanceof PrimitiveType)) {
+			Visitor tv = new TypeVisitor(table);
+			returnType.accept(tv);
+		}
 		
 		table.currentScope().addMethod(NameHelper.mangle(mDecl), mDecl);
 		if (!mDecl.isAbstract) {
@@ -171,7 +186,10 @@ public class TopDeclVisitor extends SemanticsVisitor {
 	}
 	
 	public void visit(VariableDeclaration vd) throws Exception {
-		// TODO: type checks
+		// Done: type linking for types
+		Visitor tv = new TypeVisitor(table);
+		vd.type.accept(tv);
+		
 		table.currentScope().addVariable(vd.id, vd);
 	}
 	
