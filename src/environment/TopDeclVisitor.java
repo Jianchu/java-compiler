@@ -190,6 +190,11 @@ public class TopDeclVisitor extends SemanticsVisitor {
 		Visitor tv = new TypeVisitor(table);
 		vd.type.accept(tv);
 		
+		// check that a variable of the same name does not already exist
+		if (table.currentScope().lookUpVariable(vd.id) != null) {
+			throw new NameException("repeated variable name");
+		}
+		
 		table.currentScope().addVariable(vd.id, vd);
 	}
 	

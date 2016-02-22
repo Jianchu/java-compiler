@@ -52,11 +52,11 @@ public class Environment {
 		}
 	}
 	
-	public ASTNode lookUpVariable(String varName) {
+	public VariableDeclaration lookUpVariable(String varName) {
 		if (variables == null)
 			return null;
 		
-		ASTNode result = variables.get(varName);
+		VariableDeclaration result = variables.get(varName);
 		if (result != null)
 			return result;
 		
