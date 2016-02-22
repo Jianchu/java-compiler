@@ -110,12 +110,9 @@ public class TopDeclVisitor extends SemanticsVisitor {
 		
 		table.currentScope().addType(typeDecl.id, typeDecl);
 		
-		
-		
-		// simple check 1 and 4
-		checkSuperClass(typeDecl);
-		// simple check 2 and 3
+		// covers simple checks 1,2,3,4
 		checkInterfaces(typeDecl);
+		checkSuperClass(typeDecl);
 		
 		// create environments for methods and fields
 		table.openScope(Environment.EnvType.CLASS);
@@ -124,15 +121,25 @@ public class TopDeclVisitor extends SemanticsVisitor {
 			bDecl.accept(this);
 		}
 		
-		table.closeScope();
+		table.closeScope();	// class
+		table.closeScope(); // super class
+		table.closeScope(); // interface
 	}
 	
 	public void visit(FieldDeclaration fDecl) throws Exception {
-		table.currentScope().addVariable(fDecl.id, fDecl);
+		if (table.currentScope().fields.containsKey(fDecl.id)) {
+			throw new NameException("field name repeated.");
+		}
+		table.currentScope().addField(fDecl.id, fDecl);
 	}
 	
 	public void visit(MethodDeclaration mDecl) throws Exception {
-		table.currentScope().addVariable(NameHelper.mangle(mDecl), mDecl);
+		String mangledName = NameHelper.mangle(mDecl);
+		if (table.currentScope().methods.containsKey(mangledName)) {
+			throw new NameException("method signature repeated.");
+		}
+		
+		table.currentScope().addMethod(NameHelper.mangle(mDecl), mDecl);
 		if (!mDecl.isAbstract) {
 			table.openScope(Environment.EnvType.BLOCK);
 			// extra scope for method parameters

@@ -2,10 +2,12 @@ package environment;
 
 import ast.MethodDeclaration;
 
-public class NameHelper {
+public class NameHelper  {
 	
 	/**
 	 * TODO: figure a name mangling scheme that combines all info of the signature.
+	 * problem is with the types
+	 * type name string might be qualified or simple and they might be the same thing.
 	 * @param md
 	 * @return
 	 */

@@ -12,24 +12,21 @@ import ast.*;
 public class Environment {
 	Environment enclosing;
 	EnvType type;
-	/* 
-	 * put variable and field declaration both in one map.
-	 * first of all because they never exist at the same time
-	 * secondly it makes look up of variable name easier.
-	 */
-	Map<String, ASTNode> variables = null;
+
+	public Map<String, VariableDeclaration> variables = null;
+	public Map<String, FieldDeclaration> fields = null;
 	
 	/*
 	 * imports and files from the same package 
 	 * are listed in the global class environment, under types variable.
 	 */
-	Map<String, TypeDeclaration> types = null;
-	Map<String, MethodDeclaration> methods = null;
+	public Map<String, TypeDeclaration> types = null;
+	public Map<String, MethodDeclaration> methods = null;
 	
 	// only for compilation unit type scope
-	Map<String, TypeDeclaration> singleImports = null;
-	Map<String, TypeDeclaration> importOnDemands = null;
-	Map<String, TypeDeclaration> samePackage = null;
+	public Map<String, TypeDeclaration> singleImports = null;
+	public Map<String, TypeDeclaration> importOnDemands = null;
+	public Map<String, TypeDeclaration> samePackage = null;
 	
 	
 	public Environment(Environment outer, EnvType scopeType) {
@@ -44,18 +41,21 @@ public class Environment {
 			break;
 			
 		case CLASS:
-			variables = new HashMap<String, ASTNode>();
+			fields = new HashMap<String, FieldDeclaration>();
 			methods = new HashMap<String, MethodDeclaration>();
 			break;
 			
 		case BLOCK:
-			variables = new HashMap<String, ASTNode>();
+			variables = new HashMap<String, VariableDeclaration>();
 			break;
 			
 		}
 	}
 	
 	public ASTNode lookUpVariable(String varName) {
+		if (variables == null)
+			return null;
+		
 		ASTNode result = variables.get(varName);
 		if (result != null)
 			return result;
@@ -66,7 +66,12 @@ public class Environment {
 		return result;
 	}
 	
-	public void addVariable(String name, ASTNode declaration) {
+	public void addField(String name, FieldDeclaration decl) {
+		fields.put(name, decl);
+	}
+	
+	
+	public void addVariable(String name, VariableDeclaration declaration) {
 		variables.put(name, declaration);
 	}
 	
@@ -97,6 +102,8 @@ public class Environment {
 	public enum EnvType {
 		// might be incomplete
 		COMPILATION_UNIT,
+		INTERFACE,
+		SUPER,
 		CLASS,
 		BLOCK	// block includes method
 	}
