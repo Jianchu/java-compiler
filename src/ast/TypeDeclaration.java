@@ -137,7 +137,9 @@ public class TypeDeclaration extends BodyDeclaration{
 				break;
 			case InterfaceMemberDeclaration:
 				// no interface constants
-				members.add(new MethodDeclaration(child.findChild(Symbol.AbstractMethodDeclaration)));
+				ParseTree amDecl = child.findChild(Symbol.AbstractMethodDeclaration);
+				if (amDecl != null)
+				members.add(new MethodDeclaration(amDecl));
 				break;
 			}
 		}
