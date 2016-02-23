@@ -36,6 +36,15 @@ public class Hierarchy {
 		
 		Environment inheritEnv = typeDecl.getEnvironment().getEnclosing();
 		
+		for (Type itf : typeDecl.interfaces) {
+			TypeDeclaration itfDecl = itf.getDeclaration();
+			if (! visited.contains(itfDecl)) {
+				buildInherit(itfDecl);
+			}
+			Environment superEnv = itfDecl.getEnvironment();
+			inherit(inheritEnv, superEnv);
+		}
+		
 		// parent class
 		if (typeDecl.superClass != null) {
 			TypeDeclaration superDecl = typeDecl.superClass.getDeclaration();
@@ -45,28 +54,31 @@ public class Hierarchy {
 			}
 			
 			Environment superEnv = superDecl.getEnvironment();
-			Environment superInherit = superEnv.getEnclosing();
-			
-			// fields from super class, overriding might happen
-			for (String field : superInherit.fields.keySet()) {
-				inheritEnv.addField(field, superEnv.fields.get(field));
-			}
-			for (String field : superEnv.fields.keySet()) {
-				inheritEnv.addField(field, superEnv.fields.get(field));
-			}
-			
-			//methods from superclass, overriding might happen
-			for (String method : superInherit.methods.keySet()) {
-				inheritEnv.addMethod(method, superInherit.methods.get(method));
-			}
-			for (String method : superEnv.methods.keySet()) {
-				inheritEnv.addMethod(method, superEnv.methods.get(method));
-			}
+			inherit(inheritEnv, superEnv);
 		}
 		
 		visited.add(typeDecl);
 		
+	}
+	
+	public void inherit(Environment inheritEnv, Environment superEnv) {
+		Environment superInherit = superEnv.getEnclosing();
 		
+		// fields from super class, overriding might happen
+		for (String field : superInherit.fields.keySet()) {
+			inheritEnv.addField(field, superEnv.fields.get(field));
+		}
+		for (String field : superEnv.fields.keySet()) {
+			inheritEnv.addField(field, superEnv.fields.get(field));
+		}
+		
+		//methods from superclass, overriding might happen
+		for (String method : superInherit.methods.keySet()) {
+			inheritEnv.addMethod(method, superInherit.methods.get(method));
+		}
+		for (String method : superEnv.methods.keySet()) {
+			inheritEnv.addMethod(method, superEnv.methods.get(method));
+		}
 	}
 	
 	public void checkHierarchy(List<AST> trees) {

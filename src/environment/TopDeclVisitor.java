@@ -168,16 +168,15 @@ public class TopDeclVisitor extends SemanticsVisitor {
 		}
 		
 		table.currentScope().addMethod(NameHelper.mangle(mDecl), mDecl);
-		if (!mDecl.isAbstract) {
-			table.openScope(Environment.EnvType.BLOCK);
-			// extra scope for method parameters
-			for (VariableDeclaration vd : mDecl.parameters) {
-				vd.accept(this);
-			}
-			mDecl.body.accept(this);
-			
-			table.closeScope();
+		table.openScope(Environment.EnvType.BLOCK);
+		// extra scope for method parameters
+		for (VariableDeclaration vd : mDecl.parameters) {
+			vd.accept(this);
 		}
+		if (!mDecl.isAbstract) {
+			mDecl.body.accept(this);
+		}
+		table.closeScope();
 	}
 	
 	public void visit(Block block) throws Exception {
