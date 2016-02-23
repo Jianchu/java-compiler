@@ -39,6 +39,7 @@ public class Environment {
 			types = new HashMap<String, TypeDeclaration>();
 			break;
 			
+		case INHERIT:
 		case CLASS:
 			fields = new HashMap<String, FieldDeclaration>();
 			methods = new HashMap<String, MethodDeclaration>();
@@ -101,9 +102,8 @@ public class Environment {
 	public enum EnvType {
 		// might be incomplete
 		COMPILATION_UNIT,
-		INTERFACE,
-		SUPER,
-		CLASS,
+		INHERIT,	// contains the fields and methods inherited
+		CLASS,	// contains the declared fields and methods
 		BLOCK	// block includes method
 	}
 	

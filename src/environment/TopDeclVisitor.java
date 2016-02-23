@@ -122,6 +122,10 @@ public class TopDeclVisitor extends SemanticsVisitor {
 		checkInterfaces(typeDecl);
 		checkSuperClass(typeDecl);
 		
+		// environment for inherited fields and methods,
+		// will filled later in Hierarchy class.
+		table.openScope(Environment.EnvType.INHERIT);	
+		
 		// create environments for methods and fields
 		table.openScope(Environment.EnvType.CLASS);
 		
