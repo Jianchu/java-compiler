@@ -168,6 +168,8 @@ public class TopDeclVisitor extends SemanticsVisitor {
 		}
 		
 		table.currentScope().addMethod(NameHelper.mangle(mDecl), mDecl);
+		
+		
 		table.openScope(Environment.EnvType.BLOCK);
 		// extra scope for method parameters
 		for (VariableDeclaration vd : mDecl.parameters) {
