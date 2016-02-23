@@ -128,14 +128,16 @@ public class TypeDeclaration extends BodyDeclaration{
 		}
 	}
 	
-	private void parseInterfaceMemberDeclarations(ParseTree pt) {
+	
+	private void parseInterfaceMemberDeclarations(ParseTree pt) throws ASTException {
 		for (ParseTree child : pt.getChildren()) {
 			switch(child.getTokenType()) {
 			case InterfaceMemberDeclarations:
 				parseInterfaceMemberDeclarations(child);
 				break;
 			case InterfaceMemberDeclaration:
-				child.findChild(Symbol.AbstractMethodDeclaration);
+				// no interface constants
+				members.add(new MethodDeclaration(child.findChild(Symbol.AbstractMethodDeclaration)));
 				break;
 			}
 		}
