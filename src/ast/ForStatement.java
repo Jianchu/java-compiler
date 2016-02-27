@@ -15,7 +15,7 @@ public class ForStatement extends Statement{
     public Statement forBody;
 
     public ForStatement(ParseTree forNode) throws ASTException {
-        System.out.println(forNode.getTokenType());
+        // System.out.println(forNode.getTokenType());
         for (ParseTree child : forNode.getChildren()) {
             switch (child.getTokenType()) {
             case ForInit:
