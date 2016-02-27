@@ -38,6 +38,9 @@ public class MethodDeclaration extends BodyDeclaration{
 				case SEMICOLON:
 					// only appears in AbstractMethodDeclaration
 					isAbstract = true;
+					if (!modifiers.contains(Modifier.ABSTRACT)) {
+						modifiers.add(new Modifier(Modifier.ABSTRACT));
+					}
 					break;
 				default:
 					throw new ASTException();

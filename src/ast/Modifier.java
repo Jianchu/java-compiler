@@ -26,6 +26,12 @@ public class Modifier implements Next{
 		}
 	}
 	
+	public Modifier(int modifier) throws ASTException {
+		if (modifier < 7 && modifier > 0)
+			mod = modifier;
+		else throw new ASTException("unsupported modifier value");
+	}
+	
 	private void parseSingleModifier(ParseTree pt) {
 		ParseTree child = pt.getChildren().get(0);
 		switch(child.getTokenType()) {
@@ -78,7 +84,23 @@ public class Modifier implements Next{
 		}
 	}
 	
+	@Override
+	public boolean equals(Object o) {
+		if (o instanceof Modifier) {
+			Modifier m = (Modifier) o;
+			return m.mod == this.mod;
+		} else if (o instanceof Integer) {
+			return ((Integer) o).equals(this.mod);
+		} else
+			return false;
+	}
+	
     public void accept(Visitor v) throws Exception {
         v.visit(this);
+    }
+    
+    public static void main(String args[]) throws ASTException {
+    	Modifier m = new Modifier(Modifier.FINAL);
+    	System.out.println(m.equals(Modifier.FINAL));
     }
 }
