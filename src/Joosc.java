@@ -1,6 +1,7 @@
 import java.io.File;
 import java.io.FileReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -51,12 +52,10 @@ public class Joosc {
      * @param args
      */
     // May be use File[] as param?
-    public static void mainSTL(String[] args) {
+    public static void mainSTL(File[] args) {
         File javaLib = new File(System.getProperty("user.dir") + "/java/");
         List<File> sourceFiles = new ArrayList<File>(getLibFiles(javaLib));
-        for (String arg : args) {
-            sourceFiles.add(new File(arg));
-        }
+        sourceFiles.addAll(Arrays.asList(args));
         Scanner scanner = null;
         List<Token> tokens = null;
         try {
