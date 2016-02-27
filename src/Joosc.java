@@ -45,4 +45,12 @@ public class Joosc {
 
     }
     
+    /**
+     * write a version of main method that adds the standard library to arguments for testing.
+     * @param args
+     */
+    public static void mainSTL(String[] args) {
+    	
+    }
+    
 }

@@ -134,7 +134,7 @@ ConstructorBody Block
 
 #production for interface
 #interface extends? abstract method?
-#no inferface constants
+#no interface constants
 InterfaceDeclaration Modifiers INTERFACE ID ExtendsInterfaces InterfaceBody
 InterfaceDeclaration INTERFACE ID ExtendsInterfaces InterfaceBody
 InterfaceDeclaration Modifiers INTERFACE ID InterfaceBody

@@ -45,6 +45,9 @@ public class TypeDeclaration extends BodyDeclaration{
 				throw new ASTException("Unexpected node type.");	
 			}
 		}
+		for (BodyDeclaration mem: members) {
+			mem.setParent(this);
+		}
 	}
 	
 	public boolean hasNext() {
