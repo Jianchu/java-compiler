@@ -1,7 +1,6 @@
 import java.io.File;
 import java.io.FileReader;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -51,42 +50,26 @@ public class Joosc {
      * write a version of main method that adds the standard library to arguments for testing.
      * @param args
      */
-    // May be use File[] as param?
-    public static void mainSTL(File[] args) {
+
+    public static void mainSTL(String[] args) {
         File javaLib = new File(System.getProperty("user.dir") + "/java/");
-        List<File> sourceFiles = new ArrayList<File>(getLibFiles(javaLib));
-        sourceFiles.addAll(Arrays.asList(args));
-        Scanner scanner = null;
-        List<Token> tokens = null;
-        try {
-            File grammar = new File(System.getProperty("user.dir") + "/data/grammar.lr1");
-            List<AST> trees = new LinkedList<AST>();
-            for (File sourcefile : sourceFiles) {
-                System.out.println(sourcefile);
-                scanner = new Scanner(new FileReader(sourcefile));
-                tokens = scanner.scan();
-                Parser parser = new Parser(tokens, grammar);
-                ParseTree parseTree = parser.parse();
-                Weeder weeder = new Weeder(parseTree, sourcefile.getName().substring(0, sourcefile.getName().lastIndexOf('.')));
-                weeder.weed();
-                AST ast = new AST(parseTree);
-                trees.add(ast);
-            }
-            SymbolTable.buildEnvs(trees);
-            
-        } catch (Exception e) {
-            System.err.println(e);
+        List<String> sourceFiles = new ArrayList<String>(getLibFiles(javaLib));
+        for (String arg : args) {
+            sourceFiles.add(arg);
         }
+        String[] sourceFilesInArray = new String[sourceFiles.size()];
+        sourceFilesInArray = sourceFiles.toArray(sourceFilesInArray);
+        main(sourceFilesInArray);
     }
 
-    private static List<File> getLibFiles(File javaLib) {
-        List<File> libFiles = new ArrayList<File>();
+    private static List<String> getLibFiles(File javaLib) {
+        List<String> libFiles = new ArrayList<String>();
         File[] javaLibFiles = javaLib.listFiles();
         for (File javaLibFile : javaLibFiles) {
             if (javaLibFile.isDirectory()) {
                 libFiles.addAll(getLibFiles(javaLibFile));
             } else {
-                libFiles.add(javaLibFile);
+                libFiles.add(javaLibFile.getAbsolutePath());
             }
         }
         return libFiles;
