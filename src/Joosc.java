@@ -18,14 +18,22 @@ public class Joosc {
             System.err.println("Usage: java Joosc <filename>");
             System.exit(42);
         }
-	
+
+        String objInterfacePath = System.getProperty("user.dir") + "/data/ObjInterface.java";
+        List<String> augArgs = new LinkedList<String>();
+        for (String arg : args) {
+        	augArgs.add(arg);
+        }
+        augArgs.add(objInterfacePath);
+        
         Scanner scanner = null;
         List<Token> tokens = null;
+        
         File grammar;
         try {
             grammar = new File(System.getProperty("user.dir") + "/data/grammar.lr1");
 		    List<AST> trees = new LinkedList<AST>();
-		    for (String arg : args) {
+		    for (String arg : augArgs) {
 				File input = new File(arg);
 				scanner = new Scanner(new FileReader(input));
 				tokens = scanner.scan();
