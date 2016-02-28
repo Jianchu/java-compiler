@@ -1,6 +1,6 @@
 package joosc.lang;
 
-public interface ObjInterface() {
+public interface ObjInterface {
 	public boolean equals(Object other);
 	public String toString();
 	public int hashCode();
