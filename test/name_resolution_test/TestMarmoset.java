@@ -36,7 +36,7 @@ public class TestMarmoset {
     public static Collection testA1() throws Exception {
         storeTestCases();
         // pass J1_, J2_, Je_, or All
-        Object[][] parameters = getParameters("Je_");
+        Object[][] parameters = getParameters("All");
         return Arrays.asList(parameters);
     }
     
@@ -90,12 +90,6 @@ public class TestMarmoset {
 
     @Test
     public void test() {
-        String[] input = new String[testCases.get(testCase).size()];
-        input = testCases.get(testCase).toArray(input);
-        int result = Joosc.compileSTL(input);
-        if (result != expectedResult) {
-            System.out.println(testCase);
-        }
         if (testCase.contains("Je_")) {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             PrintStream ps = new PrintStream(baos);
@@ -103,6 +97,12 @@ public class TestMarmoset {
         } else {
             System.out.flush();
             System.setErr(oldErr);
+        }
+        String[] input = new String[testCases.get(testCase).size()];
+        input = testCases.get(testCase).toArray(input);
+        int result = Joosc.compileSTL(input);
+        if (result != expectedResult) {
+            System.out.println(testCase);
         }
         assertEquals(expectedResult, result);
         // System.out.println(testCases.get(testCase));
