@@ -1,5 +1,7 @@
 package joosc.lang;
 
+import java.lang.String;
+
 public interface ObjInterface {
 	public boolean equals(Object other);
 	public String toString();

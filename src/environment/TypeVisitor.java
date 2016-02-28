@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import ast.ArrayType;
+import ast.PrimitiveType;
 import ast.QualifiedName;
 import ast.SimpleName;
 import ast.SimpleType;
@@ -29,6 +31,14 @@ public class TypeVisitor extends TopDeclVisitor {
         super(syms);
         this.globalPackages = SymbolTable.getAllPackages();
         this.global = SymbolTable.getGlobal();
+    }
+    
+    public void visit(PrimitiveType type) throws Exception {
+    	// do nothing
+    }
+    
+    public void visit(ArrayType type) throws Exception {
+    	type.type.accept(this);
     }
     
     /**
@@ -64,7 +74,7 @@ public class TypeVisitor extends TopDeclVisitor {
                 && !checkSimpleName(env.singleImports, node.toString())
                 && !checkSimpleName(env.samePackage, node.toString())
                 && !checkSimpleName(env.importOnDemands,node.toString())) {
-            throw new TypeLinkException("The type name is not found");
+            throw new TypeLinkException("The type name is not found: " + node);
         }
     }
 

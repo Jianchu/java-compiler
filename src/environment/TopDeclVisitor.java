@@ -44,7 +44,7 @@ public class TopDeclVisitor extends SemanticsVisitor {
 		Environment curr = table.currentScope();
 		
 		final Map<String, List<String>> pkgCls = SymbolTable.getAllPackages();
-		final Map<String, TypeDeclaration> global = SymbolTable.getGlobal();
+		final Map<String, TypeDeclaration> globalEnv = SymbolTable.getGlobal();
 		
 		//Done: check for ambiguous names
 		//package files
@@ -53,7 +53,7 @@ public class TopDeclVisitor extends SemanticsVisitor {
 			pkg = cu.pkg.name.toString();
 		}
 		for (String cls : pkgCls.get(pkg)) {
-			TypeDeclaration otherDecl = global.get(cls);
+			TypeDeclaration otherDecl = globalEnv.get(cls);
 			TypeDeclaration thisDecl = null;
 			if (cu.types.size() > 0) {
 				thisDecl = cu.types.get(0);
@@ -82,12 +82,12 @@ public class TopDeclVisitor extends SemanticsVisitor {
 				}
 				
 				for (String cls : clsList) {
-					curr.addImportOnDemand(cls, global.get(cls));
+					curr.addImportOnDemand(cls, globalEnv.get(cls));
 				}
 				
 			} else {
 				// single import 
-				TypeDeclaration decl = global.get(nameStr);
+				TypeDeclaration decl = globalEnv.get(nameStr);
 				if (decl == null) {
 					throw new NameException("Import class name not recoginzed: " + nameStr);
 				}
@@ -101,6 +101,20 @@ public class TopDeclVisitor extends SemanticsVisitor {
 				curr.addSingleImport(nameStr, decl);
 			}
 		}
+		
+		// import java.lang automatically
+		final String lang = "java.lang";
+		if (pkgCls.get(lang) != null) {
+			for (String cls : pkgCls.get(lang)) {
+				String fn =  cls;
+				if (curr.singleImports.get(fn) == null)
+					curr.addSingleImport(fn, globalEnv.get(fn));
+			}
+		} else {
+			// TODO: maybe throw exception.
+			System.err.println("could not find java.lang");
+		}
+		
 		
 		// class or interface declaration
 		for (TypeDeclaration typeDecl : cu.types) {
@@ -147,17 +161,16 @@ public class TopDeclVisitor extends SemanticsVisitor {
 	}
 	
 	public void visit(MethodDeclaration mDecl) throws Exception {
+//		System.out.println(mDecl.id);
 		// link param types, needs to do this first so that name mangler can use the info
 		for (VariableDeclaration vd : mDecl.parameters) {
-			if (vd.type instanceof SimpleType) {
-				Visitor tv = new TypeVisitor(table);
-				vd.type.accept(tv);
-			}
+			Visitor tv = new TypeVisitor(table);
+			vd.type.accept(tv);
 		}
 		
 		// link return type
 		Type returnType = mDecl.returnType;
-		if (returnType != null && ! (returnType instanceof PrimitiveType)) {
+		if (returnType != null) {
 			Visitor tv = new TypeVisitor(table);
 			returnType.accept(tv);
 		}
@@ -208,7 +221,7 @@ public class TopDeclVisitor extends SemanticsVisitor {
 	public void visit(VariableDeclaration vd) throws Exception {
 		// Done: type linking for types
 		Visitor tv = new TypeVisitor(table);
-		if (vd.type instanceof SimpleType && vd.type.getDeclaration() == null) {
+		if (vd.type instanceof SimpleType || vd.type instanceof ArrayType) {
 			// if is simple type but has not been linked, type linking
 			vd.type.accept(tv);
 		}

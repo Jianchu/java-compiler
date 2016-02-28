@@ -53,8 +53,8 @@ public class Joosc {
 		    SymbolTable.buildEnvs(trees);
 		    
         } catch (Exception e) {
-            System.err.println(e);
-            return 42;
+        	e.printStackTrace();
+        	return 42;
         }
         return 0;
     }

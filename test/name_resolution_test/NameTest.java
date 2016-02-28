@@ -7,12 +7,12 @@ public class NameTest {
 	@Test
 	public void test() {
 		String[] paths = {System.getProperty("user.dir") + "/assignment_testcases/a1/J1_01.java"};
-		Joosc.main(paths);
+		Joosc.compileSTL(paths);
 	}
 	
 	@Test
 	public void testModifier() {
 		String[] paths = {System.getProperty("user.dir") + "/test/testprogram/PublicFinal.java"};
-		Joosc.main(paths);
+		Joosc.compileSTL(paths);
 	}
 }
