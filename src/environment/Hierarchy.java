@@ -8,8 +8,10 @@ import ast.*;
 
 public class Hierarchy {
 	Set<TypeDeclaration> visited;
+	SymbolTable table;
 	
-	public Hierarchy(List<AST> trees) {
+	public Hierarchy(List<AST> trees, SymbolTable symTable) {
+		table = symTable;
 		buildHierarchy(trees);
 		checkHierarchy(trees);
 	}
@@ -35,6 +37,29 @@ public class Hierarchy {
 		}
 		
 		Environment inheritEnv = typeDecl.getEnvironment().getEnclosing();
+		
+		if (typeDecl.isInterface) {
+			if (typeDecl.interfaces.size() == 0 
+				&& typeDecl != table.getObjectInterfaceRef()) {
+				// if interface does not extend any other interfaces
+				// implicitly inheirt from object interface
+				TypeDeclaration objInterface = table.getObjectInterfaceRef();
+				if (! visited.contains(objInterface)) {
+					visited.add(objInterface);
+				}
+				inherit(inheritEnv, objInterface.getEnvironment());
+			}
+		} else {
+			if (typeDecl.superClass == null && typeDecl != table.getObjRef()) {
+				// if class does not extend any class
+				// inherit from object
+				TypeDeclaration obj = table.getObjRef();
+				if (! visited.contains(obj)) {
+					visited.add(obj);
+				}
+				inherit(inheritEnv, obj.getEnvironment());		
+			}
+		}
 		
 		for (Type itf : typeDecl.interfaces) {
 			TypeDeclaration itfDecl = itf.getDeclaration();

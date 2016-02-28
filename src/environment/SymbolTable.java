@@ -21,6 +21,8 @@ public class SymbolTable {
 	Environment curr;
 	private static HashMap<String, TypeDeclaration> global = null;
 	private static HashMap<String, List<String>> globalPackages = null;
+	private static final String OBJ = "java.lang.Object";
+	private static final String OBJ_ITF= "joosc.lang.ObjInterface";
 	
 	public SymbolTable() {
 		curr = null;
@@ -101,6 +103,14 @@ public class SymbolTable {
 		for (AST tree : trees) {
 			tree.root.accept(sv);
 		}
+	}
+	
+	public TypeDeclaration getObjRef() {
+		return global.get(OBJ);
+	}
+	
+	public TypeDeclaration getObjectInterfaceRef() {
+		return global.get(OBJ_ITF);
 	}
 	
 }
