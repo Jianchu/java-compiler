@@ -1,7 +1,7 @@
 JC = javac
 JFLAGS = -g -d ${classpath}
 
-SUBDIR = exceptions scanner parser weeder ast joosc
+SUBDIR = exceptions scanner parser weeder ast environment joosc
 SOURCES = Joosc.java
 
 ifndef classpath
