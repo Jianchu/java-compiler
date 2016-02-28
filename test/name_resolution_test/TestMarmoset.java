@@ -7,9 +7,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import joosc.Joosc;
+
 import org.junit.Before;
 import org.junit.Test;
-
 public class TestMarmoset {
 
 
@@ -27,6 +28,8 @@ public class TestMarmoset {
     public void test() {
         storeTestCases();
         for (String testcase : testCases.keySet()) {
+            //TODO: change value arraylist to array.
+            //Joosc.mainSTL(args);
             System.out.println(testcase);
             System.out.println(testCases.get(testcase));
         }
