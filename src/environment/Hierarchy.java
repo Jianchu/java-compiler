@@ -120,7 +120,42 @@ public class Hierarchy {
 		}
 	}
 	
-	public void checkHierarchy(List<AST> trees) {
-		
+	public void checkHierarchy(List<AST> trees) throws HierarchyException {
+		checkPublicFinal(trees);
+	}
+	
+	/**
+	 * for all methods that m, m' such that m replaces m',
+	 * if m' is public, then m must be public
+	 * 
+	 * 
+	 * @param trees
+	 * @throws HierarchyException 
+	 */
+	public void checkPublicFinal(List<AST> trees) throws HierarchyException {
+		for (AST ast : trees) {
+			if (ast.root.types.size() == 0)
+				continue;
+			
+			Environment clsEnv = ast.root.types.get(0).getEnvironment();
+			Environment inheritEnv = clsEnv.getEnclosing();
+			for (String m : clsEnv.methods.keySet()) {
+				if (inheritEnv.methods.containsKey(m)) {
+					MethodDeclaration decl1 = clsEnv.methods.get(m);
+					MethodDeclaration decl2 = inheritEnv.methods.get(m);
+					
+					// if the method replaced is public, the new method needs to be public 
+					if (decl2.modifiers.contains(Modifier.PUBLIC) &&
+							!decl1.modifiers.contains(Modifier.PUBLIC)) {
+						throw new HierarchyException("A non-public method replaced public method.");
+					}
+					
+					// the old method can't be final
+					if (decl2.modifiers.contains(Modifier.FINAL)) {
+						throw new HierarchyException("Final method cannot be override.s");
+					}
+				}
+			}
+		}
 	}
 }
