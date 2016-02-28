@@ -20,6 +20,10 @@ public class Joosc {
             System.exit(42);
         }
 
+        System.exit(compile(args));
+    }
+    
+    public static int compile(String[] args) {
         String objInterfacePath = System.getProperty("user.dir") + "/data/ObjInterface.java";
         List<String> augArgs = new LinkedList<String>();
         for (String arg : args) {
@@ -50,10 +54,9 @@ public class Joosc {
 		    
         } catch (Exception e) {
             System.err.println(e);
-            System.exit(42);
+            return 42;
         }
-        System.exit(0);
-
+        return 0;
     }
     
     /**
@@ -61,7 +64,7 @@ public class Joosc {
      * @param args
      */
 
-    public static void mainSTL(String[] args) {
+    public static int compileSTL(String[] args) {
         File javaLib = new File(System.getProperty("user.dir") + "/java/");
         List<String> sourceFiles = new ArrayList<String>(getLibFiles(javaLib));
         for (String arg : args) {
@@ -69,7 +72,7 @@ public class Joosc {
         }
         String[] sourceFilesInArray = new String[sourceFiles.size()];
         sourceFilesInArray = sourceFiles.toArray(sourceFilesInArray);
-        main(sourceFilesInArray);
+        return compile(sourceFilesInArray);
     }
 
     private static List<String> getLibFiles(File javaLib) {
