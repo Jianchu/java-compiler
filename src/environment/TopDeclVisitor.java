@@ -199,6 +199,12 @@ public class TopDeclVisitor extends SemanticsVisitor {
 		table.closeScope();
 	}
 	
+	public void visit(VariableDeclarationExpression vde) throws Exception {
+		table.openScope(Environment.EnvType.BLOCK);
+		vde.variableDeclaration.accept(this);
+		table.closeScope();
+	}
+	
 	public void visit(VariableDeclaration vd) throws Exception {
 		// Done: type linking for types
 		Visitor tv = new TypeVisitor(table);
@@ -214,6 +220,33 @@ public class TopDeclVisitor extends SemanticsVisitor {
 		
 		table.currentScope().addVariable(vd.id, vd);
 	}
+	
+	/*
+	 * Other Statement
+	 */
+	public void visit(ExpressionStatement node) throws Exception {
+		visitNextStatement(node);
+	}
+	public void visit(ForStatement node) throws Exception {
+		node.forInit.accept(this);
+		visitNextStatement(node);
+	}
+	public void visit(IfStatement node) throws Exception {
+		visitNextStatement(node);
+	}
+	public void visit(ReturnStatement node) throws Exception {
+		visitNextStatement(node);
+	}
+	public void visit(WhileStatement node) throws Exception {
+		visitNextStatement(node);
+	}
+	
+	private void visitNextStatement(Statement node) throws Exception {
+		if (node.hasNext()) {
+			node.next().accept(this);
+		}
+	}
+	
 	
 	private void checkSuperClass(TypeDeclaration typeDecl) throws Exception {
 		if (typeDecl.superClass != null) {

@@ -22,7 +22,7 @@ public class SymbolTable {
 	private static HashMap<String, TypeDeclaration> global = null;
 	private static HashMap<String, List<String>> globalPackages = null;
 	private static final String OBJ = "java.lang.Object";
-	private static final String OBJ_ITF= "joosc.lang.ObjInterface";
+	private static final String OBJ_ITF = "joosc.lang.ObjInterface";
 	
 	public SymbolTable() {
 		curr = null;
