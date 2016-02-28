@@ -57,10 +57,13 @@ public class Weeder {
                 }
             }
             if (InterfaceDecNode != null) {
-                ParseTree methodHeaderNode = findNode(InterfaceDecNode,Symbol.MethodHeader);
+                ParseTree methodHeaderNode = findNode(InterfaceDecNode,
+                        Symbol.MethodHeader);
                 if (methodHeaderNode != null) {
-
-                    visitModifier(methodHeaderNode, Symbol.InterfaceDeclaration);
+                    ParseTree modifierNode = findNode(methodHeaderNode,Symbol.Modifiers);
+                    if (modifierNode != null) {
+                        visitModifier(modifierNode, Symbol.InterfaceDeclaration);
+                    }
                 }
             }
         }
@@ -84,6 +87,7 @@ public class Weeder {
                     if (checkNodeType(child, Symbol.FieldDeclaration)) {
                         modifierNode = findNode(child, Symbol.Modifiers);
                         if (modifierNode != null) {
+
                             visitModifier(modifierNode, Symbol.FieldDeclaration);
                             // Check: No package private field.
                         } else if (modifierNode == null) {
@@ -92,6 +96,7 @@ public class Weeder {
                     } else if (checkNodeType(child, Symbol.MethodDeclaration)) {
                         modifierNode = findNode(child, Symbol.Modifiers);
                         if (modifierNode != null) {
+
                             visitModifier(modifierNode, Symbol.MethodHeader);
                             // Check: No package private method.
                         } else {
@@ -99,6 +104,7 @@ public class Weeder {
                         }
                         blockNode = findNode(child, Symbol.Block);
                         if (blockNode != null) {
+
                             visitModifier(modifierNode, Symbol.MethodDeclaration);
 //                            ParseTree castNode = findNode(blockNode, Symbol.CastExpression);
 //                            if (castNode != null) {
@@ -106,6 +112,7 @@ public class Weeder {
 //                            }
                             visitBlock(blockNode);
                         } else {
+                            
                             visitModifier(modifierNode, Symbol.Block);
                         }
                     } else if (checkNodeType(child, Symbol.ConstructorDeclaration)) {
@@ -227,6 +234,7 @@ public class Weeder {
 
     private void visitModifier(ParseTree modifierNode, Symbol parent)
             throws WeedException {
+
         Stack<ParseTree> stack = new Stack<ParseTree>();
         Set<Symbol> modifiersSet = new HashSet<Symbol>();
         stack.push(modifierNode);
@@ -235,14 +243,12 @@ public class Weeder {
             // System.out.println(currentNode);
             for (ParseTree child : currentNode.getChildren()) {
                 Symbol symbol = child.getTokenType();
+                System.out.println(symbol);
                 // Check: Duplicated modifer.
                 if (modifiersSet.contains(symbol)) {
-                	/*
-                	 * TODO: check this problem
-                	 */
-                	for (Symbol s : modifiersSet) {
-                		System.err.println(s);
-                	}
+                    // for (Symbol s : modifiersSet) {
+                    // System.err.println(s);
+                    // }
                     throw new WeedException("Duplicate modifer: " + symbol);
                 }
                 if (!symbol.equals(Symbol.Modifiers) && !symbol.equals(Symbol.Modifier)) {
