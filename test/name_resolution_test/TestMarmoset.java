@@ -2,7 +2,9 @@ package name_resolution_test;
 
 import static org.junit.Assert.assertEquals;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -21,6 +23,7 @@ public class TestMarmoset {
 
     private static final File files = new File(System.getProperty("user.dir")  + "/assignment_testcases/a2");
     private static final Map<String, ArrayList<String>> testCases = new HashMap<String, ArrayList<String>>();
+    private final PrintStream oldErr = System.err;
     private int expectedResult;
     private String testCase;
     
@@ -33,7 +36,7 @@ public class TestMarmoset {
     public static Collection testA1() throws Exception {
         storeTestCases();
         // pass J1_, J2_, Je_, or All
-        Object[][] parameters = getParameters("J1_");
+        Object[][] parameters = getParameters("Je_");
         return Arrays.asList(parameters);
     }
     
@@ -87,10 +90,20 @@ public class TestMarmoset {
 
     @Test
     public void test() {
-        System.out.println(testCase);
         String[] input = new String[testCases.get(testCase).size()];
         input = testCases.get(testCase).toArray(input);
         int result = Joosc.compileSTL(input);
+        if (result != expectedResult) {
+            System.out.println(testCase);
+        }
+        if (testCase.contains("Je_")) {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            PrintStream ps = new PrintStream(baos);
+            System.setErr(ps);
+        } else {
+            System.out.flush();
+            System.setErr(oldErr);
+        }
         assertEquals(expectedResult, result);
         // System.out.println(testCases.get(testCase));
     }
