@@ -5,12 +5,14 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import ast.*;
+import exceptions.HierarchyException;
 
 public class Hierarchy {
 	Set<TypeDeclaration> visited;
 	SymbolTable table;
+	Set<TypeDeclaration> onPath;	//for checking cycles
 	
-	public Hierarchy(List<AST> trees, SymbolTable symTable) {
+	public Hierarchy(List<AST> trees, SymbolTable symTable) throws HierarchyException {
 		table = symTable;
 		buildHierarchy(trees);
 		checkHierarchy(trees);
@@ -19,16 +21,18 @@ public class Hierarchy {
 	/**
 	 * fills the inherit environment for each type declaration
 	 * @param trees
+	 * @throws HierarchyException 
 	 */
-	public void buildHierarchy(List<AST> trees) {
+	public void buildHierarchy(List<AST> trees) throws HierarchyException {
 		visited = new TreeSet<TypeDeclaration>();
 		for (AST tree : trees) {
 			if (tree.root.types.size() > 0)
-				buildInherit(tree.root.types.get(0));
+				
+				buildInherit(tree.root.types.get(0), new TreeSet<TypeDeclaration>());
 		}
 	}
 
-	private void buildInherit(TypeDeclaration typeDecl) {
+	private void buildInherit(TypeDeclaration typeDecl, Set<TypeDeclaration> ancestors) throws HierarchyException {
 		
 		if (visited.contains(typeDecl)) {
 			// if already visited, skip.
@@ -38,10 +42,19 @@ public class Hierarchy {
 		
 		Environment inheritEnv = typeDecl.getEnvironment().getEnclosing();
 		
+		// create a new set of ancestors including self for checking cycles
+		Set<TypeDeclaration> newAncesters = new TreeSet<TypeDeclaration>(ancestors);
+		newAncesters.add(typeDecl);
+		
+		// inherit from super interfaces
 		for (Type itf : typeDecl.interfaces) {
 			TypeDeclaration itfDecl = itf.getDeclaration();
+			if (newAncesters.contains(itfDecl)) {
+				// if super interface is an ancestor, error
+				throw new HierarchyException("cycle detected in class hierarchy.");
+			}
 			if (! visited.contains(itfDecl)) {
-				buildInherit(itfDecl);
+				buildInherit(itfDecl, newAncesters);
 			}
 			Environment superEnv = itfDecl.getEnvironment();
 			inherit(inheritEnv, superEnv);
@@ -50,9 +63,12 @@ public class Hierarchy {
 		// parent class
 		if (typeDecl.superClass != null) {
 			TypeDeclaration superDecl = typeDecl.superClass.getDeclaration();
+			if (newAncesters.contains(superDecl)) {
+				throw new HierarchyException("cycle detected in class hierarchy.");
+			}
 			if (! visited.contains(superDecl)) {
 				// if the super class has not been processed, do it first
-				buildInherit(superDecl);
+				buildInherit(superDecl, newAncesters);
 			}
 			
 			Environment superEnv = superDecl.getEnvironment();
