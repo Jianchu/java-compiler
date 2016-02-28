@@ -16,6 +16,7 @@ public class ASTHelper {
 		
 	}
 	
+	@SuppressWarnings("unchecked")
 	public static <E extends Next<E>> List<E> getList(E elem) {
 		List<E> result = new LinkedList<E>();
 		result.add(elem);

@@ -1,7 +1,7 @@
 JC = javac
 JFLAGS = -g -d ${classpath}
 
-SUBDIR = exceptions scanner parser weeder ast
+SUBDIR = exceptions scanner parser weeder ast joosc
 SOURCES = Joosc.java
 
 ifndef classpath
@@ -13,7 +13,8 @@ endif
 
 default: all
 
-all: ${SUBDIR} ${SOURCES:.java=.class}
+all: ${SUBDIR} 
+#${SOURCES:.java=.class}
 
 ${SUBDIR}:
 	${JC} ${JFLAGS} $@/*.java
