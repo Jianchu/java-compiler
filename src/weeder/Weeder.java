@@ -243,7 +243,6 @@ public class Weeder {
             // System.out.println(currentNode);
             for (ParseTree child : currentNode.getChildren()) {
                 Symbol symbol = child.getTokenType();
-                System.out.println(symbol);
                 // Check: Duplicated modifer.
                 if (modifiersSet.contains(symbol)) {
                     // for (Symbol s : modifiersSet) {
