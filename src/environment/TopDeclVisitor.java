@@ -242,15 +242,20 @@ public class TopDeclVisitor extends SemanticsVisitor {
 	}
 	public void visit(ForStatement node) throws Exception {
 		node.forInit.accept(this);
+		node.forBody.accept(this);
 		visitNextStatement(node);
 	}
 	public void visit(IfStatement node) throws Exception {
+		node.ifStatement.accept(this);
+		if (node.elseStatement != null)
+			node.elseStatement.accept(this);
 		visitNextStatement(node);
 	}
 	public void visit(ReturnStatement node) throws Exception {
 		visitNextStatement(node);
 	}
 	public void visit(WhileStatement node) throws Exception {
+		node.whileStatement.accept(this);
 		visitNextStatement(node);
 	}
 	

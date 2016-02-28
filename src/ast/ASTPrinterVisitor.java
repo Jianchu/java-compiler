@@ -463,9 +463,11 @@ public class ASTPrinterVisitor implements Visitor{
         //File f = new File(System.getProperty("user.dir")+ "/assignment_testcases/a2/J1_1_Cast_NamedTypeAsVariable.java");
         //File f = new File(System.getProperty("user.dir")+ "/assignment_testcases/a2/J1_4_MethodDeclare_DuplicateArrayTypes.java");
         //File f = new File(System.getProperty("user.dir")+ "/assignment_testcases/a1/J1_evalMethodInvocationFromParExp.java");
-        File f = new File(System.getProperty("user.dir")
-                + "/assignment_testcases/a1/J1_arbitrarylocaldeclaration.java");
-
+//        File f = new File(System.getProperty("user.dir")
+//                + "/assignment_testcases/a1/J1_arbitrarylocaldeclaration.java");
+        File f = new File(System.getProperty("user.dir")+ "/test/testprogram/ElseIf.java");
+        
+        
         Scanner scanner = new Scanner(new FileReader(f));
         List<Token> tokens = scanner.scan();
         Parser par = new Parser(tokens, grammar);
