@@ -3,7 +3,6 @@ package name_resolution_test;
 import static org.junit.Assert.assertEquals;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -31,27 +30,61 @@ public class TestMarmoset {
     }
 
     @Parameterized.Parameters
-    public static Collection testA1() throws FileNotFoundException {
+    public static Collection testA1() throws Exception {
         storeTestCases();
-        Object[][] parameters = new Object[testCases.keySet().size()][2];
-        int i = 0;
-        for (String testcase : testCases.keySet()) {
-            if (testcase.contains("Je_")) {
-                parameters[i][0] = testcase;
-                parameters[i][1] = 42;
-            } else if (testcase.contains("J1_")) {
-                parameters[i][0] = testcase;
-                parameters[i][1] = 0;
-            } else {
-                // J2 should fail?
-                parameters[i][0] = testcase;
-                parameters[i][1] = 0;
-            }
-            i++;
-        }
+        // pass J1_, J2_, Je_, or All
+        Object[][] parameters = getParameters("J1_");
         return Arrays.asList(parameters);
     }
     
+    private static Object[][] getParameters(String name) throws Exception {
+        boolean checkJ1, checkJ2, checkJe;
+        checkJ1 = checkJ2 = checkJe = false;
+        Object[][] parameters;
+        if (name == "J1_") {
+            parameters = new Object[101][2];
+            checkJ1 = true;
+        } else if (name == "J2_") {
+            parameters = new Object[18][2];
+            checkJ2 = true;
+        } else if (name == "Je_") {
+            parameters = new Object[109][2];
+            checkJe = true;
+        } else if (name == "All") {
+            parameters = new Object[testCases.keySet().size()][2];
+            checkJ1 = checkJ2 = checkJe = true;
+        } else {
+            throw new Exception("have to use J1_, J2_, Je_, or All");
+        }
+
+        int i = 0;
+        for (String testcase : testCases.keySet()) {
+
+            if (testcase.contains("J1_")) {
+                if (checkJ1) {
+                    parameters[i][0] = testcase;
+                    parameters[i][1] = 0;
+                    i++;
+                }
+            } else if (testcase.contains("J2_")) {
+                // J2 should pass or fail?
+                if (checkJ2) {
+                    parameters[i][0] = testcase;
+                    parameters[i][1] = 0;
+                    i++;
+                }
+            } else if (testcase.contains("Je_")) {
+                if (checkJe) {
+                    parameters[i][0] = testcase;
+                    parameters[i][1] = 42;
+                    i++;
+                }
+            }
+        }
+        return parameters;
+
+    }
+
     @Test
     public void test() {
         System.out.println(testCase);
@@ -59,7 +92,6 @@ public class TestMarmoset {
         input = testCases.get(testCase).toArray(input);
         int result = Joosc.compileSTL(input);
         assertEquals(expectedResult, result);
-
         // System.out.println(testCases.get(testCase));
     }
 
