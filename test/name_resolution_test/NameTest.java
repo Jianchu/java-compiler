@@ -9,4 +9,10 @@ public class NameTest {
 		String[] paths = {System.getProperty("user.dir") + "/assignment_testcases/a1/J1_01.java"};
 		Joosc.main(paths);
 	}
+	
+	@Test
+	public void testModifier() {
+		String[] paths = {System.getProperty("user.dir") + "/test/testprogram/PublicFinal.java"};
+		Joosc.main(paths);
+	}
 }

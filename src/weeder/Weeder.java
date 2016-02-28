@@ -237,7 +237,13 @@ public class Weeder {
                 Symbol symbol = child.getTokenType();
                 // Check: Duplicated modifer.
                 if (modifiersSet.contains(symbol)) {
-                    throw new WeedException("Duplicated modifer.");
+                	/*
+                	 * TODO: check this problem
+                	 */
+                	for (Symbol s : modifiersSet) {
+                		System.err.println(s);
+                	}
+                    throw new WeedException("Duplicate modifer: " + symbol);
                 }
                 if (!symbol.equals(Symbol.Modifiers) && !symbol.equals(Symbol.Modifier)) {
                     modifiersSet.add(symbol);

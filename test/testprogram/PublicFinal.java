@@ -1,9 +1,9 @@
-package joosc.lang;
+package testprogram;
 
-public interface ObjInterface {
+public interface PublicFinal {
 	public boolean equals(Object other);
 	public String toString();
 	public int hashCode();
 //	protected Object clone();
-	public Class getClass();
+//	public Class getClass();
 }

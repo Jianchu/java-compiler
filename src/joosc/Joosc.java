@@ -35,6 +35,7 @@ public class Joosc {
             grammar = new File(System.getProperty("user.dir") + "/data/grammar.lr1");
 		    List<AST> trees = new LinkedList<AST>();
 		    for (String arg : augArgs) {
+//		    	System.out.println(arg);
 				File input = new File(arg);
 				scanner = new Scanner(new FileReader(input));
 				tokens = scanner.scan();
