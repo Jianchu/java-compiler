@@ -1,34 +1,32 @@
 package environment;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.TreeSet;
 
 import ast.*;
 import exceptions.HierarchyException;
 
 public class Hierarchy {
 	Set<TypeDeclaration> visited;
-	SymbolTable table;
-	Set<TypeDeclaration> onPath;	//for checking cycles
 	
-	public Hierarchy(List<AST> trees, SymbolTable symTable) throws HierarchyException {
-		table = symTable;
+	public Hierarchy(List<AST> trees) throws HierarchyException {
 		buildHierarchy(trees);
 		checkHierarchy(trees);
 	}
 	
 	/**
 	 * fills the inherit environment for each type declaration
+	 * also checks for cycles in hierarchy
 	 * @param trees
 	 * @throws HierarchyException 
 	 */
 	public void buildHierarchy(List<AST> trees) throws HierarchyException {
-		visited = new TreeSet<TypeDeclaration>();
+		visited = new HashSet<TypeDeclaration>();
 		for (AST tree : trees) {
 			if (tree.root.types.size() > 0)
 				
-				buildInherit(tree.root.types.get(0), new TreeSet<TypeDeclaration>());
+				buildInherit(tree.root.types.get(0), new HashSet<TypeDeclaration>());
 		}
 	}
 
@@ -43,7 +41,7 @@ public class Hierarchy {
 		Environment inheritEnv = typeDecl.getEnvironment().getEnclosing();
 		
 		// create a new set of ancestors including self for checking cycles
-		Set<TypeDeclaration> newAncesters = new TreeSet<TypeDeclaration>(ancestors);
+		Set<TypeDeclaration> newAncesters = new HashSet<TypeDeclaration>(ancestors);
 		newAncesters.add(typeDecl);
 		
 		// inherit from super interfaces
@@ -77,20 +75,20 @@ public class Hierarchy {
 		
 		if (typeDecl.isInterface) {
 			if (typeDecl.interfaces.size() == 0 
-				&& typeDecl != table.getObjectInterfaceRef()) {
+				&& typeDecl != SymbolTable.getObjectInterfaceRef()) {
 				// if interface does not extend any other interfaces
 				// implicitly inheirt from object interface
-				TypeDeclaration objInterface = table.getObjectInterfaceRef();
+				TypeDeclaration objInterface = SymbolTable.getObjectInterfaceRef();
 				if (! visited.contains(objInterface)) {
 					visited.add(objInterface);
 				}
 				inherit(inheritEnv, objInterface.getEnvironment());
 			}
 		} else {	// is class
-			if (typeDecl.superClass == null && typeDecl != table.getObjRef()) {
+			if (typeDecl.superClass == null && typeDecl != SymbolTable.getObjRef()) {
 				// if class does not extend any class
 				// inherit from object
-				TypeDeclaration obj = table.getObjRef();
+				TypeDeclaration obj = SymbolTable.getObjRef();
 				if (! visited.contains(obj)) {
 					visited.add(obj);
 				}

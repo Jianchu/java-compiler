@@ -11,6 +11,7 @@ import scanner.Scanner;
 import scanner.Token;
 import weeder.Weeder;
 import ast.AST;
+import environment.Hierarchy;
 import environment.SymbolTable;
 
 public class Joosc {
@@ -51,6 +52,7 @@ public class Joosc {
 				trees.add(ast);			
 		    }
 		    SymbolTable.buildEnvs(trees);
+		    Hierarchy hier = new Hierarchy(trees);
 		    
         } catch (Exception e) {
         	e.printStackTrace();

@@ -105,11 +105,11 @@ public class SymbolTable {
 		}
 	}
 	
-	public TypeDeclaration getObjRef() {
+	public static TypeDeclaration getObjRef() {
 		return global.get(OBJ);
 	}
 	
-	public TypeDeclaration getObjectInterfaceRef() {
+	public static TypeDeclaration getObjectInterfaceRef() {
 		return global.get(OBJ_ITF);
 	}
 	
