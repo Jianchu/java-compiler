@@ -14,6 +14,8 @@ import java.util.TreeSet;
 
 import ast.*;
 import exceptions.ASTException;
+import exceptions.AbstractMethodException;
+import exceptions.InheritanceException;
 import exceptions.NameException;
 import parser.ParseTree;
 import parser.Parser;
@@ -182,6 +184,20 @@ public class TopDeclVisitor extends SemanticsVisitor {
 		
 		table.currentScope().addMethod(NameHelper.mangle(mDecl), mDecl);
 		
+		Environment env = table.currentScope().getEnclosing();
+		while (env != null) {
+			MethodDeclaration repMDecl = env.methods.get(mangledName);
+			if (repMDecl != null) {
+				if (repMDecl.modifiers.contains(Modifier.STATIC) != mDecl.modifiers.contains(Modifier.STATIC)) {
+					throw new InheritanceException("static modifiers do not match");
+				}
+				if (!repMDecl.returnType.equals(mDecl.returnType)) {
+					throw new InheritanceException("return types do not macth");
+				}
+				break;
+			}
+			env = env.getEnclosing();
+		}
 		
 		table.openScope(Environment.EnvType.BLOCK);
 		// extra scope for method parameters
@@ -190,6 +206,11 @@ public class TopDeclVisitor extends SemanticsVisitor {
 		}
 		if (!mDecl.isAbstract) {
 			mDecl.body.accept(this);
+		} else {
+			TypeDeclaration typeDecl = (TypeDeclaration) mDecl.getParent();
+			if (!typeDecl.isInterface && !typeDecl.modifiers.contains(Modifier.ABSTRACT)) {
+				throw new AbstractMethodException();
+			}
 		}
 		table.closeScope();
 	}
