@@ -60,6 +60,10 @@ public class NameTest {
     // requirement of type linking.
     // package name same as the type name, should this be checked in visit
     // CompilationUnit when it reads package name?
+    // same problem in Je_3_PackageNameIsClassName_Prefix
+    // same problem in Je_4_Resolve_DefaultPackage
+    // same problem in Je_3_PackageNameIsClassName
+    
     @Test
     public void testCheck4() {
         String[] paths = new String[0];
@@ -97,6 +101,16 @@ public class NameTest {
     public void testCheck7() {
         String[] paths = new String[0];
         paths = FileUtility.getFileNames(System.getProperty("user.dir") + "/assignment_testcases/a2/J2_Ifaceimplicitabstract").toArray(paths);
+        Joosc.compileSTL(paths);
+    }
+    
+    /**
+     * Check that all import-on-demand declarations refer to existing packages.
+     */
+    @Test
+    public void testCheck8() {
+        String[] paths = new String[0];
+        paths = FileUtility.getFileNames(System.getProperty("user.dir") + "/assignment_testcases/a2/Je_3_ImportOnDemand_ClassNameAsPackage").toArray(paths);
         Joosc.compileSTL(paths);
     }
 }
