@@ -132,4 +132,15 @@ public class NameTest {
         int result = Joosc.compileSTL(paths);
         assert (result == 0) : "Should be a valid case";
     }
+    
+    @Test
+    /**
+     * Method has same sig as a constructor is valid
+     */
+    public void testCheck10() {
+        String[] paths = new String[0];
+        paths = FileUtility.getFileNames(System.getProperty("user.dir") + "/assignment_testcases/a2/J1_4_DuplicateMethodDeclare_MethodNameEqualsConstructorName.java").toArray(paths);
+        int result = Joosc.compileSTL(paths);
+        assert (result == 0) : "Should be a valid case";
+    }
 }
