@@ -28,6 +28,8 @@ public class NameTest {
         Joosc.compileSTL(paths);
     }
     
+    // TODO: The problems in testCheck2 and testCheck3 causes many crashes!
+    
     // stack trace:
     //exceptions.NameException: Import class name not recoginzed: java.awt
     //at environment.TopDeclVisitor.visit(TopDeclVisitor.java:92)
@@ -44,24 +46,24 @@ public class NameTest {
         Joosc.compileSTL(paths);
     }
     
+    //null pointer exception at ast.Type.parseInterfaceTypeList(Type.java:56)
+    //problem in AST?
+    // same problem in J1_singleTypeImport
+    @Test
+    public void testCheck3() {
+        String[] paths = new String[0];
+        paths = FileUtility.getFileNames(System.getProperty("user.dir") + "/assignment_testcases/a2/J2_4_InterfaceExtends_MultipleWays").toArray(paths);
+        Joosc.compileSTL(paths);
+    }
+    
     // See https://www.student.cs.uwaterloo.ca/~cs444/a2.html ,the sixth
     // requirement of type linking.
     // package name same as the type name, should this be checked in visit
     // CompilationUnit when it reads package name?
     @Test
-    public void testCheck3() {
-        String[] paths = new String[0];
-        paths = FileUtility.getFileNames(System.getProperty("user.dir") + "/assignment_testcases/a2/Je_3_Resolve_SamePackageAndClassName.java").toArray(paths);
-        Joosc.compileSTL(paths);
-    }
-
-    //null pointer exception at ast.Type.parseInterfaceTypeList(Type.java:56)
-    //problem in AST?
-    // same problem in J1_singleTypeImport
-    @Test
     public void testCheck4() {
         String[] paths = new String[0];
-        paths = FileUtility.getFileNames(System.getProperty("user.dir") + "/assignment_testcases/a2/J2_4_InterfaceExtends_MultipleWays").toArray(paths);
+        paths = FileUtility.getFileNames(System.getProperty("user.dir") + "/assignment_testcases/a2/Je_3_Resolve_SamePackageAndClassName.java").toArray(paths);
         Joosc.compileSTL(paths);
     }
     
@@ -81,6 +83,20 @@ public class NameTest {
     public void testCheck6() {
         String[] paths = new String[0];
         paths = FileUtility.getFileNames(System.getProperty("user.dir") + "/assignment_testcases/a2/Je_4_Override_DifferentReturnTypes_AbstractFromSuperclassAndInterface").toArray(paths);
+        Joosc.compileSTL(paths);
+    }
+    
+    /**
+     * Null pointer exception in Hierarchy.checkPublicFinal() 
+     * stack trace:
+     * at environment.Hierarchy.checkPublicFinal(Hierarchy.java:164) 
+     * at environment.Hierarchy.checkHierarchy(Hierarchy.java:124)
+     * at environment.Hierarchy.<init>(Hierarchy.java:15)
+     **/
+    @Test
+    public void testCheck7() {
+        String[] paths = new String[0];
+        paths = FileUtility.getFileNames(System.getProperty("user.dir") + "/assignment_testcases/a2/J2_Ifaceimplicitabstract").toArray(paths);
         Joosc.compileSTL(paths);
     }
 }
