@@ -114,7 +114,7 @@ public class TypeDeclaration extends BodyDeclaration{
 			 * Interface specific
 			 */
 			case ExtendsInterfaces:
-				interfaces.addAll(Type.parseInterfaceTypeList(pt.findChild(Symbol.InterfaceTypeList)));
+				interfaces.addAll(Type.parseInterfaceTypeList(child.findChild(Symbol.InterfaceTypeList)));
 				break;
 			case InterfaceBody:
 				parseInterfaceBody(child);
