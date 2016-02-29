@@ -186,17 +186,22 @@ public class TopDeclVisitor extends SemanticsVisitor {
 		
 		Environment env = table.currentScope().getEnclosing();
 		while (env != null) {
-			MethodDeclaration repMDecl = env.methods.get(mangledName);
-			if (repMDecl != null) {
-				if (repMDecl.modifiers.contains(Modifier.STATIC) != mDecl.modifiers.contains(Modifier.STATIC)) {
-					throw new InheritanceException("static modifiers do not match");
-				}
-				if (!repMDecl.returnType.equals(mDecl.returnType)) {
-					throw new InheritanceException("return types do not macth");
-				}
-				break;
+			if (env.methods == null) {
+				env = env.getEnclosing();
+				continue;
 			}
-			env = env.getEnclosing();
+			MethodDeclaration repMDecl = env.methods.get(mangledName);
+			if (repMDecl == null) {
+				env = env.getEnclosing();
+				continue;
+			}
+			if (repMDecl.modifiers.contains(Modifier.STATIC) != mDecl.modifiers.contains(Modifier.STATIC)) {
+				throw new InheritanceException("static modifiers do not match");
+			}
+			if (!repMDecl.returnType.equals(mDecl.returnType)) {
+				throw new InheritanceException("return types do not macth");
+			}
+			break;
 		}
 		
 		table.openScope(Environment.EnvType.BLOCK);

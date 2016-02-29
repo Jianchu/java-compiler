@@ -27,4 +27,30 @@ public class NameTest {
         paths =  FileUtility.getFileNames(System.getProperty("user.dir") + "/assignment_testcases/a2/Je_2_DuplicateType/").toArray(paths);
         Joosc.compileSTL(paths);
     }
+    
+    // stack trace:
+    //exceptions.NameException: Import class name not recoginzed: java.awt
+    //at environment.TopDeclVisitor.visit(TopDeclVisitor.java:92)
+    //
+    // This should be importOnDemands, why go in to single import branch?
+    // same problem in J1_3_OnDemandImport_NonAmbiguous_SamePackage
+    @Test
+    public void testCheck2() {
+        String[] paths = new String[0];
+        paths = FileUtility.getFileNames(System.getProperty("user.dir") + "/assignment_testcases/a2/J1_3_OnDemandImport_NonAmbiguous_SamePackage").toArray(paths);
+        Joosc.compileSTL(paths);
+    }
+    
+    // See https://www.student.cs.uwaterloo.ca/~cs444/a2.html ,the sixth
+    // requirement of type linking.
+    // package name same as the type name, should this be checked in visit
+    // CompilationUnit when it reads package name?
+    @Test
+    public void testCheck3() {
+        String[] paths = new String[0];
+        paths = FileUtility.getFileNames(System.getProperty("user.dir") + "/assignment_testcases/a2/Je_3_Resolve_SamePackageAndClassName.java").toArray(paths);
+        Joosc.compileSTL(paths);
+    }
+    
+        
 }
