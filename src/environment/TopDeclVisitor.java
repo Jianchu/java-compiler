@@ -71,9 +71,9 @@ public class TopDeclVisitor extends SemanticsVisitor {
 		for (ImportDeclaration importDecl : cu.imports) {
 			List<String> name = importDecl.name.getFullName();
 			String nameStr = importDecl.name.toString();
-			if (name.get(name.size() -1).equals("*")) {
+			if (importDecl.onDemand){
 				// import on demand
-				List<String> qualifier = name.subList(0, name.size() - 1);
+				List<String> qualifier = name;
 				String qualifierStr = String.join(".", name);
 				List<String> clsList = pkgCls.get(qualifierStr);
 				if (clsList == null) {
@@ -86,6 +86,7 @@ public class TopDeclVisitor extends SemanticsVisitor {
 				}
 				
 			} else {
+				System.out.println(name.get(name.size() - 1));
 				// single import 
 				TypeDeclaration decl = globalEnv.get(nameStr);
 				if (decl == null) {
