@@ -64,5 +64,14 @@ public class NameTest {
         paths = FileUtility.getFileNames(System.getProperty("user.dir") + "/assignment_testcases/a2/J2_4_InterfaceExtends_MultipleWays").toArray(paths);
         Joosc.compileSTL(paths);
     }
+    
+    // See Main.java
+    // The problem is in Object interface?
+    @Test
+    public void testCheck5() {
+        String[] paths = new String[0];
+        paths = FileUtility.getFileNames(System.getProperty("user.dir") + "/assignment_testcases/a2/Je_14_Interface_DeclaresToString_ThrowsConflict").toArray(paths);
+        Joosc.compileSTL(paths);
+    }
         
 }
