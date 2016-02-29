@@ -73,7 +73,6 @@ public class NameTest {
         paths = FileUtility.getFileNames(System.getProperty("user.dir") + "/assignment_testcases/a2/Je_3_Resolve_SamePackageAndClassName.java").toArray(paths);
         int result = Joosc.compileSTL(paths);
         assertEquals(42, result);
-        assertEquals(result, 42);
     }
     
     // See Main.java

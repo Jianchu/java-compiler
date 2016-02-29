@@ -5,12 +5,13 @@ import java.util.List;
 import java.util.Set;
 
 import ast.*;
+import exceptions.AbstractMethodException;
 import exceptions.HierarchyException;
 
 public class Hierarchy {
 	Set<TypeDeclaration> visited;
 	
-	public Hierarchy(List<AST> trees) throws HierarchyException {
+	public Hierarchy(List<AST> trees) throws Exception {
 		buildHierarchy(trees);
 		checkHierarchy(trees);
 	}
@@ -122,7 +123,7 @@ public class Hierarchy {
 		}
 	}
 	
-	public void checkHierarchy(List<AST> trees) throws HierarchyException {
+	public void checkHierarchy(List<AST> trees) throws Exception {
 		checkPublicFinal(trees);
 	}
 	
@@ -133,14 +134,34 @@ public class Hierarchy {
 	 * 
 	 * @param trees
 	 * @throws HierarchyException 
+	 * @throws AbstractMethodException 
 	 */
-	public void checkPublicFinal(List<AST> trees) throws HierarchyException {
+	public void checkPublicFinal(List<AST> trees) throws HierarchyException, AbstractMethodException {
 		for (AST ast : trees) {
 			if (ast.root.types.size() == 0)
 				continue;
 			
 			Environment clsEnv = ast.root.types.get(0).getEnvironment();
 			Environment inheritEnv = clsEnv.getEnclosing();
+			
+			Set<MethodDeclaration> mContains = new HashSet<MethodDeclaration>();
+			for (MethodDeclaration md :clsEnv.methods.values()) {
+				mContains.add(md);
+			}
+			for (String m : inheritEnv.methods.keySet()) {
+				if (!clsEnv.methods.containsKey(m)) {
+					mContains.add(inheritEnv.methods.get(m));
+				}
+			}
+			for (MethodDeclaration md : mContains) {
+				if (md.isAbstract) {
+					TypeDeclaration typeDecl = ast.root.types.get(0);
+					if (!typeDecl.isInterface && !typeDecl.modifiers.contains(Modifier.ABSTRACT)) {
+						throw new AbstractMethodException(typeDecl.id + "." + md.id);
+					}
+				}
+			}
+			
 			for (String m : clsEnv.methods.keySet()) {
 				if (inheritEnv.methods.containsKey(m)) {
 					MethodDeclaration decl1 = clsEnv.methods.get(m);
@@ -178,6 +199,11 @@ public class Hierarchy {
 			MethodDeclaration decl2 = superEnv.methods.get(method);
 			if (!decl2.returnType.equals(decl1.returnType)) {
 				throw new HierarchyException("Return type of replaced method does not match.");
+			}
+			
+			// the old method can't be final
+			if (decl2.modifiers.contains(Modifier.FINAL)) {
+				throw new HierarchyException("Final method cannot be override.s");
 			}
 		}
 	}

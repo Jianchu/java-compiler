@@ -191,10 +191,10 @@ public class TopDeclVisitor extends SemanticsVisitor {
 			if (mDecl.body != null)
 				mDecl.body.accept(this);
 		} else {
-			TypeDeclaration typeDecl = (TypeDeclaration) mDecl.getParent();
-			if (!typeDecl.isInterface && !typeDecl.modifiers.contains(Modifier.ABSTRACT)) {
-				throw new AbstractMethodException(typeDecl.id + "." + mDecl.id);
-			}
+//			TypeDeclaration typeDecl = (TypeDeclaration) mDecl.getParent();
+//			if (!typeDecl.isInterface && !typeDecl.modifiers.contains(Modifier.ABSTRACT)) {
+//				throw new AbstractMethodException(typeDecl.id + "." + mDecl.id);
+//			}
 		}
 		table.closeScope();
 	}
