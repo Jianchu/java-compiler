@@ -156,10 +156,6 @@ public class Hierarchy {
 			for (MethodDeclaration md : mContains) {
 				if (md.isAbstract) {
 					TypeDeclaration typeDecl = ast.root.types.get(0);
-					System.out.println(typeDecl.id);
-					for (Modifier m : typeDecl.modifiers) 
-						System.out.println("" + m + m.mod);
-					System.out.println(typeDecl.modifiers.contains(Modifier.ABSTRACT));
 					if (!typeDecl.isInterface && !typeDecl.modifiers.contains(Modifier.ABSTRACT)) {
 						throw new AbstractMethodException(typeDecl.id + "." + md.id);
 					}
@@ -188,7 +184,7 @@ public class Hierarchy {
 					}
 					
 					// return types should be the same
-					if (!decl2.returnType.equals(decl1.returnType)) {
+					if (!(decl2.returnType == decl1.returnType || decl2.returnType.equals(decl1.returnType))) {
 						// both checks are required to deal with simple type and primitive type.
 						throw new HierarchyException("Return type of replaced method does not match.");
 					}
@@ -203,11 +199,6 @@ public class Hierarchy {
 			MethodDeclaration decl2 = superEnv.methods.get(method);
 			if (!decl2.returnType.equals(decl1.returnType)) {
 				throw new HierarchyException("Return type of replaced method does not match.");
-			}
-			
-			// the old method can't be final
-			if (decl2.modifiers.contains(Modifier.FINAL)) {
-				throw new HierarchyException("Final method cannot be override.s");
 			}
 		}
 	}
