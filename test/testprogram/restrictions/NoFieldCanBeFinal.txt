@@ -1,5 +1,0 @@
-package testprogram.restrictions;
-
-public class NoFieldCanBeFinal {
-    final int a = 1;
-}

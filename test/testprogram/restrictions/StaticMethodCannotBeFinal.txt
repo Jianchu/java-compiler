@@ -1,7 +1,0 @@
-package testprogram.restrictions;
-
-public class StaticMethodCannotBeFinal {
-    static final void method() {
-
-    }
-}

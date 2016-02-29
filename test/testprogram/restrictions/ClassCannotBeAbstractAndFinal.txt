@@ -1,5 +1,0 @@
-package testprogram.restrictions;
-
-abstract final class ClassCannotBeAbstractAndFinal {
-
-}
