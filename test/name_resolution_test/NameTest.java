@@ -28,7 +28,7 @@ public class NameTest {
         Joosc.compileSTL(paths);
     }
     
-    // TODO: The problems in testCheck2 and testCheck3 causes many crashes!
+    // TODO: The problems in testCheck2 and testCheck3 cause many crashes!
     
     // stack trace:
     //exceptions.NameException: Import class name not recoginzed: java.awt
