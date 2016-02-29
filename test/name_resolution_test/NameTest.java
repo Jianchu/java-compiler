@@ -123,4 +123,27 @@ public class NameTest {
         int result = Joosc.compileSTL(paths);
         assert (result == 42) : "Should be an invalid case";
     }
+    
+    
+    @Test
+    // Import package not recoginzed: foo
+    // at environment.TopDeclVisitor.visit(TopDeclVisitor.java:81)
+    // at ast.CompilationUnit.accept(CompilationUnit.java:56)
+    public void testCheck9() {
+        String[] paths = new String[0];
+        paths = FileUtility.getFileNames(System.getProperty("user.dir") + "/assignment_testcases/a2/J1_3_PackageExists_AsPrefix_Internal").toArray(paths);
+        int result = Joosc.compileSTL(paths);
+        assert (result == 0) : "Should be a valid case";
+    }
+    
+    @Test
+    /**
+     * Method has same sig as a constructor is valid
+     */
+    public void testCheck10() {
+        String[] paths = new String[0];
+        paths = FileUtility.getFileNames(System.getProperty("user.dir") + "/assignment_testcases/a2/J1_4_DuplicateMethodDeclare_MethodNameEqualsConstructorName.java").toArray(paths);
+        int result = Joosc.compileSTL(paths);
+        assert (result == 0) : "Should be a valid case";
+    }
 }
