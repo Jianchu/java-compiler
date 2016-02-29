@@ -74,4 +74,13 @@ public class NameTest {
         Joosc.compileSTL(paths);
     }
         
+    //See main.java
+    // no A class or interface must not have (declare or inherit) two methods
+    // with the same name and parameter types but different return types
+    @Test
+    public void testCheck6() {
+        String[] paths = new String[0];
+        paths = FileUtility.getFileNames(System.getProperty("user.dir") + "/assignment_testcases/a2/Je_4_Override_DifferentReturnTypes_AbstractFromSuperclassAndInterface").toArray(paths);
+        Joosc.compileSTL(paths);
+    }
 }
