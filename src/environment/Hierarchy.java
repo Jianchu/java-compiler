@@ -161,7 +161,7 @@ public class Hierarchy {
 					}
 					
 					// return types should be the same
-					if (decl2.returnType.equals(decl1.returnType)) {
+					if (!decl2.returnType.equals(decl1.returnType)) {
 						throw new HierarchyException("Return type of replaced method does not match.");
 					}
 				}
