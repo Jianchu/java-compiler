@@ -57,6 +57,7 @@ public class NameTest {
 
     //null pointer exception at ast.Type.parseInterfaceTypeList(Type.java:56)
     //problem in AST?
+    // same problem in J1_singleTypeImport
     @Test
     public void testCheck4() {
         String[] paths = new String[0];
