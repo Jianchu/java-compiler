@@ -210,11 +210,12 @@ public class TopDeclVisitor extends SemanticsVisitor {
 			vd.accept(this);
 		}
 		if (!mDecl.isAbstract) {
-			mDecl.body.accept(this);
+			if (mDecl.body != null)
+				mDecl.body.accept(this);
 		} else {
 			TypeDeclaration typeDecl = (TypeDeclaration) mDecl.getParent();
 			if (!typeDecl.isInterface && !typeDecl.modifiers.contains(Modifier.ABSTRACT)) {
-				throw new AbstractMethodException();
+				throw new AbstractMethodException(typeDecl.id + "." + mDecl.id);
 			}
 		}
 		table.closeScope();

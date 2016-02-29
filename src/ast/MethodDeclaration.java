@@ -32,7 +32,9 @@ public class MethodDeclaration extends BodyDeclaration{
 						body = (Block) Statement.parseStatement(child);
 					} else {
 						// abstract method in abstract class
-						isAbstract = true;
+						if (modifiers.contains(Modifier.ABSTRACT))
+							isAbstract = true;
+						// otherwise it is native...
 					}
 					break;
 				case SEMICOLON:
