@@ -13,9 +13,7 @@ import java.util.TreeSet;
 
 
 import ast.*;
-import exceptions.ASTException;
 import exceptions.AbstractMethodException;
-import exceptions.InheritanceException;
 import exceptions.NameException;
 import parser.ParseTree;
 import parser.Parser;
@@ -183,26 +181,6 @@ public class TopDeclVisitor extends SemanticsVisitor {
 		}
 		
 		table.currentScope().addMethod(NameHelper.mangle(mDecl), mDecl);
-		
-		Environment env = table.currentScope().getEnclosing();
-		while (env != null) {
-			if (env.methods == null) {
-				env = env.getEnclosing();
-				continue;
-			}
-			MethodDeclaration repMDecl = env.methods.get(mangledName);
-			if (repMDecl == null) {
-				env = env.getEnclosing();
-				continue;
-			}
-			if (repMDecl.modifiers.contains(Modifier.STATIC) != mDecl.modifiers.contains(Modifier.STATIC)) {
-				throw new InheritanceException("static modifiers do not match");
-			}
-			if (!repMDecl.returnType.equals(mDecl.returnType)) {
-				throw new InheritanceException("return types do not macth");
-			}
-			break;
-		}
 		
 		table.openScope(Environment.EnvType.BLOCK);
 		// extra scope for method parameters

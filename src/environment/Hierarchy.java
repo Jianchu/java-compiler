@@ -154,6 +154,16 @@ public class Hierarchy {
 					if (decl2.modifiers.contains(Modifier.FINAL)) {
 						throw new HierarchyException("Final method cannot be override.s");
 					}
+					
+					// old method static <=> new method static
+					if (decl2.modifiers.contains(Modifier.STATIC) != decl1.modifiers.contains(Modifier.STATIC)) {
+						throw new HierarchyException("Static modifier in replaced method does not match.");
+					}
+					
+					// return types should be the same
+					if (decl2.returnType.equals(decl1.returnType)) {
+						throw new HierarchyException("Return type of replaced method does not match.");
+					}
 				}
 			}
 		}

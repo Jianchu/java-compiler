@@ -36,7 +36,7 @@ public class TestMarmoset {
     public static Collection testA1() throws Exception {
         storeTestCases();
         // pass J1_, J2_, Je_, or All
-        Object[][] parameters = getParameters("J1_");
+        Object[][] parameters = getParameters("Je_");
         return Arrays.asList(parameters);
     }
     
