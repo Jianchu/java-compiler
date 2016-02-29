@@ -9,16 +9,14 @@ import utility.FileUtility;
 public class NameTest {
     @Test
     public void testRun() {
-        String[] paths = { System.getProperty("user.dir")
-                + "/assignment_testcases/a1/J1_01.java" };
+        String[] paths = {System.getProperty("user.dir") + "/assignment_testcases/a1/J1_01.java"};
         Joosc.compileSTL(paths);
     }
-
+    
     @Test
     public void testCheck1() {
         String[] paths = new String[0];
-        // paths = FileUtility.getFileNames(System.getProperty("user.dir") +
-        // "/assignment_testcases/a1/").toArray(paths);
+//      paths = FileUtility.getFileNames(System.getProperty("user.dir") + "/assignment_testcases/a1/").toArray(paths);
         Joosc.compileSTL(paths);
     }
 
@@ -26,16 +24,13 @@ public class NameTest {
     @Test
     public void testRun1() {
         String[] paths = new String[0];
-        paths = FileUtility.getFileNames(
-                System.getProperty("user.dir")
-                        + "/assignment_testcases/a2/Je_2_DuplicateType/")
-                .toArray(paths);
+        paths =  FileUtility.getFileNames(System.getProperty("user.dir") + "/assignment_testcases/a2/Je_2_DuplicateType/").toArray(paths);
         Joosc.compileSTL(paths);
     }
-
+    
     // stack trace:
-    // exceptions.NameException: Import class name not recoginzed: java.awt
-    // at environment.TopDeclVisitor.visit(TopDeclVisitor.java:92)
+    //exceptions.NameException: Import class name not recoginzed: java.awt
+    //at environment.TopDeclVisitor.visit(TopDeclVisitor.java:92)
     //
     // This should be importOnDemands, why go in to single import branch?
     // same problem in J1_3_PackageClashWithType_Linked_Mutated
@@ -45,11 +40,7 @@ public class NameTest {
     @Test
     public void testCheck2() {
         String[] paths = new String[0];
-        paths = FileUtility
-                .getFileNames(
-                        System.getProperty("user.dir")
-                                + "/assignment_testcases/a2/J1_3_OnDemandImport_NonAmbiguous_SamePackage")
-                .toArray(paths);
+        paths = FileUtility.getFileNames(System.getProperty("user.dir") + "/assignment_testcases/a2/J1_3_OnDemandImport_NonAmbiguous_SamePackage").toArray(paths);
         Joosc.compileSTL(paths);
     }
     
@@ -60,16 +51,12 @@ public class NameTest {
     @Test
     public void testCheck3() {
         String[] paths = new String[0];
-        paths = FileUtility
-                .getFileNames(
-                        System.getProperty("user.dir")
-                                + "/assignment_testcases/a2/Je_3_Resolve_SamePackageAndClassName.java")
-                .toArray(paths);
+        paths = FileUtility.getFileNames(System.getProperty("user.dir") + "/assignment_testcases/a2/Je_3_Resolve_SamePackageAndClassName.java").toArray(paths);
         Joosc.compileSTL(paths);
     }
 
-    // null pointer exception at ast.Type.parseInterfaceTypeList(Type.java:56)
-    // problem in AST?
+    //null pointer exception at ast.Type.parseInterfaceTypeList(Type.java:56)
+    //problem in AST?
     @Test
     public void testCheck4() {
         String[] paths = new String[0];
