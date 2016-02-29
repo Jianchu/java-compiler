@@ -73,7 +73,7 @@ public class TestMarmoset {
                 // J2 should pass or fail?
                 if (checkJ2) {
                     parameters[i][0] = testcase;
-                    parameters[i][1] = 42;
+                    parameters[i][1] = 0;
                     i++;
                 }
             } else if (testcase.contains("Je_")) {
