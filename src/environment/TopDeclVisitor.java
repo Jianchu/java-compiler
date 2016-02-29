@@ -86,7 +86,6 @@ public class TopDeclVisitor extends SemanticsVisitor {
 				}
 				
 			} else {
-				System.out.println(name.get(name.size() - 1));
 				// single import 
 				TypeDeclaration decl = globalEnv.get(nameStr);
 				if (decl == null) {

@@ -10,6 +10,7 @@ import java.util.Stack;
 import ast.AST;
 import ast.TypeDeclaration;
 import exceptions.ASTException;
+import exceptions.NameException;
 
 /**
  * created so that it is easier to maintain environment stack through different visitors
@@ -44,8 +45,9 @@ public class SymbolTable {
 	/**
 	 * The global environment contains all the classes with fully qualified names
 	 * @param trees
+	 * @throws NameException 
 	 */
-	public static void buildGlobal(List<AST> trees) {
+	public static void buildGlobal(List<AST> trees) throws NameException {
 		global = new HashMap<String, TypeDeclaration>();
 		globalPackages = new HashMap<String, List<String>>();
 		for (AST ast : trees) {
@@ -115,13 +117,25 @@ public class SymbolTable {
 	}
 	
 	/**
+	 * @throws NameException 
 	 * 
 	 */
-	private static void checkPkgNames() {
-		for (String pkg : globalPackages.keySet()) {
-			
+	private static void checkPkgNames() throws NameException {
+		for (String pkg1 : globalPackages.keySet()) {
+			for (String pkg2 : globalPackages.keySet()) {
+				if (pkg2 != "") {	// if not in default package
+					// get or files from pkg2
+					for (String type : globalPackages.get(pkg2)) {
+						if (pkg1.startsWith(type)) {
+							if (pkg1.length() == type.length() 
+									|| (pkg1.length() > type.length() && pkg1.charAt(type.length())=='.')) {
+								throw new NameException("package name conflicts with type name.");
+							}
+						}
+					}
+				}
+			}
 		}
-		
 	}
 	
 }
