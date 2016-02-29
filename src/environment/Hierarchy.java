@@ -100,7 +100,7 @@ public class Hierarchy {
 		
 	}
 	
-	public void inherit(Environment inheritEnv, Environment superEnv) {
+	public void inherit(Environment inheritEnv, Environment superEnv) throws HierarchyException {
 		Environment superInherit = superEnv.getEnclosing();
 		
 		// fields from super class, overriding might happen
@@ -113,9 +113,11 @@ public class Hierarchy {
 		
 		//methods from superclass, overriding might happen
 		for (String method : superInherit.methods.keySet()) {
+			checkReplace(inheritEnv, superInherit, method);
 			inheritEnv.addMethod(method, superInherit.methods.get(method));
 		}
 		for (String method : superEnv.methods.keySet()) {
+			checkReplace(inheritEnv, superEnv, method);
 			inheritEnv.addMethod(method, superEnv.methods.get(method));
 		}
 	}
@@ -161,10 +163,21 @@ public class Hierarchy {
 					}
 					
 					// return types should be the same
-					if (decl2.returnType.getDeclaration() != decl1.returnType.getDeclaration()) {
+					if (!decl2.returnType.equals(decl1.returnType)) {
+						// both checks are required to deal with simple type and primitive type.
 						throw new HierarchyException("Return type of replaced method does not match.");
 					}
 				}
+			}
+		}
+	}
+	
+	public void checkReplace(Environment inheritEnv, Environment superEnv, String method) throws HierarchyException {
+		if (inheritEnv.methods.containsKey(method)) {
+			MethodDeclaration decl1 = inheritEnv.methods.get(method);
+			MethodDeclaration decl2 = superEnv.methods.get(method);
+			if (!decl2.returnType.equals(decl1.returnType)) {
+				throw new HierarchyException("Return type of replaced method does not match.");
 			}
 		}
 	}

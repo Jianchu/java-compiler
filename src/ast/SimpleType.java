@@ -35,4 +35,8 @@ public class SimpleType extends Type{
 	public void accept(Visitor v) throws Exception {
 		v.visit(this);
 	}
+	
+	public String toString() {
+		return name.toString();
+	}
 }
