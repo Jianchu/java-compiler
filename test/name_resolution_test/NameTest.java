@@ -45,7 +45,8 @@ public class NameTest {
     public void testCheck2() {
         String[] paths = new String[0];
         paths = FileUtility.getFileNames(System.getProperty("user.dir") + "/assignment_testcases/a2/J1_3_OnDemandImport_NonAmbiguous_SamePackage").toArray(paths);
-        Joosc.compileSTL(paths);
+        int result = Joosc.compileSTL(paths);
+        assert (result == 0) : "Should be a valid case";
     }
     
     //null pointer exception at ast.Type.parseInterfaceTypeList(Type.java:56)
@@ -55,7 +56,8 @@ public class NameTest {
     public void testCheck3() {
         String[] paths = new String[0];
         paths = FileUtility.getFileNames(System.getProperty("user.dir") + "/assignment_testcases/a2/J2_4_InterfaceExtends_MultipleWays").toArray(paths);
-        Joosc.compileSTL(paths);
+        int result = Joosc.compileSTL(paths);
+        assert (result == 0) : "Should be a valid case";
     }
     
     // See https://www.student.cs.uwaterloo.ca/~cs444/a2.html ,the sixth
@@ -70,6 +72,8 @@ public class NameTest {
     public void testCheck4() {
         String[] paths = new String[0];
         paths = FileUtility.getFileNames(System.getProperty("user.dir") + "/assignment_testcases/a2/Je_3_Resolve_SamePackageAndClassName.java").toArray(paths);
+        int result = Joosc.compileSTL(paths);
+        assert (result == 42) : "Should be an invalid case";
     }
     
     // See Main.java
@@ -78,7 +82,8 @@ public class NameTest {
     public void testCheck5() {
         String[] paths = new String[0];
         paths = FileUtility.getFileNames(System.getProperty("user.dir") + "/assignment_testcases/a2/Je_14_Interface_DeclaresToString_ThrowsConflict").toArray(paths);
-        Joosc.compileSTL(paths);
+        int result = Joosc.compileSTL(paths);
+        assert (result == 42) : "Should be an invalid case";
     }
         
     //See main.java
@@ -88,7 +93,8 @@ public class NameTest {
     public void testCheck6() {
         String[] paths = new String[0];
         paths = FileUtility.getFileNames(System.getProperty("user.dir") + "/assignment_testcases/a2/Je_4_Override_DifferentReturnTypes_AbstractFromSuperclassAndInterface").toArray(paths);
-        Joosc.compileSTL(paths);
+        int result = Joosc.compileSTL(paths);
+        assert (result == 42) : "Should be an invalid case";
     }
     
     /**
@@ -102,7 +108,8 @@ public class NameTest {
     public void testCheck7() {
         String[] paths = new String[0];
         paths = FileUtility.getFileNames(System.getProperty("user.dir") + "/assignment_testcases/a2/J2_Ifaceimplicitabstract").toArray(paths);
-        Joosc.compileSTL(paths);
+        int result = Joosc.compileSTL(paths);
+        assert (result == 0) : "Should be a valid case";
     }
     
     /**
@@ -112,6 +119,7 @@ public class NameTest {
     public void testCheck8() {
         String[] paths = new String[0];
         paths = FileUtility.getFileNames(System.getProperty("user.dir") + "/assignment_testcases/a2/Je_3_ImportOnDemand_ClassNameAsPackage").toArray(paths);
-        Joosc.compileSTL(paths);
+        int result = Joosc.compileSTL(paths);
+        assert (result == 42) : "Should be an invalid case";
     }
 }
