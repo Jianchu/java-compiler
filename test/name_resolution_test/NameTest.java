@@ -73,6 +73,7 @@ public class NameTest {
         String[] paths = new String[0];
         paths = FileUtility.getFileNames(System.getProperty("user.dir") + "/assignment_testcases/a2/Je_3_Resolve_SamePackageAndClassName.java").toArray(paths);
         int result = Joosc.compileSTL(paths);
+        assertEquals(42, result);
         assert (result == 42) : "Should be an invalid case";
     }
     

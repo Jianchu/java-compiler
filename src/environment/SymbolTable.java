@@ -126,9 +126,10 @@ public class SymbolTable {
 				if (pkg2 != "") {	// if not in default package
 					// get or files from pkg2
 					for (String type : globalPackages.get(pkg2)) {
-						if (pkg1.startsWith(type)) {
-							if (pkg1.length() == type.length() 
-									|| (pkg1.length() > type.length() && pkg1.charAt(type.length())=='.')) {
+						String typeSimpleName = global.get(type).id;
+						if (pkg1.startsWith(typeSimpleName)) {
+							if (pkg1.length() == typeSimpleName.length() 
+									|| (pkg1.length() > typeSimpleName.length() && pkg1.charAt(typeSimpleName.length())=='.')) {
 								throw new NameException("package name conflicts with type name.");
 							}
 						}
