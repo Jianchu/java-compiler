@@ -27,4 +27,16 @@ public class NameTest {
         paths =  FileUtility.getFileNames(System.getProperty("user.dir") + "/assignment_testcases/a2/Je_2_DuplicateType/").toArray(paths);
         Joosc.compileSTL(paths);
     }
+    
+    //exceptions.NameException: Import class name not recoginzed: java.awt
+    //at environment.TopDeclVisitor.visit(TopDeclVisitor.java:92)
+    //This is importOnDemands way go in to single import branch?
+    @Test
+    public void testCheck2() {
+        String[] paths = new String[0];
+        paths = FileUtility.getFileNames(System.getProperty("user.dir") + "/assignment_testcases/a2/J1_3_OnDemandImport_NonAmbiguous_SamePackage").toArray(paths);
+        Joosc.compileSTL(paths);
+    }
+    
+        
 }
