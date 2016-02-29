@@ -1,8 +1,0 @@
-package testprogram.restrictions;
-
-public abstract class AbstractMethodCannotBeStaticOrFinal {
-    abstract final void abstractMethod1();
-
-    abstract static void abstractMethod2();
-    
-}

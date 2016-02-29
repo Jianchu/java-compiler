@@ -1,5 +1,0 @@
-package testprogram.restrictions;
-
-public class TypeVoidOnlyForReturn {
-    void a;
-}

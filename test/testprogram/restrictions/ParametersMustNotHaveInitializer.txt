@@ -1,7 +1,0 @@
-package testprogram.restrictions;
-
-public class ParametersMustNotHaveInitializer {
-    public void method(int a = 1) {
-        
-    }
-}

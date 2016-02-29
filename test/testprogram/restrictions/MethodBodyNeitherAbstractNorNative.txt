@@ -1,9 +1,0 @@
-package testprogram.restrictions;
-
-public abstract class MethodBodyNeitherAbstractNorNative {
-    abstract void abstractMethod() {
-    }
-    
-    native void NativeMethod() {
-    }
-}

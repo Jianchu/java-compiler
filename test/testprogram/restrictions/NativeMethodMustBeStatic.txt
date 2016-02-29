@@ -1,5 +1,0 @@
-package testprogram.restrictions;
-
-public class NativeMethodMustBeStatic {
-    native void NativeMethod();
-}
