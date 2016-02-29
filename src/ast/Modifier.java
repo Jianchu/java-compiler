@@ -1,6 +1,10 @@
 package ast;
 
 import parser.ParseTree;
+
+import java.util.LinkedList;
+import java.util.List;
+
 import exceptions.ASTException;
 
 public class Modifier implements Next{
@@ -91,8 +95,9 @@ public class Modifier implements Next{
 			return m.mod == this.mod;
 		} else if (o instanceof Integer) {
 			return ((Integer) o).equals(this.mod);
-		} else
+		} else {
 			return false;
+		}
 	}
 	
     public void accept(Visitor v) throws Exception {
@@ -102,5 +107,8 @@ public class Modifier implements Next{
     public static void main(String args[]) throws ASTException {
     	Modifier m = new Modifier(Modifier.FINAL);
     	System.out.println(m.equals(Modifier.FINAL));
+    	List<Modifier> ml = new LinkedList<Modifier>();
+    	ml.add(m);
+    	System.out.println(ml.contains(Modifier.FINAL));
     }
 }

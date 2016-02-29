@@ -156,6 +156,10 @@ public class Hierarchy {
 			for (MethodDeclaration md : mContains) {
 				if (md.isAbstract) {
 					TypeDeclaration typeDecl = ast.root.types.get(0);
+					System.out.println(typeDecl.id);
+					for (Modifier m : typeDecl.modifiers) 
+						System.out.println("" + m + m.mod);
+					System.out.println(typeDecl.modifiers.contains(Modifier.ABSTRACT));
 					if (!typeDecl.isInterface && !typeDecl.modifiers.contains(Modifier.ABSTRACT)) {
 						throw new AbstractMethodException(typeDecl.id + "." + md.id);
 					}
