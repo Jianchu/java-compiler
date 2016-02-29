@@ -73,6 +73,7 @@ public class SymbolTable {
 
 			}
 		}
+		checkPkgNames();
 	}
 	
 	public static Map<String, TypeDeclaration> getGlobal() {
@@ -111,6 +112,16 @@ public class SymbolTable {
 	
 	public static TypeDeclaration getObjectInterfaceRef() {
 		return global.get(OBJ_ITF);
+	}
+	
+	/**
+	 * 
+	 */
+	private static void checkPkgNames() {
+		for (String pkg : globalPackages.keySet()) {
+			
+		}
+		
 	}
 	
 }

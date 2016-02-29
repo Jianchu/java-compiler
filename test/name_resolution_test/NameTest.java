@@ -2,6 +2,8 @@ package name_resolution_test;
 
 import joosc.Joosc;
 
+import static org.junit.Assert.*;
+
 import org.junit.Test;
 
 import utility.FileUtility;
@@ -68,7 +70,6 @@ public class NameTest {
     public void testCheck4() {
         String[] paths = new String[0];
         paths = FileUtility.getFileNames(System.getProperty("user.dir") + "/assignment_testcases/a2/Je_3_Resolve_SamePackageAndClassName.java").toArray(paths);
-        Joosc.compileSTL(paths);
     }
     
     // See Main.java
