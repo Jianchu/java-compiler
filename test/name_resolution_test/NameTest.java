@@ -28,9 +28,11 @@ public class NameTest {
         Joosc.compileSTL(paths);
     }
     
+    // stack trace:
     //exceptions.NameException: Import class name not recoginzed: java.awt
     //at environment.TopDeclVisitor.visit(TopDeclVisitor.java:92)
-    //This is importOnDemands way go in to single import branch?
+    //
+    // This should be importOnDemands, why go in to single import branch?
     // same problem in J1_3_OnDemandImport_NonAmbiguous_SamePackage
     @Test
     public void testCheck2() {
