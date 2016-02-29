@@ -36,7 +36,7 @@ public class TestMarmoset {
     public static Collection testA1() throws Exception {
         storeTestCases();
         // pass J1_, J2_, Je_, or All
-        Object[][] parameters = getParameters("J1_");
+        Object[][] parameters = getParameters("J2_");
         return Arrays.asList(parameters);
     }
     
@@ -73,7 +73,7 @@ public class TestMarmoset {
                 // J2 should pass or fail?
                 if (checkJ2) {
                     parameters[i][0] = testcase;
-                    parameters[i][1] = 0;
+                    parameters[i][1] = 42;
                     i++;
                 }
             } else if (testcase.contains("Je_")) {

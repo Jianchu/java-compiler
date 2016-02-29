@@ -33,7 +33,10 @@ public class NameTest {
     //at environment.TopDeclVisitor.visit(TopDeclVisitor.java:92)
     //
     // This should be importOnDemands, why go in to single import branch?
-    // same problem in J1_3_OnDemandImport_NonAmbiguous_SamePackage
+    // same problem in J1_3_PackageClashWithType_Linked_Mutated
+    // same problem in J1_3_ImportOnDemand_DefaultImportInPresenceOfOtherImport
+    // same problem in J1_3_ImportOnDemand_ProgramDefinedPackage
+
     @Test
     public void testCheck2() {
         String[] paths = new String[0];
@@ -52,5 +55,6 @@ public class NameTest {
         Joosc.compileSTL(paths);
     }
     
+
         
 }
