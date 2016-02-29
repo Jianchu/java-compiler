@@ -45,7 +45,7 @@ public class NameTest {
         String[] paths = new String[0];
         paths = FileUtility.getFileNames(System.getProperty("user.dir") + "/assignment_testcases/a2/J1_3_OnDemandImport_NonAmbiguous_SamePackage").toArray(paths);
         int result = Joosc.compileSTL(paths);
-        assertEquals(result, 0);
+        assertEquals(0, result);
     }
     
     //null pointer exception at ast.Type.parseInterfaceTypeList(Type.java:56)
@@ -56,7 +56,7 @@ public class NameTest {
         String[] paths = new String[0];
         paths = FileUtility.getFileNames(System.getProperty("user.dir") + "/assignment_testcases/a2/J2_4_InterfaceExtends_MultipleWays").toArray(paths);
         int result = Joosc.compileSTL(paths);
-        assertEquals(result, 0);
+        assertEquals(0, result);
     }
     
     // See https://www.student.cs.uwaterloo.ca/~cs444/a2.html ,the sixth
@@ -73,7 +73,6 @@ public class NameTest {
         paths = FileUtility.getFileNames(System.getProperty("user.dir") + "/assignment_testcases/a2/Je_3_Resolve_SamePackageAndClassName.java").toArray(paths);
         int result = Joosc.compileSTL(paths);
         assertEquals(42, result);
-        assertEquals(result, 42);
     }
     
     // See Main.java
@@ -83,7 +82,7 @@ public class NameTest {
         String[] paths = new String[0];
         paths = FileUtility.getFileNames(System.getProperty("user.dir") + "/assignment_testcases/a2/Je_14_Interface_DeclaresToString_ThrowsConflict").toArray(paths);
         int result = Joosc.compileSTL(paths);
-        assertEquals(result, 42);
+        assertEquals(42, result);
     }
         
     //See main.java
@@ -94,7 +93,7 @@ public class NameTest {
         String[] paths = new String[0];
         paths = FileUtility.getFileNames(System.getProperty("user.dir") + "/assignment_testcases/a2/Je_4_Override_DifferentReturnTypes_AbstractFromSuperclassAndInterface").toArray(paths);
         int result = Joosc.compileSTL(paths);
-        assertEquals(result, 42);
+        assertEquals(42, result);
     }
     
     /**
@@ -109,7 +108,7 @@ public class NameTest {
         String[] paths = new String[0];
         paths = FileUtility.getFileNames(System.getProperty("user.dir") + "/assignment_testcases/a2/J2_Ifaceimplicitabstract").toArray(paths);
         int result = Joosc.compileSTL(paths);
-        assertEquals(result, 0);
+        assertEquals(0, result);
     }
     
     /**
@@ -120,7 +119,7 @@ public class NameTest {
         String[] paths = new String[0];
         paths = FileUtility.getFileNames(System.getProperty("user.dir") + "/assignment_testcases/a2/Je_3_ImportOnDemand_ClassNameAsPackage").toArray(paths);
         int result = Joosc.compileSTL(paths);
-        assertEquals(result, 42);
+        assertEquals(42, result);
     }
     
     
@@ -132,7 +131,7 @@ public class NameTest {
         String[] paths = new String[0];
         paths = FileUtility.getFileNames(System.getProperty("user.dir") + "/assignment_testcases/a2/J1_3_PackageExists_AsPrefix_Internal").toArray(paths);
         int result = Joosc.compileSTL(paths);
-        assertEquals(result, 0);
+        assertEquals(0, result);
     }
     
     @Test
@@ -143,7 +142,7 @@ public class NameTest {
         String[] paths = new String[0];
         paths = FileUtility.getFileNames(System.getProperty("user.dir") + "/assignment_testcases/a2/J1_4_DuplicateMethodDeclare_MethodNameEqualsConstructorName.java").toArray(paths);
         int result = Joosc.compileSTL(paths);
-        assertEquals(result, 0);
+        assertEquals(0, result);
     }
     
     
@@ -152,21 +151,24 @@ public class NameTest {
      * 
      */
     //null pinter in at environment.TopDeclVisitor.checkInterfaces(TopDeclVisitor.java:309)
+    // same: J1_classimplementsserializable2
+    // J1_4_InheritedFields_SameField_TwoWays
     @Test
     public void testCheck11() {
         String[] paths = new String[0];
         paths = FileUtility.getFileNames(System.getProperty("user.dir") + "/assignment_testcases/a2/J2_4_ImplementsInterface_TwiceByName").toArray(paths);
         int result = Joosc.compileSTL(paths);
-        assertEquals(result, 0);
+        assertEquals(0, result);
     }
     
     //null pointer in at environment.TopDeclVisitor.checkSuperClass(TopDeclVisitor.java:284)
+    // same: J1_classextendsobject2.java
     @Test
     public void testCheck12() {
         String[] paths = new String[0];
         paths = FileUtility.getFileNames(System.getProperty("user.dir") + "/assignment_testcases/a2/J1_4_ClassExtendsClass_SameName").toArray(paths);
         int result = Joosc.compileSTL(paths);
-        assertEquals(result, 0);
+        assertEquals(0, result);
     }
     
     //null pointer in at environment.NameHelper.mangle(NameHelper.java:28)
@@ -175,7 +177,7 @@ public class NameTest {
         String[] paths = new String[0];
         paths = FileUtility.getFileNames(System.getProperty("user.dir") + "/assignment_testcases/a2/J1_4_InterfaceMethod_FromObject").toArray(paths);
         int result = Joosc.compileSTL(paths);
-        assertEquals(result, 0);
+        assertEquals(0, result);
     }
     
     //null pointer in at environment.Hierarchy.checkPublicFinal(Hierarchy.java:164)
@@ -184,33 +186,50 @@ public class NameTest {
         String[] paths = new String[0];
         paths = FileUtility.getFileNames(System.getProperty("user.dir") + "/assignment_testcases/a2/J2_Ifaceimplicitabstract").toArray(paths);
         int result = Joosc.compileSTL(paths);
-        assertEquals(result, 0);
+        assertEquals(0, result);
     }
     
-    
     /**
-     * exceptions.NameException: single import name collides.
-       at environment.TopDeclVisitor.visit(TopDeclVisitor.java:96)
-     * 
+     * exceptions.NameException: package name conflicts with type name. at
+     * environment.SymbolTable.checkPkgNames(SymbolTable.java:133) at
+     * environment.SymbolTable.buildGlobal(SymbolTable.java:78)
+     * same:J1_3_PackageDecl_SamePackageAndClassName
+     * J1_4_PackageNameIsClassName_DefaultPackage J1_name
+     * J1_3_SingleTypeImport_ClashWithPackageName
+     * J1_6_ProtectedAccess_StaticMethod_This
      */
     @Test
     public void testCheck15() {
         String[] paths = new String[0];
+        paths = FileUtility.getFileNames(System.getProperty("user.dir") + "/assignment_testcases/a2/J1_3_InfixResolvesToType").toArray(paths);
+        int result = Joosc.compileSTL(paths);
+        assertEquals(0, result);
+    }
+    
+    /**
+     * exceptions.NameException: single import name collides.
+       at environment.TopDeclVisitor.visit(TopDeclVisitor.java:96)
+     * same :J1_singleTypeImportSameTypeMultipleTimes
+     */
+    @Test
+    public void testCheck16() {
+        String[] paths = new String[0];
         paths = FileUtility.getFileNames(System.getProperty("user.dir") + "/assignment_testcases/a2/J1_3_SingleTypeImport_MultipleImportsOfSameType").toArray(paths);
         int result = Joosc.compileSTL(paths);
-        assertEquals(result, 0);
+        assertEquals(0, result);
     }
     
     /**
      * exceptions.NameException: method signature repeated.
         at environment.TopDeclVisitor.visit(TopDeclVisitor.java:180)
+        same : J1_constructorWithSameNameAsMethod.java
      */
     @Test
-    public void testCheck16() {
+    public void testCheck17() {
         String[] paths = new String[0];
         paths = FileUtility.getFileNames(System.getProperty("user.dir") + "/assignment_testcases/a2/J1_4_DuplicateMethodDeclare_MethodNameEqualsConstructorName.java").toArray(paths);
         int result = Joosc.compileSTL(paths);
-        assertEquals(result, 0);
+        assertEquals(0, result);
     }
     
     /**
@@ -219,11 +238,11 @@ public class NameTest {
         at ast.CompilationUnit.accept(CompilationUnit.java:56)
      */
     @Test
-    public void testCheck17() {
+    public void testCheck18() {
         String[] paths = new String[0];
         paths = FileUtility.getFileNames(System.getProperty("user.dir") + "/assignment_testcases/a2/J1_3_PackageExists_AsPrefix_Internal").toArray(paths);
         int result = Joosc.compileSTL(paths);
-        assertEquals(result, 0);
+        assertEquals(0, result);
     }
     
 }
