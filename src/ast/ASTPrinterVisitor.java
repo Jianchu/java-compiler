@@ -148,8 +148,8 @@ public class ASTPrinterVisitor implements Visitor{
     public void visit(ClassInstanceCreationExpression node) throws Exception {
         printIndent(node.getClass().getSimpleName());
         indent += DISTANCE;
-        if (node.name != null) {
-            node.name.accept(this);
+        if (node.type != null) {
+            node.type.accept(this);
         }
 
         if (node.arglist != null) {

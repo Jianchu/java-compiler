@@ -197,7 +197,7 @@ public class Hierarchy {
 		if (inheritEnv.methods.containsKey(method)) {
 			MethodDeclaration decl1 = inheritEnv.methods.get(method);
 			MethodDeclaration decl2 = superEnv.methods.get(method);
-			if (!decl2.returnType.equals(decl1.returnType)) {
+			if (!(decl2.returnType == decl1.returnType || decl2.returnType.equals(decl1.returnType))) {
 				throw new HierarchyException("Return type of replaced method does not match.");
 			}
 		}

@@ -50,6 +50,7 @@ public class TopDeclVisitor extends SemanticsVisitor {
 		//package files
 		String pkg = "";
 		if (cu.pkg != null) {
+//			checkPkgName(cu.pkg.name);
 			pkg = cu.pkg.name.toString();
 		}
 		for (String cls : pkgCls.get(pkg)) {
@@ -68,6 +69,7 @@ public class TopDeclVisitor extends SemanticsVisitor {
 		//imports
 		// check for single type import collision. e.g java.util.List, java.awt.List
 		Set<String> singleName = new TreeSet<String>();
+		Set<String> seen = new TreeSet<String>();
 		for (ImportDeclaration importDecl : cu.imports) {
 			List<String> name = importDecl.name.getFullName();
 			String nameStr = importDecl.name.toString();
@@ -100,7 +102,9 @@ public class TopDeclVisitor extends SemanticsVisitor {
 					throw new NameException("Import class name not recoginzed: " + nameStr);
 				}
 				String simName = name.get(name.size() - 1);
-				if (singleName.contains(simName)) {
+				if (singleName.contains(simName) &&
+						! curr.singleImports.containsKey(nameStr)) {
+					// if class name the same, but fully qualified name different.
 					throw new NameException("single import name collides.");
 				} else {
 					singleName.add(simName);
@@ -258,6 +262,7 @@ public class TopDeclVisitor extends SemanticsVisitor {
 	 * Other Statement
 	 */
 	public void visit(ExpressionStatement node) throws Exception {
+		node.statementExpression.accept(this);
 		visitNextStatement(node);
 	}
 	public void visit(ForStatement node) throws Exception {
@@ -284,6 +289,19 @@ public class TopDeclVisitor extends SemanticsVisitor {
 			node.next().accept(this);
 		}
 	}
+	
+	/*
+	 * Expressions
+	 */
+	public void visit(ClassInstanceCreationExpression node) throws Exception {
+		Visitor tv = new TypeVisitor(table);
+		node.type.accept(tv);
+	}
+	
+	public void visit(MethodInvocation node) throws Exception {
+		node.expr.accept(this);
+	}
+	
 	
 	
 	private void checkSuperClass(TypeDeclaration typeDecl) throws Exception {
@@ -327,6 +345,18 @@ public class TopDeclVisitor extends SemanticsVisitor {
 			// simple check no.3
 			if (seen.contains(itfDecl)) 
 				throw new NameException("cannot implement same interface twice");
+		}
+	}
+	
+	private void checkPkgName(Name pkg) throws NameException {
+		String pkgStr = pkg.toString();
+		for (String clsStr : table.getGlobal().keySet()) {
+			System.out.println(pkgStr + " : " + clsStr);
+			if (pkgStr.startsWith(clsStr) 
+					&& (pkgStr.length() == clsStr.length() 
+						|| pkgStr.charAt(clsStr.length()) == '.')) {
+				throw new NameException("package name conflicts with class name");
+			}
 		}
 	}
 	

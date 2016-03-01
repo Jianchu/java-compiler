@@ -47,6 +47,10 @@ public class QualifiedName extends Name{
 		return new LinkedList<String>(fullName);
 	}
 	
+	public Name getQualifier() {
+		return qualifier;
+	}
+	
 	@Override
 	public String toString() {
 		return String.join(".", fullName);

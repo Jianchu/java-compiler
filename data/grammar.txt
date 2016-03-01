@@ -222,8 +222,8 @@ PrimaryNoNewArray ClassInstanceCreationExpression
 PrimaryNoNewArray FieldAccess
 PrimaryNoNewArray MethodInvocation
 PrimaryNoNewArray ArrayAccess
-ClassInstanceCreationExpression NEW Name LPAREN ArgumentList RPAREN
-ClassInstanceCreationExpression NEW Name LPAREN RPAREN
+ClassInstanceCreationExpression NEW ClassType LPAREN ArgumentList RPAREN
+ClassInstanceCreationExpression NEW ClassType LPAREN RPAREN
 ArgumentList Expression
 ArgumentList ArgumentList COMMA Expression
 ArrayCreationExpression NEW PrimitiveType DimExpr
