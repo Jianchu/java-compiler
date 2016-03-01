@@ -75,11 +75,19 @@ public class TopDeclVisitor extends SemanticsVisitor {
 				// import on demand
 				List<String> qualifier = name;
 				String qualifierStr = String.join(".", name);
-				List<String> clsList = pkgCls.get(qualifierStr);
-				if (clsList == null) {
-					// check that the package exist;
-					throw new NameException("Import package not recoginzed: " + nameStr);
+				boolean found = false;
+				List<String> clsList = new LinkedList<String>(); 
+				for (String pkgName : pkgCls.keySet()) {
+					if (pkgName.startsWith(qualifierStr) 
+							&& (pkgName.length() == qualifierStr.length() 
+									|| pkgName.charAt(qualifierStr.length()) == '.')){
+						found = true;
+						clsList.addAll(pkgCls.get(pkgName));
+					}
 				}
+				
+				if (!found)
+					throw new NameException("Import package name not recognized: " + qualifierStr);
 				
 				for (String cls : clsList) {
 					curr.addImportOnDemand(cls, globalEnv.get(cls));
@@ -176,11 +184,18 @@ public class TopDeclVisitor extends SemanticsVisitor {
 		}
 		
 		String mangledName = NameHelper.mangle(mDecl);
-		if (table.currentScope().methods.containsKey(mangledName)) {
-			throw new NameException("method signature repeated.");
-		}
+		if (!mDecl.isConstructor) {
+			if (table.currentScope().methods.containsKey(mangledName)) {
+				throw new NameException("method signature repeated.");
+			}
 		
-		table.currentScope().addMethod(NameHelper.mangle(mDecl), mDecl);
+			table.currentScope().addMethod(NameHelper.mangle(mDecl), mDecl);
+		} else {
+			if (table.currentScope().constructors.containsKey(mangledName)) {
+				throw new NameException("method signature repeated.");
+			}
+			table.currentScope().addConstructor(NameHelper.mangle(mDecl), mDecl);
+		}
 		
 		table.openScope(Environment.EnvType.BLOCK);
 		// extra scope for method parameters
@@ -281,7 +296,7 @@ public class TopDeclVisitor extends SemanticsVisitor {
 			parent.accept(tv);	// find declaration using type visitor
 			
 			TypeDeclaration parentDecl = parent.getDeclaration();
-			if (parentDecl.id.equals(typeDecl.id)) {
+			if (parentDecl == typeDecl) {
 				throw new NameException("class cannot extend itself.");
 			} 
 			if (parentDecl.isInterface){
@@ -306,9 +321,9 @@ public class TopDeclVisitor extends SemanticsVisitor {
 			
 			TypeDeclaration itfDecl = itf.getDeclaration();
 			// simple check no.2
-			if (!itfDecl.isInterface)
+			if (!itfDecl.isInterface) {
 				throw new NameException("must implement an interface");
-			
+			}
 			// simple check no.3
 			if (seen.contains(itfDecl)) 
 				throw new NameException("cannot implement same interface twice");

@@ -75,7 +75,7 @@ public class SymbolTable {
 
 			}
 		}
-		checkPkgNames();
+//		checkPkgNames();
 	}
 	
 	public static Map<String, TypeDeclaration> getGlobal() {
