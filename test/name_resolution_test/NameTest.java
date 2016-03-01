@@ -245,4 +245,21 @@ public class NameTest {
         assertEquals(0, result);
     }
     
+    /**
+     * single import or package name clash with type 
+     * same in:
+     * Je_3_SingleTypeImport_ClashWithClass
+     * Je_3_SingleTypeImport_ClashWithClass_InPackage
+     * Je_3_PackageNameIsClassName Je_3_PackageNameIsClassName_External
+     * Je_3_PackageNameIsClassName_Prefix
+     * Je_3_PackageNameIsClassName_ExternalPrefix
+     */
+    @Test
+    public void testCheck19() {
+        String[] paths = new String[0];
+        paths = FileUtility.getFileNames(System.getProperty("user.dir") + "/assignment_testcases/a2/Je_3_SingleTypeImport_ClashWithInterface").toArray(paths);
+        int result = Joosc.compileSTL(paths);
+        assertEquals(42, result);
+    }
+    
 }
