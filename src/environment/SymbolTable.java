@@ -71,6 +71,9 @@ public class SymbolTable {
 				TypeDeclaration type = ast.root.types.get(0);
 				fullName += type.id;
 				pkgCls.add(fullName);
+				if (global.get(fullName) != null) {
+					throw new NameException("Duplicate Type");
+				}
 				global.put(fullName, type);
 
 			}

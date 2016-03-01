@@ -50,7 +50,7 @@ public class TopDeclVisitor extends SemanticsVisitor {
 		//package files
 		String pkg = "";
 		if (cu.pkg != null) {
-//			checkPkgName(cu.pkg.name);
+			checkPkgName(cu.pkg.name);
 			pkg = cu.pkg.name.toString();
 		}
 		for (String cls : pkgCls.get(pkg)) {
@@ -75,25 +75,7 @@ public class TopDeclVisitor extends SemanticsVisitor {
 			String nameStr = importDecl.name.toString();
 			if (importDecl.onDemand){
 				// import on demand
-				List<String> qualifier = name;
-				String qualifierStr = String.join(".", name);
-				boolean found = false;
-				List<String> clsList = new LinkedList<String>(); 
-				for (String pkgName : pkgCls.keySet()) {
-					if (pkgName.startsWith(qualifierStr) 
-							&& (pkgName.length() == qualifierStr.length() 
-									|| pkgName.charAt(qualifierStr.length()) == '.')){
-						found = true;
-						clsList.addAll(pkgCls.get(pkgName));
-					}
-				}
-				
-				if (!found)
-					throw new NameException("Import package name not recognized: " + qualifierStr);
-				
-				for (String cls : clsList) {
-					curr.addImportOnDemand(cls, globalEnv.get(cls));
-				}
+				importOnDemand(name);
 				
 			} else {
 				// single import 
@@ -106,7 +88,7 @@ public class TopDeclVisitor extends SemanticsVisitor {
 						! curr.singleImports.containsKey(nameStr)) {
 					// if class name the same, but fully qualified name different.
 					throw new NameException("single import name collides.");
-				} else if (cu.types.size() > 0 && simName.equals(cu.types.get(0).id)) {
+				} else if (cu.types.size() > 0 && simName.equals(cu.types.get(0).id) && !nameStr.equals(cu.types.get(0).getFullName())) {
 					throw new NameException("single import name collides with type name.");
 				}
 				else {
@@ -118,17 +100,20 @@ public class TopDeclVisitor extends SemanticsVisitor {
 		}
 		
 		// import java.lang automatically
-		final String lang = "java.lang";
-		if (pkgCls.get(lang) != null) {
-			for (String cls : pkgCls.get(lang)) {
-				String fn =  cls;
-				if (curr.singleImports.get(fn) == null)
-					curr.addSingleImport(fn, globalEnv.get(fn));
-			}
-		} else {
-			// TODO: maybe throw exception.
-			System.err.println("could not find java.lang");
-		}
+		List<String> lang = new LinkedList<String>();
+		lang.add("java"); lang.add("lang");
+		importOnDemand(lang);
+//		final String lang = "java.lang";
+//		if (pkgCls.get(lang) != null) {
+//			for (String cls : pkgCls.get(lang)) {
+//				String fn =  cls;
+//				if (curr.singleImports.get(fn) == null)
+//					curr.addSingleImport(fn, globalEnv.get(fn));
+//			}
+//		} else {
+//			// TODO: maybe throw exception.
+//			System.err.println("could not find java.lang");
+//		}
 		
 		
 		// class or interface declaration
@@ -280,6 +265,7 @@ public class TopDeclVisitor extends SemanticsVisitor {
 		visitNextStatement(node);
 	}
 	public void visit(ReturnStatement node) throws Exception {
+		node.returnExpression.accept(this);
 		visitNextStatement(node);
 	}
 	public void visit(WhileStatement node) throws Exception {
@@ -348,14 +334,37 @@ public class TopDeclVisitor extends SemanticsVisitor {
 			// simple check no.3
 			if (seen.contains(itfDecl)) 
 				throw new NameException("cannot implement same interface twice");
+			
+			seen.add(itfDecl);
+		}
+	}
+	
+	private void importOnDemand(List<String> name) throws NameException {
+		String qualifierStr = String.join(".", name);
+		boolean found = false;
+		List<String> clsList = new LinkedList<String>(); 
+		for (String pkgName : table.getAllPackages().keySet()) {
+			if (pkgName.startsWith(qualifierStr) 
+					&& (pkgName.length() == qualifierStr.length() 
+							|| pkgName.charAt(qualifierStr.length()) == '.')){
+				found = true;
+				clsList.addAll(table.getAllPackages().get(pkgName));
+			}
+		}
+		
+		if (!found)
+			throw new NameException("Import package name not recognized: " + qualifierStr);
+		
+		for (String cls : clsList) {
+			table.currentScope().addImportOnDemand(cls, table.getGlobal().get(cls));
 		}
 	}
 	
 	private void checkPkgName(Name pkg) throws NameException {
 		String pkgStr = pkg.toString();
 		for (String clsStr : table.getGlobal().keySet()) {
-			System.out.println(pkgStr + " : " + clsStr);
-			if (pkgStr.startsWith(clsStr) 
+//			System.out.println(pkgStr + " : " + clsStr);
+			if (clsStr.contains(".") && pkgStr.startsWith(clsStr) 
 					&& (pkgStr.length() == clsStr.length() 
 						|| pkgStr.charAt(clsStr.length()) == '.')) {
 				throw new NameException("package name conflicts with class name");
