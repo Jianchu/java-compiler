@@ -106,7 +106,10 @@ public class TopDeclVisitor extends SemanticsVisitor {
 						! curr.singleImports.containsKey(nameStr)) {
 					// if class name the same, but fully qualified name different.
 					throw new NameException("single import name collides.");
-				} else {
+				} else if (cu.types.size() > 0 && simName.equals(cu.types.get(0).id)) {
+					throw new NameException("single import name collides with type name.");
+				}
+				else {
 					singleName.add(simName);
 				}
 				

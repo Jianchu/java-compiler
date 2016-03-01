@@ -17,7 +17,7 @@ public class NameTest {
     @Test
     public void testCheck1() {
         String[] paths = new String[0];
-//      paths = FileUtility.getFileNames(System.getProperty("user.dir") + "/assignment_testcases/a1/").toArray(paths);
+      paths = FileUtility.getFileNames(System.getProperty("user.dir") + "/assignment_testcases/a2/Je_4_ProtectedOverride_Exception_Clone").toArray(paths);
         Joosc.compileSTL(paths);
     }
 
