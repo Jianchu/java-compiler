@@ -245,4 +245,80 @@ public class NameTest {
         assertEquals(0, result);
     }
     
+    /**
+     * single import or package name clash with type 
+     * same in:
+     * Je_3_SingleTypeImport_ClashWithClass
+     * Je_3_SingleTypeImport_ClashWithClass_InPackage
+     * Je_3_PackageNameIsClassName Je_3_PackageNameIsClassName_External
+     * Je_3_PackageNameIsClassName_Prefix
+     * Je_3_PackageNameIsClassName_ExternalPrefix
+     */
+    @Test
+    public void testCheck19() {
+        String[] paths = new String[0];
+        paths = FileUtility.getFileNames(System.getProperty("user.dir") + "/assignment_testcases/a2/Je_3_SingleTypeImport_ClashWithInterface").toArray(paths);
+        int result = Joosc.compileSTL(paths);
+        assertEquals(42, result);
+    }
+    
+    /**
+     * A protected method must not override a public method 
+     * same in:
+     * Je_4_ProtectedOverride_Exception_Clone
+     * Je_4_ProtectedOverride_TwoVersionsFromSuperclass
+     */
+    @Test
+    public void testCheck20() {
+        String[] paths = new String[0];
+        paths = FileUtility.getFileNames(System.getProperty("user.dir") + "/assignment_testcases/a2/Je_4_ProtectedOverride_FromSuperclassAndInterface").toArray(paths);
+        int result = Joosc.compileSTL(paths);
+        assertEquals(42, result);
+    }
+    
+    /**
+     * An interface must not be mentioned more than once in the same implements clause of a class 
+     * same in:
+     * Je_4_ImplementTwice_SimpleName
+     */
+    @Test
+    public void testCheck21() {
+        String[] paths = new String[0];
+        paths = FileUtility.getFileNames(System.getProperty("user.dir") + "/assignment_testcases/a2/Je_4_ImplementTwice_QualifiedName").toArray(paths);
+        int result = Joosc.compileSTL(paths);
+        assertEquals(42, result);
+    }
+    
+    /**
+     * Duplicate Type
+     */
+    @Test
+    public void testCheck22() {
+        String[] paths = new String[0];
+        paths = FileUtility.getFileNames(System.getProperty("user.dir") + "/assignment_testcases/a2/Je_2_DuplicateType").toArray(paths);
+        int result = Joosc.compileSTL(paths);
+        assertEquals(42, result);
+    }
+    
+    /**
+     * why visit(ClassInstanceCreationExpression node) is not called?
+     */
+    @Test
+    public void testCheck23() {
+        String[] paths = new String[0];
+        paths = FileUtility.getFileNames(System.getProperty("user.dir") + "/assignment_testcases/a2/Je_3_ImportOnDemand_ClashWithImplicitImport").toArray(paths);
+        int result = Joosc.compileSTL(paths);
+        assertEquals(42, result);
+    }
+    
+    /**
+     * getClass should be a final method?
+     */
+    @Test
+    public void testCheck24() {
+        String[] paths = new String[0];
+        paths = FileUtility.getFileNames(System.getProperty("user.dir") + "/assignment_testcases/a2/Je_4_Interface_FinalMethodFromObject").toArray(paths);
+        int result = Joosc.compileSTL(paths);
+        assertEquals(42, result);
+    }
 }
