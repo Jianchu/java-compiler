@@ -311,6 +311,9 @@ public class NameTest {
         assertEquals(42, result);
     }
     
+    /**
+     * getClass should be a final method?
+     */
     @Test
     public void testCheck24() {
         String[] paths = new String[0];
