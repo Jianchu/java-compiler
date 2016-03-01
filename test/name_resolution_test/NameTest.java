@@ -263,12 +263,39 @@ public class NameTest {
     }
     
     /**
-     * A protected method must not override a public method
+     * A protected method must not override a public method 
+     * same in:
+     * Je_4_ProtectedOverride_Exception_Clone
+     * Je_4_ProtectedOverride_TwoVersionsFromSuperclass
      */
     @Test
     public void testCheck20() {
         String[] paths = new String[0];
         paths = FileUtility.getFileNames(System.getProperty("user.dir") + "/assignment_testcases/a2/Je_4_ProtectedOverride_FromSuperclassAndInterface").toArray(paths);
+        int result = Joosc.compileSTL(paths);
+        assertEquals(42, result);
+    }
+    
+    /**
+     * An interface must not be mentioned more than once in the same implements clause of a class 
+     * same in:
+     * Je_4_ImplementTwice_SimpleName
+     */
+    @Test
+    public void testCheck21() {
+        String[] paths = new String[0];
+        paths = FileUtility.getFileNames(System.getProperty("user.dir") + "/assignment_testcases/a2/Je_4_ImplementTwice_QualifiedName").toArray(paths);
+        int result = Joosc.compileSTL(paths);
+        assertEquals(42, result);
+    }
+    
+    /**
+     * Duplicate Type
+     */
+    @Test
+    public void testCheck22() {
+        String[] paths = new String[0];
+        paths = FileUtility.getFileNames(System.getProperty("user.dir") + "/assignment_testcases/a2/Je_2_DuplicateType").toArray(paths);
         int result = Joosc.compileSTL(paths);
         assertEquals(42, result);
     }
