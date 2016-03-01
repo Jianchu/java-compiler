@@ -262,4 +262,14 @@ public class NameTest {
         assertEquals(42, result);
     }
     
+    /**
+     * A protected method must not override a public method
+     */
+    @Test
+    public void testCheck20() {
+        String[] paths = new String[0];
+        paths = FileUtility.getFileNames(System.getProperty("user.dir") + "/assignment_testcases/a2/Je_4_ProtectedOverride_FromSuperclassAndInterface").toArray(paths);
+        int result = Joosc.compileSTL(paths);
+        assertEquals(42, result);
+    }
 }
