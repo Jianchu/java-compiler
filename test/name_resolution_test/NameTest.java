@@ -299,4 +299,23 @@ public class NameTest {
         int result = Joosc.compileSTL(paths);
         assertEquals(42, result);
     }
+    
+    /**
+     * 
+     */
+    @Test
+    public void testCheck23() {
+        String[] paths = new String[0];
+        paths = FileUtility.getFileNames(System.getProperty("user.dir") + "/assignment_testcases/a2/Je_3_ImportOnDemand_ClashWithImplicitImport").toArray(paths);
+        int result = Joosc.compileSTL(paths);
+        assertEquals(42, result);
+    }
+    
+    @Test
+    public void testCheck24() {
+        String[] paths = new String[0];
+        paths = FileUtility.getFileNames(System.getProperty("user.dir") + "/assignment_testcases/a2/Je_4_Interface_FinalMethodFromObject").toArray(paths);
+        int result = Joosc.compileSTL(paths);
+        assertEquals(42, result);
+    }
 }
