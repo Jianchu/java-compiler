@@ -301,7 +301,7 @@ public class NameTest {
     }
     
     /**
-     * 
+     * why visit(ClassInstanceCreationExpression node) is not called?
      */
     @Test
     public void testCheck23() {
