@@ -5,6 +5,7 @@ import ast.ArrayCreationExpression;
 import ast.ArrayType;
 import ast.AssignmentExpression;
 import ast.Block;
+import ast.BodyDeclaration;
 import ast.BooleanLiteral;
 import ast.CastExpression;
 import ast.CharacterLiteral;
@@ -33,6 +34,7 @@ import ast.SimpleType;
 import ast.Statement;
 import ast.StringLiteral;
 import ast.ThisExpression;
+import ast.Type;
 import ast.TypeDeclaration;
 import ast.VariableDeclaration;
 import ast.VariableDeclarationExpression;
@@ -63,22 +65,58 @@ public class TraversalVisitor implements Visitor{
         if (node.initializer != null) {
             node.initializer.accept(this);
         }
-
     }
 
     public void visit(ImportDeclaration node) throws Exception {
+        if (node.name != null) {
+            node.name.accept(this);
+        }
     }
 
     public void visit(MethodDeclaration node) throws Exception {
+        for (Modifier mo : node.modifiers) {
+            mo.accept(this);
+        }
+        if (!node.isConstructor) {
+            // check for void
+            if (node.returnType != null) {
+                node.returnType.accept(this);
+            }
+        }
+        for (VariableDeclaration va : node.parameters) {
+            va.accept(this);
+        }
+        if (node.body != null) {
+            node.body.accept(this);
+        }
     }
 
     public void visit(PackageDeclaration node) throws Exception {
+        if (node.name != null) {
+            node.name.accept(this);
+        }
     }
 
     public void visit(TypeDeclaration node) throws Exception {
+        for (Modifier im : node.modifiers) {
+            im.accept(this);
+        }
+        if (node.superClass != null) {
+            node.superClass.accept(this);
+        }
+        for (Type ty : node.interfaces) {
+            ty.accept(this);
+        }
+        for (BodyDeclaration im : node.members) {
+            im.accept(this);
+        }
     }
 
     public void visit(VariableDeclaration node) throws Exception {
+        node.type.accept(this);
+        if (node.initializer != null) {
+            node.initializer.accept(this);
+        }
     }
 
     /*
