@@ -11,6 +11,7 @@ import ast.CastExpression;
 import ast.CharacterLiteral;
 import ast.ClassInstanceCreationExpression;
 import ast.CompilationUnit;
+import ast.Expression;
 import ast.ExpressionStatement;
 import ast.FieldAccess;
 import ast.FieldDeclaration;
@@ -196,57 +197,124 @@ public class TraversalVisitor implements Visitor{
      * Type
      */
     public void visit(ArrayType node) throws Exception {
+        if (node.type != null) {
+            node.type.accept(this);
+        }
     }
 
     public void visit(PrimitiveType node) throws Exception {
+
     }
 
     public void visit(SimpleType node) throws Exception {
+        node.name.accept(this);
     }
 
     /*
      * Expression
      */
     public void visit(ArrayAccess node) throws Exception {
+        if (node.array != null) {
+            node.array.accept(this);
+        }
+        if (node.index != null) {
+            node.index.accept(this);
+        }
     }
 
     public void visit(ArrayCreationExpression node) throws Exception {
+        if (node.type != null) {
+            node.type.accept(this);
+        }
+        if (node.expr != null) {
+            node.expr.accept(this);
+        }
     }
 
     public void visit(AssignmentExpression node) throws Exception {
+        if (node.lhs != null) {
+            node.lhs.accept(this);
+        }
+        if (node.expr != null) {
+            node.expr.accept(this);
+        }
     }
 
     public void visit(BooleanLiteral node) throws Exception {
     }
 
     public void visit(CastExpression node) throws Exception {
+        if (node.type != null) {
+            node.type.accept(this);
+        }
+        if (node.expr != null) {
+            node.expr.accept(this);
+        }
+        if (node.unary != null) {
+            node.unary.accept(this);
+        }
     }
 
     public void visit(CharacterLiteral node) throws Exception {
+
     }
 
     public void visit(ClassInstanceCreationExpression node) throws Exception {
+        if (node.type != null) {
+            node.type.accept(this);
+        }
+        if (node.arglist != null) {
+            for (Expression expr : node.arglist) {
+                expr.accept(this);
+            }
+        }
     }
 
     public void visit(FieldAccess node) throws Exception {
+        if (node.expr != null) {
+            node.expr.accept(this);
+        }
     }
 
     public void visit(InfixExpression node) throws Exception {
+        if (node.lhs != null) {
+            node.lhs.accept(this);
+        }
+        if (node.rhs != null) {
+            node.rhs.accept(this);
+        }
     }
 
     public void visit(InstanceofExpression node) throws Exception {
+        if (node.expr != null) {
+            node.expr.accept(this);
+        }
+        if (node.type != null) {
+            node.type.accept(this);
+        }
     }
 
     public void visit(IntegerLiteral node) throws Exception {
     }
 
     public void visit(MethodInvocation node) throws Exception {
+        if (node.expr != null) {
+            node.expr.accept(this);
+        }
+        if (node.arglist != null) {
+            for (Expression expr : node.arglist) {
+                expr.accept(this);
+            }
+        }
     }
 
     public void visit(NullLiteral node) throws Exception {
     }
 
     public void visit(PrefixExpression node) throws Exception {
+        if (node.expr != null) {
+            node.expr.accept(this);
+        }
     }
 
     public void visit(StringLiteral node) throws Exception {
@@ -256,6 +324,9 @@ public class TraversalVisitor implements Visitor{
     }
 
     public void visit(VariableDeclarationExpression node) throws Exception {
+        if (node.variableDeclaration != null) {
+            node.variableDeclaration.accept(this);
+        }
     }
 
     /*
