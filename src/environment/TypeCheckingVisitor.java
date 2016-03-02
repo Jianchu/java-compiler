@@ -85,7 +85,7 @@ public class TypeCheckingVisitor extends TraversalVisitor {
             // Type checking for String concatenation.
             // Separate the following two because we cannot create type by name.
             // Avoid NPE
-            // TODO: This about if(lhs != null && rhs != null)
+            // TODO: Think about if(lhs != null && rhs != null)
             if (lhs != null) {
                 if (lhs.getDeclaration().getFullName() == "java.lang.String") {
                     if (rhs != null) {
