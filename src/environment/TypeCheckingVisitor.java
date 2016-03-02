@@ -1,5 +1,7 @@
 package environment;
 
+import java.util.Map;
+
 import ast.ArrayAccess;
 import ast.ArrayCreationExpression;
 import ast.AssignmentExpression;
@@ -9,6 +11,7 @@ import ast.CharacterLiteral;
 import ast.ClassInstanceCreationExpression;
 import ast.FieldAccess;
 import ast.InfixExpression;
+import ast.InfixExpression.Operator;
 import ast.InstanceofExpression;
 import ast.IntegerLiteral;
 import ast.MethodInvocation;
@@ -16,9 +19,13 @@ import ast.NullLiteral;
 import ast.PrefixExpression;
 import ast.StringLiteral;
 import ast.ThisExpression;
+import ast.Type;
+import ast.TypeDeclaration;
 import ast.VariableDeclarationExpression;
+import exceptions.TypeCheckingException;
 
 public class TypeCheckingVisitor extends TraversalVisitor {
+    private final Map<String, TypeDeclaration> global = SymbolTable.getGlobal();
 
     // maybe need to add or delete some methods...
 
@@ -56,6 +63,51 @@ public class TypeCheckingVisitor extends TraversalVisitor {
 
     @Override
     public void visit(InfixExpression node) throws Exception {
+        if (node.lhs != null) {
+            node.lhs.accept(this);
+        }
+        Type lhsType = node.lhs.getType();
+
+        if (node.rhs != null) {
+            node.rhs.accept(this);
+        }
+        Type rhsType = node.lhs.getType();
+
+        Operator op = node.op;
+        
+        Type type = typeCheckInfixExp(lhsType, rhsType, op);
+        node.attachType(type);
+    }
+
+    private Type typeCheckInfixExp(Type lhs, Type rhs, Operator op) throws TypeCheckingException {
+        switch (op) {
+        case PLUS:
+            // Type checking for String concatenation.
+            // Separate the following two because we cannot create type by name.
+            // Avoid NPE
+            if (lhs != null) {
+                if (lhs.getDeclaration().getFullName() == "java.lang.String") {
+                    if (rhs != null) {
+                        return lhs;
+                    } else {
+                       throw new TypeCheckingException("Cannot concat string with void");
+                   }
+                }
+            }
+
+            // Avoid NPE
+            if (rhs != null) {
+                if (rhs.getDeclaration().getFullName() == "java.lang.String") {
+                    if (lhs != null) {
+                        return rhs;
+                    } else {
+                        throw new TypeCheckingException("Cannot concat string with void");
+                    }
+                }
+            }
+        }
+        return null;
+
     }
 
     @Override
@@ -89,4 +141,5 @@ public class TypeCheckingVisitor extends TraversalVisitor {
     @Override
     public void visit(VariableDeclarationExpression node) throws Exception {
     }
+
 }

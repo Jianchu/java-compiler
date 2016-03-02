@@ -3,11 +3,13 @@ package ast;
 import java.util.LinkedList;
 import java.util.List;
 
-import exceptions.ASTException;
-import scanner.Symbol;
 import parser.ParseTree;
+import scanner.Symbol;
+import exceptions.ASTException;
 
 public abstract class Expression extends ASTNode{
+
+    Type type;
     public static Expression parseExpression(ParseTree pt) throws ASTException {
         List<ParseTree> ptChildren = null;
         for ( ; ; ) {
@@ -117,5 +119,13 @@ public abstract class Expression extends ASTNode{
             arglist.add(0, parseExpression(ptChildren.get(2)));
             pt = ptChildren.get(0);
         }
+    }
+
+    public void attachType(Type type) {
+        this.type = type;
+    }
+
+    public Type getType() {
+        return type;
     }
 }
