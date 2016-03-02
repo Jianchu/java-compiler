@@ -123,29 +123,66 @@ public class TraversalVisitor implements Visitor{
      * Statement
      */
     public void visit(Block node) throws Exception {
+        for (Statement statement : node.statements) {
+            statement.accept(this);
+        }
     }
 
     public void visit(ExpressionStatement node) throws Exception {
+        if (node.statementExpression != null) {
+            node.statementExpression.accept(this);
+        }
         visitNextStatement(node);
     }
 
     public void visit(ForStatement node) throws Exception {
+        if (node.forInit != null) {
+            node.forInit.accept(this);
+        }
+        if (node.forCondition != null) {
+            node.forCondition.accept(this);
+        }
+        if (node.forUpdate != null) {
+            node.forUpdate.accept(this);
+        }
+        if (node.forBody != null) {
+            node.forBody.accept(this);
+        }
         visitNextStatement(node);
     }
 
     public void visit(IfStatement node) throws Exception {
+        if (node.ifCondition != null) {
+            node.ifCondition.accept(this);
+        }
+        if (node.ifStatement != null) {
+            node.ifStatement.accept(this);
+        }
+        if (node.elseStatement != null) {
+            node.elseStatement.accept(this);
+        }
         visitNextStatement(node);
     }
 
     public void visit(ReturnStatement node) throws Exception {
+        node.returnExpression.accept(this);
         visitNextStatement(node);
     }
 
     public void visit(VariableDeclarationStatement node) throws Exception {
+        if (node.varDeclar != null) {
+            node.varDeclar.accept(this);
+        }
         visitNextStatement(node);
     }
 
     public void visit(WhileStatement node) throws Exception {
+        if (node.whileCondition != null) {
+            node.whileCondition.accept(this);
+        }
+        if (node.whileStatement != null) {
+            node.whileStatement.accept(this);
+        }
         visitNextStatement(node);
     }
 
