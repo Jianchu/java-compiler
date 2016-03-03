@@ -95,29 +95,17 @@ public class TypeCheckingVisitor extends TraversalVisitor {
             } else if (type2 != null) {
                 return type2;
             }
-            if ((lhs instanceof PrimitiveType) && (rhs instanceof PrimitiveType)) {
-                PrimitiveType plhs = (PrimitiveType) lhs;
-                PrimitiveType prhs = (PrimitiveType) rhs;
-                if (!plhs.value.equals(Value.BOOLEAN) && !prhs.value.equals(Value.BOOLEAN)) {
-                    return new PrimitiveType(Value.INT);
-                } else {
-                    throw new TypeCheckingException("Invalid operation: + cannot be used for boolean");
-                }
+            if (checkPrimitive(lhs, rhs, false)) {
+                return new PrimitiveType(Value.INT);
+            } else {
+                throw new TypeCheckingException("Invalid operation: + have to be used for PrimitiveType except boolean");
             }
-            break;
         case AND:
         case LOR:
         case BITOR:
         case BITAND:
-            //TODO : check null
-            if ((lhs instanceof PrimitiveType) && (rhs instanceof PrimitiveType)) {
-                PrimitiveType plhs = (PrimitiveType) lhs;
-                PrimitiveType prhs = (PrimitiveType) rhs;
-                if (plhs.value.equals(Value.BOOLEAN) && prhs.value.equals(Value.BOOLEAN)) {
-                    return prhs;
-                } else {
-                    throw new TypeCheckingException("Invalid comparasion: & && | || have to be used for boolean");
-                }
+            if (checkPrimitive(lhs, rhs, true)) {
+                return new PrimitiveType(Value.BOOLEAN);
             } else {
                 throw new TypeCheckingException("Invalid comparasion: & && | || have to be used for boolean");
             }
@@ -125,17 +113,10 @@ public class TypeCheckingVisitor extends TraversalVisitor {
         case RANGLE:
         case GEQ:
         case LEQ:
-          //TODO : check null
-            if ((lhs instanceof PrimitiveType) && (rhs instanceof PrimitiveType)) {
-                PrimitiveType plhs = (PrimitiveType) lhs;
-                PrimitiveType prhs = (PrimitiveType) rhs;
-                if (!plhs.value.equals(Value.BOOLEAN) && !prhs.value.equals(Value.BOOLEAN)) {
-                    return new PrimitiveType(Value.BOOLEAN);
-                } else {
-                    throw new TypeCheckingException("Invalid comparasion: < << > >> cannot be used for boolean");
-                }
+            if (checkPrimitive(lhs, rhs, false)) {
+                return new PrimitiveType(Value.BOOLEAN);
             } else {
-                throw new TypeCheckingException("Invalid comparasion: < << > >> have to be used for PrimitiveType");
+                throw new TypeCheckingException("Invalid comparasion: < << > >> have to be used for PrimitiveType except boolean");
             }
         case NEQ:
         case EQUAL:
@@ -145,23 +126,17 @@ public class TypeCheckingVisitor extends TraversalVisitor {
         case STAR:
         case SLASH:
         case MOD:
-            // duplicate code for now...
-            if ((lhs instanceof PrimitiveType) && (rhs instanceof PrimitiveType)) {
-                PrimitiveType plhs = (PrimitiveType) lhs;
-                PrimitiveType prhs = (PrimitiveType) rhs;
-                if (!plhs.value.equals(Value.BOOLEAN) && !prhs.value.equals(Value.BOOLEAN)) {
-                    return new PrimitiveType(Value.INT);
-                } else {
-                    throw new TypeCheckingException("Invalid comparasion: < << > >> cannot be used for boolean");
-                }
+            if (checkPrimitive(lhs, rhs, false)) {
+                return new PrimitiveType(Value.INT);
             } else {
-                throw new TypeCheckingException("Invalid operation: - * / % have to be used for PrimitiveType");
+                throw new TypeCheckingException("Invalid operation: - * / % have to be used for PrimitiveType except boolean");
             }
         }
         return null;
     }
-
-    private SimpleType checkeStringConcat(Type type1, Type type2) throws TypeCheckingException {
+    
+    private SimpleType checkeStringConcat(Type type1, Type type2)
+            throws TypeCheckingException {
         if (type1 instanceof SimpleType) {
             if (type1.getDeclaration().getFullName() == "java.lang.String") {
                 if (!(type2 instanceof Void)) {
@@ -172,6 +147,28 @@ public class TypeCheckingVisitor extends TraversalVisitor {
             }
         }
         return null;
+    }
+
+    private boolean checkPrimitive(Type type1, Type type2, boolean isBoolean) {
+        if ((type1 instanceof PrimitiveType) && (type2 instanceof PrimitiveType)) {
+            PrimitiveType ptype1 = (PrimitiveType) type1;
+            PrimitiveType ptype2 = (PrimitiveType) type2;
+            if (isBoolean) {
+                if (ptype1.value.equals(Value.BOOLEAN) && ptype2.value.equals(Value.BOOLEAN)) {
+                    return true;
+                } else {
+                    return false;
+                }
+            } else {
+                if (!ptype1.value.equals(Value.BOOLEAN) && !ptype2.value.equals(Value.BOOLEAN)) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+        } else {
+            return false;
+        }
     }
 
     @Override
