@@ -26,7 +26,6 @@ import ast.ThisExpression;
 import ast.Type;
 import ast.TypeDeclaration;
 import ast.VariableDeclarationExpression;
-import ast.Visitor;
 import exceptions.TypeCheckingException;
 
 public class TypeCheckingVisitor extends TraversalVisitor {
@@ -84,6 +83,7 @@ public class TypeCheckingVisitor extends TraversalVisitor {
         node.attachType(type);
     }
 
+    
     private Type typeCheckInfixExp(Type lhs, Type rhs, Operator op) throws TypeCheckingException {
         switch (op) {
         case PLUS:
@@ -107,7 +107,7 @@ public class TypeCheckingVisitor extends TraversalVisitor {
             if (checkPrimitive(lhs, rhs, true)) {
                 return new PrimitiveType(Value.BOOLEAN);
             } else {
-                throw new TypeCheckingException("Invalid comparasion: & && | || have to be used for boolean");
+                throw new TypeCheckingException("Invalid comparison: & && | || have to be used for boolean");
             }
         case LANGLE:
         case RANGLE:
@@ -116,7 +116,7 @@ public class TypeCheckingVisitor extends TraversalVisitor {
             if (checkPrimitive(lhs, rhs, false)) {
                 return new PrimitiveType(Value.BOOLEAN);
             } else {
-                throw new TypeCheckingException("Invalid comparasion: < << > >> have to be used for PrimitiveType except boolean");
+                throw new TypeCheckingException("Invalid comparison: < << > >> have to be used for PrimitiveType except boolean");
             }
         case NEQ:
         case EQUAL:
@@ -211,14 +211,4 @@ public class TypeCheckingVisitor extends TraversalVisitor {
         return type;
     }
 
-    public class Void extends Type {
-        @Override
-        public String toString() {
-            return "void";
-        }
-
-        @Override
-        public void accept(Visitor v) throws Exception {
-        }
-    }
 }
