@@ -198,12 +198,7 @@ public class TopDeclVisitor extends TraversalVisitor {
 		if (!mDecl.isAbstract) {
 			if (mDecl.body != null)
 				mDecl.body.accept(this);
-		} else {
-//			TypeDeclaration typeDecl = (TypeDeclaration) mDecl.getParent();
-//			if (!typeDecl.isInterface && !typeDecl.modifiers.contains(Modifier.ABSTRACT)) {
-//				throw new AbstractMethodException(typeDecl.id + "." + mDecl.id);
-//			}
-		}
+		} 
 		table.closeScope();
 	}
 	
@@ -255,8 +250,11 @@ public class TopDeclVisitor extends TraversalVisitor {
 		visitNextStatement(node);
 	}
 	public void visit(ForStatement node) throws Exception {
-		node.forInit.accept(this);
-		node.forBody.accept(this);
+		
+		if (node.forInit != null)
+			node.forInit.accept(this);
+		if (node.forBody != null)
+			node.forBody.accept(this);
 		visitNextStatement(node);
 	}
 	public void visit(IfStatement node) throws Exception {
