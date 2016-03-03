@@ -133,15 +133,14 @@ public class TypeCheckingVisitor extends TraversalVisitor {
             if ((lhs instanceof PrimitiveType) && (rhs instanceof PrimitiveType)) {
                 PrimitiveType plhs = (PrimitiveType) lhs;
                 PrimitiveType prhs = (PrimitiveType) rhs;
-                if (plhs.value.equals(prhs.value)) {
-                    if (!plhs.value.equals(Value.BOOLEAN) && !prhs.value.equals(Value.BOOLEAN)) {
-                        // TODO: return boolean type
-                    } else {
-                        throw new TypeCheckingException("Invalid comparasion: < << > >> cannot be used for boolean");
-                    }
+                if (!plhs.value.equals(Value.BOOLEAN)
+                        && !prhs.value.equals(Value.BOOLEAN)) {
+                    // TODO: return boolean type
                 } else {
-                    throw new TypeCheckingException("Invalid comparasion: < << > >> have to be used for same types");
+                    throw new TypeCheckingException(
+                            "Invalid comparasion: < << > >> cannot be used for boolean");
                 }
+
             } else {
                 throw new TypeCheckingException("Invalid comparasion: < << > >> have to be used for PrimitiveType");
             }
@@ -154,7 +153,18 @@ public class TypeCheckingVisitor extends TraversalVisitor {
         case STAR:
         case SLASH:
         case MOD:
-            // need num(type) here...
+            // duplicate code for now...
+            if ((lhs instanceof PrimitiveType) && (rhs instanceof PrimitiveType)) {
+                PrimitiveType plhs = (PrimitiveType) lhs;
+                PrimitiveType prhs = (PrimitiveType) rhs;
+                if (!plhs.value.equals(Value.BOOLEAN) && !prhs.value.equals(Value.BOOLEAN)) {
+                        //TODO: return int
+                } else {
+                    throw new TypeCheckingException("Invalid comparasion: < << > >> cannot be used for boolean");
+                }
+            } else {
+                throw new TypeCheckingException("Invalid operation: - * / % have to be used for PrimitiveType");
+            }
             break;
         }
         return null;
