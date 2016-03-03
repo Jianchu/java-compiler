@@ -12,11 +12,13 @@ import ast.ClassInstanceCreationExpression;
 import ast.FieldAccess;
 import ast.InfixExpression;
 import ast.InfixExpression.Operator;
+import ast.PrimitiveType.Value;
 import ast.InstanceofExpression;
 import ast.IntegerLiteral;
 import ast.MethodInvocation;
 import ast.NullLiteral;
 import ast.PrefixExpression;
+import ast.PrimitiveType;
 import ast.StringLiteral;
 import ast.ThisExpression;
 import ast.Type;
@@ -105,6 +107,22 @@ public class TypeCheckingVisitor extends TraversalVisitor {
                         throw new TypeCheckingException("Cannot concat string with void");
                     }
                 }
+            }
+            break;
+        case AND:
+        case LOR:
+        case BITOR:
+        case BITAND:
+            if ((lhs instanceof PrimitiveType) && (rhs instanceof PrimitiveType)) {
+                PrimitiveType plhs = (PrimitiveType) lhs;
+                PrimitiveType prhs = (PrimitiveType) rhs;
+                if (plhs.value.equals(Value.BOOLEAN) && prhs.value.equals(Value.BOOLEAN)) {
+                    return prhs;
+                } else {
+                    throw new TypeCheckingException("Invalid comparasion: & && | || have to be used for boolean");
+                }
+            } else {
+                throw new TypeCheckingException("Invalid comparasion: & && | || have to be used for boolean");
             }
         }
         return null;
