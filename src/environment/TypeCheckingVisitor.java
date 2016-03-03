@@ -88,27 +88,27 @@ public class TypeCheckingVisitor extends TraversalVisitor {
             // Separate the following two because we cannot create type by name.
             // Avoid NPE
             // TODO: Think about if(lhs != null && rhs != null)
-            if (lhs != null) {
-                if (lhs.getDeclaration().getFullName() == "java.lang.String") {
-                    if (rhs != null) {
-                        return lhs;
-                    } else {
-                       throw new TypeCheckingException("Cannot concat string with void");
-                   }
-                }
-            }
-
-            // Avoid NPE
-            if (rhs != null) {
-                if (rhs.getDeclaration().getFullName() == "java.lang.String") {
-                    if (lhs != null) {
-                        return rhs;
-                    } else {
-                        throw new TypeCheckingException("Cannot concat string with void");
-                    }
-                }
-            }
-            break;
+//            if (lhs != null) {
+//                if (lhs.getDeclaration().getFullName() == "java.lang.String") {
+//                    if (rhs != null) {
+//                        return lhs;
+//                    } else {
+//                       throw new TypeCheckingException("Cannot concat string with void");
+//                   }
+//                }
+//            }
+//
+//            // Avoid NPE
+//            if (rhs != null) {
+//                if (rhs.getDeclaration().getFullName() == "java.lang.String") {
+//                    if (lhs != null) {
+//                        return rhs;
+//                    } else {
+//                        throw new TypeCheckingException("Cannot concat string with void");
+//                    }
+//                }
+//            }
+//            break;
         case AND:
         case LOR:
         case BITOR:
@@ -201,5 +201,4 @@ public class TypeCheckingVisitor extends TraversalVisitor {
     @Override
     public void visit(VariableDeclarationExpression node) throws Exception {
     }
-
 }
