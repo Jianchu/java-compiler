@@ -291,7 +291,20 @@ public class TopDeclVisitor extends SemanticsVisitor {
 		node.expr.accept(this);
 	}
 	
+	public void visit(CastExpression node) throws Exception {
+		Visitor tv = new TypeVisitor(table);
+		node.type.accept(tv);
+	}
 	
+	public void visit(ArrayCreationExpression node) throws Exception {
+		Visitor tv = new TypeVisitor(table);
+		node.type.accept(tv);
+	}
+	
+	
+	/*
+	 * Helper
+	 */
 	
 	private void checkSuperClass(TypeDeclaration typeDecl) throws Exception {
 		if (typeDecl.superClass != null) {
