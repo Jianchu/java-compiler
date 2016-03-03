@@ -82,7 +82,7 @@ public class TypeCheckingVisitor extends TraversalVisitor {
     }
 
     /**
-     * NEQ, EQUAL, LANGLE, RANGLE, GEQ, LEQ, PLUS, MINUS, STAR, SLASH, MOD
+     * NEQ, EQUAL, PLUS, MINUS, STAR, SLASH, MOD
      **/
     private Type typeCheckInfixExp(Type lhs, Type rhs, Operator op) throws TypeCheckingException {
         switch (op) {
