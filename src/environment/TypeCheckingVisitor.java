@@ -19,11 +19,14 @@ import ast.NullLiteral;
 import ast.PrefixExpression;
 import ast.PrimitiveType;
 import ast.PrimitiveType.Value;
+import ast.SimpleName;
+import ast.SimpleType;
 import ast.StringLiteral;
 import ast.ThisExpression;
 import ast.Type;
 import ast.TypeDeclaration;
 import ast.VariableDeclarationExpression;
+import ast.Visitor;
 import exceptions.TypeCheckingException;
 
 public class TypeCheckingVisitor extends TraversalVisitor {
@@ -85,30 +88,15 @@ public class TypeCheckingVisitor extends TraversalVisitor {
         switch (op) {
         case PLUS:
             // Type checking for String concatenation.
-            // Separate the following two because we cannot create type by name.
-            // Avoid NPE
-            // TODO: Think about if(lhs != null && rhs != null)
-//            if (lhs != null) {
-//                if (lhs.getDeclaration().getFullName() == "java.lang.String") {
-//                    if (rhs != null) {
-//                        return lhs;
-//                    } else {
-//                       throw new TypeCheckingException("Cannot concat string with void");
-//                   }
-//                }
-//            }
-//
-//            // Avoid NPE
-//            if (rhs != null) {
-//                if (rhs.getDeclaration().getFullName() == "java.lang.String") {
-//                    if (lhs != null) {
-//                        return rhs;
-//                    } else {
-//                        throw new TypeCheckingException("Cannot concat string with void");
-//                    }
-//                }
-//            }
-//            break;
+            SimpleType type1 = checkeStringConcat(lhs, rhs);
+            SimpleType type2 = checkeStringConcat(rhs, lhs);
+            if (type1 != null) {
+                return type1;
+            } else if (type2 != null) {
+                return type2;
+            }
+
+            break;
         case AND:
         case LOR:
         case BITOR:
@@ -133,9 +121,8 @@ public class TypeCheckingVisitor extends TraversalVisitor {
             if ((lhs instanceof PrimitiveType) && (rhs instanceof PrimitiveType)) {
                 PrimitiveType plhs = (PrimitiveType) lhs;
                 PrimitiveType prhs = (PrimitiveType) rhs;
-                if (!plhs.value.equals(Value.BOOLEAN)
-                        && !prhs.value.equals(Value.BOOLEAN)) {
-                    // TODO: return boolean type
+                if (!plhs.value.equals(Value.BOOLEAN) && !prhs.value.equals(Value.BOOLEAN)) {
+                    return new PrimitiveType(Value.BOOLEAN);
                 } else {
                     throw new TypeCheckingException(
                             "Invalid comparasion: < << > >> cannot be used for boolean");
@@ -144,7 +131,6 @@ public class TypeCheckingVisitor extends TraversalVisitor {
             } else {
                 throw new TypeCheckingException("Invalid comparasion: < << > >> have to be used for PrimitiveType");
             }
-            break;
         case NEQ:
         case EQUAL:
             // need := here...
@@ -158,14 +144,27 @@ public class TypeCheckingVisitor extends TraversalVisitor {
                 PrimitiveType plhs = (PrimitiveType) lhs;
                 PrimitiveType prhs = (PrimitiveType) rhs;
                 if (!plhs.value.equals(Value.BOOLEAN) && !prhs.value.equals(Value.BOOLEAN)) {
-                        //TODO: return int
+                    return new PrimitiveType(Value.INT);
                 } else {
                     throw new TypeCheckingException("Invalid comparasion: < << > >> cannot be used for boolean");
                 }
             } else {
                 throw new TypeCheckingException("Invalid operation: - * / % have to be used for PrimitiveType");
             }
-            break;
+        }
+        return null;
+    }
+
+    private SimpleType checkeStringConcat(Type type1, Type type2)
+            throws TypeCheckingException {
+        if (type1 instanceof SimpleType) {
+            if (type1.getDeclaration().getFullName() == "java.lang.String") {
+                if (!(type2 instanceof Void)) {
+                    return simpletypeBuilder("java.lang.String");
+                } else {
+                    throw new TypeCheckingException("Cannot concat string with void");
+                }
+            }
         }
         return null;
     }
@@ -200,5 +199,24 @@ public class TypeCheckingVisitor extends TraversalVisitor {
 
     @Override
     public void visit(VariableDeclarationExpression node) throws Exception {
+    }
+
+    private SimpleType simpletypeBuilder(String typeName) {
+        SimpleName name = new SimpleName(typeName);
+        SimpleType type = new SimpleType(name);
+        TypeDeclaration typeDec = global.get(typeName);
+        type.attachDeclaration(typeDec);
+        return type;
+    }
+
+    public class Void extends Type {
+        @Override
+        public String toString() {
+            return "void";
+        }
+
+        @Override
+        public void accept(Visitor v) throws Exception {
+        }
     }
 }
