@@ -27,7 +27,7 @@ public class TypeVisitor extends TopDeclVisitor {
     private TypeDeclaration typeDec = null;
     
     public TypeVisitor(SymbolTable syms) {
-        super(syms);
+        table = syms;
         this.global = SymbolTable.getGlobal();
     }
     

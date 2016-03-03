@@ -25,14 +25,15 @@ import scanner.Token;
  * @author zanel
  *
  */
-public class TopDeclVisitor extends SemanticsVisitor {
-		
+public class TopDeclVisitor extends TraversalVisitor {
+	SymbolTable table;
+
 	/**
 	 * So that the current environment can be shared through different visitors.
 	 * @param curr
 	 */
-	public TopDeclVisitor(SymbolTable syms)  {
-		table = syms;
+	public TopDeclVisitor()  {
+		table = new SymbolTable();;
 	}
 	
 	/**
@@ -293,10 +294,16 @@ public class TopDeclVisitor extends SemanticsVisitor {
 	
 	public void visit(CastExpression node) throws Exception {
 		Visitor tv = new TypeVisitor(table);
-		node.type.accept(tv);
+		// TODO: Deal with type linking for cast expression somewhere else
+//		node.type.accept(tv);
 	}
 	
 	public void visit(ArrayCreationExpression node) throws Exception {
+		Visitor tv = new TypeVisitor(table);
+		node.type.accept(tv);
+	}
+	
+	public void visit(InstanceofExpression node) throws Exception {
 		Visitor tv = new TypeVisitor(table);
 		node.type.accept(tv);
 	}
@@ -401,7 +408,7 @@ public class TopDeclVisitor extends SemanticsVisitor {
         allTrees.add(ast);
         SymbolTable.buildGlobal(allTrees);
         SymbolTable table = new SymbolTable();
-        Visitor v = new SemanticsVisitor();
+        Visitor v = new TopDeclVisitor();
         ast.root.accept(v);
     }
 	
