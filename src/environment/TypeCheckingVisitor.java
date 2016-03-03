@@ -12,13 +12,13 @@ import ast.ClassInstanceCreationExpression;
 import ast.FieldAccess;
 import ast.InfixExpression;
 import ast.InfixExpression.Operator;
-import ast.PrimitiveType.Value;
 import ast.InstanceofExpression;
 import ast.IntegerLiteral;
 import ast.MethodInvocation;
 import ast.NullLiteral;
 import ast.PrefixExpression;
 import ast.PrimitiveType;
+import ast.PrimitiveType.Value;
 import ast.StringLiteral;
 import ast.ThisExpression;
 import ast.Type;
@@ -81,6 +81,9 @@ public class TypeCheckingVisitor extends TraversalVisitor {
         node.attachType(type);
     }
 
+    /**
+     * NEQ, EQUAL, LANGLE, RANGLE, GEQ, LEQ, PLUS, MINUS, STAR, SLASH, MOD
+     **/
     private Type typeCheckInfixExp(Type lhs, Type rhs, Operator op) throws TypeCheckingException {
         switch (op) {
         case PLUS:
@@ -113,6 +116,7 @@ public class TypeCheckingVisitor extends TraversalVisitor {
         case LOR:
         case BITOR:
         case BITAND:
+            //TODO : check null
             if ((lhs instanceof PrimitiveType) && (rhs instanceof PrimitiveType)) {
                 PrimitiveType plhs = (PrimitiveType) lhs;
                 PrimitiveType prhs = (PrimitiveType) rhs;
@@ -124,6 +128,27 @@ public class TypeCheckingVisitor extends TraversalVisitor {
             } else {
                 throw new TypeCheckingException("Invalid comparasion: & && | || have to be used for boolean");
             }
+        case LANGLE:
+        case RANGLE:
+        case GEQ:
+        case LEQ:
+          //TODO : check null
+            if ((lhs instanceof PrimitiveType) && (rhs instanceof PrimitiveType)) {
+                PrimitiveType plhs = (PrimitiveType) lhs;
+                PrimitiveType prhs = (PrimitiveType) rhs;
+                if (plhs.value.equals(prhs.value)) {
+                    if (!plhs.value.equals(Value.BOOLEAN) && !prhs.value.equals(Value.BOOLEAN)) {
+                        // TODO: return boolean type
+                    } else {
+                        throw new TypeCheckingException("Invalid comparasion: < << > >> cannot be used for boolean");
+                    }
+                } else {
+                    throw new TypeCheckingException("Invalid comparasion: < << > >> have to be used for same types");
+                }
+            } else {
+                throw new TypeCheckingException("Invalid comparasion: < << > >> have to be used for PrimitiveType");
+            }
+            break;
         }
         return null;
     }
