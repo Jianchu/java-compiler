@@ -25,14 +25,15 @@ import scanner.Token;
  * @author zanel
  *
  */
-public class TopDeclVisitor extends SemanticsVisitor {
-		
+public class TopDeclVisitor extends TraversalVisitor {
+	SymbolTable table;
+
 	/**
 	 * So that the current environment can be shared through different visitors.
 	 * @param curr
 	 */
-	public TopDeclVisitor(SymbolTable syms)  {
-		table = syms;
+	public TopDeclVisitor()  {
+		table = new SymbolTable();;
 	}
 	
 	/**
@@ -197,12 +198,7 @@ public class TopDeclVisitor extends SemanticsVisitor {
 		if (!mDecl.isAbstract) {
 			if (mDecl.body != null)
 				mDecl.body.accept(this);
-		} else {
-//			TypeDeclaration typeDecl = (TypeDeclaration) mDecl.getParent();
-//			if (!typeDecl.isInterface && !typeDecl.modifiers.contains(Modifier.ABSTRACT)) {
-//				throw new AbstractMethodException(typeDecl.id + "." + mDecl.id);
-//			}
-		}
+		} 
 		table.closeScope();
 	}
 	
@@ -254,8 +250,11 @@ public class TopDeclVisitor extends SemanticsVisitor {
 		visitNextStatement(node);
 	}
 	public void visit(ForStatement node) throws Exception {
-		node.forInit.accept(this);
-		node.forBody.accept(this);
+		
+		if (node.forInit != null)
+			node.forInit.accept(this);
+		if (node.forBody != null)
+			node.forBody.accept(this);
 		visitNextStatement(node);
 	}
 	public void visit(IfStatement node) throws Exception {
@@ -291,7 +290,26 @@ public class TopDeclVisitor extends SemanticsVisitor {
 		node.expr.accept(this);
 	}
 	
+	public void visit(CastExpression node) throws Exception {
+		Visitor tv = new TypeVisitor(table);
+		// TODO: Deal with type linking for cast expression somewhere else
+//		node.type.accept(tv);
+	}
 	
+	public void visit(ArrayCreationExpression node) throws Exception {
+		Visitor tv = new TypeVisitor(table);
+		node.type.accept(tv);
+	}
+	
+	public void visit(InstanceofExpression node) throws Exception {
+		Visitor tv = new TypeVisitor(table);
+		node.type.accept(tv);
+	}
+	
+	
+	/*
+	 * Helper
+	 */
 	
 	private void checkSuperClass(TypeDeclaration typeDecl) throws Exception {
 		if (typeDecl.superClass != null) {
@@ -388,7 +406,7 @@ public class TopDeclVisitor extends SemanticsVisitor {
         allTrees.add(ast);
         SymbolTable.buildGlobal(allTrees);
         SymbolTable table = new SymbolTable();
-        Visitor v = new SemanticsVisitor();
+        Visitor v = new TopDeclVisitor();
         ast.root.accept(v);
     }
 	

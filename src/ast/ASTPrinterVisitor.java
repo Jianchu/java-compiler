@@ -465,7 +465,7 @@ public class ASTPrinterVisitor implements Visitor{
         //File f = new File(System.getProperty("user.dir")+ "/assignment_testcases/a1/J1_evalMethodInvocationFromParExp.java");
 //        File f = new File(System.getProperty("user.dir")
 //                + "/assignment_testcases/a1/J1_arbitrarylocaldeclaration.java");
-        File f = new File(System.getProperty("user.dir")+ "/test/testprogram/ElseIf.java");
+        File f = new File(System.getProperty("user.dir")+ "/test/testprogram/CastExpr.java");
         
         
         Scanner scanner = new Scanner(new FileReader(f));

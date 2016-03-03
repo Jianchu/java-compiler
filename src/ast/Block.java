@@ -42,15 +42,18 @@ public class Block extends Statement {
     			if (last != null)
     				last.setNext(s);
     			last = s;
+    			
     			statements.add(s);
     			break;
     		case Statement:
     			s = Statement.parseStatement(child);
-    			if (last != null)
-    				last.setNext(s);
-    			last = s;
-    			
-    			statements.add(Statement.parseStatement(child));
+    			if (s != null) {
+	    			if (last != null)
+	    				last.setNext(s);
+	    			last = s;
+	    			
+	    			statements.add(Statement.parseStatement(child));
+    			}
     			break;
     		}
     	}

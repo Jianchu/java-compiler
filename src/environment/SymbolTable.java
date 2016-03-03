@@ -9,6 +9,7 @@ import java.util.Stack;
 
 import ast.AST;
 import ast.TypeDeclaration;
+import ast.Visitor;
 import exceptions.ASTException;
 import exceptions.NameException;
 
@@ -105,7 +106,7 @@ public class SymbolTable {
 	 */
 	public static void buildEnvs(List<AST> trees) throws Exception {
 		buildGlobal(trees);
-		SemanticsVisitor sv = new SemanticsVisitor();
+		Visitor sv = new TopDeclVisitor();
 		for (AST tree : trees) {
 			tree.root.accept(sv);
 		}

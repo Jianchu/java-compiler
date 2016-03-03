@@ -15,9 +15,16 @@ public class NameTest {
     }
     
     @Test
+    public void testTopDecl() {
+        String[] paths = new String[0];
+      paths = FileUtility.getFileNames(System.getProperty("user.dir") + "/test/testprogram/ForStatement.java").toArray(paths);
+        Joosc.compileSTL(paths);
+    }
+    
+    @Test
     public void testCheck1() {
         String[] paths = new String[0];
-      paths = FileUtility.getFileNames(System.getProperty("user.dir") + "/assignment_testcases/a2/Je_3_ImportOnDemand_ClashWithImplicitImport").toArray(paths);
+      paths = FileUtility.getFileNames(System.getProperty("user.dir") + "/assignment_testcases/a2/J1_singleTypeImport").toArray(paths);
         Joosc.compileSTL(paths);
     }
 
