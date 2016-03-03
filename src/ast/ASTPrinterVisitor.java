@@ -148,8 +148,8 @@ public class ASTPrinterVisitor implements Visitor{
     public void visit(ClassInstanceCreationExpression node) throws Exception {
         printIndent(node.getClass().getSimpleName());
         indent += DISTANCE;
-        if (node.name != null) {
-            node.name.accept(this);
+        if (node.type != null) {
+            node.type.accept(this);
         }
 
         if (node.arglist != null) {
@@ -465,7 +465,7 @@ public class ASTPrinterVisitor implements Visitor{
         //File f = new File(System.getProperty("user.dir")+ "/assignment_testcases/a1/J1_evalMethodInvocationFromParExp.java");
 //        File f = new File(System.getProperty("user.dir")
 //                + "/assignment_testcases/a1/J1_arbitrarylocaldeclaration.java");
-        File f = new File(System.getProperty("user.dir")+ "/test/testprogram/ElseIf.java");
+        File f = new File(System.getProperty("user.dir")+ "/test/testprogram/CastExpr.java");
         
         
         Scanner scanner = new Scanner(new FileReader(f));

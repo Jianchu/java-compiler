@@ -75,4 +75,25 @@ public abstract class Type extends ASTNode{
 		return decl;
 	}
 	
+	public abstract String toString();
+	
+	public boolean equals(Object o) {
+		if (! (o instanceof Type)) {
+			return false;
+		}
+		
+		Type t = (Type) o;
+		if (this instanceof SimpleType) {
+			return this.getDeclaration() == t.getDeclaration();
+		} else if (this instanceof PrimitiveType) {
+			return this.toString().equals(t.toString());
+		} else if (this instanceof ArrayType || t instanceof ArrayType) {
+			ArrayType thisArr = (ArrayType) this;
+			ArrayType thatArr = (ArrayType) t;
+			return thisArr.type.equals(thatArr.type);
+		} else {
+			return false;
+		}
+		
+	}
 }

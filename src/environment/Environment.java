@@ -22,11 +22,13 @@ public class Environment {
 	 */
 	public Map<String, TypeDeclaration> types = null;
 	public Map<String, MethodDeclaration> methods = null;
+	public Map<String, MethodDeclaration> constructors = null;
 	
 	// only for compilation unit type scope
 	public Map<String, TypeDeclaration> singleImports = null;
 	public Map<String, TypeDeclaration> importOnDemands = null;
 	public Map<String, TypeDeclaration> samePackage = null;
+	
 	
 	public Environment(Environment outer, EnvType scopeType) {
 		enclosing = outer;
@@ -39,8 +41,9 @@ public class Environment {
 			types = new HashMap<String, TypeDeclaration>();
 			break;
 			
-		case INHERIT:
 		case CLASS:
+			constructors = new HashMap<String, MethodDeclaration>();
+		case INHERIT:
 			fields = new HashMap<String, FieldDeclaration>();
 			methods = new HashMap<String, MethodDeclaration>();
 			break;
@@ -77,6 +80,10 @@ public class Environment {
 	
 	public void addMethod(String name, MethodDeclaration decl) {
 		methods.put(name, decl);
+	}
+	
+	public void addConstructor(String name, MethodDeclaration decl) {
+		constructors.put(name, decl);
 	}
 	
 	public void addType(String name, TypeDeclaration decl) {

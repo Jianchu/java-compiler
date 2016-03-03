@@ -5,12 +5,13 @@ import java.util.List;
 import java.util.Set;
 
 import ast.*;
+import exceptions.AbstractMethodException;
 import exceptions.HierarchyException;
 
 public class Hierarchy {
 	Set<TypeDeclaration> visited;
 	
-	public Hierarchy(List<AST> trees) throws HierarchyException {
+	public Hierarchy(List<AST> trees) throws Exception {
 		buildHierarchy(trees);
 		checkHierarchy(trees);
 	}
@@ -100,7 +101,7 @@ public class Hierarchy {
 		
 	}
 	
-	public void inherit(Environment inheritEnv, Environment superEnv) {
+	public void inherit(Environment inheritEnv, Environment superEnv) throws HierarchyException {
 		Environment superInherit = superEnv.getEnclosing();
 		
 		// fields from super class, overriding might happen
@@ -113,14 +114,16 @@ public class Hierarchy {
 		
 		//methods from superclass, overriding might happen
 		for (String method : superInherit.methods.keySet()) {
+			checkReplace(inheritEnv, superInherit, method);
 			inheritEnv.addMethod(method, superInherit.methods.get(method));
 		}
 		for (String method : superEnv.methods.keySet()) {
+			checkReplace(inheritEnv, superEnv, method);
 			inheritEnv.addMethod(method, superEnv.methods.get(method));
 		}
 	}
 	
-	public void checkHierarchy(List<AST> trees) throws HierarchyException {
+	public void checkHierarchy(List<AST> trees) throws Exception {
 		checkPublicFinal(trees);
 	}
 	
@@ -131,18 +134,53 @@ public class Hierarchy {
 	 * 
 	 * @param trees
 	 * @throws HierarchyException 
+	 * @throws AbstractMethodException 
 	 */
-	public void checkPublicFinal(List<AST> trees) throws HierarchyException {
+	public void checkPublicFinal(List<AST> trees) throws HierarchyException, AbstractMethodException {
 		for (AST ast : trees) {
 			if (ast.root.types.size() == 0)
 				continue;
+			TypeDeclaration tDecl = ast.root.types.get(0);
 			
 			Environment clsEnv = ast.root.types.get(0).getEnvironment();
 			Environment inheritEnv = clsEnv.getEnclosing();
+			
+			// check that type does  not inherit from  obj
+			Environment objEnv = SymbolTable.getObjRef().getEnvironment();
+			
+			if (tDecl != SymbolTable.getObjRef() && tDecl != SymbolTable.getObjectInterfaceRef()) {
+				for (String m : clsEnv.methods.keySet()) {
+					MethodDeclaration md = objEnv.methods.get(m);
+					if (md != null && md.modifiers.contains(Modifier.FINAL)) {
+						throw new HierarchyException("cannot override final from Object: " + md.id);
+					}
+				}
+			}
+			
+			// check that if type has abstract method and is class, then is abstract class
+			Set<MethodDeclaration> mContains = new HashSet<MethodDeclaration>();
+			for (MethodDeclaration md :clsEnv.methods.values()) {
+				mContains.add(md);
+			}
+			for (String m : inheritEnv.methods.keySet()) {
+				if (!clsEnv.methods.containsKey(m)) {
+					mContains.add(inheritEnv.methods.get(m));
+				}
+			}
+			for (MethodDeclaration md : mContains) {
+				if (md.isAbstract) {
+					TypeDeclaration typeDecl = ast.root.types.get(0);
+					if (!typeDecl.isInterface && !typeDecl.modifiers.contains(Modifier.ABSTRACT)) {
+						throw new AbstractMethodException(typeDecl.id + "." + md.id);
+					}
+				}				
+			}
+			
 			for (String m : clsEnv.methods.keySet()) {
 				if (inheritEnv.methods.containsKey(m)) {
 					MethodDeclaration decl1 = clsEnv.methods.get(m);
 					MethodDeclaration decl2 = inheritEnv.methods.get(m);
+					// decl2 is replaced by decl1
 					
 					// if the method replaced is public, the new method needs to be public 
 					if (decl2.modifiers.contains(Modifier.PUBLIC) &&
@@ -161,11 +199,33 @@ public class Hierarchy {
 					}
 					
 					// return types should be the same
-					if (decl2.returnType.equals(decl1.returnType)) {
+					if (!(decl2.returnType == decl1.returnType || decl2.returnType.equals(decl1.returnType))) {
+						// both checks are required to deal with simple type and primitive type.
 						throw new HierarchyException("Return type of replaced method does not match.");
 					}
 				}
 			}
+		}
+	}
+	
+	public void checkReplace(Environment toEnv, Environment fromEnv, String method) throws HierarchyException {
+		if (toEnv.methods.containsKey(method)) {
+			MethodDeclaration decl2 = toEnv.methods.get(method);
+			MethodDeclaration decl1 = fromEnv.methods.get(method);
+			// decl2 is replaced by decl1
+			
+			if (!(decl2.returnType == decl1.returnType || decl2.returnType.equals(decl1.returnType))) {
+				throw new HierarchyException("Return type of replaced method does not match.");
+			}
+			if (decl2.modifiers.contains(Modifier.PUBLIC) &&
+					!decl1.modifiers.contains(Modifier.PUBLIC)) {
+				throw new HierarchyException("A non-public method replaced public method.");
+			}
+			// the old method can't be final
+			if (decl2.modifiers.contains(Modifier.FINAL)) {
+				throw new HierarchyException("Final method cannot be override.s");
+			}
+			
 		}
 	}
 }

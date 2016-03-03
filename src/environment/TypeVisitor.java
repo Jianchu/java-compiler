@@ -1,6 +1,5 @@
 package environment;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -21,15 +20,13 @@ public class TypeVisitor extends TopDeclVisitor {
     // globalPackages is the map between package name and the type names
     // declared in that package.
     // May be useless here.
-    private final Map<String, List<String>> globalPackages;
     // global is the map between full name of a type and it's AST node.
     // If global is just used for QualifiedName, change this to a local variable.
     private final Map<String, TypeDeclaration> global;
     private TypeDeclaration typeDec = null;
     
     public TypeVisitor(SymbolTable syms) {
-        super(syms);
-        this.globalPackages = SymbolTable.getAllPackages();
+        table = syms;
         this.global = SymbolTable.getGlobal();
     }
     
@@ -49,6 +46,8 @@ public class TypeVisitor extends TopDeclVisitor {
      * @throws Exception
      */
     public void visit(SimpleType type) throws Exception {
+
+    	typeDec = null;
         if (type.name != null) {
             type.name.accept(this);
         }
@@ -76,6 +75,7 @@ public class TypeVisitor extends TopDeclVisitor {
                 && !checkSimpleName(env.importOnDemands,node.toString())) {
             throw new TypeLinkException("The type name is not found: " + node);
         }
+        
     }
 
     /**
@@ -119,6 +119,20 @@ public class TypeVisitor extends TopDeclVisitor {
         if (!global.keySet().contains(fullName)) {
             throw new TypeLinkException(
                     "The full qualified type name is not found");
+        } else {
+        	this.typeDec = global.get(fullName);
+        }
+        
+        if (node.getQualifier() != null) {
+        	boolean issue = true;
+        	try {
+        		node.getQualifier().accept(this);
+        	} catch (TypeLinkException e) {
+        		issue = false;
+        	}
+        	if (issue) {
+        		throw new TypeLinkException("Prefix of qualified name cannot resolve to type");
+        	}
         }
     }
 }

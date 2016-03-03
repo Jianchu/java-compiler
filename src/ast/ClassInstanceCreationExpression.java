@@ -6,12 +6,12 @@ import exceptions.ASTException;
 import parser.ParseTree;
 
 public class ClassInstanceCreationExpression extends Expression {
-    public Expression name;
+    public Type type;
     public List<Expression> arglist;    
 
     public ClassInstanceCreationExpression(ParseTree pt) throws ASTException {
         List<ParseTree> subtrees = pt.getChildren();
-        name = Name.parseName(subtrees.get(1));
+        type = Type.parseType(subtrees.get(1));
         arglist = null;
         if (subtrees.size() > 4) {
             arglist = Expression.parseArglist(subtrees.get(3));
