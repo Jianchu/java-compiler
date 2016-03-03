@@ -81,9 +81,6 @@ public class TypeCheckingVisitor extends TraversalVisitor {
         node.attachType(type);
     }
 
-    /**
-     * NEQ, EQUAL, PLUS, MINUS, STAR, SLASH, MOD
-     **/
     private Type typeCheckInfixExp(Type lhs, Type rhs, Operator op) throws TypeCheckingException {
         switch (op) {
         case PLUS:
@@ -148,6 +145,16 @@ public class TypeCheckingVisitor extends TraversalVisitor {
             } else {
                 throw new TypeCheckingException("Invalid comparasion: < << > >> have to be used for PrimitiveType");
             }
+            break;
+        case NEQ:
+        case EQUAL:
+            // need := here...
+            break;
+        case MINUS:
+        case STAR:
+        case SLASH:
+        case MOD:
+            // need num(type) here...
             break;
         }
         return null;
