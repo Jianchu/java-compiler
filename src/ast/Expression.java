@@ -9,7 +9,7 @@ import exceptions.ASTException;
 
 public abstract class Expression extends ASTNode{
 
-    Type type;
+    Type _type;
     public static Expression parseExpression(ParseTree pt) throws ASTException {
         List<ParseTree> ptChildren = null;
         for ( ; ; ) {
@@ -122,10 +122,10 @@ public abstract class Expression extends ASTNode{
     }
 
     public void attachType(Type type) {
-        this.type = type;
+        this._type = type;
     }
 
     public Type getType() {
-        return type;
+        return _type;
     }
 }

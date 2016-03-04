@@ -293,7 +293,7 @@ public class TopDeclVisitor extends TraversalVisitor {
 	public void visit(CastExpression node) throws Exception {
 		Visitor tv = new TypeVisitor(table);
 		// TODO: Deal with type linking for cast expression somewhere else
-//		node.type.accept(tv);
+		
 	}
 	
 	public void visit(ArrayCreationExpression node) throws Exception {
