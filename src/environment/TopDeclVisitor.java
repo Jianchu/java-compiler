@@ -297,6 +297,7 @@ public class TopDeclVisitor extends TraversalVisitor {
 			} else {
 				node.type = new SimpleType((Name) node.expr);
 			}
+			node.expr = null;	// clear the useless expression now
 		}
 		node.type.accept(tv);
 	}

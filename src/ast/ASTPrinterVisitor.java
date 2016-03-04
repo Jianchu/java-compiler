@@ -170,11 +170,11 @@ public class ASTPrinterVisitor implements Visitor{
     }
 
     // TODO
-    public void visit(FieldAccessExpression node) {
-        printIndent(node.getClass().getSimpleName());
-        indent += DISTANCE;
-        indent -= DISTANCE;
-    }
+//    public void visit(FieldAccessExpression node) {
+//        printIndent(node.getClass().getSimpleName());
+//        indent += DISTANCE;
+//        indent -= DISTANCE;
+//    }
 
     public void visit(FieldAccess node) throws Exception {
         printIndent(node.getClass().getSimpleName());
