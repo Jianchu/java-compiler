@@ -6,6 +6,7 @@ import java.util.Set;
 
 import ast.ArrayAccess;
 import ast.ArrayCreationExpression;
+import ast.ArrayType;
 import ast.AssignmentExpression;
 import ast.BooleanLiteral;
 import ast.CastExpression;
@@ -39,6 +40,25 @@ public class TypeCheckingVisitor extends TraversalVisitor {
 
     @Override
     public void visit(ArrayAccess node) throws Exception {
+        if (node.array != null) {
+            node.array.accept(this);
+        }
+        if (node.index != null) {
+            node.index.accept(this);
+        }
+        Type arrayType = node.array.getType();
+        Type indexType = node.index.getType();
+        if (arrayType instanceof ArrayType) {
+            Set<Value> values = new HashSet<Value>();
+            values.add(Value.BOOLEAN);
+            if (CheckSinglePrimitive(indexType, values, null)) {
+                node.attachType(arrayType);
+            } else {
+                throw new TypeCheckingException("Index cannot be boolean.");
+            }
+        } else {
+            throw new TypeCheckingException("Access a non-array type by array access.");
+        }
     }
 
     @Override
@@ -254,17 +274,16 @@ public class TypeCheckingVisitor extends TraversalVisitor {
         // TODO: Check whether the type of -byte and -short is int.
         case MINUS:
             values = new HashSet<Value>();
-            values.add(Value.BYTE);
-            values.add(Value.SHORT);
-            values.add(Value.INT);
-            if (CheckSinglePrimitive(expr, values)) {
+            values.add(Value.CHAR);
+            values.add(Value.BOOLEAN);
+            if (CheckSinglePrimitive(expr, values, null)) {
                 return new PrimitiveType(Value.INT);
             }
             break;
         case NOT:
             values = new HashSet<Value>();
             values.add(Value.BOOLEAN);
-            if (CheckSinglePrimitive(expr, values)) {
+            if (CheckSinglePrimitive(expr, null, values)) {
                 return new PrimitiveType(Value.BOOLEAN);
             }
             break;
@@ -272,10 +291,21 @@ public class TypeCheckingVisitor extends TraversalVisitor {
         throw new TypeCheckingException("Invalid prefix expression");
     }
 
-    private boolean CheckSinglePrimitive(Type type, Set<Value> values) {
+    private boolean CheckSinglePrimitive(Type type, Set<Value> excludes, Set<Value> includes) {
+        Set<Value> allTypes = new HashSet<Value>();
+        allTypes.add(Value.BOOLEAN);
+        allTypes.add(Value.INT);
+        allTypes.add(Value.CHAR);
+        allTypes.add(Value.BYTE);
+        allTypes.add(Value.SHORT);
+        if (excludes != null) {
+            allTypes.removeAll(excludes);
+        } else if (includes != null) {
+            allTypes.retainAll(includes);
+        }
         if (type instanceof PrimitiveType) {
             PrimitiveType ptype = (PrimitiveType) type;
-            if (values.contains(ptype.value)) {
+            if (allTypes.contains(ptype.value)) {
                 return true;
             }
         }
