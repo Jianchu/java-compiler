@@ -49,6 +49,7 @@ public class TypeCheckingVisitor extends TraversalVisitor {
 
     @Override
     public void visit(BooleanLiteral node) throws Exception {
+        node.attachType(new PrimitiveType(Value.BOOLEAN));
     }
 
     @Override
@@ -57,6 +58,7 @@ public class TypeCheckingVisitor extends TraversalVisitor {
 
     @Override
     public void visit(CharacterLiteral node) throws Exception {
+        node.attachType(new PrimitiveType(Value.CHAR));
     }
 
     @Override
