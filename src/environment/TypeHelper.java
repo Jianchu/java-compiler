@@ -1,4 +1,6 @@
-import ast.TypeDeclaration;
+package environment;
+
+import ast.*;
 
 public class TypeHelper {
     // t1 := t2
