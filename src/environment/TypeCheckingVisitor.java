@@ -56,6 +56,29 @@ public class TypeCheckingVisitor extends TraversalVisitor {
 
     @Override
     public void visit(CastExpression node) throws Exception {
+        Type castToType = null;
+
+        if (node.type != null) {
+            node.type.accept(this);
+            castToType = node.type;
+        }
+        if (node.expr != null) {
+            node.expr.accept(this);
+            castToType = node.expr.getType();
+        }
+        if (node.unary != null) {
+            node.unary.accept(this);
+        }
+        Type unaryType = node.unary.getType();
+        
+        // break cast into three cases:
+        if (checkPrimitive(castToType, unaryType, false)) {
+            node.attachType(castToType);
+        } else if (checkPrimitive(castToType, unaryType, true)) {
+            node.attachType(new PrimitiveType(Value.BOOLEAN));
+        } else if (helper.assignable(castToType, unaryType) || helper.assignable(unaryType, castToType)) {
+            node.attachType(simpletypeBuilder((SimpleType) castToType));
+        }
     }
 
     @Override
