@@ -1,3 +1,4 @@
+package testprogram;
 
 public class ForStatement {
 	public ForStatement() {}
