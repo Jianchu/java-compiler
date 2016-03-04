@@ -63,6 +63,23 @@ public class TypeCheckingVisitor extends TraversalVisitor {
 
     @Override
     public void visit(ArrayCreationExpression node) throws Exception {
+        if (node.type != null) {
+            node.type.accept(this);
+        } else {
+            throw new TypeCheckingException("No null array.");
+        }
+        if (node.expr != null) {
+            node.expr.accept(this);
+        }
+        Type indexType = node.expr.getType();
+        
+        Set<Value> values = new HashSet<Value>();
+        values.add(Value.BOOLEAN);
+        if (CheckSinglePrimitive(indexType, values, null)) {
+            node.attachType(arrayTypeBuilder(node.type));
+        } else {
+            throw new TypeCheckingException("Index cannot be boolean.");
+        }
     }
 
     @Override
@@ -97,7 +114,7 @@ public class TypeCheckingVisitor extends TraversalVisitor {
         } else if (checkPrimitive(castToType, unaryType, true)) {
             node.attachType(new PrimitiveType(Value.BOOLEAN));
         } else if (helper.assignable(castToType, unaryType) || helper.assignable(unaryType, castToType)) {
-            node.attachType(simpletypeBuilder((SimpleType) castToType));
+            node.attachType(simpleTypeBuilder((SimpleType) castToType));
         }
     }
 
@@ -192,7 +209,7 @@ public class TypeCheckingVisitor extends TraversalVisitor {
         if (type1 instanceof SimpleType) {
             if (type1.getDeclaration().getFullName() == "java.lang.String") {
                 if (!(type2 instanceof Void)) {
-                    return simpletypeBuilder((SimpleType) type1);
+                    return simpleTypeBuilder((SimpleType) type1);
                 } else {
                     throw new TypeCheckingException("Cannot concat string with void");
                 }
@@ -325,11 +342,27 @@ public class TypeCheckingVisitor extends TraversalVisitor {
     public void visit(VariableDeclarationExpression node) throws Exception {
     }
 
-    private SimpleType simpletypeBuilder(SimpleType simpleType) {
+    private SimpleType simpleTypeBuilder(SimpleType simpleType) {
         Name name = simpleType.name;
         SimpleType type = new SimpleType(name);
         type.attachDeclaration(simpleType.getDeclaration());
         return type;
+    }
+
+    private ArrayType arrayTypeBuilder(Type type) throws TypeCheckingException {
+        ArrayType arrayType = null;
+        if (type instanceof SimpleType) {
+            SimpleType stype = (SimpleType) type;
+            Name name = stype.name;
+            arrayType = new ArrayType(name);
+        } else if (type instanceof PrimitiveType) {
+            PrimitiveType ptype = (PrimitiveType) type;
+            SimpleName name = new SimpleName(ptype.value.toString());
+            arrayType = new ArrayType(name);
+        } else {
+            throw new TypeCheckingException("ArrayBuilder error.");
+        }
+        return arrayType;
     }
 
     // Keep this for String Literal for now...
