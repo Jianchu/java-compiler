@@ -56,7 +56,7 @@ public class Hierarchy {
 				buildInherit(itfDecl, newAncesters);
 			}
 			Environment superEnv = itfDecl.getEnvironment();
-			inherit(inheritEnv, superEnv);
+			inherit(inheritEnv, superEnv, true);
 		}
 		
 		// parent class
@@ -71,7 +71,7 @@ public class Hierarchy {
 			}
 			
 			Environment superEnv = superDecl.getEnvironment();
-			inherit(inheritEnv, superEnv);
+			inherit(inheritEnv, superEnv, false);
 		}
 		
 		if (typeDecl.isInterface) {
@@ -83,7 +83,7 @@ public class Hierarchy {
 				if (! visited.contains(objInterface)) {
 					visited.add(objInterface);
 				}
-				inherit(inheritEnv, objInterface.getEnvironment());
+				inherit(inheritEnv, objInterface.getEnvironment(), true);
 			}
 		} else {	// is class
 			if (typeDecl.superClass == null && typeDecl != SymbolTable.getObjRef()) {
@@ -93,7 +93,7 @@ public class Hierarchy {
 				if (! visited.contains(obj)) {
 					visited.add(obj);
 				}
-				inherit(inheritEnv, obj.getEnvironment());		
+				inherit(inheritEnv, obj.getEnvironment(), false);		
 			}
 		}
 		
@@ -101,7 +101,7 @@ public class Hierarchy {
 		
 	}
 	
-	public void inherit(Environment inheritEnv, Environment superEnv) throws HierarchyException {
+	public void inherit(Environment inheritEnv, Environment superEnv, boolean isInterface) throws HierarchyException {
 		Environment superInherit = superEnv.getEnclosing();
 		
 		// fields from super class, overriding might happen
@@ -114,10 +114,19 @@ public class Hierarchy {
 		
 		//methods from superclass, overriding might happen
 		for (String method : superInherit.methods.keySet()) {
+			if (isInterface && superInherit.methods.get(method).modifiers.contains(Modifier.STATIC)) {
+				// static methods from interfaces do not get inherited
+				continue;
+			}
+				
 			checkReplace(inheritEnv, superInherit, method);
 			inheritEnv.addMethod(method, superInherit.methods.get(method));
 		}
 		for (String method : superEnv.methods.keySet()) {
+			if (isInterface && superEnv.methods.get(method).modifiers.contains(Modifier.STATIC)) {
+				// static methods from interfaces do not get inherited
+				continue;
+			}
 			checkReplace(inheritEnv, superEnv, method);
 			inheritEnv.addMethod(method, superEnv.methods.get(method));
 		}

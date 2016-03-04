@@ -79,7 +79,6 @@ public class SymbolTable {
 
 			}
 		}
-//		checkPkgNames();
 	}
 	
 	public static Map<String, TypeDeclaration> getGlobal() {
@@ -118,29 +117,6 @@ public class SymbolTable {
 	
 	public static TypeDeclaration getObjectInterfaceRef() {
 		return global.get(OBJ_ITF);
-	}
-	
-	/**
-	 * @throws NameException 
-	 * 
-	 */
-	private static void checkPkgNames() throws NameException {
-		for (String pkg1 : globalPackages.keySet()) {
-			for (String pkg2 : globalPackages.keySet()) {
-				if (pkg2 != "") {	// if not in default package
-					// get or files from pkg2
-					for (String type : globalPackages.get(pkg2)) {
-						String typeSimpleName = global.get(type).id;
-						if (pkg1.startsWith(typeSimpleName)) {
-							if (pkg1.length() == typeSimpleName.length() 
-									|| (pkg1.length() > typeSimpleName.length() && pkg1.charAt(typeSimpleName.length())=='.')) {
-								throw new NameException("package name conflicts with type name.");
-							}
-						}
-					}
-				}
-			}
-		}
 	}
 	
 }

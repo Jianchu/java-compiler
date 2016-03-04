@@ -33,7 +33,7 @@ public class TopDeclVisitor extends TraversalVisitor {
 	 * @param curr
 	 */
 	public TopDeclVisitor()  {
-		table = new SymbolTable();;
+		table = new SymbolTable();
 	}
 	
 	/**
@@ -104,18 +104,6 @@ public class TopDeclVisitor extends TraversalVisitor {
 		List<String> lang = new LinkedList<String>();
 		lang.add("java"); lang.add("lang");
 		importOnDemand(lang);
-//		final String lang = "java.lang";
-//		if (pkgCls.get(lang) != null) {
-//			for (String cls : pkgCls.get(lang)) {
-//				String fn =  cls;
-//				if (curr.singleImports.get(fn) == null)
-//					curr.addSingleImport(fn, globalEnv.get(fn));
-//			}
-//		} else {
-//			// TODO: maybe throw exception.
-//			System.err.println("could not find java.lang");
-//		}
-		
 		
 		// class or interface declaration
 		for (TypeDeclaration typeDecl : cu.types) {
@@ -240,6 +228,9 @@ public class TopDeclVisitor extends TraversalVisitor {
 		}
 		
 		table.currentScope().addVariable(vd.id, vd);
+		
+		if (vd.initializer != null)
+			vd.initializer.accept(this);
 	}
 	
 	/*
@@ -251,10 +242,13 @@ public class TopDeclVisitor extends TraversalVisitor {
 	}
 	public void visit(ForStatement node) throws Exception {
 		
+		table.openScope(Environment.EnvType.BLOCK);
+		// scope for variables declared in forInit
 		if (node.forInit != null)
 			node.forInit.accept(this);
 		if (node.forBody != null)
 			node.forBody.accept(this);
+		table.closeScope();
 		visitNextStatement(node);
 	}
 	public void visit(IfStatement node) throws Exception {
@@ -293,7 +287,18 @@ public class TopDeclVisitor extends TraversalVisitor {
 	public void visit(CastExpression node) throws Exception {
 		Visitor tv = new TypeVisitor(table);
 		// TODO: Deal with type linking for cast expression somewhere else
-		
+
+		if (node.expr != null) {
+			if (!(node.expr instanceof Name)) {
+				throw new NameException("123");
+			}
+			if (node.isArray) {
+				node.type = new ArrayType((Name) node.expr);
+			} else {
+				node.type = new SimpleType((Name) node.expr);
+			}
+		}
+		node.type.accept(tv);
 	}
 	
 	public void visit(ArrayCreationExpression node) throws Exception {
@@ -361,12 +366,12 @@ public class TopDeclVisitor extends TraversalVisitor {
 		String qualifierStr = String.join(".", name);
 		boolean found = false;
 		List<String> clsList = new LinkedList<String>(); 
-		for (String pkgName : table.getAllPackages().keySet()) {
+		for (String pkgName : SymbolTable.getAllPackages().keySet()) {
 			if (pkgName.startsWith(qualifierStr) 
 					&& (pkgName.length() == qualifierStr.length() 
 							|| pkgName.charAt(qualifierStr.length()) == '.')){
 				found = true;
-				clsList.addAll(table.getAllPackages().get(pkgName));
+				clsList.addAll(SymbolTable.getAllPackages().get(pkgName));
 			}
 		}
 		
@@ -374,14 +379,13 @@ public class TopDeclVisitor extends TraversalVisitor {
 			throw new NameException("Import package name not recognized: " + qualifierStr);
 		
 		for (String cls : clsList) {
-			table.currentScope().addImportOnDemand(cls, table.getGlobal().get(cls));
+			table.currentScope().addImportOnDemand(cls, SymbolTable.getGlobal().get(cls));
 		}
 	}
 	
 	private void checkPkgName(Name pkg) throws NameException {
 		String pkgStr = pkg.toString();
-		for (String clsStr : table.getGlobal().keySet()) {
-//			System.out.println(pkgStr + " : " + clsStr);
+		for (String clsStr : SymbolTable.getGlobal().keySet()) {
 			if (clsStr.contains(".") && pkgStr.startsWith(clsStr) 
 					&& (pkgStr.length() == clsStr.length() 
 						|| pkgStr.charAt(clsStr.length()) == '.')) {

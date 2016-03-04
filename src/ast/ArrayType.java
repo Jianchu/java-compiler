@@ -17,6 +17,10 @@ public class ArrayType extends Type {
 		}
 	}
 	
+	public ArrayType(Name n) {
+		type = new SimpleType(n);
+	}
+	
 	public void accept(Visitor v) throws Exception {
 		v.visit(this);
 	}

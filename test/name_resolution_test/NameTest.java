@@ -17,7 +17,7 @@ public class NameTest {
     @Test
     public void testTopDecl() {
         String[] paths = new String[0];
-      paths = FileUtility.getFileNames(System.getProperty("user.dir") + "/test/testprogram/CastExpr.java").toArray(paths);
+      paths = FileUtility.getFileNames(System.getProperty("user.dir") + "/assignment_testcases/a2/J1_4_AbstractMethod_InheritAbstractFromObject").toArray(paths);
         Joosc.compileSTL(paths);
     }
     
