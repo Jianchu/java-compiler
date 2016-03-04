@@ -1,6 +1,8 @@
 package environment;
 
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import ast.ArrayAccess;
 import ast.ArrayCreationExpression;
@@ -198,6 +200,48 @@ public class TypeCheckingVisitor extends TraversalVisitor {
 
     @Override
     public void visit(PrefixExpression node) throws Exception {
+        if (node.expr != null) {
+            node.expr.accept(this);
+        }
+        Type expr = node.expr.getType();
+
+        ast.PrefixExpression.Operator op = node.op;
+
+        Type type = typeCheckPrefixExp(expr, op);
+        node.attachType(type);
+    }
+
+    private Type typeCheckPrefixExp(Type expr, ast.PrefixExpression.Operator op) throws TypeCheckingException {
+        Set<Value> values;
+        switch (op) {
+        case MINUS:
+            values = new HashSet<Value>();
+            values.add(Value.BYTE);
+            values.add(Value.SHORT);
+            values.add(Value.INT);
+            if (CheckSinglePrimitive(expr, values)) {
+                return new PrimitiveType(Value.INT);
+            }
+            break;
+        case NOT:
+            values = new HashSet<Value>();
+            values.add(Value.BOOLEAN);
+            if (CheckSinglePrimitive(expr, values)) {
+                return new PrimitiveType(Value.BOOLEAN);
+            }
+            break;
+        }
+        throw new TypeCheckingException("Invalid prefix expression");
+    }
+
+    private boolean CheckSinglePrimitive(Type type, Set<Value> values) {
+        if (type instanceof PrimitiveType) {
+            PrimitiveType ptype = (PrimitiveType) type;
+            if (values.contains(ptype.value)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
