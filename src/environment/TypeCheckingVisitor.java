@@ -15,11 +15,11 @@ import ast.InfixExpression.Operator;
 import ast.InstanceofExpression;
 import ast.IntegerLiteral;
 import ast.MethodInvocation;
+import ast.Name;
 import ast.NullLiteral;
 import ast.PrefixExpression;
 import ast.PrimitiveType;
 import ast.PrimitiveType.Value;
-import ast.SimpleName;
 import ast.SimpleType;
 import ast.StringLiteral;
 import ast.ThisExpression;
@@ -30,6 +30,7 @@ import exceptions.TypeCheckingException;
 
 public class TypeCheckingVisitor extends TraversalVisitor {
     private final Map<String, TypeDeclaration> global = SymbolTable.getGlobal();
+    private final TypeHelper helper = new TypeHelper();
 
     // maybe need to add or delete some methods...
 
@@ -120,8 +121,11 @@ public class TypeCheckingVisitor extends TraversalVisitor {
             }
         case NEQ:
         case EQUAL:
-            // need := here...
-            break;
+            if (helper.assignable(lhs, rhs) || helper.assignable(rhs, lhs)) {
+                return new PrimitiveType(Value.BOOLEAN);
+            } else {
+                throw new TypeCheckingException("Invalid comparison: = == have to be used for comparable types");
+            }
         case MINUS:
         case STAR:
         case SLASH:
@@ -140,7 +144,7 @@ public class TypeCheckingVisitor extends TraversalVisitor {
         if (type1 instanceof SimpleType) {
             if (type1.getDeclaration().getFullName() == "java.lang.String") {
                 if (!(type2 instanceof Void)) {
-                    return simpletypeBuilder("java.lang.String");
+                    return simpletypeBuilder((SimpleType) type1);
                 } else {
                     throw new TypeCheckingException("Cannot concat string with void");
                 }
@@ -203,11 +207,10 @@ public class TypeCheckingVisitor extends TraversalVisitor {
     public void visit(VariableDeclarationExpression node) throws Exception {
     }
 
-    private SimpleType simpletypeBuilder(String typeName) {
-        SimpleName name = new SimpleName(typeName);
+    private SimpleType simpletypeBuilder(SimpleType simpleType) {
+        Name name = simpleType.name;
         SimpleType type = new SimpleType(name);
-        TypeDeclaration typeDec = global.get(typeName);
-        type.attachDeclaration(typeDec);
+        type.attachDeclaration(simpleType.getDeclaration());
         return type;
     }
 
