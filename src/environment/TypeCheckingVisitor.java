@@ -20,6 +20,7 @@ import ast.NullLiteral;
 import ast.PrefixExpression;
 import ast.PrimitiveType;
 import ast.PrimitiveType.Value;
+import ast.SimpleName;
 import ast.SimpleType;
 import ast.StringLiteral;
 import ast.ThisExpression;
@@ -181,6 +182,7 @@ public class TypeCheckingVisitor extends TraversalVisitor {
 
     @Override
     public void visit(IntegerLiteral node) throws Exception {
+        node.attachType(new PrimitiveType(Value.INT));
     }
 
     @Override
@@ -189,6 +191,7 @@ public class TypeCheckingVisitor extends TraversalVisitor {
 
     @Override
     public void visit(NullLiteral node) throws Exception {
+        node.attachType(null);
     }
 
     @Override
@@ -197,6 +200,7 @@ public class TypeCheckingVisitor extends TraversalVisitor {
 
     @Override
     public void visit(StringLiteral node) throws Exception {
+        node.attachType(simpletypeBuilder("java.lang.String"));
     }
 
     @Override
@@ -214,4 +218,12 @@ public class TypeCheckingVisitor extends TraversalVisitor {
         return type;
     }
 
+    // Keep this for String Literal for now...
+    private SimpleType simpletypeBuilder(String typeName) {
+        SimpleName name = new SimpleName(typeName);
+        SimpleType type = new SimpleType(name);
+        TypeDeclaration typeDec = global.get(typeName);
+        type.attachDeclaration(typeDec);
+        return type;
+    }
 }
