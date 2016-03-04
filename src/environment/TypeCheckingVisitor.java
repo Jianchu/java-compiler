@@ -1,6 +1,8 @@
 package environment;
 
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import ast.ArrayAccess;
 import ast.ArrayCreationExpression;
@@ -15,6 +17,7 @@ import ast.InfixExpression.Operator;
 import ast.InstanceofExpression;
 import ast.IntegerLiteral;
 import ast.MethodInvocation;
+import ast.Name;
 import ast.NullLiteral;
 import ast.PrefixExpression;
 import ast.PrimitiveType;
@@ -30,6 +33,7 @@ import exceptions.TypeCheckingException;
 
 public class TypeCheckingVisitor extends TraversalVisitor {
     private final Map<String, TypeDeclaration> global = SymbolTable.getGlobal();
+    private final TypeHelper helper = new TypeHelper();
 
     // maybe need to add or delete some methods...
 
@@ -47,6 +51,7 @@ public class TypeCheckingVisitor extends TraversalVisitor {
 
     @Override
     public void visit(BooleanLiteral node) throws Exception {
+        node.attachType(new PrimitiveType(Value.BOOLEAN));
     }
 
     @Override
@@ -55,6 +60,7 @@ public class TypeCheckingVisitor extends TraversalVisitor {
 
     @Override
     public void visit(CharacterLiteral node) throws Exception {
+        node.attachType(new PrimitiveType(Value.CHAR));
     }
 
     @Override
@@ -120,8 +126,11 @@ public class TypeCheckingVisitor extends TraversalVisitor {
             }
         case NEQ:
         case EQUAL:
-            // need := here...
-            break;
+            if (helper.assignable(lhs, rhs) || helper.assignable(rhs, lhs)) {
+                return new PrimitiveType(Value.BOOLEAN);
+            } else {
+                throw new TypeCheckingException("Invalid comparison: = == have to be used for comparable types");
+            }
         case MINUS:
         case STAR:
         case SLASH:
@@ -140,7 +149,7 @@ public class TypeCheckingVisitor extends TraversalVisitor {
         if (type1 instanceof SimpleType) {
             if (type1.getDeclaration().getFullName() == "java.lang.String") {
                 if (!(type2 instanceof Void)) {
-                    return simpletypeBuilder("java.lang.String");
+                    return simpletypeBuilder((SimpleType) type1);
                 } else {
                     throw new TypeCheckingException("Cannot concat string with void");
                 }
@@ -173,10 +182,25 @@ public class TypeCheckingVisitor extends TraversalVisitor {
 
     @Override
     public void visit(InstanceofExpression node) throws Exception {
+        if (node.expr != null) {
+            node.expr.accept(this);
+        }
+        if (node.type != null) {
+            node.type.accept(this);
+        }
+        
+        Type exprType = node.expr.getType();
+        
+        if (helper.assignable(exprType, node.type) || helper.assignable(node.type, exprType)) {
+            node.attachType(new PrimitiveType(Value.BOOLEAN)); 
+        } else {
+            throw new TypeCheckingException("Uncomparable types in instanceof");
+        }
     }
 
     @Override
     public void visit(IntegerLiteral node) throws Exception {
+        node.attachType(new PrimitiveType(Value.INT));
     }
 
     @Override
@@ -185,14 +209,59 @@ public class TypeCheckingVisitor extends TraversalVisitor {
 
     @Override
     public void visit(NullLiteral node) throws Exception {
+        node.attachType(null);
     }
 
     @Override
     public void visit(PrefixExpression node) throws Exception {
+        if (node.expr != null) {
+            node.expr.accept(this);
+        }
+        Type expr = node.expr.getType();
+
+        ast.PrefixExpression.Operator op = node.op;
+
+        Type type = typeCheckPrefixExp(expr, op);
+        node.attachType(type);
+    }
+
+    private Type typeCheckPrefixExp(Type expr, ast.PrefixExpression.Operator op) throws TypeCheckingException {
+        Set<Value> values;
+        switch (op) {
+        // TODO: Check whether the type of -byte and -short is int.
+        case MINUS:
+            values = new HashSet<Value>();
+            values.add(Value.BYTE);
+            values.add(Value.SHORT);
+            values.add(Value.INT);
+            if (CheckSinglePrimitive(expr, values)) {
+                return new PrimitiveType(Value.INT);
+            }
+            break;
+        case NOT:
+            values = new HashSet<Value>();
+            values.add(Value.BOOLEAN);
+            if (CheckSinglePrimitive(expr, values)) {
+                return new PrimitiveType(Value.BOOLEAN);
+            }
+            break;
+        }
+        throw new TypeCheckingException("Invalid prefix expression");
+    }
+
+    private boolean CheckSinglePrimitive(Type type, Set<Value> values) {
+        if (type instanceof PrimitiveType) {
+            PrimitiveType ptype = (PrimitiveType) type;
+            if (values.contains(ptype.value)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
     public void visit(StringLiteral node) throws Exception {
+        node.attachType(simpletypeBuilder("java.lang.String"));
     }
 
     @Override
@@ -203,6 +272,14 @@ public class TypeCheckingVisitor extends TraversalVisitor {
     public void visit(VariableDeclarationExpression node) throws Exception {
     }
 
+    private SimpleType simpletypeBuilder(SimpleType simpleType) {
+        Name name = simpleType.name;
+        SimpleType type = new SimpleType(name);
+        type.attachDeclaration(simpleType.getDeclaration());
+        return type;
+    }
+
+    // Keep this for String Literal for now...
     private SimpleType simpletypeBuilder(String typeName) {
         SimpleName name = new SimpleName(typeName);
         SimpleType type = new SimpleType(name);
@@ -210,5 +287,4 @@ public class TypeCheckingVisitor extends TraversalVisitor {
         type.attachDeclaration(typeDec);
         return type;
     }
-
 }
