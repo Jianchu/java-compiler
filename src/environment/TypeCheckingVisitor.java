@@ -182,6 +182,20 @@ public class TypeCheckingVisitor extends TraversalVisitor {
 
     @Override
     public void visit(InstanceofExpression node) throws Exception {
+        if (node.expr != null) {
+            node.expr.accept(this);
+        }
+        if (node.type != null) {
+            node.type.accept(this);
+        }
+        
+        Type exprType = node.expr.getType();
+        
+        if (helper.assignable(exprType, node.type) || helper.assignable(node.type, exprType)) {
+            node.attachType(new PrimitiveType(Value.BOOLEAN)); 
+        } else {
+            throw new TypeCheckingException("Uncomparable types in instanceof");
+        }
     }
 
     @Override
@@ -214,6 +228,7 @@ public class TypeCheckingVisitor extends TraversalVisitor {
     private Type typeCheckPrefixExp(Type expr, ast.PrefixExpression.Operator op) throws TypeCheckingException {
         Set<Value> values;
         switch (op) {
+        // TODO: Check whether the type of -byte and -short is int.
         case MINUS:
             values = new HashSet<Value>();
             values.add(Value.BYTE);
