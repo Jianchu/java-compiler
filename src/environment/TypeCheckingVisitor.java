@@ -160,7 +160,11 @@ public class TypeCheckingVisitor extends TraversalVisitor {
         node.attachType(new PrimitiveType(Value.CHAR));
     }
 
-    // TODO:
+    /**
+     * TODO:
+     * get the constructors of node.type
+     * check whether node.arglist matches the parameters of one of the constructors
+     */
     @Override
     public void visit(ClassInstanceCreationExpression node) throws Exception {
         if (node.type != null) {
@@ -173,12 +177,20 @@ public class TypeCheckingVisitor extends TraversalVisitor {
         }
     }
 
-    // TODO:
+    /**
+     * TODO: 
+     * node.expr is the qualifier
+     * node.id is field's name
+     * the type of A.B.C.f is type of C or C.
+     */
+    
     @Override
     public void visit(FieldAccess node) throws Exception {
         if (node.expr != null) {
             node.expr.accept(this);
         }
+        
+        
     }
 
     @Override
@@ -223,7 +235,13 @@ public class TypeCheckingVisitor extends TraversalVisitor {
         node.attachType(new PrimitiveType(Value.INT));
     }
 
-    // TODO:
+    /**
+     * TODO:
+     * node.expr: A.B.C.m
+     * get declaration of methods in type C (or the type of C) who has name m. 
+     * check whether node.arglist matches the parameters of one of the methods
+     * the type of node is the return type of m.
+     */
     @Override
     public void visit(MethodInvocation node) throws Exception {
         if (node.expr != null) {
@@ -234,6 +252,7 @@ public class TypeCheckingVisitor extends TraversalVisitor {
                 expr.accept(this);
             }
         }
+
     }
 
     @Override
