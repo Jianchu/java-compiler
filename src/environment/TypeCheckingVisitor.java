@@ -97,14 +97,19 @@ public class TypeCheckingVisitor extends TraversalVisitor {
         Type exprType = node.expr.getType();
 
         if (node.lhs instanceof ArrayAccess) {
-
+            ArrayAccess arrayAccess = (ArrayAccess) node.lhs;
+            Type typeOfArray = arrayAccess.getType();
+            if (helper.assignable(typeOfArray, exprType)) {
+                node.attachType(typeOfArray);
+            } else {
+                throw new TypeCheckingException("Invalid comparison: = == have to be used for comparable types");
+            }
+            
         } else if (node.lhs instanceof SimpleName) {
 
         } else if (node.lhs instanceof QualifiedName) {
 
         }
-
-
     }
 
     @Override

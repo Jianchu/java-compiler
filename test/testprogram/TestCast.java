@@ -2,7 +2,7 @@ package testprogram;
 
 public class TestCast {
     public TestCast() {
-        a[3] = 4;
+        int r3 = a.length;
         TestCast r = new TestCast();
         r.b = 4;
         int a = 3;
