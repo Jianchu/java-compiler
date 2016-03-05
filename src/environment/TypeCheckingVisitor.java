@@ -93,7 +93,12 @@ public class TypeCheckingVisitor extends TraversalVisitor {
         }
     }
 
-    // TODO:
+    /**
+     * TODO:
+     * lhs: QualifiedName/SimpleName/ArrayAccess
+     * expr: QualifiedName/SimpleName/ArrayAccess/MethodInvocation
+     * 
+     */
     @Override
     public void visit(AssignmentExpression node) throws Exception {
         if (node.lhs != null) {
@@ -112,7 +117,7 @@ public class TypeCheckingVisitor extends TraversalVisitor {
             if (helper.assignable(typeOfArray, exprType)) {
                 node.attachType(typeOfArray);
             } else {
-                throw new TypeCheckingException("Invalid comparison: = == have to be used for comparable types");
+                throw new TypeCheckingException("Invalid assignment: incomparable types");
             }
             
         } else if (node.lhs instanceof SimpleName) {
