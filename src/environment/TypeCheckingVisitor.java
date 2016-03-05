@@ -23,6 +23,7 @@ import ast.NullLiteral;
 import ast.PrefixExpression;
 import ast.PrimitiveType;
 import ast.PrimitiveType.Value;
+import ast.QualifiedName;
 import ast.SimpleName;
 import ast.SimpleType;
 import ast.StringLiteral;
@@ -52,7 +53,7 @@ public class TypeCheckingVisitor extends TraversalVisitor {
             Set<Value> values = new HashSet<Value>();
             values.add(Value.BOOLEAN);
             if (CheckSinglePrimitive(indexType, values, null)) {
-                node.attachType(arrayType);
+                node.attachType(((ArrayType) arrayType).type);
             } else {
                 throw new TypeCheckingException("Index cannot be boolean.");
             }
@@ -82,8 +83,28 @@ public class TypeCheckingVisitor extends TraversalVisitor {
         }
     }
 
+    // TODO:
     @Override
     public void visit(AssignmentExpression node) throws Exception {
+        if (node.lhs != null) {
+            node.lhs.accept(this);
+        }
+        Type lhsType = node.lhs.getType();
+
+        if (node.expr != null) {
+            node.expr.accept(this);
+        }
+        Type exprType = node.expr.getType();
+
+        if (node.lhs instanceof ArrayAccess) {
+
+        } else if (node.lhs instanceof SimpleName) {
+
+        } else if (node.lhs instanceof QualifiedName) {
+
+        }
+
+
     }
 
     @Override
@@ -123,10 +144,12 @@ public class TypeCheckingVisitor extends TraversalVisitor {
         node.attachType(new PrimitiveType(Value.CHAR));
     }
 
+    // TODO:
     @Override
     public void visit(ClassInstanceCreationExpression node) throws Exception {
     }
 
+    // TODO:
     @Override
     public void visit(FieldAccess node) throws Exception {
     }
@@ -149,6 +172,67 @@ public class TypeCheckingVisitor extends TraversalVisitor {
         node.attachType(type);
     }
 
+    @Override
+    public void visit(InstanceofExpression node) throws Exception {
+        if (node.expr != null) {
+            node.expr.accept(this);
+        }
+        if (node.type != null) {
+            node.type.accept(this);
+        }
+
+        Type exprType = node.expr.getType();
+
+        if (helper.assignable(exprType, node.type)
+                || helper.assignable(node.type, exprType)) {
+            node.attachType(new PrimitiveType(Value.BOOLEAN));
+        } else {
+            throw new TypeCheckingException("Uncomparable types in instanceof");
+        }
+    }
+
+    @Override
+    public void visit(IntegerLiteral node) throws Exception {
+        node.attachType(new PrimitiveType(Value.INT));
+    }
+
+    // TODO:
+    @Override
+    public void visit(MethodInvocation node) throws Exception {
+    }
+
+    @Override
+    public void visit(NullLiteral node) throws Exception {
+        node.attachType(null);
+    }
+
+    @Override
+    public void visit(PrefixExpression node) throws Exception {
+        if (node.expr != null) {
+            node.expr.accept(this);
+        }
+        Type expr = node.expr.getType();
+
+        ast.PrefixExpression.Operator op = node.op;
+
+        Type type = typeCheckPrefixExp(expr, op);
+        node.attachType(type);
+    }
+
+    @Override
+    public void visit(StringLiteral node) throws Exception {
+        node.attachType(simpletypeBuilder("java.lang.String"));
+    }
+
+    // TODO:
+    @Override
+    public void visit(ThisExpression node) throws Exception {
+    }
+
+    // TODO:
+    @Override
+    public void visit(VariableDeclarationExpression node) throws Exception {
+    }
     
     private Type typeCheckInfixExp(Type lhs, Type rhs, Operator op) throws TypeCheckingException {
         switch (op) {
@@ -240,51 +324,6 @@ public class TypeCheckingVisitor extends TraversalVisitor {
         }
     }
 
-    @Override
-    public void visit(InstanceofExpression node) throws Exception {
-        if (node.expr != null) {
-            node.expr.accept(this);
-        }
-        if (node.type != null) {
-            node.type.accept(this);
-        }
-        
-        Type exprType = node.expr.getType();
-        
-        if (helper.assignable(exprType, node.type) || helper.assignable(node.type, exprType)) {
-            node.attachType(new PrimitiveType(Value.BOOLEAN)); 
-        } else {
-            throw new TypeCheckingException("Uncomparable types in instanceof");
-        }
-    }
-
-    @Override
-    public void visit(IntegerLiteral node) throws Exception {
-        node.attachType(new PrimitiveType(Value.INT));
-    }
-
-    @Override
-    public void visit(MethodInvocation node) throws Exception {
-    }
-
-    @Override
-    public void visit(NullLiteral node) throws Exception {
-        node.attachType(null);
-    }
-
-    @Override
-    public void visit(PrefixExpression node) throws Exception {
-        if (node.expr != null) {
-            node.expr.accept(this);
-        }
-        Type expr = node.expr.getType();
-
-        ast.PrefixExpression.Operator op = node.op;
-
-        Type type = typeCheckPrefixExp(expr, op);
-        node.attachType(type);
-    }
-
     private Type typeCheckPrefixExp(Type expr, ast.PrefixExpression.Operator op) throws TypeCheckingException {
         Set<Value> values;
         switch (op) {
@@ -327,19 +366,6 @@ public class TypeCheckingVisitor extends TraversalVisitor {
             }
         }
         return false;
-    }
-
-    @Override
-    public void visit(StringLiteral node) throws Exception {
-        node.attachType(simpletypeBuilder("java.lang.String"));
-    }
-
-    @Override
-    public void visit(ThisExpression node) throws Exception {
-    }
-
-    @Override
-    public void visit(VariableDeclarationExpression node) throws Exception {
     }
 
     private SimpleType simpleTypeBuilder(SimpleType simpleType) {
