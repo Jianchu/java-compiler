@@ -13,6 +13,7 @@ import ast.CastExpression;
 import ast.CharacterLiteral;
 import ast.ClassInstanceCreationExpression;
 import ast.CompilationUnit;
+import ast.Expression;
 import ast.FieldAccess;
 import ast.InfixExpression;
 import ast.InfixExpression.Operator;
@@ -162,11 +163,22 @@ public class TypeCheckingVisitor extends TraversalVisitor {
     // TODO:
     @Override
     public void visit(ClassInstanceCreationExpression node) throws Exception {
+        if (node.type != null) {
+            node.type.accept(this);
+        }
+        if (node.arglist != null) {
+            for (Expression expr : node.arglist) {
+                expr.accept(this);
+            }
+        }
     }
 
     // TODO:
     @Override
     public void visit(FieldAccess node) throws Exception {
+        if (node.expr != null) {
+            node.expr.accept(this);
+        }
     }
 
     @Override
@@ -214,6 +226,14 @@ public class TypeCheckingVisitor extends TraversalVisitor {
     // TODO:
     @Override
     public void visit(MethodInvocation node) throws Exception {
+        if (node.expr != null) {
+            node.expr.accept(this);
+        }
+        if (node.arglist != null) {
+            for (Expression expr : node.arglist) {
+                expr.accept(this);
+            }
+        }
     }
 
     @Override
@@ -244,9 +264,16 @@ public class TypeCheckingVisitor extends TraversalVisitor {
         node.attachType(simpleTypeBuilder(this.currentTypeName));
     }
 
-    // TODO:
     @Override
     public void visit(VariableDeclarationExpression node) throws Exception {
+        if (node.variableDeclaration != null) {
+            node.variableDeclaration.accept(this);
+        }
+
+        Type initializerType = node.variableDeclaration.initializer.getType();
+        if (helper.assignable(node.variableDeclaration.type, initializerType)) {
+            node.attachType(node.variableDeclaration.type);
+        }
     }
     
     private Type typeCheckInfixExp(Type lhs, Type rhs, Operator op) throws TypeCheckingException {
