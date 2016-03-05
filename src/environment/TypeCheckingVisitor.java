@@ -164,6 +164,7 @@ public class TypeCheckingVisitor extends TraversalVisitor {
      * TODO:
      * get the constructors of node.type
      * check whether node.arglist matches the parameters of one of the constructors
+     * the type of node is node.type
      */
     @Override
     public void visit(ClassInstanceCreationExpression node) throws Exception {
@@ -238,7 +239,7 @@ public class TypeCheckingVisitor extends TraversalVisitor {
     /**
      * TODO:
      * node.expr: A.B.C.m
-     * get declaration of methods in type C (or the type of C) who has name m. 
+     * get declaration of methods in type C (or the type of C) who have name m. 
      * check whether node.arglist matches the parameters of one of the methods
      * the type of node is the return type of m.
      */
