@@ -12,6 +12,7 @@ import ast.BooleanLiteral;
 import ast.CastExpression;
 import ast.CharacterLiteral;
 import ast.ClassInstanceCreationExpression;
+import ast.CompilationUnit;
 import ast.FieldAccess;
 import ast.InfixExpression;
 import ast.InfixExpression.Operator;
@@ -36,8 +37,16 @@ import exceptions.TypeCheckingException;
 public class TypeCheckingVisitor extends TraversalVisitor {
     private final Map<String, TypeDeclaration> global = SymbolTable.getGlobal();
     private final TypeHelper helper = new TypeHelper();
-
+    private String currentTypeName;
     // maybe need to add or delete some methods...
+
+    @Override
+    public void visit(CompilationUnit node) throws Exception {
+        for (TypeDeclaration typeDecl : node.types) {
+            this.currentTypeName = typeDecl.getFullName();
+            typeDecl.accept(this);
+        }
+    }
 
     @Override
     public void visit(ArrayAccess node) throws Exception {
@@ -106,6 +115,7 @@ public class TypeCheckingVisitor extends TraversalVisitor {
             }
             
         } else if (node.lhs instanceof SimpleName) {
+
 
         } else if (node.lhs instanceof QualifiedName) {
 
@@ -226,12 +236,12 @@ public class TypeCheckingVisitor extends TraversalVisitor {
 
     @Override
     public void visit(StringLiteral node) throws Exception {
-        node.attachType(simpletypeBuilder("java.lang.String"));
+        node.attachType(simpleTypeBuilder("java.lang.String"));
     }
 
-    // TODO:
     @Override
     public void visit(ThisExpression node) throws Exception {
+        node.attachType(simpleTypeBuilder(this.currentTypeName));
     }
 
     // TODO:
@@ -396,8 +406,8 @@ public class TypeCheckingVisitor extends TraversalVisitor {
         return arrayType;
     }
 
-    // Keep this for String Literal for now...
-    private SimpleType simpletypeBuilder(String typeName) {
+    // Keep this for String Literal and this for now...
+    private SimpleType simpleTypeBuilder(String typeName) {
         SimpleName name = new SimpleName(typeName);
         SimpleType type = new SimpleType(name);
         TypeDeclaration typeDec = global.get(typeName);
