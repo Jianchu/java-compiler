@@ -8,5 +8,7 @@ public class CastExpr {
 		//int y = (String) x;
 //		int[] z = new int[5];
 //		z[0] = 1;
+		x.x().y();
+		x.x.y=1;
 	}
 }

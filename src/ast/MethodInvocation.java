@@ -7,7 +7,7 @@ import parser.ParseTree;
 
 public class MethodInvocation extends Expression {
     public Expression expr;
-    public String id;
+    public SimpleName id;
     public List<Expression> arglist;
 
     public MethodInvocation(ParseTree pt) throws ASTException {
@@ -20,7 +20,7 @@ public class MethodInvocation extends Expression {
                 arglist = Expression.parseArglist(subtrees.get(2));
             }
         } else {
-            id = ASTHelper.parseID(subtrees.get(2));
+            id = new SimpleName(ASTHelper.parseID(subtrees.get(2)));
             arglist = null;
             if (subtrees.size() == 6) {
                 arglist = Expression.parseArglist(subtrees.get(4));

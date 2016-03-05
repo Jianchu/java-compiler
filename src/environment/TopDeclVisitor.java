@@ -139,6 +139,7 @@ public class TopDeclVisitor extends TraversalVisitor {
 		// attach the scope of fields and methods to TypeDeclaration.
 		typeDecl.attachEnvironment(table.currentScope());
 		table.closeScope();	// class
+		table.closeScope(); // inherit
 
 	}
 	
@@ -178,8 +179,10 @@ public class TopDeclVisitor extends TraversalVisitor {
 			table.currentScope().addConstructor(NameHelper.mangle(mDecl), mDecl);
 		}
 		
-		table.openScope(Environment.EnvType.BLOCK);
-		// extra scope for method parameters
+		table.openScope(Environment.EnvType.BLOCK); // extra scope for method parameters
+		mDecl.attachEnvironment(table.currentScope());
+		
+		
 		for (VariableDeclaration vd : mDecl.parameters) {
 			vd.accept(this);
 		}
@@ -192,6 +195,9 @@ public class TopDeclVisitor extends TraversalVisitor {
 	
 	public void visit(Block block) throws Exception {
 		table.openScope(Environment.EnvType.BLOCK);
+		
+		// attach the environment of this block to the node
+		block.attachEnvironment(table.currentScope());
 		if (block.statements.size() > 0) {
 			Statement first = block.statements.get(0);
 			first.accept(this);
@@ -201,6 +207,10 @@ public class TopDeclVisitor extends TraversalVisitor {
 	
 	public void visit(VariableDeclarationStatement vds) throws Exception {
 		table.openScope(Environment.EnvType.BLOCK);
+		
+		// attach the environment to the node 
+		vds.attachEnvironment(table.currentScope());
+		
 		vds.varDeclar.accept(this);
 		if (vds.hasNext()) {
 			vds.next().accept(this);
@@ -209,9 +219,7 @@ public class TopDeclVisitor extends TraversalVisitor {
 	}
 	
 	public void visit(VariableDeclarationExpression vde) throws Exception {
-		table.openScope(Environment.EnvType.BLOCK);
 		vde.variableDeclaration.accept(this);
-		table.closeScope();
 	}
 	
 	public void visit(VariableDeclaration vd) throws Exception {
@@ -244,6 +252,8 @@ public class TopDeclVisitor extends TraversalVisitor {
 		
 		table.openScope(Environment.EnvType.BLOCK);
 		// scope for variables declared in forInit
+		node.attachEnvironment(table.currentScope());
+		
 		if (node.forInit != null)
 			node.forInit.accept(this);
 		if (node.forBody != null)

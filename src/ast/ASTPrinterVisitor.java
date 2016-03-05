@@ -302,7 +302,7 @@ public class ASTPrinterVisitor implements Visitor{
             node.expr.accept(this);
         }
         if (node.id != null) {
-            printIndent(node.id);
+            printIndent(node.id.toString());
         }
         if (node.arglist != null) {
             for (Expression expr : node.arglist) {
