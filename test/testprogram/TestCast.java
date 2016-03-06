@@ -26,6 +26,7 @@ public class TestCast {
     public TestCast m(int a) {
         TestCast t = new TestCast();
         a = t.f2.length;
+        int q = t.m(3).f;
         return t;
     }
 }

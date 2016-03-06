@@ -122,14 +122,14 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
         if (node.lhs instanceof ArrayAccess) {
             ArrayAccess arrayAccess = (ArrayAccess) node.lhs;
             Type typeOfArray = arrayAccess.getType();
-            if (helper.assignable(typeOfArray, exprType)) {
+            if (TypeHelper.assignable(typeOfArray, exprType)) {
                 node.attachType(typeOfArray);
             } else {
                 throw new TypeCheckingException("Invalid assignment: incomparable types");
             }
             
         } else {
-            if (helper.assignable(lhsType, exprType)) {
+            if (TypeHelper.assignable(lhsType, exprType)) {
                 node.attachType(lhsType);
             } else {
                 throw new TypeCheckingException("Invalid assignment: incomparable types");
@@ -164,7 +164,7 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
             node.attachType(castToType);
         } else if (checkPrimitive(castToType, unaryType, true)) {
             node.attachType(new PrimitiveType(Value.BOOLEAN));
-        } else if (helper.assignable(castToType, unaryType) || helper.assignable(unaryType, castToType)) {
+        } else if (TypeHelper.assignable(castToType, unaryType) || TypeHelper.assignable(unaryType, castToType)) {
             node.attachType(simpleTypeBuilder((SimpleType) castToType));
         }
     }
@@ -272,8 +272,8 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
 
         Type exprType = node.expr.getType();
 
-        if (helper.assignable(exprType, node.type)
-                || helper.assignable(node.type, exprType)) {
+        if (TypeHelper.assignable(exprType, node.type)
+                || TypeHelper.assignable(node.type, exprType)) {
             node.attachType(new PrimitiveType(Value.BOOLEAN));
         } else {
             throw new TypeCheckingException("Uncomparable types in instanceof");
@@ -365,7 +365,7 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
         }
 
         Type initializerType = node.variableDeclaration.initializer.getType();
-        if (helper.assignable(node.variableDeclaration.type, initializerType)) {
+        if (TypeHelper.assignable(node.variableDeclaration.type, initializerType)) {
             node.attachType(node.variableDeclaration.type);
         } else {
             throw new TypeCheckingException(initializerType.toString()
@@ -410,7 +410,7 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
             }
         case NEQ:
         case EQUAL:
-            if (helper.assignable(lhs, rhs) || helper.assignable(rhs, lhs)) {
+            if (TypeHelper.assignable(lhs, rhs) || TypeHelper.assignable(rhs, lhs)) {
                 return new PrimitiveType(Value.BOOLEAN);
             } else {
                 throw new TypeCheckingException("Invalid comparison: = == have to be used for comparable types");
