@@ -223,13 +223,17 @@ public class Hierarchy {
 			MethodDeclaration decl1 = fromEnv.methods.get(method);
 			// decl2 is replaced by decl1
 			
+			// applies to abstract method replace too.
 			if (!(decl2.returnType == decl1.returnType || decl2.returnType.equals(decl1.returnType))) {
 				throw new HierarchyException("Return type of replaced method does not match.");
 			}
+			
+			// only applies to superclass replace
 			if (decl2.modifiers.contains(Modifier.PUBLIC) &&
 					!decl1.modifiers.contains(Modifier.PUBLIC)) {
 				throw new HierarchyException("A non-public method replaced public method.");
 			}
+			// only applies to superclass replace
 			// the old method can't be final
 			if (decl2.modifiers.contains(Modifier.FINAL)) {
 				throw new HierarchyException("Final method cannot be override.s");
