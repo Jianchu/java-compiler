@@ -25,12 +25,14 @@ import ast.NullLiteral;
 import ast.PrefixExpression;
 import ast.PrimitiveType;
 import ast.PrimitiveType.Value;
+import ast.QualifiedName;
 import ast.SimpleName;
 import ast.SimpleType;
 import ast.StringLiteral;
 import ast.ThisExpression;
 import ast.Type;
 import ast.TypeDeclaration;
+import ast.VariableDeclaration;
 import ast.VariableDeclarationExpression;
 import exceptions.TypeCheckingException;
 
@@ -301,6 +303,26 @@ public class TypeCheckingVisitor extends TraversalVisitor {
         }
     }
     
+    @Override
+    public void visit(SimpleName node) throws Exception {
+        attachTypeOfName(node);
+    }
+
+    @Override
+    public void visit(QualifiedName node) throws Exception {
+        attachTypeOfName(node);
+    }
+
+    private void attachTypeOfName(Name node) throws TypeCheckingException {
+        VariableDeclaration vDecl = (VariableDeclaration) node.getDeclaration();
+        Type type = vDecl.type;
+        if (type != null) {
+            node.attachType(type);
+        } else {
+            throw new TypeCheckingException("Type not found for name: " + node.toString());
+        }
+    }
+
     private Type typeCheckInfixExp(Type lhs, Type rhs, Operator op) throws TypeCheckingException {
         switch (op) {
         case PLUS:

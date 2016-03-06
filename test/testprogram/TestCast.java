@@ -27,6 +27,7 @@ public class TestCast {
         Integer c = new Integer(1);
         int q = 3;
         m(1).f1 = q;
+        c = q;
         return t;
     }
 }
