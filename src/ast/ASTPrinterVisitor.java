@@ -183,7 +183,7 @@ public class ASTPrinterVisitor implements Visitor{
             node.expr.accept(this);
         }
         if (node.id != null) {
-            printIndent(node.id);
+            printIndent(node.id.toString());
         }
         indent -= DISTANCE;
     }
