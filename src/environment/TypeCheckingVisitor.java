@@ -12,6 +12,8 @@ import ast.BooleanLiteral;
 import ast.CastExpression;
 import ast.CharacterLiteral;
 import ast.ClassInstanceCreationExpression;
+import ast.CompilationUnit;
+import ast.Expression;
 import ast.FieldAccess;
 import ast.InfixExpression;
 import ast.InfixExpression.Operator;
@@ -36,8 +38,16 @@ import exceptions.TypeCheckingException;
 public class TypeCheckingVisitor extends TraversalVisitor {
     private final Map<String, TypeDeclaration> global = SymbolTable.getGlobal();
     private final TypeHelper helper = new TypeHelper();
-
+    private String currentTypeName;
     // maybe need to add or delete some methods...
+
+    @Override
+    public void visit(CompilationUnit node) throws Exception {
+        for (TypeDeclaration typeDecl : node.types) {
+            this.currentTypeName = typeDecl.getFullName();
+            typeDecl.accept(this);
+        }
+    }
 
     @Override
     public void visit(ArrayAccess node) throws Exception {
@@ -83,7 +93,12 @@ public class TypeCheckingVisitor extends TraversalVisitor {
         }
     }
 
-    // TODO:
+    /**
+     * TODO:
+     * lhs: QualifiedName/SimpleName/ArrayAccess
+     * expr: QualifiedName/SimpleName/ArrayAccess/MethodInvocation
+     * 
+     */
     @Override
     public void visit(AssignmentExpression node) throws Exception {
         if (node.lhs != null) {
@@ -102,10 +117,11 @@ public class TypeCheckingVisitor extends TraversalVisitor {
             if (helper.assignable(typeOfArray, exprType)) {
                 node.attachType(typeOfArray);
             } else {
-                throw new TypeCheckingException("Invalid comparison: = == have to be used for comparable types");
+                throw new TypeCheckingException("Invalid assignment: incomparable types");
             }
             
         } else if (node.lhs instanceof SimpleName) {
+
 
         } else if (node.lhs instanceof QualifiedName) {
 
@@ -149,14 +165,38 @@ public class TypeCheckingVisitor extends TraversalVisitor {
         node.attachType(new PrimitiveType(Value.CHAR));
     }
 
-    // TODO:
+    /**
+     * TODO:
+     * get the constructors of node.type
+     * check whether node.arglist matches the parameters of one of the constructors
+     * the type of node is node.type
+     */
     @Override
     public void visit(ClassInstanceCreationExpression node) throws Exception {
+        if (node.type != null) {
+            node.type.accept(this);
+        }
+        if (node.arglist != null) {
+            for (Expression expr : node.arglist) {
+                expr.accept(this);
+            }
+        }
     }
 
-    // TODO:
+    /**
+     * TODO: 
+     * node.expr is the qualifier
+     * node.id is field's name
+     * the type of A.B.C.f is type of C or C.
+     */
+    
     @Override
     public void visit(FieldAccess node) throws Exception {
+        if (node.expr != null) {
+            node.expr.accept(this);
+        }
+        
+        
     }
 
     @Override
@@ -201,9 +241,24 @@ public class TypeCheckingVisitor extends TraversalVisitor {
         node.attachType(new PrimitiveType(Value.INT));
     }
 
-    // TODO:
+    /**
+     * TODO:
+     * node.expr: A.B.C.m
+     * get declaration of methods in type C (or the type of C) who have name m. 
+     * check whether node.arglist matches the parameters of one of the methods
+     * the type of node is the return type of m.
+     */
     @Override
     public void visit(MethodInvocation node) throws Exception {
+        if (node.expr != null) {
+            node.expr.accept(this);
+        }
+        if (node.arglist != null) {
+            for (Expression expr : node.arglist) {
+                expr.accept(this);
+            }
+        }
+
     }
 
     @Override
@@ -226,17 +281,24 @@ public class TypeCheckingVisitor extends TraversalVisitor {
 
     @Override
     public void visit(StringLiteral node) throws Exception {
-        node.attachType(simpletypeBuilder("java.lang.String"));
+        node.attachType(simpleTypeBuilder("java.lang.String"));
     }
 
-    // TODO:
     @Override
     public void visit(ThisExpression node) throws Exception {
+        node.attachType(simpleTypeBuilder(this.currentTypeName));
     }
 
-    // TODO:
     @Override
     public void visit(VariableDeclarationExpression node) throws Exception {
+        if (node.variableDeclaration != null) {
+            node.variableDeclaration.accept(this);
+        }
+
+        Type initializerType = node.variableDeclaration.initializer.getType();
+        if (helper.assignable(node.variableDeclaration.type, initializerType)) {
+            node.attachType(node.variableDeclaration.type);
+        }
     }
     
     private Type typeCheckInfixExp(Type lhs, Type rhs, Operator op) throws TypeCheckingException {
@@ -396,8 +458,8 @@ public class TypeCheckingVisitor extends TraversalVisitor {
         return arrayType;
     }
 
-    // Keep this for String Literal for now...
-    private SimpleType simpletypeBuilder(String typeName) {
+    // Keep this for String Literal and this for now...
+    private SimpleType simpleTypeBuilder(String typeName) {
         SimpleName name = new SimpleName(typeName);
         SimpleType type = new SimpleType(name);
         TypeDeclaration typeDec = global.get(typeName);
