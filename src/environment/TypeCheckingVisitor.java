@@ -2,6 +2,7 @@ package environment;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -10,6 +11,7 @@ import ast.PrimitiveType.Value;
 import ast.InfixExpression.Operator;
 import ast.*;
 import exceptions.NameException;
+
 import exceptions.TypeCheckingException;
 
 public class TypeCheckingVisitor extends EnvTraversalVisitor {
@@ -72,8 +74,8 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
 
     /**
      * TODO:
-     * lhs: QualifiedName/SimpleName/ArrayAccess
-     * expr: QualifiedName/SimpleName/ArrayAccess/MethodInvocation
+     * lhs: QualifiedName/SimpleName/ArrayAccess/FieldAccess
+     * expr: QualifiedName/SimpleName/ArrayAccess/MethodInvocation/FieldAccess
      * 
      */
     @Override
@@ -97,11 +99,12 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
                 throw new TypeCheckingException("Invalid assignment: incomparable types");
             }
             
-        } else if (node.lhs instanceof SimpleName) {
-
-
-        } else if (node.lhs instanceof QualifiedName) {
-
+        } else {
+            if (helper.assignable(lhsType, exprType)) {
+                node.attachType(lhsType);
+            } else {
+                throw new TypeCheckingException("Invalid assignment: incomparable types");
+            }
         }
     }
 
@@ -150,14 +153,50 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
      */
     @Override
     public void visit(ClassInstanceCreationExpression node) throws Exception {
+        List<Expression> realParameters = new LinkedList<Expression>();
         if (node.type != null) {
             node.type.accept(this);
         }
+        Type instanceType = node.type;
         if (node.arglist != null) {
             for (Expression expr : node.arglist) {
                 expr.accept(this);
             }
+            realParameters = node.arglist;
         }
+
+        try {
+            Map<String, MethodDeclaration> constructors = node.type.getDeclaration().getEnvironment().constructors;
+            for (String s : constructors.keySet()) {
+                List<VariableDeclaration> Decparameters = constructors.get(s).parameters;
+                if (Decparameters.size() == realParameters.size()) {
+                    if (realParameters.size() == 0) {
+                        node.attachType(instanceType);
+                    } else {
+                        boolean matches = checkParameters(realParameters, Decparameters);
+                        if (matches) {
+                            node.attachType(instanceType);
+                            return;
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            throw new TypeCheckingException("Type environment not found");
+        }
+    }
+
+    private boolean checkParameters(List<Expression> realParameters, List<VariableDeclaration> Decparameters) {
+        int paraSize = realParameters.size();
+        boolean matches = true;
+        for (int i = paraSize; i > 0; i--) {
+            Type realType = realParameters.get(i).getType();
+            Type decType = Decparameters.get(i).type;
+            if (!realType.equals(decType)) {
+                matches = false;
+            }
+        }
+        return matches;
     }
 
     /**
@@ -301,7 +340,7 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
             node.attachType(node.variableDeclaration.type);
         }	//TODO: else?
     }
-    
+
     private Type typeCheckInfixExp(Type lhs, Type rhs, Operator op) throws TypeCheckingException {
         switch (op) {
         case PLUS:
