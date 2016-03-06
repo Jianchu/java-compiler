@@ -454,8 +454,12 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
     		// array.length
     		QualifiedName qn = (QualifiedName) name;
     		if (qn.isArrayLength) {
-    		    //check that the qualifier is ArrayType. 
-    		    if (qn.getQualifier().getType() instanceof ArrayType) {
+    		    //check that the qualifier is ArrayType.
+    		    Name qualifier = qn.getQualifier();
+    		    if (qualifier == null) {
+    		        resolveNameType(qualifier);
+    		    }
+    		    if (qualifier.getType() instanceof ArrayType) {
     		        name.attachType(new PrimitiveType(Value.INT));
     		    }
     		} else {
