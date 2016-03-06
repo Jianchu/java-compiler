@@ -25,7 +25,6 @@ import ast.NullLiteral;
 import ast.PrefixExpression;
 import ast.PrimitiveType;
 import ast.PrimitiveType.Value;
-import ast.QualifiedName;
 import ast.SimpleName;
 import ast.SimpleType;
 import ast.StringLiteral;
@@ -95,8 +94,8 @@ public class TypeCheckingVisitor extends TraversalVisitor {
 
     /**
      * TODO:
-     * lhs: QualifiedName/SimpleName/ArrayAccess
-     * expr: QualifiedName/SimpleName/ArrayAccess/MethodInvocation
+     * lhs: QualifiedName/SimpleName/ArrayAccess/FieldAccess
+     * expr: QualifiedName/SimpleName/ArrayAccess/MethodInvocation/FieldAccess
      * 
      */
     @Override
@@ -120,11 +119,12 @@ public class TypeCheckingVisitor extends TraversalVisitor {
                 throw new TypeCheckingException("Invalid assignment: incomparable types");
             }
             
-        } else if (node.lhs instanceof SimpleName) {
-
-
-        } else if (node.lhs instanceof QualifiedName) {
-
+        } else {
+            if (helper.assignable(lhsType, exprType)) {
+                node.attachType(lhsType);
+            } else {
+                throw new TypeCheckingException("Invalid assignment: incomparable types");
+            }
         }
     }
 

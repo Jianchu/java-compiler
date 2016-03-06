@@ -1,3 +1,4 @@
+package testprogram;
 
 public class ArrayAccess {
 	public ArrayAccess() {}

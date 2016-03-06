@@ -22,12 +22,12 @@ public class TestCast {
      * field = array -
      * 
      */
-    public int m(int a) {
+    public TestCast m(int a) {
         TestCast t = new TestCast();
-        int[] g = new int[2];
-        TestCast.f = t.f1;
-        
-        return 1;
+        Integer c = new Integer(1);
+        int q = 3;
+        m(1).f1 = q;
+        return t;
     }
 }
 
