@@ -17,7 +17,7 @@ import exceptions.TypeLinkException;
 public class Disambiguation extends EnvTraversalVisitor{
 	
 	public void visit(TypeDeclaration node) throws Exception {
-//		System.out.println(node.getFullName());
+		System.out.println(node.getFullName());
 		super.visit(node);
 	}
 	
@@ -70,6 +70,7 @@ public class Disambiguation extends EnvTraversalVisitor{
 	}
 	
 	/**
+	 * TODO: check for no decl in 
 	 * A1.A2.A3....
 	 * @throws Exception 
 	 */
@@ -78,12 +79,18 @@ public class Disambiguation extends EnvTraversalVisitor{
 		ASTNode a1Decl = curr.lookUpVariable(fn.get(0));
 		if (a1Decl != null) {
 			// A1 is variable declaration, the rest are instance field;
+			TypeDeclaration prefixDecl = ((VariableDeclaration) a1Decl).type.getDeclaration();
+			prefixDecl = lookUpField(node, prefixDecl);
+			node.attachDeclaration(prefixDecl);		// the final prefix is just the full name
 			return;
 		}
 		
 		a1Decl = curr.lookUpField(fn.get(0));
 		if (a1Decl != null) {
 			// A1 is a field, the rest are instance fields
+			TypeDeclaration prefixDecl = ((FieldDeclaration) a1Decl).type.getDeclaration();
+			prefixDecl = lookUpField(node, prefixDecl);
+			node.attachDeclaration(prefixDecl);		// the final prefix is just the full name
 			return;
 		}
 		
@@ -114,24 +121,37 @@ public class Disambiguation extends EnvTraversalVisitor{
 		throw new NameException("Qualified Name not recognized: " + node.toString());
 	}
 	
-	public void resolveMethodName(Name name) throws Exception {
-		if (name instanceof SimpleName)
-			resolveMethodName((SimpleName) name);
-		else {
-			resolveMethodName((QualifiedName) name);
+	/**
+	 * for looking up instance fields
+	 * @param fn
+	 * @param decl
+	 * @return
+	 * @throws NameException 
+	 */
+	private TypeDeclaration lookUpField(QualifiedName name, TypeDeclaration prefixDecl) throws NameException {		
+		List<String> fn = name.getFullName();
+		for (int i = 1; i < fn.size(); i++) {	
+			if (prefixDecl == null) {
+				// array.length
+				if (fn.get(i).equals("length") && fn.size() == i+1) {
+					name.getQualifier().attachDeclaration(prefixDecl);
+					name.isArrayLength = true;
+					return null;
+				} else {
+					throw new NameException("Field Prefix not recognized: "+ String.join(".", fn.subList(0, i+1)));
+				}
+			}
+			
+			// normal
+			FieldDeclaration fDecl = prefixDecl.getEnvironment().lookUpField(fn.get(i));
+			if (fDecl == null) {
+				throw new NameException("Field Prefix not recognized: "+ String.join(".", fn.subList(0, i+1)));
+			}
+			prefixDecl = fDecl.type.getDeclaration();
 		}
+		return prefixDecl;
 	}
-	
-	public void resolveMethodName(SimpleName name) throws NameException {
-		MethodDeclaration mDecl = curr.lookUpMethod(name.toString());
-		if (mDecl == null)
-			throw new NameException("Simple method name not recognized: " + name );
-		name.attachDeclaration(mDecl);
-	}
-	
-	public void resolveMethodName(QualifiedName name) throws Exception {
-		
-	}
+
 	
 	public static void disambiguate(List<AST> trees) throws Exception {
 		for (AST t : trees) {

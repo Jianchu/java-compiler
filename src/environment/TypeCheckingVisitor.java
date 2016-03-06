@@ -1,15 +1,18 @@
 package environment;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import ast.PrimitiveType.Value;
 import ast.InfixExpression.Operator;
 import ast.*;
+import exceptions.NameException;
 import exceptions.TypeCheckingException;
 
-public class TypeCheckingVisitor extends TraversalVisitor {
+public class TypeCheckingVisitor extends EnvTraversalVisitor {
     private final Map<String, TypeDeclaration> global = SymbolTable.getGlobal();
     private final TypeHelper helper = new TypeHelper();
     private String currentTypeName;
@@ -223,15 +226,40 @@ public class TypeCheckingVisitor extends TraversalVisitor {
      */
     @Override
     public void visit(MethodInvocation node) throws Exception {
-        if (node.expr != null) {
-            node.expr.accept(this);
-        }
-        if (node.arglist != null) {
+        List<Type> argTypes = new ArrayList<Type>();
+    	if (node.arglist != null) {
             for (Expression expr : node.arglist) {
                 expr.accept(this);
+                // save the parameter types to a list
+                argTypes.add(expr.getType());
             }
         }
-
+        
+        if (node.id != null) {
+        	// Primary.id(...)
+        	node.expr.accept(this);	// there should always be an expression
+        	TypeDeclaration prefixDecl = node.expr.getType().getDeclaration();
+        	String methodName = NameHelper.mangle(node.id.toString(), argTypes);
+        	MethodDeclaration mDecl = prefixDecl.getEnvironment().lookUpMethod(methodName);
+        	if (mDecl == null)
+        		throw new TypeCheckingException("Method invocation [Primary].[ID]() not recoginzed: " + node.expr + " " + node.id);
+        	
+        	if (mDecl.returnType != null) {
+        		node.attachType(mDecl.returnType);
+        	} else {
+        		node.attachType(new Void());
+        	}
+        	
+        	// resolve the declaration of id too
+        	node.id.attachDeclaration(mDecl);
+        	
+        } else if (node.expr instanceof Name) {
+        	// Name(...)
+        	resolveMethodName((Name) node.expr, argTypes);
+        	
+        } else {
+        	throw new TypeCheckingException("Method invocation: " + node.expr + " " + node.id);
+        }
     }
 
     @Override
@@ -271,7 +299,7 @@ public class TypeCheckingVisitor extends TraversalVisitor {
         Type initializerType = node.variableDeclaration.initializer.getType();
         if (helper.assignable(node.variableDeclaration.type, initializerType)) {
             node.attachType(node.variableDeclaration.type);
-        }
+        }	//TODO: else?
     }
     
     private Type typeCheckInfixExp(Type lhs, Type rhs, Operator op) throws TypeCheckingException {
@@ -328,10 +356,16 @@ public class TypeCheckingVisitor extends TraversalVisitor {
         return null;
     }
     
+    /**
+     * only search for variable or field name
+     */
     public void visit(SimpleName name) throws TypeCheckingException {
     	resolveNameType(name);
     }
     
+    /**
+     * only search for variable or field name
+     */
     public void visit(QualifiedName name) throws TypeCheckingException {
     	resolveNameType(name);
     }
@@ -344,6 +378,14 @@ public class TypeCheckingVisitor extends TraversalVisitor {
     	} else if (decl instanceof FieldDeclaration) {
     		FieldDeclaration fDecl = (FieldDeclaration) decl;
     		name.attachType(fDecl.type);
+    	} else if (decl == null && name instanceof QualifiedName){
+    		// array.length
+    		QualifiedName qn = (QualifiedName) name;
+    		if (qn.isArrayLength) {
+    			name.attachType(new PrimitiveType(Value.INT));
+    		} else {
+    			throw new TypeCheckingException("Declaration found for non-array fields.");
+    		}
     	} else {
     		throw new TypeCheckingException("Field or variable name not recoginzed: " + name.toString());
     	}
@@ -460,4 +502,25 @@ public class TypeCheckingVisitor extends TraversalVisitor {
         type.attachDeclaration(typeDec);
         return type;
     }
+    
+	private void resolveMethodName(Name name, List<Type> paramTypes) throws Exception {
+		if (name instanceof SimpleName)
+			resolveMethodName((SimpleName) name, paramTypes);
+		else {
+			resolveMethodName((QualifiedName) name, paramTypes);
+		}
+	}
+	
+	private void resolveMethodName(SimpleName name, List<Type> paramTypes) throws NameException {
+		MethodDeclaration mDecl = curr.lookUpMethod(NameHelper.mangle(name.toString(), paramTypes));
+		if (mDecl == null)
+			throw new NameException("Simple method name not recognized: " + name );
+		name.attachDeclaration(mDecl);
+	}
+	
+	private void resolveMethodName(QualifiedName name, List<Type> paramTypes) throws Exception {
+		List<String> fn = name.getFullName();
+		ASTNode a1Decl = curr.lookUpVariable(fn.get(0));
+		
+	}
 }

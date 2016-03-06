@@ -15,6 +15,7 @@ import parser.ParseTree;
 public class QualifiedName extends Name{
 	private Name qualifier = null;
 	private String id = null;
+	public boolean isArrayLength = false;
 	
 	// the list could be length 0
 	private List<String> fullName = new LinkedList<String>();
