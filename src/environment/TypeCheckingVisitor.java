@@ -4,35 +4,9 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import ast.ArrayAccess;
-import ast.ArrayCreationExpression;
-import ast.ArrayType;
-import ast.AssignmentExpression;
-import ast.BooleanLiteral;
-import ast.CastExpression;
-import ast.CharacterLiteral;
-import ast.ClassInstanceCreationExpression;
-import ast.CompilationUnit;
-import ast.Expression;
-import ast.FieldAccess;
-import ast.InfixExpression;
-import ast.InfixExpression.Operator;
-import ast.InstanceofExpression;
-import ast.IntegerLiteral;
-import ast.MethodInvocation;
-import ast.Name;
-import ast.NullLiteral;
-import ast.PrefixExpression;
-import ast.PrimitiveType;
 import ast.PrimitiveType.Value;
-import ast.QualifiedName;
-import ast.SimpleName;
-import ast.SimpleType;
-import ast.StringLiteral;
-import ast.ThisExpression;
-import ast.Type;
-import ast.TypeDeclaration;
-import ast.VariableDeclarationExpression;
+import ast.InfixExpression.Operator;
+import ast.*;
 import exceptions.TypeCheckingException;
 
 public class TypeCheckingVisitor extends TraversalVisitor {
@@ -189,7 +163,6 @@ public class TypeCheckingVisitor extends TraversalVisitor {
      * node.id is field's name
      * the type of A.B.C.f is type of C or C.
      */
-    
     @Override
     public void visit(FieldAccess node) throws Exception {
         if (node.expr != null) {
@@ -353,6 +326,27 @@ public class TypeCheckingVisitor extends TraversalVisitor {
             }
         }
         return null;
+    }
+    
+    public void visit(SimpleName name) throws TypeCheckingException {
+    	resolveNameType(name);
+    }
+    
+    public void visit(QualifiedName name) throws TypeCheckingException {
+    	resolveNameType(name);
+    }
+    
+    private void resolveNameType(Name name) throws TypeCheckingException {
+    	ASTNode decl = name.getDeclaration();
+    	if (decl instanceof VariableDeclaration) {
+    		VariableDeclaration vDecl = (VariableDeclaration) decl;
+    		name.attachType(vDecl.type);
+    	} else if (decl instanceof FieldDeclaration) {
+    		FieldDeclaration fDecl = (FieldDeclaration) decl;
+    		name.attachType(fDecl.type);
+    	} else {
+    		throw new TypeCheckingException("Field or variable name not recoginzed: " + name.toString());
+    	}
     }
     
     private SimpleType checkeStringConcat(Type type1, Type type2)
