@@ -561,7 +561,24 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
 	
 	private void resolveMethodName(QualifiedName name, List<Type> paramTypes) throws Exception {
 		List<String> fn = name.getFullName();
-		ASTNode a1Decl = curr.lookUpVariable(fn.get(0));
-		
+		ASTNode a1Decl;
+		if ((a1Decl  = curr.lookUpVariable(fn.get(0))) != null || (a1Decl = curr.lookUpField(fn.get(0))) != null) {
+			// A1 is variable or a field, everything in the middle is an instance field
+			TypeDeclaration prefixDecl;
+			if (a1Decl instanceof VariableDeclaration)
+				prefixDecl = ((VariableDeclaration) a1Decl).type.getDeclaration();
+			else 
+				prefixDecl = ((FieldDeclaration) a1Decl).type.getDeclaration();
+			
+			MethodDeclaration mDecl = searchMethod(name, prefixDecl, paramTypes);
+			name.attachDeclaration(mDecl);
+			name.attachType(mDecl.returnType);
+			return;
+		}
+	}
+
+	private MethodDeclaration searchMethod(QualifiedName name, TypeDeclaration prefixDecl, List<Type> paramTypes) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }
