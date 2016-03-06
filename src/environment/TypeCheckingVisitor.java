@@ -197,12 +197,12 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
         try {
             Map<String, MethodDeclaration> constructors = node.type.getDeclaration().getEnvironment().constructors;
             for (String s : constructors.keySet()) {
-                List<VariableDeclaration> Decparameters = constructors.get(s).parameters;
-                if (Decparameters.size() == realParameters.size()) {
+                List<VariableDeclaration> DecParameters = constructors.get(s).parameters;
+                if (DecParameters.size() == realParameters.size()) {
                     if (realParameters.size() == 0) {
                         node.attachType(instanceType);
                     } else {
-                        boolean matches = checkParameters(realParameters, Decparameters);
+                        boolean matches = checkParameters(realParameters, DecParameters);
                         if (matches) {
                             node.attachType(instanceType);
                             return;
@@ -215,12 +215,12 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
         }
     }
 
-    private boolean checkParameters(List<Expression> realParameters, List<VariableDeclaration> Decparameters) {
+    private boolean checkParameters(List<Expression> realParameters, List<VariableDeclaration> DecParameters) {
         int paraSize = realParameters.size();
         boolean matches = true;
         for (int i = paraSize; i > 0; i--) {
             Type realType = realParameters.get(i).getType();
-            Type decType = Decparameters.get(i).type;
+            Type decType = DecParameters.get(i).type;
             if (!realType.equals(decType)) {
                 matches = false;
             }
@@ -454,9 +454,10 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
     		// array.length
     		QualifiedName qn = (QualifiedName) name;
     		if (qn.isArrayLength) {
-    			//TODO: check that the qualifier is ArrayType.
-
-    			name.attachType(new PrimitiveType(Value.INT));
+    		    //check that the qualifier is ArrayType. 
+    		    if (qn.getQualifier().getType() instanceof ArrayType) {
+    		        name.attachType(new PrimitiveType(Value.INT));
+    		    }
     		} else {
     			throw new TypeCheckingException("Declaration found for non-array fields.");
     		}
