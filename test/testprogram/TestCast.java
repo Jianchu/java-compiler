@@ -4,6 +4,7 @@ public class TestCast {
 
     public static int f = 3;
     public int f1 = 3;
+    public int[] f2 = new int[3];
     public TestCast() {
     }
     /**
@@ -24,10 +25,7 @@ public class TestCast {
      */
     public TestCast m(int a) {
         TestCast t = new TestCast();
-        Integer c = new Integer(1);
-        int q = 3;
-        m(1).f1 = q;
-        c = q;
+        a = t.f2.length;
         return t;
     }
 }

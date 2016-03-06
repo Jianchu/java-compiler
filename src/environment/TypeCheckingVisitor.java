@@ -7,11 +7,40 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import ast.PrimitiveType.Value;
+import ast.ASTNode;
+import ast.ArrayAccess;
+import ast.ArrayCreationExpression;
+import ast.ArrayType;
+import ast.AssignmentExpression;
+import ast.BooleanLiteral;
+import ast.CastExpression;
+import ast.CharacterLiteral;
+import ast.ClassInstanceCreationExpression;
+import ast.CompilationUnit;
+import ast.Expression;
+import ast.FieldAccess;
+import ast.FieldDeclaration;
+import ast.InfixExpression;
 import ast.InfixExpression.Operator;
-import ast.*;
+import ast.InstanceofExpression;
+import ast.IntegerLiteral;
+import ast.MethodDeclaration;
+import ast.MethodInvocation;
+import ast.Name;
+import ast.NullLiteral;
+import ast.PrefixExpression;
+import ast.PrimitiveType;
+import ast.PrimitiveType.Value;
+import ast.QualifiedName;
+import ast.SimpleName;
+import ast.SimpleType;
+import ast.StringLiteral;
+import ast.ThisExpression;
+import ast.Type;
+import ast.TypeDeclaration;
+import ast.VariableDeclaration;
+import ast.VariableDeclarationExpression;
 import exceptions.NameException;
-
 import exceptions.TypeCheckingException;
 
 public class TypeCheckingVisitor extends EnvTraversalVisitor {
@@ -168,12 +197,12 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
         try {
             Map<String, MethodDeclaration> constructors = node.type.getDeclaration().getEnvironment().constructors;
             for (String s : constructors.keySet()) {
-                List<VariableDeclaration> Decparameters = constructors.get(s).parameters;
-                if (Decparameters.size() == realParameters.size()) {
+                List<VariableDeclaration> DecParameters = constructors.get(s).parameters;
+                if (DecParameters.size() == realParameters.size()) {
                     if (realParameters.size() == 0) {
                         node.attachType(instanceType);
                     } else {
-                        boolean matches = checkParameters(realParameters, Decparameters);
+                        boolean matches = checkParameters(realParameters, DecParameters);
                         if (matches) {
                             node.attachType(instanceType);
                             return;
@@ -186,12 +215,12 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
         }
     }
 
-    private boolean checkParameters(List<Expression> realParameters, List<VariableDeclaration> Decparameters) {
+    private boolean checkParameters(List<Expression> realParameters, List<VariableDeclaration> DecParameters) {
         int paraSize = realParameters.size();
         boolean matches = true;
         for (int i = paraSize; i > 0; i--) {
             Type realType = realParameters.get(i).getType();
-            Type decType = Decparameters.get(i).type;
+            Type decType = DecParameters.get(i).type;
             if (!realType.equals(decType)) {
                 matches = false;
             }
@@ -338,7 +367,11 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
         Type initializerType = node.variableDeclaration.initializer.getType();
         if (helper.assignable(node.variableDeclaration.type, initializerType)) {
             node.attachType(node.variableDeclaration.type);
-        }	//TODO: else?
+        } else {
+            throw new TypeCheckingException(initializerType.toString()
+                    + " is not assignable to "
+                    + node.variableDeclaration.type.toString());
+        }
     }
 
     private Type typeCheckInfixExp(Type lhs, Type rhs, Operator op) throws TypeCheckingException {
@@ -421,9 +454,14 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
     		// array.length
     		QualifiedName qn = (QualifiedName) name;
     		if (qn.isArrayLength) {
-    			//TODO: check that the qualifier is ArrayType.
-
-    			name.attachType(new PrimitiveType(Value.INT));
+    		    //check that the qualifier is ArrayType.
+    		    Name qualifier = qn.getQualifier();
+    		    if (qualifier == null) {
+    		        resolveNameType(qualifier);
+    		    }
+    		    if (qualifier.getType() instanceof ArrayType) {
+    		        name.attachType(new PrimitiveType(Value.INT));
+    		    }
     		} else {
     			throw new TypeCheckingException("Declaration found for non-array fields.");
     		}
