@@ -19,6 +19,7 @@ import ast.InfixExpression;
 import ast.InfixExpression.Operator;
 import ast.InstanceofExpression;
 import ast.IntegerLiteral;
+import ast.MethodDeclaration;
 import ast.MethodInvocation;
 import ast.Name;
 import ast.NullLiteral;
@@ -175,14 +176,46 @@ public class TypeCheckingVisitor extends TraversalVisitor {
      */
     @Override
     public void visit(ClassInstanceCreationExpression node) throws Exception {
+        int paraSize = 0;
         if (node.type != null) {
             node.type.accept(this);
         }
+        Type instanceType = node.type;
         if (node.arglist != null) {
             for (Expression expr : node.arglist) {
                 expr.accept(this);
             }
+            paraSize = node.arglist.size();
         }
+
+        try {
+            Map<String, MethodDeclaration> constructors = node.type.getDeclaration().getEnvironment().constructors;
+            for (String s : constructors.keySet()) {
+                MethodDeclaration methodDec = constructors.get(s);
+                if (paraSize == methodDec.parameters.size()) {
+                    boolean matches = true;
+                    if (paraSize == 0) {
+                        node.attachType(instanceType);
+                        return;
+                    } else {
+                        for (int i = paraSize; i > 0; i--) {
+                            Type realType = node.arglist.get(i).getType();
+                            Type decType = methodDec.parameters.get(i).type;
+                            if (!realType.equals(decType)) {
+                                matches = false;
+                            }
+                        }
+                        if (matches) {
+                            node.attachType(instanceType);
+                            return;
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            throw new TypeCheckingException("Type environment not found");
+        }
+
     }
 
     /**
