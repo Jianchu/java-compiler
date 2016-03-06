@@ -23,7 +23,14 @@ public class DisambiguationTest {
 	@Test
 	public void test() {
         String[] paths = new String[0];
-        paths = FileUtility.getFileNames(System.getProperty("user.dir") + "/assignment_testcases/a2/J2_interface_omitted_abstract").toArray(paths);
+        paths = FileUtility.getFileNames(System.getProperty("user.dir") + "/assignment_testcases/a2/J1_importName9.java").toArray(paths);
+        Joosc.compileSTL(paths);
+	}
+	
+	@Test
+	public void testArrayAccess() {
+        String[] paths = new String[0];
+        paths = FileUtility.getFileNames(System.getProperty("user.dir") + "/test/testprogram/ArrayAccess.java").toArray(paths);
         Joosc.compileSTL(paths);
 	}
 

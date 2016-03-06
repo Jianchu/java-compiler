@@ -94,11 +94,15 @@ public class Environment {
 		}
 		
 		TypeDeclaration decl = null;
-		if ((decl = findSimpleName(cuEnv.types, typeName)) == null
-				&& (decl = findSimpleName(cuEnv.singleImports, typeName)) == null
-				&& (decl = findSimpleName(cuEnv.samePackage, typeName)) == null
-				&& (decl = findSimpleName(cuEnv.importOnDemands, typeName)) == null) {
-			return null;
+		if (typeName.contains(".")) {
+			decl = SymbolTable.getGlobal().get(typeName);
+		} else {
+			if ((decl = findName(cuEnv.types, typeName)) == null
+					&& (decl = findName(cuEnv.singleImports, typeName)) == null
+					&& (decl = findName(cuEnv.samePackage, typeName)) == null
+					&& (decl = findName(cuEnv.importOnDemands, typeName)) == null) {	
+				return null;
+			}
 		}
 		return decl;
 	}
@@ -164,7 +168,7 @@ public class Environment {
 		BLOCK	// block includes method
 	}
 	
-    private TypeDeclaration findSimpleName(Map<String, TypeDeclaration> map, String simpleName) throws TypeLinkException {
+    private TypeDeclaration findName(Map<String, TypeDeclaration> map, String simpleName) throws TypeLinkException {
         Set<String> fullNames = map.keySet();
         boolean simpleNameExists = false;
         TypeDeclaration typeDec = null;

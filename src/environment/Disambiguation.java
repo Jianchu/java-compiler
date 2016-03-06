@@ -10,7 +10,7 @@ public class Disambiguation extends EnvTraversalVisitor{
 	
 	public void visit(TypeDeclaration node) throws Exception {
 //		System.out.println(node.getFullName());
-//		super.visit(node);
+		super.visit(node);
 	}
 	
 	@Override
@@ -79,10 +79,10 @@ public class Disambiguation extends EnvTraversalVisitor{
 		
 		for (int i = 1; i < fn.size(); i++) {
 			String prefix = String.join(".", fn.subList(0, i));
+
 			TypeDeclaration prefixDecl = curr.lookUpType(prefix);
 			if (prefixDecl != null) {
 				// prefix A1...Ai is type
-
 				// A(i+1) is field
 				FieldDeclaration fDecl = prefixDecl.getEnvironment().lookUpField(fn.get(i));
 				if (fDecl == null)
