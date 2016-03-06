@@ -1,6 +1,8 @@
 package environment;
 
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -176,7 +178,7 @@ public class TypeCheckingVisitor extends TraversalVisitor {
      */
     @Override
     public void visit(ClassInstanceCreationExpression node) throws Exception {
-        int paraSize = 0;
+        List<Expression> realParameters = new LinkedList<Expression>();
         if (node.type != null) {
             node.type.accept(this);
         }
@@ -185,26 +187,18 @@ public class TypeCheckingVisitor extends TraversalVisitor {
             for (Expression expr : node.arglist) {
                 expr.accept(this);
             }
-            paraSize = node.arglist.size();
+            realParameters = node.arglist;
         }
 
         try {
             Map<String, MethodDeclaration> constructors = node.type.getDeclaration().getEnvironment().constructors;
             for (String s : constructors.keySet()) {
-                MethodDeclaration methodDec = constructors.get(s);
-                if (paraSize == methodDec.parameters.size()) {
-                    boolean matches = true;
-                    if (paraSize == 0) {
+                List<VariableDeclaration> Decparameters = constructors.get(s).parameters;
+                if (Decparameters.size() == realParameters.size()) {
+                    if (realParameters.size() == 0) {
                         node.attachType(instanceType);
-                        return;
                     } else {
-                        for (int i = paraSize; i > 0; i--) {
-                            Type realType = node.arglist.get(i).getType();
-                            Type decType = methodDec.parameters.get(i).type;
-                            if (!realType.equals(decType)) {
-                                matches = false;
-                            }
-                        }
+                        boolean matches = checkParameters(realParameters, Decparameters);
                         if (matches) {
                             node.attachType(instanceType);
                             return;
@@ -215,7 +209,19 @@ public class TypeCheckingVisitor extends TraversalVisitor {
         } catch (Exception e) {
             throw new TypeCheckingException("Type environment not found");
         }
+    }
 
+    private boolean checkParameters(List<Expression> realParameters, List<VariableDeclaration> Decparameters) {
+        int paraSize = realParameters.size();
+        boolean matches = true;
+        for (int i = paraSize; i > 0; i--) {
+            Type realType = realParameters.get(i).getType();
+            Type decType = Decparameters.get(i).type;
+            if (!realType.equals(decType)) {
+                matches = false;
+            }
+        }
+        return matches;
     }
 
     /**
