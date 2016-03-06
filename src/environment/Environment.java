@@ -5,9 +5,11 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 
 import ast.*;
+import exceptions.TypeLinkException;
 
 public class Environment {
 	Environment enclosing;
@@ -85,6 +87,38 @@ public class Environment {
 		return fDecl;
 	}
 	
+	public TypeDeclaration lookUpType(String typeName) throws TypeLinkException {
+		Environment cuEnv = this;
+		while (cuEnv.type != EnvType.COMPILATION_UNIT) {
+			cuEnv = cuEnv.getEnclosing();
+		}
+		
+		TypeDeclaration decl = null;
+		if ((decl = findSimpleName(cuEnv.types, typeName)) == null
+				&& (decl = findSimpleName(cuEnv.singleImports, typeName)) == null
+				&& (decl = findSimpleName(cuEnv.samePackage, typeName)) == null
+				&& (decl = findSimpleName(cuEnv.importOnDemands, typeName)) == null) {
+			return null;
+		}
+		return decl;
+	}
+	
+	public MethodDeclaration lookUpMethod(String methodName) {
+		MethodDeclaration mDecl = null;
+		// search local
+		if (methods != null) {
+			mDecl = methods.get(methodName);
+		}
+		if (mDecl != null)
+			return mDecl;
+		
+		if (enclosing != null) {
+			mDecl= enclosing.lookUpMethod(methodName);
+		}
+		
+		return mDecl;
+	}
+	
 	public void addField(String name, FieldDeclaration decl) {
 		fields.put(name, decl);
 	}
@@ -130,5 +164,23 @@ public class Environment {
 		BLOCK	// block includes method
 	}
 	
+    private TypeDeclaration findSimpleName(Map<String, TypeDeclaration> map, String simpleName) throws TypeLinkException {
+        Set<String> fullNames = map.keySet();
+        boolean simpleNameExists = false;
+        TypeDeclaration typeDec = null;
+        for (String fullName : fullNames) {
+            if (fullName.substring(fullName.lastIndexOf('.') + 1).equals(simpleName)) {
+                if (simpleNameExists) {
+                    throw new TypeLinkException("The type " + simpleName + " is ambiguous");
+                }
+                simpleNameExists = true;
+                typeDec = map.get(fullName);
+            }
+        }
+        if (typeDec != null) {
+        	return typeDec;
+        }
+        return null;
+    }
 
 }

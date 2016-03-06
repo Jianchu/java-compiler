@@ -298,17 +298,17 @@ public class TopDeclVisitor extends TraversalVisitor {
 		Visitor tv = new TypeVisitor(table);
 		// TODO: Deal with type linking for cast expression somewhere else
 
-		if (node.expr != null) {
-			if (!(node.expr instanceof Name)) {
-				throw new NameException("123");
-			}
-			if (node.isArray) {
-				node.type = new ArrayType((Name) node.expr);
-			} else {
-				node.type = new SimpleType((Name) node.expr);
-			}
-			node.expr = null;	// clear the useless expression now
-		}
+//		if (node.expr != null) {
+//			if (!(node.expr instanceof Name)) {
+//				throw new NameException("123");
+//			}
+//			if (node.isArray) {
+//				node.type = new ArrayType((Name) node.expr);
+//			} else {
+//				node.type = new SimpleType((Name) node.expr);
+//			}
+//			node.expr = null;	// clear the useless expression now
+//		}
 		node.type.accept(tv);
 	}
 	

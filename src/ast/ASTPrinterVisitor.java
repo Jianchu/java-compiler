@@ -479,4 +479,22 @@ public class ASTPrinterVisitor implements Visitor{
         ast.root.accept(v);
         // t.pprint();
     }
+    
+    public static void print(String path) throws Exception {
+        File grammar = new File(System.getProperty("user.dir")
+                + "/data/grammar.lr1");
+        File f = new File(path);
+        
+        
+        Scanner scanner = new Scanner(new FileReader(f));
+        List<Token> tokens = scanner.scan();
+        Parser par = new Parser(tokens, grammar);
+        ParseTree t = par.parse();
+        // Weeder wee = new Weeder(t, "StringLiterals");
+        // wee.weed();
+        AST ast = new AST(t);
+        Visitor v = new ASTPrinterVisitor();
+        ast.root.accept(v);
+        // t.pprint();
+    }
 }

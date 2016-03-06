@@ -124,9 +124,10 @@ public class TraversalVisitor implements Visitor{
      * Statement
      */
     public void visit(Block node) throws Exception {
-        for (Statement statement : node.statements) {
-            statement.accept(this);
-        }
+		if (node.statements.size() > 0) {
+			Statement first = node.statements.get(0);
+			first.accept(this);
+		}
     }
 
     public void visit(ExpressionStatement node) throws Exception {

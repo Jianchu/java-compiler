@@ -11,6 +11,8 @@ import scanner.Scanner;
 import scanner.Token;
 import weeder.Weeder;
 import ast.AST;
+import ast.Visitor;
+import environment.Disambiguation;
 import environment.Hierarchy;
 import environment.SymbolTable;
 
@@ -52,7 +54,8 @@ public class Joosc {
 				trees.add(ast);			
 		    }
 		    SymbolTable.buildEnvs(trees);
-		    Hierarchy hier = new Hierarchy(trees);
+		    new Hierarchy(trees);
+		    Disambiguation.disambiguate(trees);
 		    
         } catch (Exception e) {
         	e.printStackTrace();
