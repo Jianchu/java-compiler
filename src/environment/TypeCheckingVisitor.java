@@ -421,6 +421,8 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
     		// array.length
     		QualifiedName qn = (QualifiedName) name;
     		if (qn.isArrayLength) {
+    			//TODO: check that the qualifier is ArrayType.
+
     			name.attachType(new PrimitiveType(Value.INT));
     		} else {
     			throw new TypeCheckingException("Declaration found for non-array fields.");
