@@ -1,47 +1,7 @@
 package environment;
 
-import ast.ArrayAccess;
-import ast.ArrayCreationExpression;
-import ast.ArrayType;
-import ast.AssignmentExpression;
-import ast.Block;
-import ast.BodyDeclaration;
-import ast.BooleanLiteral;
-import ast.CastExpression;
-import ast.CharacterLiteral;
-import ast.ClassInstanceCreationExpression;
-import ast.CompilationUnit;
-import ast.Expression;
-import ast.ExpressionStatement;
-import ast.FieldAccess;
-import ast.FieldDeclaration;
-import ast.ForStatement;
-import ast.IfStatement;
-import ast.ImportDeclaration;
-import ast.InfixExpression;
-import ast.InstanceofExpression;
-import ast.IntegerLiteral;
-import ast.MethodDeclaration;
-import ast.MethodInvocation;
-import ast.Modifier;
-import ast.NullLiteral;
-import ast.PackageDeclaration;
-import ast.PrefixExpression;
-import ast.PrimitiveType;
-import ast.QualifiedName;
-import ast.ReturnStatement;
-import ast.SimpleName;
-import ast.SimpleType;
-import ast.Statement;
-import ast.StringLiteral;
-import ast.ThisExpression;
-import ast.Type;
-import ast.TypeDeclaration;
-import ast.VariableDeclaration;
-import ast.VariableDeclarationExpression;
-import ast.VariableDeclarationStatement;
-import ast.Visitor;
-import ast.WhileStatement;
+import ast.*;
+
 
 /**
  * can be extended to easily traverse AST

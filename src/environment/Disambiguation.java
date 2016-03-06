@@ -6,6 +6,14 @@ import ast.*;
 import exceptions.NameException;
 import exceptions.TypeLinkException;
 
+/**
+ * Not handled at this stage:
+ * 	Type: already did at TopDeclVisitor
+ * 	Method Invocation: require type info
+ * 	
+ * @author zanel
+ *
+ */
 public class Disambiguation extends EnvTraversalVisitor{
 	
 	public void visit(TypeDeclaration node) throws Exception {
@@ -18,8 +26,16 @@ public class Disambiguation extends EnvTraversalVisitor{
 		// do nothing. Types have already been processed
 	}
 	
+	@Override
+	public void visit(FieldAccess node) throws Exception {
+		// do not visit node.id on purpose
+		if (node.expr != null)
+			node.expr.accept(this);
+	}
+	
+	@Override
 	public void visit(MethodInvocation node) throws Exception {
-		// do not visit node.id for now
+		// do not visit node.id purpose
 		// if node.id != null. this is of the form Primary.ID(...)
 		// TODO: will need to be handled in type checking.
 		if (node.id != null){
