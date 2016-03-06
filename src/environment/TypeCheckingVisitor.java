@@ -7,11 +7,40 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import ast.PrimitiveType.Value;
+import ast.ASTNode;
+import ast.ArrayAccess;
+import ast.ArrayCreationExpression;
+import ast.ArrayType;
+import ast.AssignmentExpression;
+import ast.BooleanLiteral;
+import ast.CastExpression;
+import ast.CharacterLiteral;
+import ast.ClassInstanceCreationExpression;
+import ast.CompilationUnit;
+import ast.Expression;
+import ast.FieldAccess;
+import ast.FieldDeclaration;
+import ast.InfixExpression;
 import ast.InfixExpression.Operator;
-import ast.*;
+import ast.InstanceofExpression;
+import ast.IntegerLiteral;
+import ast.MethodDeclaration;
+import ast.MethodInvocation;
+import ast.Name;
+import ast.NullLiteral;
+import ast.PrefixExpression;
+import ast.PrimitiveType;
+import ast.PrimitiveType.Value;
+import ast.QualifiedName;
+import ast.SimpleName;
+import ast.SimpleType;
+import ast.StringLiteral;
+import ast.ThisExpression;
+import ast.Type;
+import ast.TypeDeclaration;
+import ast.VariableDeclaration;
+import ast.VariableDeclarationExpression;
 import exceptions.NameException;
-
 import exceptions.TypeCheckingException;
 
 public class TypeCheckingVisitor extends EnvTraversalVisitor {
@@ -338,7 +367,11 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
         Type initializerType = node.variableDeclaration.initializer.getType();
         if (helper.assignable(node.variableDeclaration.type, initializerType)) {
             node.attachType(node.variableDeclaration.type);
-        }	//TODO: else?
+        } else {
+            throw new TypeCheckingException(initializerType.toString()
+                    + " is not assignable to "
+                    + node.variableDeclaration.type.toString());
+        }
     }
 
     private Type typeCheckInfixExp(Type lhs, Type rhs, Operator op) throws TypeCheckingException {
