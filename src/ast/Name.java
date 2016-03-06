@@ -11,6 +11,8 @@ import parser.ParseTree;
  *
  */
 public abstract class Name extends Expression {
+	ASTNode decl;	// use ASTNode because VariableDecalration is not a bodyDeclaration
+	
 	public static Name parseName(ParseTree pt) throws ASTException {
 		switch(pt.getTokenType()) {
 		case Name:
@@ -24,4 +26,14 @@ public abstract class Name extends Expression {
 	}
 	
 	public abstract List<String> getFullName();
+	
+	public void attachDeclaration(ASTNode node) {
+		decl = node;
+	}
+	
+	public ASTNode getDeclaration() {
+		return decl;
+	}
+	
+	
 }

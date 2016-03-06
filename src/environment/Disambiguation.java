@@ -3,6 +3,7 @@ package environment;
 import java.util.List;
 
 import ast.*;
+import exceptions.NameException;
 
 public class Disambiguation extends EnvTraversalVisitor{
 	
@@ -34,16 +35,23 @@ public class Disambiguation extends EnvTraversalVisitor{
 		
 	}
 	
-	public void visit(SimpleName node) {
-		VariableDeclaration vDecl = curr.lookUpVariable(node.toString());
+	public void visit(SimpleName node) throws NameException {
+		String name = node.toString();
+		VariableDeclaration vDecl = curr.lookUpVariable(name);
 		if (vDecl != null) {
-			
+			node.attachDeclaration(vDecl);
 			return; 
 		}
+		FieldDeclaration fDecl = curr.lookUpField(name);
+		if (fDecl == null) {
+			throw new NameException("Simple Name cannot be  resolved: " + node.toString());
+		} 
+		node.attachDeclaration(fDecl);
 	}
 	
+	
 	public void visit(QualifiedName node) {
-		
+		node.getFullName();
 	}
 	
 	public void resolveMethodName(Name name) {

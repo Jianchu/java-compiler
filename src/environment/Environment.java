@@ -69,6 +69,22 @@ public class Environment {
 		return result;
 	}
 	
+	public FieldDeclaration lookUpField(String field) {
+		FieldDeclaration fDecl = null;
+		// search local
+		if (fields != null) {
+			fDecl = fields.get(field);
+		}
+		if (fDecl != null)
+			return fDecl;
+		
+		if (enclosing != null) {
+			fDecl= enclosing.lookUpField(field);
+		}
+		
+		return fDecl;
+	}
+	
 	public void addField(String name, FieldDeclaration decl) {
 		fields.put(name, decl);
 	}
