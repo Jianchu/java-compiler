@@ -18,12 +18,6 @@ public class Disambiguation extends EnvTraversalVisitor{
 		// do nothing. Types have already been processed
 	}
 	
-	@Override
-	public void visit(CastExpression node) {
-		// name node was used but was actually type
-		// already handled in TopDeclVisitor
-	}
-	
 	public void visit(MethodInvocation node) throws Exception {
 		// do not visit node.id for now
 		// if node.id != null. this is of the form Primary.ID(...)
