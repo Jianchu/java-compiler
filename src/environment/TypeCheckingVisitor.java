@@ -225,7 +225,7 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
     private boolean checkParameters(List<Expression> realParameters, List<VariableDeclaration> DecParameters) {
         int paraSize = realParameters.size();
         boolean matches = true;
-        for (int i = paraSize; i > 0; i--) {
+        for (int i = 0; i < paraSize; i++) {
             Type realType = realParameters.get(i).getType();
             Type decType = DecParameters.get(i).type;
             if (!realType.equals(decType)) {
