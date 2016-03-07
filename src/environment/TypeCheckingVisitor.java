@@ -140,7 +140,7 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
         if (TypeHelper.assignable(lhsType, exprType)) {
             node.attachType(lhsType);
         } else {
-            throw new TypeCheckingException("Invalid assignment: incomparable types");
+            throw new TypeCheckingException("Invalid assignment, incomparable types: " + lhsType + ":=" + exprType);
         }
     }
 
@@ -495,8 +495,9 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
     }
     
     private void resolveNameType(Name name) throws TypeCheckingException {
-//    	System.out.println(name);
+//    	System.out.println("\t" + name + ":" + (name.getDeclaration() == null));
     	ASTNode decl = name.getDeclaration();
+    
     	if (decl instanceof VariableDeclaration) {
     		VariableDeclaration vDecl = (VariableDeclaration) decl;
 //    		System.out.println(name + ":" +vDecl.type +" " + vDecl.id );
@@ -508,15 +509,16 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
     		// array.length
     		QualifiedName qn = (QualifiedName) name;
     		if (qn.isArrayLength) {
+    			
     		    //check that the qualifier is ArrayType.
     		    Name qualifier = qn.getQualifier();
-    		    if (qualifier == null) {
+    		    if (qualifier != null) {
     		        resolveNameType(qualifier);
     		    }
     		    if (qualifier.getType() instanceof ArrayType) {
     		        name.attachType(new PrimitiveType(Value.INT));
     		    } else {
-    		        throw new TypeCheckingException("non-array type cannot call length");
+    		        throw new TypeCheckingException("non-array type cannot call length: " + name);
     		    }
     		} else {
     			throw new TypeCheckingException("Declaration found for non-array fields.");
@@ -621,7 +623,7 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
             arrayType = new ArrayType(name);
         } else if (type instanceof PrimitiveType) {
             PrimitiveType ptype = (PrimitiveType) type;
-            SimpleName name = new SimpleName(ptype.value.toString());
+            SimpleName name = new SimpleName(ptype.toString());
             arrayType = new ArrayType(name);
         } else {
             throw new TypeCheckingException("ArrayBuilder error.");

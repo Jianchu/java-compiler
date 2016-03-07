@@ -28,4 +28,9 @@ public class ArrayType extends Type {
 	public String toString() {
 		return type.toString() + "[]";
 	}
+	
+//	@Override
+//	public TypeDeclaration getDeclaration() {
+//		throw new RuntimeException("ArrayType do not support getting declaration. Get the type in array.");
+//	}
 }

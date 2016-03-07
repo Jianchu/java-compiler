@@ -81,16 +81,24 @@ public class Disambiguation extends EnvTraversalVisitor{
 			// A1 is variable declaration, the rest are instance field;
 			TypeDeclaration prefixDecl = ((VariableDeclaration) a1Decl).type.getDeclaration();
 			FieldDeclaration fDecl = searchField(node, prefixDecl);
-			node.attachDeclaration(prefixDecl);		// the final prefix is just the full name
+			if (fDecl != null) {
+				node.attachDeclaration(fDecl);		// the final prefix is just the full name
+			} else {
+				node.getQualifier().accept(this);
+			}
 			return;
 		}
 		
 		a1Decl = curr.lookUpField(fn.get(0));
 		if (a1Decl != null) {
-			// A1 is a field, the rest are instance fields
+			// A1 is a field, the rest are instance fields			
 			TypeDeclaration prefixDecl = ((FieldDeclaration) a1Decl).type.getDeclaration();
 			FieldDeclaration fDecl = searchField(node, prefixDecl);
-			node.attachDeclaration(prefixDecl);		// the final prefix is just the full name
+			if (fDecl != null) {
+				node.attachDeclaration(fDecl);		// the final prefix is just the full name
+			} else {
+				node.getQualifier().accept(this);
+			}
 			return;
 		}
 		
@@ -135,9 +143,10 @@ public class Disambiguation extends EnvTraversalVisitor{
 		FieldDeclaration fDecl = null;
 		for (int i = 1; i < fn.size(); i++) {	
 			if (prefixDecl == null) {
+				// prefix is array type
 				// array.length
 				if (fn.get(i).equals("length") && fn.size() == i+1) {
-					name.getQualifier().attachDeclaration(prefixDecl);
+//					name.getQualifier().attachDeclaration(fDecl);
 					name.isArrayLength = true;
 					return null;
 				} else {
