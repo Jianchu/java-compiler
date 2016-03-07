@@ -15,6 +15,7 @@ import ast.Visitor;
 import environment.Disambiguation;
 import environment.Hierarchy;
 import environment.SymbolTable;
+import environment.TypeCheckingVisitor;
 
 public class Joosc {
     public static void main(String[] args) {
@@ -56,6 +57,7 @@ public class Joosc {
 		    SymbolTable.buildEnvs(trees);
 		    new Hierarchy(trees);
 		    Disambiguation.disambiguate(trees);
+		    TypeCheckingVisitor.typeCheck(trees);
 		    
         } catch (Exception e) {
         	e.printStackTrace();

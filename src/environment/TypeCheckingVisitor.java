@@ -1,6 +1,6 @@
 package environment;
 
-import java.lang.reflect.Modifier;
+//import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -8,40 +8,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import ast.ASTNode;
-import ast.ArrayAccess;
-import ast.ArrayCreationExpression;
-import ast.ArrayType;
-import ast.AssignmentExpression;
-import ast.BooleanLiteral;
-import ast.CastExpression;
-import ast.CharacterLiteral;
-import ast.ClassInstanceCreationExpression;
-import ast.CompilationUnit;
-import ast.Expression;
-import ast.FieldAccess;
-import ast.FieldDeclaration;
-import ast.InfixExpression;
+import ast.*;
+
 import ast.InfixExpression.Operator;
-import ast.InstanceofExpression;
-import ast.IntegerLiteral;
-import ast.MethodDeclaration;
-import ast.MethodInvocation;
-import ast.Name;
-import ast.NullLiteral;
-import ast.PrefixExpression;
-import ast.PrimitiveType;
 import ast.PrimitiveType.Value;
-import ast.QualifiedName;
-import ast.ReturnStatement;
-import ast.SimpleName;
-import ast.SimpleType;
-import ast.StringLiteral;
-import ast.ThisExpression;
-import ast.Type;
-import ast.TypeDeclaration;
-import ast.VariableDeclaration;
-import ast.VariableDeclarationExpression;
 import exceptions.NameException;
 import exceptions.TypeCheckingException;
 
@@ -298,10 +268,15 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
     @Override
     public void visit(MethodInvocation node) throws Exception {
         List<Type> argTypes = new ArrayList<Type>();
-    	if (node.arglist != null) {
+//        System.out.println("=================");
+//        System.out.println((node.arglist != null? node.arglist.size():0));
+        if (node.arglist != null) {
             for (Expression expr : node.arglist) {
                 expr.accept(this);
                 // save the parameter types to a list
+                if (expr.getType() instanceof Void) {
+                	throw new TypeCheckingException("return type of parameter cannot be void.");
+                }
                 argTypes.add(expr.getType());
             }
         }
@@ -326,11 +301,18 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
         	
         } else if (node.expr instanceof Name) {
         	// Name(...)
-        	resolveMethodName((Name) node.expr, argTypes);
-        	
+        	Name mn = (Name) node.expr;
+        	resolveMethodName(mn, argTypes);
+        	MethodDeclaration mDecl = (MethodDeclaration) mn.getDeclaration();
+        	if (mDecl.returnType != null)
+        		node.attachType(mDecl.returnType);
+        	else {
+        		node.attachType(new Void());
+        	}
         } else {
         	throw new TypeCheckingException("Method invocation: " + node.expr + " " + node.id);
         }
+//        System.out.println("~~~~~~~");
     }
 
     @Override
@@ -480,9 +462,11 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
     }
     
     private void resolveNameType(Name name) throws TypeCheckingException {
+//    	System.out.println(name);
     	ASTNode decl = name.getDeclaration();
     	if (decl instanceof VariableDeclaration) {
     		VariableDeclaration vDecl = (VariableDeclaration) decl;
+//    		System.out.println(name + ":" +vDecl.type +" " + vDecl.id );
     		name.attachType(vDecl.type);
     	} else if (decl instanceof FieldDeclaration) {
     		FieldDeclaration fDecl = (FieldDeclaration) decl;
@@ -647,7 +631,6 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
 			
 			MethodDeclaration mDecl = searchMethod(name, prefixDecl, paramTypes);
 			name.attachDeclaration(mDecl);
-			name.attachType(mDecl.returnType);
 			return;
 		}
 		
@@ -663,12 +646,11 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
 				MethodDeclaration mDecl = prefixDecl.getEnvironment().lookUpMethod(NameHelper.mangle(fn.get(i), paramTypes));
 				if (i == j && !mDecl.modifiers.contains(Modifier.STATIC)) {
 					// static method
-					throw new TypeCheckingException("Nonstatic method accessed in a static manner.");
+					throw new TypeCheckingException("Nonstatic method accessed in a static manner: " + name);
 				} 
 				if (mDecl == null)
 					throw new TypeCheckingException("Method unrecognized: " + name.toString() + " ");
 				name.attachDeclaration(mDecl);
-				name.attachType(mDecl.returnType);
 				return;
 			}
 		}
@@ -690,5 +672,12 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
 		
 		MethodDeclaration mDecl = prefixDecl.getEnvironment().lookUpMethod(NameHelper.mangle(fn.get(i), paramTypes));
 		return mDecl;
+	}
+	
+	public static void typeCheck(List<AST> trees) throws Exception {
+		for (AST t : trees) {
+			Visitor tcv = new TypeCheckingVisitor();
+			t.root.accept(tcv);
+		}
 	}
 }

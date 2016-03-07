@@ -71,7 +71,7 @@ public class NameHelper  {
 				}
 				typeName += "[]";
 			} else {
-				throw new NameException("unexpected type.");
+				throw new NameException("unexpected type: " + (t==null? "null" : t.getClass().toString()));
 			}
 			
 			mName += typeName.length() + typeName;

@@ -8,6 +8,7 @@ public class EnvTraversalVisitor extends TraversalVisitor{
 	
 	@Override
 	public void visit(TypeDeclaration node) throws Exception {
+		System.out.println(node.getFullName());
 		curr = node.getEnvironment();
 		super.visit(node);
 	}

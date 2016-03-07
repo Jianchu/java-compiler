@@ -125,6 +125,7 @@ public class Hierarchy {
 			if (decl1 != null
 					&& decl1.isAbstract && decl2.isAbstract
 					&& decl1.modifiers.contains(Modifier.PUBLIC) && !decl2.modifiers.contains(Modifier.PUBLIC)) {
+				// protected abstract shall not replace public abstract
 				continue;
 			}
 			
