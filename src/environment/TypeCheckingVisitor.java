@@ -450,7 +450,7 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
             if (TypeHelper.assignable(lhs, rhs) || TypeHelper.assignable(rhs, lhs)) {
                 return new PrimitiveType(Value.BOOLEAN);
             } else {
-                throw new TypeCheckingException("Invalid comparison: = == have to be used for comparable types");
+                throw new TypeCheckingException("Invalid comparison: = != have to be used for comparable types");
             }
         case MINUS:
         case STAR:
