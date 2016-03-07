@@ -11,10 +11,12 @@ public class ReturnStatement extends Statement {
     public ReturnStatement(ParseTree returnNode) throws ASTException {
         ParseTree expressionNode = returnNode.findChild(Symbol.Expression);
         // don't check null intentionally
-        this.returnExpression = Expression.parseExpression(expressionNode);
+        if (expressionNode != null) {
+            this.returnExpression = Expression.parseExpression(expressionNode);
+        }
     }
     
-	public void accept(Visitor v) throws Exception {
-		v.visit(this);
-	}
+    public void accept(Visitor v) throws Exception {
+        v.visit(this);
+    }
 }
