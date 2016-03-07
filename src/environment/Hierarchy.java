@@ -45,6 +45,8 @@ public class Hierarchy {
 		Set<TypeDeclaration> newAncesters = new HashSet<TypeDeclaration>(ancestors);
 		newAncesters.add(typeDecl);
 		
+		
+		
 		// inherit from super interfaces
 		for (Type itf : typeDecl.interfaces) {
 			TypeDeclaration itfDecl = itf.getDeclaration();
@@ -83,6 +85,9 @@ public class Hierarchy {
 				if (! visited.contains(objInterface)) {
 					visited.add(objInterface);
 				}
+				SimpleType st = new SimpleType(new SimpleName("objInterface"));
+				st.attachDeclaration(objInterface);
+				typeDecl.interfaces.add(st);
 				inherit(inheritEnv, objInterface.getEnvironment(), true);
 			}
 		} else {	// is class
@@ -93,6 +98,9 @@ public class Hierarchy {
 				if (! visited.contains(obj)) {
 					visited.add(obj);
 				}
+				SimpleType st = new SimpleType(new SimpleName("Object"));
+				st.attachDeclaration(obj);
+				typeDecl.superClass = st;
 				inherit(inheritEnv, obj.getEnvironment(), false);		
 			}
 		}
