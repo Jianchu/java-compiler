@@ -373,6 +373,11 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
                     + node.variableDeclaration.type.toString());
         }
     }
+    
+    @Override
+    public void visit(SimpleType node) {
+            // do nothing. Types have already been processed
+    }
 
     private Type typeCheckInfixExp(Type lhs, Type rhs, Operator op) throws TypeCheckingException {
         switch (op) {

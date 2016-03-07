@@ -21,8 +21,8 @@ import org.junit.runners.Parameterized;
 @RunWith(Parameterized.class)
 public class TestMarmoset {
 
-    //private static final File files = new File(System.getProperty("user.dir")  + "/assignment_testcases/a2");
-    private static final File files = new File(System.getProperty("user.dir")  + "/assignment_testcases/a3");
+    //private static final File files = new File(System.getProperty("user.dir")  + "/assignment_testcases/a3");
+    private static final File files = new File(System.getProperty("user.dir")  + "/assignment_testcases/a2");
     private static final Map<String, ArrayList<String>> testCases = new HashMap<String, ArrayList<String>>();
     private final PrintStream oldErr = System.err;
     private int expectedResult;
