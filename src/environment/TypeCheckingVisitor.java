@@ -32,6 +32,7 @@ import ast.PrefixExpression;
 import ast.PrimitiveType;
 import ast.PrimitiveType.Value;
 import ast.QualifiedName;
+import ast.ReturnStatement;
 import ast.SimpleName;
 import ast.SimpleType;
 import ast.StringLiteral;
@@ -47,6 +48,7 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
     private final Map<String, TypeDeclaration> global = SymbolTable.getGlobal();
     private final TypeHelper helper = new TypeHelper();
     private String currentTypeName;
+    private MethodDeclaration currentMethod;
     // maybe need to add or delete some methods...
 
     @Override
@@ -102,7 +104,6 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
     }
 
     /**
-     * TODO:
      * lhs: QualifiedName/SimpleName/ArrayAccess/FieldAccess
      * expr: QualifiedName/SimpleName/ArrayAccess/MethodInvocation/FieldAccess
      * 
@@ -379,6 +380,35 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
     @Override
     public void visit(SimpleType node) {
             // do nothing. Types have already been processed
+    }
+
+    @Override
+    public void visit(MethodDeclaration node) throws Exception {
+        this.currentMethod = node;
+        last = curr;
+        curr = node.getEnvironment();
+        super.visit(node);
+        curr = last;
+        this.currentMethod = null;
+    }
+
+    @Override
+    public void visit(ReturnStatement node) throws Exception {
+        super.visit(node);
+        Type returnType = node.returnExpression.getType();
+        
+        if ((this.currentMethod.returnType) == null) {
+            if (returnType != null) {
+                throw new TypeCheckingException("Void method cannot return a value");
+            }
+        } else {
+            if (!TypeHelper.assignable(this.currentMethod.returnType, returnType)) {
+                throw new TypeCheckingException(
+                        "Type mismatch: cannot convert from "
+                                + returnType.toString() + " to "
+                                + this.currentMethod.returnType.toString());
+            }
+        }
     }
 
     private Type typeCheckInfixExp(Type lhs, Type rhs, Operator op) throws TypeCheckingException {
