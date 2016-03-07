@@ -77,8 +77,9 @@ public class Environment {
 		if (fields != null) {
 			fDecl = fields.get(field);
 		}
-		if (fDecl != null)
+		if (fDecl != null) {
 			return fDecl;
+		}
 		
 		if (enclosing != null) {
 			fDecl= enclosing.lookUpField(field);

@@ -17,7 +17,7 @@ import exceptions.TypeLinkException;
 public class Disambiguation extends EnvTraversalVisitor{
 	
 	public void visit(TypeDeclaration node) throws Exception {
-		System.out.println(node.getFullName());
+//		System.out.println(node.getFullName());
 		super.visit(node);
 	}
 	

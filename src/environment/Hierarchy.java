@@ -106,7 +106,7 @@ public class Hierarchy {
 		
 		// fields from super class, overriding might happen
 		for (String field : superInherit.fields.keySet()) {
-			inheritEnv.addField(field, superEnv.fields.get(field));
+			inheritEnv.addField(field, superInherit.fields.get(field));
 		}
 		for (String field : superEnv.fields.keySet()) {
 			inheritEnv.addField(field, superEnv.fields.get(field));
