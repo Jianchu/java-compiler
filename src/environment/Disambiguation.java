@@ -80,7 +80,7 @@ public class Disambiguation extends EnvTraversalVisitor{
 		if (a1Decl != null) {
 			// A1 is variable declaration, the rest are instance field;
 			TypeDeclaration prefixDecl = ((VariableDeclaration) a1Decl).type.getDeclaration();
-			prefixDecl = searchField(node, prefixDecl);
+			FieldDeclaration fDecl = searchField(node, prefixDecl);
 			node.attachDeclaration(prefixDecl);		// the final prefix is just the full name
 			return;
 		}
@@ -89,7 +89,7 @@ public class Disambiguation extends EnvTraversalVisitor{
 		if (a1Decl != null) {
 			// A1 is a field, the rest are instance fields
 			TypeDeclaration prefixDecl = ((FieldDeclaration) a1Decl).type.getDeclaration();
-			prefixDecl = searchField(node, prefixDecl);
+			FieldDeclaration fDecl = searchField(node, prefixDecl);
 			node.attachDeclaration(prefixDecl);		// the final prefix is just the full name
 			return;
 		}
@@ -130,8 +130,9 @@ public class Disambiguation extends EnvTraversalVisitor{
 	 * @return
 	 * @throws NameException 
 	 */
-	private TypeDeclaration searchField(QualifiedName name, TypeDeclaration prefixDecl) throws NameException {		
+	private FieldDeclaration searchField(QualifiedName name, TypeDeclaration prefixDecl) throws NameException {		
 		List<String> fn = name.getFullName();
+		FieldDeclaration fDecl = null;
 		for (int i = 1; i < fn.size(); i++) {	
 			if (prefixDecl == null) {
 				// array.length
@@ -145,13 +146,13 @@ public class Disambiguation extends EnvTraversalVisitor{
 			}
 			
 			// normal
-			FieldDeclaration fDecl = prefixDecl.getEnvironment().lookUpField(fn.get(i));
+			fDecl = prefixDecl.getEnvironment().lookUpField(fn.get(i));
 			if (fDecl == null) {
 				throw new NameException("Field prefix not recognized: "+ String.join(".", fn.subList(0, i+1)));
 			}
 			prefixDecl = fDecl.type.getDeclaration();
 		}
-		return prefixDecl;
+		return fDecl;
 	}
 
 	

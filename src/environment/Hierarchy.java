@@ -120,11 +120,27 @@ public class Hierarchy {
 			}
 				
 			checkReplace(inheritEnv, superInherit, method);
+			MethodDeclaration decl1 = inheritEnv.methods.get(method);
+			MethodDeclaration decl2 = superInherit.methods.get(method);
+			if (decl1 != null
+					&& decl1.isAbstract && decl2.isAbstract
+					&& decl1.modifiers.contains(Modifier.PUBLIC) && !decl2.modifiers.contains(Modifier.PUBLIC)) {
+				continue;
+			}
+			
+			
 			inheritEnv.addMethod(method, superInherit.methods.get(method));
 		}
 		for (String method : superEnv.methods.keySet()) {
 			if (isInterface && superEnv.methods.get(method).modifiers.contains(Modifier.STATIC)) {
 				// static methods from interfaces do not get inherited
+				continue;
+			}
+			MethodDeclaration decl1 = inheritEnv.methods.get(method);
+			MethodDeclaration decl2 = superEnv.methods.get(method);
+			if (decl1 != null
+					&& decl1.isAbstract && decl2.isAbstract
+					&& decl1.modifiers.contains(Modifier.PUBLIC) && !decl2.modifiers.contains(Modifier.PUBLIC)) {
 				continue;
 			}
 			checkReplace(inheritEnv, superEnv, method);
@@ -229,14 +245,14 @@ public class Hierarchy {
 			}
 			
 			// only applies to superclass replace
-			if (decl2.modifiers.contains(Modifier.PUBLIC) &&
+			if (!decl1.isAbstract && decl2.modifiers.contains(Modifier.PUBLIC) &&
 					!decl1.modifiers.contains(Modifier.PUBLIC)) {
 				throw new HierarchyException("A non-public method replaced public method.");
 			}
 			// only applies to superclass replace
 			// the old method can't be final
 			if (decl2.modifiers.contains(Modifier.FINAL)) {
-				throw new HierarchyException("Final method cannot be override.s");
+				throw new HierarchyException("Final method cannot be overriden.");
 			}
 			
 		}

@@ -127,7 +127,8 @@ public class TraversalVisitor implements Visitor{
     }
 
     public void visit(ReturnStatement node) throws Exception {
-        node.returnExpression.accept(this);
+    	if (node.returnExpression != null)
+    		node.returnExpression.accept(this);
         visitNextStatement(node);
     }
 

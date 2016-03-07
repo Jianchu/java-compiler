@@ -144,10 +144,17 @@ public class TopDeclVisitor extends TraversalVisitor {
 	}
 	
 	public void visit(FieldDeclaration fDecl) throws Exception {
+		Visitor tv = new TypeVisitor(table);
+		// if is simple type but has not been linked, type linking
+		fDecl.type.accept(tv);
+		
 		if (table.currentScope().fields.containsKey(fDecl.id)) {
 			throw new NameException("field name repeated.");
 		}
 		table.currentScope().addField(fDecl.id, fDecl);
+		
+		if (fDecl.initializer != null)
+			fDecl.initializer.accept(this);
 	}
 	
 	public void visit(MethodDeclaration mDecl) throws Exception {
@@ -268,7 +275,8 @@ public class TopDeclVisitor extends TraversalVisitor {
 		visitNextStatement(node);
 	}
 	public void visit(ReturnStatement node) throws Exception {
-		node.returnExpression.accept(this);
+		if (node.returnExpression != null)
+			node.returnExpression.accept(this);
 		visitNextStatement(node);
 	}
 	public void visit(WhileStatement node) throws Exception {

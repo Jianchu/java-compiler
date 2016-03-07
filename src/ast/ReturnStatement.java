@@ -12,6 +12,7 @@ public class ReturnStatement extends Statement {
         ParseTree expressionNode = returnNode.findChild(Symbol.Expression);
         // don't check null intentionally
         if (expressionNode != null) {
+        	
             this.returnExpression = Expression.parseExpression(expressionNode);
         }
     }
