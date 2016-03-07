@@ -104,10 +104,8 @@ public class Disambiguation extends EnvTraversalVisitor{
 				FieldDeclaration fDecl = prefixDecl.getEnvironment().lookUpField(fn.get(i));
 				if (fDecl == null)
 					throw new NameException("Static field not found.");
-				node.attachDeclaration(fDecl);
 				
 				int j = i + 1;
-				VariableDeclaration vDecl = null;
 				while (j < fn.size()) {
 					TypeDeclaration fType = fDecl.type.getDeclaration();
 					fDecl = fType.getEnvironment().lookUpField(fn.get(j));
