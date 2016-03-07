@@ -153,7 +153,6 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
     @Override
     public void visit(CastExpression node) throws Exception {
         Type castToType = null;
-
         if (node.type != null) {
             node.type.accept(this);
             castToType = node.type;
@@ -167,13 +166,18 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
         }
         Type unaryType = node.unary.getType();
         
+//        System.out.println("" + castToType + (castToType.getDeclaration() == null));
+//        System.out.println("" + unaryType + (unaryType.getDeclaration() == null));
+
         // break cast into three cases:
         if (checkPrimitive(castToType, unaryType, false)) {
-            node.attachType(castToType);
+        	node.attachType(castToType);
         } else if (checkPrimitive(castToType, unaryType, true)) {
-            node.attachType(new PrimitiveType(Value.BOOLEAN));
+        	node.attachType(new PrimitiveType(Value.BOOLEAN));
         } else if (TypeHelper.assignable(castToType, unaryType) || TypeHelper.assignable(unaryType, castToType)) {
-            node.attachType(simpleTypeBuilder((SimpleType) castToType));
+        	node.attachType(simpleTypeBuilder((SimpleType) castToType));
+        } else {
+        	throw new TypeCheckingException("No type found for cast.");
         }
     }
 
@@ -311,7 +315,7 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
             for (Expression expr : node.arglist) {
                 expr.accept(this);
                 // save the parameter types to a list
-                if (expr.getType() instanceof Void) {
+                if (expr.getType() instanceof Void || expr.getType() == null) {
                 	throw new TypeCheckingException("return type of parameter cannot be void.");
                 }
                 argTypes.add(expr.getType());

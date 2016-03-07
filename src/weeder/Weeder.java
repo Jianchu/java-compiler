@@ -39,7 +39,7 @@ public class Weeder {
                     this.className = child.getLexeme();
                     if (!this.className.equals(this.fileName)) {
                         throw new WeedException(
-                                "Class's name has to be same as file's name");
+                                "Class's name has to be same as file's name: " + this.className + " " + this.fileName);
                     }
                 }
             }

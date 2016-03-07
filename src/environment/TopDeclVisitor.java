@@ -119,8 +119,8 @@ public class TopDeclVisitor extends TraversalVisitor {
 	
 	
 	public void visit(TypeDeclaration typeDecl) throws Exception {
+//		System.out.println(typeDecl.getFullName());
 		table.currentScope().addType(typeDecl.id, typeDecl);
-		
 		// covers simple checks 1,2,3,4
 		checkInterfaces(typeDecl);
 		checkSuperClass(typeDecl);
@@ -158,7 +158,7 @@ public class TopDeclVisitor extends TraversalVisitor {
 	}
 	
 	public void visit(MethodDeclaration mDecl) throws Exception {
-//		System.out.println(mDecl.id);
+//		System.out.println("\t" + mDecl.id);
 		// link param types, needs to do this first so that name mangler can use the info
 		for (VariableDeclaration vd : mDecl.parameters) {
 			Visitor tv = new TypeVisitor(table);
@@ -251,10 +251,7 @@ public class TopDeclVisitor extends TraversalVisitor {
 	/*
 	 * Other Statement
 	 */
-	public void visit(ExpressionStatement node) throws Exception {
-		node.statementExpression.accept(this);
-		visitNextStatement(node);
-	}
+
 	public void visit(ForStatement node) throws Exception {
 		
 		table.openScope(Environment.EnvType.BLOCK);
@@ -263,31 +260,13 @@ public class TopDeclVisitor extends TraversalVisitor {
 		
 		if (node.forInit != null)
 			node.forInit.accept(this);
+        if (node.forCondition != null) {
+            node.forCondition.accept(this);
+        }
 		if (node.forBody != null)
 			node.forBody.accept(this);
 		table.closeScope();
 		visitNextStatement(node);
-	}
-	public void visit(IfStatement node) throws Exception {
-		node.ifStatement.accept(this);
-		if (node.elseStatement != null)
-			node.elseStatement.accept(this);
-		visitNextStatement(node);
-	}
-	public void visit(ReturnStatement node) throws Exception {
-		if (node.returnExpression != null)
-			node.returnExpression.accept(this);
-		visitNextStatement(node);
-	}
-	public void visit(WhileStatement node) throws Exception {
-		node.whileStatement.accept(this);
-		visitNextStatement(node);
-	}
-	
-	private void visitNextStatement(Statement node) throws Exception {
-		if (node.hasNext()) {
-			node.next().accept(this);
-		}
 	}
 	
 	/*
@@ -296,12 +275,14 @@ public class TopDeclVisitor extends TraversalVisitor {
 	public void visit(ClassInstanceCreationExpression node) throws Exception {
 		Visitor tv = new TypeVisitor(table);
 		node.type.accept(tv);
+        if (node.arglist != null) {
+            for (Expression expr : node.arglist) {
+                expr.accept(this);
+            }
+        }
 	}
 	
-	public void visit(MethodInvocation node) throws Exception {
-		node.expr.accept(this);
-	}
-	
+	@Override
 	public void visit(CastExpression node) throws Exception {
 		Visitor tv = new TypeVisitor(table);
 		// TODO: Deal with type linking for cast expression somewhere else
@@ -318,16 +299,26 @@ public class TopDeclVisitor extends TraversalVisitor {
 //			node.expr = null;	// clear the useless expression now
 //		}
 		node.type.accept(tv);
+//		System.out.println("\t\t" + node.type + " " + (node.type.getDeclaration()== null));
+		if (node.unary != null)
+			node.unary.accept(this);
 	}
 	
 	public void visit(ArrayCreationExpression node) throws Exception {
 		Visitor tv = new TypeVisitor(table);
 		node.type.accept(tv);
+        if (node.expr != null) {
+            node.expr.accept(this);
+        }
 	}
 	
 	public void visit(InstanceofExpression node) throws Exception {
 		Visitor tv = new TypeVisitor(table);
 		node.type.accept(tv);
+		
+        if (node.expr != null) {
+            node.expr.accept(this);
+        }
 	}
 	
 	
