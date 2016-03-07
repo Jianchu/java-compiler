@@ -178,7 +178,6 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
     }
 
     /**
-     * TODO:
      * get the constructors of node.type
      * check whether node.arglist matches the parameters of one of the constructors
      * the type of node is node.type

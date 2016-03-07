@@ -328,4 +328,78 @@ public class NameTest {
         int result = Joosc.compileSTL(paths);
         assertEquals(42, result);
     }
+    
+    /***************************** Failed positive test cases from a3 ********************************************/
+    @Test
+    public void testCheck25() {
+        String[] paths = new String[0];
+        paths = FileUtility.getFileNames(System.getProperty("user.dir") + "/assignment_testcases/a3/J1_typecheck_return.java").toArray(paths);
+        int result = Joosc.compileSTL(paths);
+        assertEquals(0, result);
+    }
+    
+    @Test
+    public void testCheck26() {
+        String[] paths = new String[0];
+        paths = FileUtility.getFileNames(System.getProperty("user.dir") + "/assignment_testcases/a3/J1_6_ProtectedAccess_InstanceField_This").toArray(paths);
+        int result = Joosc.compileSTL(paths);
+        assertEquals(0, result);
+    }
+    
+    @Test
+    public void testCheck27() {
+        String[] paths = new String[0];
+        paths = FileUtility.getFileNames(System.getProperty("user.dir") + "/assignment_testcases/a3/J2_6_ProtectedAccess_StaticField_This").toArray(paths);
+        int result = Joosc.compileSTL(paths);
+        assertEquals(0, result);
+    }
+    
+    @Test
+    public void testCheck28() {
+        String[] paths = new String[0];
+        paths = FileUtility.getFileNames(System.getProperty("user.dir") + "/assignment_testcases/a3/J1_sideeffects_obj3.java").toArray(paths);
+        int result = Joosc.compileSTL(paths);
+        assertEquals(0, result);
+    }
+    
+    @Test
+    public void testCheck29() {
+        String[] paths = new String[0];
+        paths = FileUtility.getFileNames(System.getProperty("user.dir") + "/assignment_testcases/a3/J1_6_ProtectedAccess_InstanceField_SubVar").toArray(paths);
+        int result = Joosc.compileSTL(paths);
+        assertEquals(0, result);
+    }
+    
+    @Test
+    public void testCheck30() {
+        String[] paths = new String[0];
+        paths = FileUtility.getFileNames(System.getProperty("user.dir") + "/assignment_testcases/a3/J2_6_ProtectedAccess_StaticField_Sub").toArray(paths);
+        int result = Joosc.compileSTL(paths);
+        assertEquals(0, result);
+    }
+    
+    @Test
+    public void testCheck31() {
+        String[] paths = new String[0];
+        paths = FileUtility.getFileNames(System.getProperty("user.dir") + "/assignment_testcases/a3/J1_supermethod_override11").toArray(paths);
+        int result = Joosc.compileSTL(paths);
+        assertEquals(0, result);
+    }
+    
+    @Test
+    public void testCheck32() {
+        String[] paths = new String[0];
+        paths = FileUtility.getFileNames(System.getProperty("user.dir") + "/assignment_testcases/a3/J1_5_ForwardReference_EqualInfix.java").toArray(paths);
+        int result = Joosc.compileSTL(paths);
+        assertEquals(0, result);
+    }
+    
+    @Test
+    public void testCheck33() {
+        String[] paths = new String[0];
+        paths = FileUtility.getFileNames(System.getProperty("user.dir") + "/assignment_testcases/a3/J2_6_ProtectedAccess_StaticField_Sub").toArray(paths);
+        int result = Joosc.compileSTL(paths);
+        assertEquals(0, result);
+    }
+
 }
