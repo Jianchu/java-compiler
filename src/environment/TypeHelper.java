@@ -48,7 +48,7 @@ public class TypeHelper {
             ArrayType tau1 = (ArrayType) t1;
             ArrayType tau2 = (ArrayType) t2;
             if (tau1.type instanceof PrimitiveType && tau2.type instanceof PrimitiveType) {
-                PrimitiveType tau1t = (PrimitiveType) tau1.type;
+            	PrimitiveType tau1t = (PrimitiveType) tau1.type;
                 PrimitiveType tau2t = (PrimitiveType) tau2.type;
                 return tau1t.value == tau2t.value;
             }

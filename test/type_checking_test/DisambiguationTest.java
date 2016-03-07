@@ -17,7 +17,9 @@ public class DisambiguationTest {
 
 	@Test
 	public void testAST() throws Exception {
-		String path = System.getProperty("user.dir") + "/java/io/OutputStream.java";
+//		String path = System.getProperty("user.dir") + "/java/io/OutputStream.java";
+		String path = System.getProperty("user.dir") + "/test/testprogram/CastExpr.java";
+		
 		ASTPrinterVisitor.print(path);
 	}
 	

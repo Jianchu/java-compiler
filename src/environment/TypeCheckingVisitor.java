@@ -140,6 +140,7 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
         if (TypeHelper.assignable(lhsType, exprType)) {
             node.attachType(lhsType);
         } else {
+//        	System.out.println((lhsType instanceof ArrayType) + " : " + (exprType instanceof ArrayType));
             throw new TypeCheckingException("Invalid assignment, incomparable types: " + lhsType + ":=" + exprType);
         }
     }
@@ -245,7 +246,10 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
         if (node.expr != null) {
             node.expr.accept(this);
         }
-        
+        TypeDeclaration prefixDecl = node.expr.getType().getDeclaration();
+        FieldDeclaration fDecl = prefixDecl.getEnvironment().lookUpField(node.id.toString());
+        node.id.attachDeclaration(fDecl);
+        node.attachType(fDecl.type);
         
     }
 

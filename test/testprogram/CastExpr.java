@@ -11,5 +11,6 @@ public class CastExpr {
 //		x.x().y();
 //		x.x.y = x().a;
 //		i = this.a;
+//		i = x().x.x;
 	}
 }
