@@ -613,6 +613,30 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
 			name.attachType(mDecl.returnType);
 			return;
 		}
+		
+		for (int i = 1; i < fn.size(); i++) {
+			String prefix = String.join(".", fn.subList(0, i));
+			TypeDeclaration prefixDecl = curr.lookUpType(prefix);
+			if (prefixDecl != null) { // the prefix resolve to a type
+				if (i == fn.size() - 1) {	// method is a static method
+					MethodDeclaration mDecl = prefixDecl.getEnvironment().lookUpMethod(NameHelper.mangle(fn.get(i), paramTypes));
+					if (mDecl == null)
+						throw new TypeCheckingException("Method un recognized: " + name.toString() + " ");
+					name.attachDeclaration(mDecl);
+					name.attachType(mDecl.returnType);
+					return;
+				} else {	// instance method, everything in between is instance field
+					int j = i;
+					while (j != fn.size() - 1) {
+						FieldDeclaration fDecl = prefixDecl.getEnvironment().lookUpField(fn.get(j));
+						prefixDecl = fDecl.type.getDeclaration();
+						//...
+					}
+				}
+			}
+		}
+		
+		
 	}
 
 	private MethodDeclaration searchMethod(QualifiedName name, TypeDeclaration prefixDecl, List<Type> paramTypes) {
