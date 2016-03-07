@@ -8,10 +8,43 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import ast.*;
-
+import ast.AST;
+import ast.ASTNode;
+import ast.ArrayAccess;
+import ast.ArrayCreationExpression;
+import ast.ArrayType;
+import ast.AssignmentExpression;
+import ast.BooleanLiteral;
+import ast.CastExpression;
+import ast.CharacterLiteral;
+import ast.ClassInstanceCreationExpression;
+import ast.CompilationUnit;
+import ast.Expression;
+import ast.FieldAccess;
+import ast.FieldDeclaration;
+import ast.InfixExpression;
 import ast.InfixExpression.Operator;
+import ast.InstanceofExpression;
+import ast.IntegerLiteral;
+import ast.MethodDeclaration;
+import ast.MethodInvocation;
+import ast.Modifier;
+import ast.Name;
+import ast.NullLiteral;
+import ast.PrefixExpression;
+import ast.PrimitiveType;
 import ast.PrimitiveType.Value;
+import ast.QualifiedName;
+import ast.ReturnStatement;
+import ast.SimpleName;
+import ast.SimpleType;
+import ast.StringLiteral;
+import ast.ThisExpression;
+import ast.Type;
+import ast.TypeDeclaration;
+import ast.VariableDeclaration;
+import ast.VariableDeclarationExpression;
+import ast.Visitor;
 import exceptions.NameException;
 import exceptions.TypeCheckingException;
 
@@ -482,6 +515,8 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
     		    }
     		    if (qualifier.getType() instanceof ArrayType) {
     		        name.attachType(new PrimitiveType(Value.INT));
+    		    } else {
+    		        throw new TypeCheckingException("non-array type cannot call length");
     		    }
     		} else {
     			throw new TypeCheckingException("Declaration found for non-array fields.");
