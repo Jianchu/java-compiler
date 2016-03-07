@@ -103,13 +103,17 @@ public class Disambiguation extends EnvTraversalVisitor{
 				// A(i+1) is field
 				FieldDeclaration fDecl = prefixDecl.getEnvironment().lookUpField(fn.get(i));
 				if (fDecl == null)
-					throw new NameException("Static field not found.");
+					throw new NameException("Static field not found: " + prefix + "." + fn.get(i));
 				
 				int j = i + 1;
 				while (j < fn.size()) {
 					TypeDeclaration fType = fDecl.type.getDeclaration();
-					fDecl = fType.getEnvironment().lookUpField(fn.get(j));
+					fDecl = fType.getEnvironment().lookUpField(fn.get(j++));	// increment j here
 				}
+				if (j == i && !fDecl.modifiers.contains(Modifier.STATIC)) {
+					throw new NameException("Static access to non-static field" + String.join(".", fn.subList(0, j+1)));
+				}
+				
 				
 				node.attachDeclaration(fDecl);
 				return;
@@ -143,7 +147,7 @@ public class Disambiguation extends EnvTraversalVisitor{
 			// normal
 			FieldDeclaration fDecl = prefixDecl.getEnvironment().lookUpField(fn.get(i));
 			if (fDecl == null) {
-				throw new NameException("Field Prefix not recognized: "+ String.join(".", fn.subList(0, i+1)));
+				throw new NameException("Field prefix not recognized: "+ String.join(".", fn.subList(0, i+1)));
 			}
 			prefixDecl = fDecl.type.getDeclaration();
 		}

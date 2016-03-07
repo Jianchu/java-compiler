@@ -1,5 +1,6 @@
 package environment;
 
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -654,29 +655,40 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
 			String prefix = String.join(".", fn.subList(0, i));
 			TypeDeclaration prefixDecl = curr.lookUpType(prefix);
 			if (prefixDecl != null) { // the prefix resolve to a type
-				if (i == fn.size() - 1) {	// method is a static method
-					MethodDeclaration mDecl = prefixDecl.getEnvironment().lookUpMethod(NameHelper.mangle(fn.get(i), paramTypes));
-					if (mDecl == null)
-						throw new TypeCheckingException("Method un recognized: " + name.toString() + " ");
-					name.attachDeclaration(mDecl);
-					name.attachType(mDecl.returnType);
-					return;
-				} else {	// instance method, everything in between is instance field
-					int j = i;
-					while (j != fn.size() - 1) {
-						FieldDeclaration fDecl = prefixDecl.getEnvironment().lookUpField(fn.get(j));
-						prefixDecl = fDecl.type.getDeclaration();
-						//...
-					}
+				int j = i;
+				while (j != fn.size() - 1) {	// everything in between is fields
+					FieldDeclaration fDecl = prefixDecl.getEnvironment().lookUpField(fn.get(j++));	// increment j here
+					prefixDecl = fDecl.type.getDeclaration();
 				}
+				MethodDeclaration mDecl = prefixDecl.getEnvironment().lookUpMethod(NameHelper.mangle(fn.get(i), paramTypes));
+				if (i == j && !mDecl.modifiers.contains(Modifier.STATIC)) {
+					// static method
+					throw new TypeCheckingException("Nonstatic method accessed in a static manner.");
+				} 
+				if (mDecl == null)
+					throw new TypeCheckingException("Method unrecognized: " + name.toString() + " ");
+				name.attachDeclaration(mDecl);
+				name.attachType(mDecl.returnType);
+				return;
 			}
 		}
 		
 		
 	}
 
-	private MethodDeclaration searchMethod(QualifiedName name, TypeDeclaration prefixDecl, List<Type> paramTypes) {
-		// TODO Auto-generated method stub
-		return null;
+	private MethodDeclaration searchMethod(QualifiedName name, TypeDeclaration prefixDecl, List<Type> paramTypes) throws NameException {
+		List<String> fn = name.getFullName();
+		int i = 1;
+		while (i < fn.size()-1) {
+			FieldDeclaration fDecl = prefixDecl.getEnvironment().lookUpField(fn.get(i));
+			if (fDecl == null) {
+				throw new NameException("Method prefix not recognized: " + String.join(".", fn.subList(0, i)));
+			}
+			prefixDecl = fDecl.type.getDeclaration();
+			i++;
+		}
+		
+		MethodDeclaration mDecl = prefixDecl.getEnvironment().lookUpMethod(NameHelper.mangle(fn.get(i), paramTypes));
+		return mDecl;
 	}
 }
