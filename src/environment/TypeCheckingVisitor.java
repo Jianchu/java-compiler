@@ -119,6 +119,7 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
         }
         Type exprType = node.expr.getType();
 
+        /**
         if (node.lhs instanceof ArrayAccess) {
             ArrayAccess arrayAccess = (ArrayAccess) node.lhs;
             Type typeOfArray = arrayAccess.getType();
@@ -128,12 +129,13 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
                 throw new TypeCheckingException("Invalid assignment: incomparable types");
             }
             
+        } 
+        **/
+        
+        if (TypeHelper.assignable(lhsType, exprType)) {
+            node.attachType(lhsType);
         } else {
-            if (TypeHelper.assignable(lhsType, exprType)) {
-                node.attachType(lhsType);
-            } else {
-                throw new TypeCheckingException("Invalid assignment: incomparable types");
-            }
+            throw new TypeCheckingException("Invalid assignment: incomparable types");
         }
     }
 
