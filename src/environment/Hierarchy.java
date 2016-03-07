@@ -44,6 +44,7 @@ public class Hierarchy {
 		// create a new set of ancestors including self for checking cycles
 		Set<TypeDeclaration> newAncesters = new HashSet<TypeDeclaration>(ancestors);
 		newAncesters.add(typeDecl);
+		Set<TypeDeclaration> superTypes = new HashSet<TypeDeclaration>();
 		
 		// inherit from super interfaces
 		for (Type itf : typeDecl.interfaces) {
@@ -56,7 +57,7 @@ public class Hierarchy {
 				buildInherit(itfDecl, newAncesters);
 			}
 			Environment superEnv = itfDecl.getEnvironment();
-			inherit(inheritEnv, superEnv, true);
+			superTypes.add(itfDecl);
 		}
 		
 		// parent class
@@ -71,7 +72,7 @@ public class Hierarchy {
 			}
 			
 			Environment superEnv = superDecl.getEnvironment();
-			inherit(inheritEnv, superEnv, false);
+			superTypes.add(superDecl);
 		}
 		
 		if (typeDecl.isInterface) {
@@ -83,7 +84,7 @@ public class Hierarchy {
 				if (! visited.contains(objInterface)) {
 					visited.add(objInterface);
 				}
-				inherit(inheritEnv, objInterface.getEnvironment(), true);
+				superTypes.add(objInterface);
 			}
 		} else {	// is class
 			if (typeDecl.superClass == null && typeDecl != SymbolTable.getObjRef()) {
@@ -93,9 +94,11 @@ public class Hierarchy {
 				if (! visited.contains(obj)) {
 					visited.add(obj);
 				}
-				inherit(inheritEnv, obj.getEnvironment(), false);		
+				superTypes.add(obj);
 			}
 		}
+		
+		// process superTypes
 		
 		visited.add(typeDecl);
 		
