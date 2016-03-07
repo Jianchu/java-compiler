@@ -1,5 +1,6 @@
-package name_resolution_test;
+package type_checking_test;
 
+import name_resolution_test.TestingHelper;
 import static org.junit.Assert.assertEquals;
 
 import java.io.ByteArrayOutputStream;
@@ -16,14 +17,15 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 @RunWith(Parameterized.class)
-public class TestMarmoset {
+public class TestMarmosetA3 {
 
     private static Map<String, ArrayList<String>> testCases;
-    private static TestingHelper helper = new TestingHelper("a2");
+    private static TestingHelper helper = new TestingHelper("a3");
+    private final PrintStream oldErr = System.err;
     private int expectedResult;
     private String testCase;
-    
-    public TestMarmoset(String testCase, int expectedResult) {
+
+    public TestMarmosetA3(String testCase, int expectedResult) {
         this.testCase = testCase;
         this.expectedResult = expectedResult;
     }
@@ -35,13 +37,16 @@ public class TestMarmoset {
         Object[][] parameters = helper.getParameters("All");
         return Arrays.asList(parameters);
     }
-    
+
     @Test
     public void test() {
         if (testCase.contains("Je_")) {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             PrintStream ps = new PrintStream(baos);
             System.setErr(ps);
+        } else {
+            System.out.flush();
+            System.setErr(oldErr);
         }
         String[] input = new String[testCases.get(testCase).size()];
         input = testCases.get(testCase).toArray(input);
