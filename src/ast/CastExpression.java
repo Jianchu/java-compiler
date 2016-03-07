@@ -1,7 +1,10 @@
 package ast;
 
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
+import ast.PrimitiveType.Value;
 import exceptions.ASTException;
 import exceptions.NameException;
 import scanner.Symbol;
@@ -31,12 +34,20 @@ public class CastExpression extends Expression {
         // tranform the expression to type
 		if (this.expr != null) {
 			if (!(this.expr instanceof Name)) {
-				throw new NameException("123");
+				throw new NameException("Unexpected expresssion in name.");
 			}
-			if (this.isArray) {
-				this.type = new ArrayType((Name) this.expr);
+			Name exprN = (Name) this.expr;
+			Type tempType;
+			if (PrimitiveType.primitives().contains(exprN.toString())) {
+				tempType = new PrimitiveType(Value.valueOf(exprN.toString()));
 			} else {
-				this.type = new SimpleType((Name) this.expr);
+				tempType = new SimpleType(exprN);
+			}
+			
+			if (this.isArray) {
+				this.type = new ArrayType(tempType);
+			} else {
+				this.type = tempType;
 			}
 			this.expr = null;	// clear the useless expression now
 		}

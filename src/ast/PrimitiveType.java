@@ -1,5 +1,8 @@
 package ast;
 
+import java.util.Set;
+import java.util.TreeSet;
+
 import parser.ParseTree;
 
 public class PrimitiveType extends Type {
@@ -52,4 +55,13 @@ public class PrimitiveType extends Type {
     public void accept(Visitor v) throws Exception {
         v.visit(this);
     }
+    
+    public static Set<String> primitives() {
+    	Set<String> primitives = new TreeSet<String>();
+		for (Value v : Value.values()) {
+			primitives.add(v.toString().toLowerCase());
+		}
+		return primitives;
+    }
+    
 }

@@ -17,8 +17,8 @@ public class ArrayType extends Type {
 		}
 	}
 	
-	public ArrayType(Name n) {
-		type = new SimpleType(n);
+	public ArrayType(Type elemType) {
+		type = elemType;
 	}
 	
 	public void accept(Visitor v) throws Exception {

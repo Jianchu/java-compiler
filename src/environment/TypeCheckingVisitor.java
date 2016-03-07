@@ -623,12 +623,10 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
         ArrayType arrayType = null;
         if (type instanceof SimpleType) {
             SimpleType stype = (SimpleType) type;
-            Name name = stype.name;
-            arrayType = new ArrayType(name);
+            arrayType = new ArrayType(stype);
         } else if (type instanceof PrimitiveType) {
             PrimitiveType ptype = (PrimitiveType) type;
-            SimpleName name = new SimpleName(ptype.toString());
-            arrayType = new ArrayType(name);
+            arrayType = new ArrayType(ptype);
         } else {
             throw new TypeCheckingException("ArrayBuilder error.");
         }
