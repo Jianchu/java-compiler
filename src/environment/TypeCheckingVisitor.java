@@ -286,7 +286,7 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
         if (node.rhs != null) {
             node.rhs.accept(this);
         }
-        Type rhsType = node.lhs.getType();
+        Type rhsType = node.rhs.getType();
 
         Operator op = node.op;
         
@@ -462,6 +462,7 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
         super.visit(node);
         Type initializerType = node.varDeclar.initializer.getType();
         if (!TypeHelper.assignable(node.varDeclar.type, initializerType)) {
+
             throw new TypeCheckingException(initializerType + " is not assignable to " + node.varDeclar.type.toString());
         } 
         curr = last;
