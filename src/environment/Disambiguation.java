@@ -19,9 +19,16 @@ import exceptions.TypeLinkException;
 public class Disambiguation extends EnvTraversalVisitor{
 	Set<FieldDeclaration> unseenFields = new HashSet<FieldDeclaration>();
 	boolean isFieldInit = false;
+	static boolean debug = false;
 	
 	public void visit(TypeDeclaration node) throws Exception {
-//		System.out.println(node.getFullName());
+		if (debug) {
+			System.out.println(node.getFullName());
+			for (String s : node.getEnvironment().getEnclosing().fields.keySet()) {
+				System.out.println("\t" + s);
+			}
+		}
+		
 		for (FieldDeclaration fd : node.getEnvironment().fields.values()) {
 			unseenFields.add(fd);
 		}

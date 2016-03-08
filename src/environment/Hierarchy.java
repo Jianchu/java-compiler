@@ -119,7 +119,7 @@ public class Hierarchy {
 		Environment inheritEnv = clsEnv.getEnclosing();
 		for (TypeDeclaration sup : superTypes) {
 			Environment supEnv = sup.getEnvironment();
-			Environment supInheritEnv = sup.getEnvironment();
+			Environment supInheritEnv = supEnv.getEnclosing();
 			for (String f : supEnv.fields.keySet()) {
 				if (!clsEnv.fields.containsKey(f)) {
 					inheritEnv.addField(f, supEnv.fields.get(f));
