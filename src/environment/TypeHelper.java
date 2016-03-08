@@ -40,7 +40,7 @@ public class TypeHelper {
             if (t2 instanceof ArrayType) {
                 SimpleType tau1 = (SimpleType) t1;
                 return tau1.toString().equals("java.lang.Object") ||
-                         tau1.toString().equals("java.lang.Clonable") ||
+                         tau1.toString().equals("java.lang.Cloneable") ||
                          tau1.toString().equals("java.io.Serializable");
             }
         } else if (t1 instanceof ArrayType) {
