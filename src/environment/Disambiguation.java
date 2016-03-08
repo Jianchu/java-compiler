@@ -17,11 +17,14 @@ import exceptions.TypeLinkException;
  *
  */
 public class Disambiguation extends EnvTraversalVisitor{
-	Set<FieldDeclaration> seenFields = new HashSet<FieldDeclaration>();
+	Set<FieldDeclaration> unseenFields = new HashSet<FieldDeclaration>();
 	boolean isFieldInit = false;
 	
 	public void visit(TypeDeclaration node) throws Exception {
 //		System.out.println(node.getFullName());
+		for (FieldDeclaration fd : node.getEnvironment().fields.values()) {
+			unseenFields.add(fd);
+		}
 		super.visit(node);
 	}
 	
@@ -35,7 +38,7 @@ public class Disambiguation extends EnvTraversalVisitor{
             node.initializer.accept(this);
         }
         isFieldInit = false;
-        seenFields.add(node);
+        unseenFields.remove(node);
 	}
 	
 	@Override
@@ -83,7 +86,7 @@ public class Disambiguation extends EnvTraversalVisitor{
 		if (fDecl == null) {
 			throw new NameException("Simple Name cannot be  resolved: " + node.toString());
 		}
-		if (isFieldInit && !seenFields.contains(fDecl)) {
+		if (isFieldInit && unseenFields.contains(fDecl)) {
 			throw new NameException("forward reference");
 		}
 		
