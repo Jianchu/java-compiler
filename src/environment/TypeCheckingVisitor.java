@@ -255,10 +255,19 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
         if (node.expr != null) {
             node.expr.accept(this);
         }
-        TypeDeclaration prefixDecl = node.expr.getType().getDeclaration();
-        FieldDeclaration fDecl = prefixDecl.getEnvironment().lookUpField(node.id.toString());
-        node.id.attachDeclaration(fDecl);
-        node.attachType(fDecl.type);
+        Type exprType = node.expr.getType();
+        
+        if (exprType instanceof ArrayType && node.id.toString().equals("length")) {
+        	node.attachType(new PrimitiveType(Value.INT));
+        } else if (exprType instanceof SimpleType) {
+            TypeDeclaration prefixDecl = node.expr.getType().getDeclaration();
+            FieldDeclaration fDecl = prefixDecl.getEnvironment().lookUpField(node.id.toString());
+            node.id.attachDeclaration(fDecl);
+            node.attachType(fDecl.type);
+        } else {
+        	throw new TypeCheckingException("field access unrecognized type." );
+        }
+
         
     }
 
@@ -693,7 +702,7 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
 					FieldDeclaration fDecl = prefixDecl.getEnvironment().lookUpField(fn.get(j++));	// increment j here
 					prefixDecl = fDecl.type.getDeclaration();
 				}
-				MethodDeclaration mDecl = prefixDecl.getEnvironment().lookUpMethod(NameHelper.mangle(fn.get(i), paramTypes));
+				MethodDeclaration mDecl = prefixDecl.getEnvironment().lookUpMethod(NameHelper.mangle(fn.get(j), paramTypes));
 				if (i == j && !mDecl.modifiers.contains(Modifier.STATIC)) {
 					// static method
 					throw new TypeCheckingException("Nonstatic method accessed in a static manner: " + name);
