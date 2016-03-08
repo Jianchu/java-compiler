@@ -46,7 +46,6 @@ public class TypeVisitor extends TopDeclVisitor {
      * @throws Exception
      */
     public void visit(SimpleType type) throws Exception {
-
     	typeDec = null;
         if (type.name != null) {
             type.name.accept(this);

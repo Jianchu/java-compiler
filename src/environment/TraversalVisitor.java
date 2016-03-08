@@ -149,7 +149,7 @@ public class TraversalVisitor implements Visitor{
         visitNextStatement(node);
     }
 
-    private void visitNextStatement(Statement node) throws Exception {
+    public void visitNextStatement(Statement node) throws Exception {
         if (node.hasNext()) {
             node.next().accept(this);
         }
@@ -259,8 +259,8 @@ public class TraversalVisitor implements Visitor{
     public void visit(IntegerLiteral node) throws Exception {
     }
 
-    public void visit(MethodInvocation node) throws Exception {
-        if (node.expr != null) {
+    public void visit(MethodInvocation node) throws Exception {    	
+    	if (node.expr != null) {
             node.expr.accept(this);
         }
         if (node.arglist != null) {
