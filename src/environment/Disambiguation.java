@@ -1,6 +1,8 @@
 package environment;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import ast.*;
 import exceptions.NameException;
@@ -15,10 +17,25 @@ import exceptions.TypeLinkException;
  *
  */
 public class Disambiguation extends EnvTraversalVisitor{
+	Set<FieldDeclaration> seenFields = new HashSet<FieldDeclaration>();
+	boolean isFieldInit = false;
 	
 	public void visit(TypeDeclaration node) throws Exception {
 //		System.out.println(node.getFullName());
 		super.visit(node);
+	}
+	
+	public void visit(FieldDeclaration node) throws Exception {
+        for (Modifier im : node.modifiers) {
+            im.accept(this);
+        }
+        node.type.accept(this);
+        isFieldInit = true;
+        if (node.initializer != null) {
+            node.initializer.accept(this);
+        }
+        isFieldInit = false;
+        seenFields.add(node);
 	}
 	
 	@Override
@@ -65,8 +82,13 @@ public class Disambiguation extends EnvTraversalVisitor{
 		FieldDeclaration fDecl = curr.lookUpField(name);
 		if (fDecl == null) {
 			throw new NameException("Simple Name cannot be  resolved: " + node.toString());
-		} 
+		}
+		if (isFieldInit && !seenFields.contains(fDecl)) {
+			throw new NameException("forward reference");
+		}
+		
 		node.attachDeclaration(fDecl);
+		
 	}
 	
 	/**
