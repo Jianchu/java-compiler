@@ -56,8 +56,8 @@ public class Joosc {
 		    }
 		    SymbolTable.buildEnvs(trees);
 		    new Hierarchy(trees);
-		    Disambiguation.disambiguate(trees);
-		    TypeCheckingVisitor.typeCheck(trees);
+//		    Disambiguation.disambiguate(trees);
+//		    TypeCheckingVisitor.typeCheck(trees);
 		    
         } catch (Exception e) {
         	e.printStackTrace();

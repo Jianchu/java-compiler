@@ -26,8 +26,14 @@ public class Hierarchy {
 		visited = new HashSet<TypeDeclaration>();
 		for (AST tree : trees) {
 			if (tree.root.types.size() > 0)
-				
+//				System.out.println(tree.root.types.get(0).getFullName());
 				buildInherit(tree.root.types.get(0), new HashSet<TypeDeclaration>());
+//				if (tree.root.types.get(0).getFullName().equals("Main")) {
+//					for (String m : tree.root.types.get(0).getEnvironment().getEnclosing().methods.keySet()) {
+//						
+//						System.out.println(m);
+//					}
+//				}
 		}
 	}
 
@@ -39,7 +45,6 @@ public class Hierarchy {
 			return;
 		}
 		
-		Environment inheritEnv = typeDecl.getEnvironment().getEnclosing();
 		
 		// create a new set of ancestors including self for checking cycles
 		Set<TypeDeclaration> newAncesters = new HashSet<TypeDeclaration>(ancestors);
@@ -79,7 +84,6 @@ public class Hierarchy {
 			if (! visited.contains(itfDecl)) {
 				buildInherit(itfDecl, newAncesters);
 			}
-			Environment superEnv = itfDecl.getEnvironment();
 			superTypes.add(itfDecl);
 		}
 		
@@ -94,7 +98,6 @@ public class Hierarchy {
 				buildInherit(superDecl, newAncesters);
 			}
 			
-			Environment superEnv = superDecl.getEnvironment();
 			superTypes.add(superDecl);
 		}
 		
@@ -106,7 +109,7 @@ public class Hierarchy {
 		
 	}
 	
-	private void inherit(TypeDeclaration typeDecl, Set<TypeDeclaration> superTypes) {
+	private void inherit(TypeDeclaration typeDecl, Set<TypeDeclaration> superTypes) throws HierarchyException {
 		inheritFields(typeDecl, superTypes);
 		inheritMethods(typeDecl, superTypes);
 	}
@@ -131,75 +134,138 @@ public class Hierarchy {
 		}
 	}
 
-	private void inheritMethods(TypeDeclaration typeDecl, Set<TypeDeclaration> superTypes) {
-		// TODO Auto-generated method stub
-		
+	private void inheritMethods(TypeDeclaration typeDecl, Set<TypeDeclaration> superTypes) throws HierarchyException {
+		for (TypeDeclaration sup : superTypes) {
+			Environment supEnv = sup.getEnvironment();
+			Environment supInheritEnv = supEnv.getEnclosing();
+			inheritEnv(typeDecl, supEnv, superTypes);
+			inheritEnv(typeDecl, supInheritEnv, superTypes);
+		}
+	}
+	
+	public void inheritEnv(TypeDeclaration cls, Environment supEnv, Set<TypeDeclaration> superTypes) throws HierarchyException {
+		Environment clsEnv = cls.getEnvironment();
+		Environment inheritEnv = clsEnv.getEnclosing();
+		for (String m : supEnv.methods.keySet()) {
+//			System.out.println("\t" + m);
+			MethodDeclaration mDecl = clsEnv.methods.get(m);
+			if (mDecl != null) {
+				// m in declare(T), check replace, but do not add to inherit
+				checkReplace(mDecl, supEnv.methods.get(m));
+			} else {
+				// m not in declare(T)
+				MethodDeclaration smDecl = supEnv.methods.get(m);
+				if (!smDecl.isAbstract) {
+					// if not abstract, in inherit
+					
+					// replace other abstract methods from other supers
+					checkInheritReplace(m, smDecl, superTypes);
+					
+					inheritEnv.addMethod(m, smDecl);
+				} else {
+					// find all methods like this one
+					if (allAbstractAndNoMoreVisible(m, smDecl, superTypes)) {
+						if (inheritEnv.methods.keySet().contains(m)) {
+							MethodDeclaration existing = inheritEnv.methods.get(m);
+							checkReturnType(smDecl, existing);
+						}
+						inheritEnv.addMethod(m, smDecl);
+					}
+				}
+			}
+		}
+	}
+	
+	
+	private void checkReturnType(MethodDeclaration newM, MethodDeclaration oldM) throws HierarchyException {
+//		System.out.println("\t" + newM.id + newM.returnType + " - " + oldM.returnType);
+		if (!(newM.returnType == oldM.returnType || newM.returnType.equals(oldM.returnType))) {
+			throw new HierarchyException("different return type: " + newM.returnType + " : " + oldM.returnType);
+		}
 	}
 
+	private void checkInheritReplace(String m, MethodDeclaration mDecl, Set<TypeDeclaration> superTypes) throws HierarchyException {
+		Set<MethodDeclaration> all = getAllMethods(m, superTypes);
+		for (MethodDeclaration old : all) {
+			if (old != mDecl) {
+				checkReplace(mDecl, old);
+			}
+		}
+	}
 
+	/**
+	 * check for all abstract. also if there is a version of better visibility.
+	 * for example if this method is protected, and there is one that is public. return false.
+	 * 
+	 * 
+	 * @param m
+	 * @param mDecl
+	 * @param superTypes
+	 * @return
+	 */
+	private boolean allAbstractAndNoMoreVisible(String m, MethodDeclaration mDecl, Set<TypeDeclaration> superTypes) {
+		for (TypeDeclaration sup :superTypes) {
+			Environment supEnv = sup.getEnvironment();
+			MethodDeclaration otherDecl = supEnv.lookUpMethod(m);
+			if (otherDecl != null && otherDecl != mDecl) {
+				if (!otherDecl.isAbstract) {
+					return false;
+				} else if (otherDecl.modifiers.contains(Modifier.PUBLIC) 
+						&& mDecl.modifiers.contains(Modifier.PROTECTED)) {
+					return false;
+				}
+			}
+		}
+		return true;
+	}
 
-	public void inherit(Environment inheritEnv, Environment superEnv, boolean isInterface) throws HierarchyException {
-		Environment superInherit = superEnv.getEnclosing();
+	private void checkReplace(MethodDeclaration mDecl, MethodDeclaration old) throws HierarchyException {
+		// TODO Auto-generated method stub
+		MethodDeclaration decl1 = mDecl;
+		MethodDeclaration decl2 = old;
+		// decl2 is replaced by decl1
 		
-		// fields from super class, overriding might happen
-		for (String field : superInherit.fields.keySet()) {
-			inheritEnv.addField(field, superInherit.fields.get(field));
-		}
-		for (String field : superEnv.fields.keySet()) {
-			inheritEnv.addField(field, superEnv.fields.get(field));
+		// if the method replaced is public, the new method needs to be public 
+		if (decl2.modifiers.contains(Modifier.PUBLIC) &&
+				!decl1.modifiers.contains(Modifier.PUBLIC)) {
+			throw new HierarchyException("A non-public method replaced public method.");
 		}
 		
-		//methods from superclass, overriding might happen
-		for (String method : superInherit.methods.keySet()) {
-			if (isInterface && superInherit.methods.get(method).modifiers.contains(Modifier.STATIC)) {
-				// static methods from interfaces do not get inherited
-				continue;
-			}
-				
-			checkReplace(inheritEnv, superInherit, method);
-			MethodDeclaration decl1 = inheritEnv.methods.get(method);
-			MethodDeclaration decl2 = superInherit.methods.get(method);
-			if (decl1 != null
-					&& decl1.isAbstract && decl2.isAbstract
-					&& decl1.modifiers.contains(Modifier.PUBLIC) && !decl2.modifiers.contains(Modifier.PUBLIC)) {
-				// protected abstract shall not replace public abstract
-				continue;
-			}
-			
-			
-			inheritEnv.addMethod(method, superInherit.methods.get(method));
+		// the old method can't be final
+		if (decl2.modifiers.contains(Modifier.FINAL)) {
+			throw new HierarchyException("Final method cannot be override.s");
 		}
-		for (String method : superEnv.methods.keySet()) {
-			if (isInterface && superEnv.methods.get(method).modifiers.contains(Modifier.STATIC)) {
-				// static methods from interfaces do not get inherited
-				continue;
-			}
-			MethodDeclaration decl1 = inheritEnv.methods.get(method);
-			MethodDeclaration decl2 = superEnv.methods.get(method);
-			if (decl1 != null
-					&& decl1.isAbstract && decl2.isAbstract
-					&& decl1.modifiers.contains(Modifier.PUBLIC) && !decl2.modifiers.contains(Modifier.PUBLIC)) {
-				continue;
-			}
-			checkReplace(inheritEnv, superEnv, method);
-			inheritEnv.addMethod(method, superEnv.methods.get(method));
+		
+		// old method static <=> new method static
+		if (decl2.modifiers.contains(Modifier.STATIC) != decl1.modifiers.contains(Modifier.STATIC)) {
+			throw new HierarchyException("Static modifier in replaced method does not match.");
 		}
+		
+		// return types should be the same
+		if (!(decl2.returnType == decl1.returnType || decl2.returnType.equals(decl1.returnType))) {
+			// both checks are required to deal with simple type and primitive type.
+			throw new HierarchyException("Return type of replaced method does not match.");
+		}
+	}
+
+	/**
+	 * Get all methods of the same signature
+	 * @param m
+	 * @param superTypes
+	 * @return
+	 */
+	private Set<MethodDeclaration> getAllMethods(String m, Set<TypeDeclaration> superTypes) {
+		Set<MethodDeclaration> all = new HashSet<MethodDeclaration>();
+		for (TypeDeclaration sup : superTypes) {
+			MethodDeclaration mDecl = sup.getEnvironment().lookUpMethod(m);
+			if (mDecl != null) {
+				all.add(mDecl);
+			}
+		}
+		return all;
 	}
 	
 	public void checkHierarchy(List<AST> trees) throws Exception {
-		checkPublicFinal(trees);
-	}
-	
-	/**
-	 * for all methods that m, m' such that m replaces m',
-	 * if m' is public, then m must be public
-	 * 
-	 * 
-	 * @param trees
-	 * @throws HierarchyException 
-	 * @throws AbstractMethodException 
-	 */
-	public void checkPublicFinal(List<AST> trees) throws HierarchyException, AbstractMethodException {
 		for (AST ast : trees) {
 			if (ast.root.types.size() == 0)
 				continue;
@@ -208,7 +274,7 @@ public class Hierarchy {
 			Environment clsEnv = ast.root.types.get(0).getEnvironment();
 			Environment inheritEnv = clsEnv.getEnclosing();
 			
-			// check that type does  not inherit from  obj
+			// check that type does  not inherit from  obj final
 			Environment objEnv = SymbolTable.getObjRef().getEnvironment();
 			
 			if (tDecl != SymbolTable.getObjRef() && tDecl != SymbolTable.getObjectInterfaceRef()) {
@@ -238,61 +304,7 @@ public class Hierarchy {
 					}
 				}				
 			}
-			
-			for (String m : clsEnv.methods.keySet()) {
-				if (inheritEnv.methods.containsKey(m)) {
-					MethodDeclaration decl1 = clsEnv.methods.get(m);
-					MethodDeclaration decl2 = inheritEnv.methods.get(m);
-					// decl2 is replaced by decl1
-					
-					// if the method replaced is public, the new method needs to be public 
-					if (decl2.modifiers.contains(Modifier.PUBLIC) &&
-							!decl1.modifiers.contains(Modifier.PUBLIC)) {
-						throw new HierarchyException("A non-public method replaced public method.");
-					}
-					
-					// the old method can't be final
-					if (decl2.modifiers.contains(Modifier.FINAL)) {
-						throw new HierarchyException("Final method cannot be override.s");
-					}
-					
-					// old method static <=> new method static
-					if (decl2.modifiers.contains(Modifier.STATIC) != decl1.modifiers.contains(Modifier.STATIC)) {
-						throw new HierarchyException("Static modifier in replaced method does not match.");
-					}
-					
-					// return types should be the same
-					if (!(decl2.returnType == decl1.returnType || decl2.returnType.equals(decl1.returnType))) {
-						// both checks are required to deal with simple type and primitive type.
-						throw new HierarchyException("Return type of replaced method does not match.");
-					}
-				}
-			}
 		}
 	}
 	
-	public void checkReplace(Environment toEnv, Environment fromEnv, String method) throws HierarchyException {
-		if (toEnv.methods.containsKey(method)) {
-			MethodDeclaration decl2 = toEnv.methods.get(method);
-			MethodDeclaration decl1 = fromEnv.methods.get(method);
-			// decl2 is replaced by decl1
-			
-			// applies to abstract method replace too.
-			if (!(decl2.returnType == decl1.returnType || decl2.returnType.equals(decl1.returnType))) {
-				throw new HierarchyException("Return type of replaced method does not match.");
-			}
-			
-			// only applies to superclass replace
-			if (!decl1.isAbstract && decl2.modifiers.contains(Modifier.PUBLIC) &&
-					!decl1.modifiers.contains(Modifier.PUBLIC)) {
-				throw new HierarchyException("A non-public method replaced public method.");
-			}
-			// only applies to superclass replace
-			// the old method can't be final
-			if (decl2.modifiers.contains(Modifier.FINAL)) {
-				throw new HierarchyException("Final method cannot be overriden.");
-			}
-			
-		}
-	}
 }
