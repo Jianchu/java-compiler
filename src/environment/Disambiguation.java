@@ -86,9 +86,12 @@ public class Disambiguation extends EnvTraversalVisitor{
 		if (fDecl == null) {
 			throw new NameException("Simple Name cannot be  resolved: " + node.toString());
 		}
-		if (isFieldInit && unseenFields.contains(fDecl)) {
-			throw new NameException("forward reference");
+		if (fDecl.modifiers.contains(Modifier.STATIC)) {
+		    if (isFieldInit && unseenFields.contains(fDecl)) {
+		        throw new NameException("forward reference");
+	            }
 		}
+
 		
 		node.attachDeclaration(fDecl);
 		
