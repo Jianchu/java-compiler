@@ -46,7 +46,28 @@ public class Hierarchy {
 		newAncesters.add(typeDecl);
 		Set<TypeDeclaration> superTypes = new HashSet<TypeDeclaration>();
 		
-		
+		if (typeDecl.isInterface) {
+			if (typeDecl.interfaces.size() == 0 
+				&& typeDecl != SymbolTable.getObjectInterfaceRef()) {
+				// if interface does not extend any other interfaces
+				// implicitly inheirt from object interface
+				TypeDeclaration objInterface = SymbolTable.getObjectInterfaceRef();
+				superTypes.add(objInterface);
+				SimpleType st = new SimpleType(new SimpleName("objInterface"));
+				st.attachDeclaration(objInterface);
+				typeDecl.interfaces.add(st);
+			}
+		} else {	// is class
+			if (typeDecl.superClass == null && typeDecl != SymbolTable.getObjRef()) {
+				// if class does not extend any class
+				// inherit from object
+				TypeDeclaration obj = SymbolTable.getObjRef();
+				superTypes.add(obj);
+				SimpleType st = new SimpleType(new SimpleName("Object"));
+				st.attachDeclaration(obj);
+				typeDecl.superClass = st;
+			}
+		}
 		
 		// inherit from super interfaces
 		for (Type itf : typeDecl.interfaces) {
@@ -77,42 +98,46 @@ public class Hierarchy {
 			superTypes.add(superDecl);
 		}
 		
-		if (typeDecl.isInterface) {
-			if (typeDecl.interfaces.size() == 0 
-				&& typeDecl != SymbolTable.getObjectInterfaceRef()) {
-				// if interface does not extend any other interfaces
-				// implicitly inheirt from object interface
-				TypeDeclaration objInterface = SymbolTable.getObjectInterfaceRef();
-				if (! visited.contains(objInterface)) {
-					visited.add(objInterface);
-				}
-				superTypes.add(objInterface);
-				SimpleType st = new SimpleType(new SimpleName("objInterface"));
-				st.attachDeclaration(objInterface);
-				typeDecl.interfaces.add(st);
-
-			}
-		} else {	// is class
-			if (typeDecl.superClass == null && typeDecl != SymbolTable.getObjRef()) {
-				// if class does not extend any class
-				// inherit from object
-				TypeDeclaration obj = SymbolTable.getObjRef();
-				if (! visited.contains(obj)) {
-					visited.add(obj);
-				}
-				superTypes.add(obj);
-				SimpleType st = new SimpleType(new SimpleName("Object"));
-				st.attachDeclaration(obj);
-				typeDecl.superClass = st;
-			}
-		}
-		
 		// process superTypes
+		inherit(typeDecl, superTypes);
+		
 		
 		visited.add(typeDecl);
 		
 	}
 	
+	private void inherit(TypeDeclaration typeDecl, Set<TypeDeclaration> superTypes) {
+		inheritFields(typeDecl, superTypes);
+		inheritMethods(typeDecl, superTypes);
+	}
+	
+	private void inheritFields(TypeDeclaration typeDecl, Set<TypeDeclaration> superTypes) {
+		Environment clsEnv = typeDecl.getEnvironment();
+		Environment inheritEnv = clsEnv.getEnclosing();
+		for (TypeDeclaration sup : superTypes) {
+			Environment supEnv = sup.getEnvironment();
+			Environment supInheritEnv = sup.getEnvironment();
+			for (String f : supEnv.fields.keySet()) {
+				if (!clsEnv.fields.containsKey(f)) {
+					inheritEnv.addField(f, supEnv.fields.get(f));
+				}
+			}
+			for (String f : supInheritEnv.fields.keySet()){
+				if (!clsEnv.fields.containsKey(f)) {
+					inheritEnv.addField(f, supInheritEnv.fields.get(f));
+				}
+			}
+			
+		}
+	}
+
+	private void inheritMethods(TypeDeclaration typeDecl, Set<TypeDeclaration> superTypes) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+
 	public void inherit(Environment inheritEnv, Environment superEnv, boolean isInterface) throws HierarchyException {
 		Environment superInherit = superEnv.getEnclosing();
 		
