@@ -136,7 +136,6 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
             
         } 
         **/
-        
         if (TypeHelper.assignable(lhsType, exprType)) {
             node.attachType(lhsType);
         } else {
@@ -177,7 +176,7 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
         } else if (TypeHelper.assignable(castToType, unaryType) || TypeHelper.assignable(unaryType, castToType)) {
             if (castToType instanceof ArrayType) {
                 ArrayType aCastToType = (ArrayType) castToType;
-                node.attachType((aCastToType.type));
+                node.attachType(aCastToType);
             } else if (castToType instanceof SimpleType) {
                 node.attachType(simpleTypeBuilder((SimpleType) castToType));
             }
