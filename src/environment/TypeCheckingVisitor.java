@@ -175,7 +175,12 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
         } else if (checkPrimitive(castToType, unaryType, true)) {
         	node.attachType(new PrimitiveType(Value.BOOLEAN));
         } else if (TypeHelper.assignable(castToType, unaryType) || TypeHelper.assignable(unaryType, castToType)) {
-        	node.attachType(simpleTypeBuilder((SimpleType) castToType));
+            if (castToType instanceof ArrayType) {
+                ArrayType aCastToType = (ArrayType) castToType;
+                node.attachType((aCastToType.type));
+            } else if (castToType instanceof SimpleType) {
+                node.attachType(simpleTypeBuilder((SimpleType) castToType));
+            }
         } else {
         	throw new TypeCheckingException("No type found for cast.");
         }
