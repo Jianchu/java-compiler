@@ -1,5 +1,6 @@
 package type_checking_test;
 
+import static org.junit.Assert.assertEquals;
 import joosc.Joosc;
 
 import org.junit.Before;
@@ -25,7 +26,51 @@ public class DisambiguationTest {
 	public void test() {
         String[] paths = new String[0];
         paths = FileUtility.getFileNames(System.getProperty("user.dir") + "/assignment_testcases/a3/J1_5_AmbiguousName_FieldVsType_Initializer.java").toArray(paths);
-        Joosc.compileSTL(paths);	
+        int result = Joosc.compileSTL(paths);
+        assertEquals(0, result);
 	}
 
+	/**
+	 * Method unrecognized: System.out.println
+	 * Failed for same error:
+	 * J1_namelinking3.java
+         * J1_implicitstringconcatenation.java
+	 */
+        @Test
+        public void test1() {
+        String[] paths = new String[0];
+        paths = FileUtility.getFileNames(System.getProperty("user.dir") + "/assignment_testcases/a3/J1_ambiguousInvoke").toArray(paths);
+        int result = Joosc.compileSTL(paths);
+        assertEquals(0, result);
+        }
+        
+        /**
+         * nullpointer in field access
+         */
+        @Test
+        public void test2() {
+        String[] paths = new String[0];
+        paths = FileUtility.getFileNames(System.getProperty("user.dir") + "/assignment_testcases/a3/J1_6_AssignmentInArrayLength.java").toArray(paths);
+        int result = Joosc.compileSTL(paths);
+        assertEquals(0, result);
+        }
+        
+        /**
+         * exceptions.NameException: forward reference
+         * Failed for same error:
+         * J1_fieldOwnInit2.java
+         * J1_fieldOwnInit1.java
+         * J1_fieldinit2.java
+         * J1_fieldinit_forward_ref.java
+         * J1_fieldInOwnInit.java
+         * J1_fieldinit_forward_ref2.java
+         * J1_5_ForwardReference_ExplicitThis_InAssignment.java
+         */
+        @Test
+        public void test3() {
+        String[] paths = new String[0];
+        paths = FileUtility.getFileNames(System.getProperty("user.dir") + "/assignment_testcases/a3/J1_fieldOwnInit2.java").toArray(paths);
+        int result = Joosc.compileSTL(paths);
+        assertEquals(0, result);
+        }
 }
