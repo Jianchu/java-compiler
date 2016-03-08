@@ -1,6 +1,10 @@
 package environment;
 
-import ast.*;
+import ast.Block;
+import ast.ForStatement;
+import ast.MethodDeclaration;
+import ast.TypeDeclaration;
+import ast.VariableDeclarationStatement;
 
 public class EnvTraversalVisitor extends TraversalVisitor{
 	Environment curr = null;
@@ -8,7 +12,7 @@ public class EnvTraversalVisitor extends TraversalVisitor{
 	
 	@Override
 	public void visit(TypeDeclaration node) throws Exception {
-		System.out.println(node.getFullName());
+        // System.out.println(node.getFullName());
 		curr = node.getEnvironment();
 		super.visit(node);
 	}

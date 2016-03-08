@@ -34,13 +34,13 @@ public class TestMarmosetA3 {
     public static Collection testA1() throws Exception {
         testCases = helper.getTestCases();
         // pass J1&2, Je, or All
-        Object[][] parameters = helper.getParameters("All");
+        Object[][] parameters = helper.getParameters("J1&2");
         return Arrays.asList(parameters);
     }
 
     @Test
     public void test() {
-        if (testCase.contains("Je_")) {
+        if (testCase.contains("J1_")) {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             PrintStream ps = new PrintStream(baos);
             System.setErr(ps);

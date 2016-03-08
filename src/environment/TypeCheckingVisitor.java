@@ -168,6 +168,7 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
 //        System.out.println("" + castToType + (castToType.getDeclaration() == null));
 //        System.out.println("" + unaryType + (unaryType.getDeclaration() == null));
 
+
         // break cast into three cases:
         if (checkPrimitive(castToType, unaryType, false)) {
         	node.attachType(castToType);
@@ -422,8 +423,10 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
     @Override
     public void visit(ReturnStatement node) throws Exception {
         super.visit(node);
-        Type returnType = node.returnExpression.getType();
-        
+        Type returnType = null;
+        if (node.returnExpression != null) {
+            returnType = node.returnExpression.getType();
+        }
         if ((this.currentMethod.returnType) == null) {
             if (returnType != null) {
                 throw new TypeCheckingException("Void method cannot return a value");

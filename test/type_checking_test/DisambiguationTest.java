@@ -1,12 +1,10 @@
 package type_checking_test;
 
-import static org.junit.Assert.*;
+import joosc.Joosc;
 
 import org.junit.Before;
 import org.junit.Test;
 
-import ast.ASTPrinterVisitor;
-import joosc.Joosc;
 import utility.FileUtility;
 
 public class DisambiguationTest {
@@ -20,7 +18,7 @@ public class DisambiguationTest {
 		String path = System.getProperty("user.dir") + "/java/lang/String.java";
 //		String path = System.getProperty("user.dir") + "/test/testprogram/CastExpr.java";
 		
-		ASTPrinterVisitor.print(path);
+        // ASTPrinterVisitor.print(path);
 	}
 	
 	@Test
