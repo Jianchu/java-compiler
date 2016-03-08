@@ -539,7 +539,7 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
     private SimpleType checkeStringConcat(Type type1, Type type2)
             throws TypeCheckingException {
         if (type1 instanceof SimpleType) {
-            if (type1.getDeclaration().getFullName() == "java.lang.String") {
+            if (type1.getDeclaration().getFullName().equals("java.lang.String")) {
                 if (!(type2 instanceof Void)) {
                     return simpleTypeBuilder((SimpleType) type1);
                 } else {

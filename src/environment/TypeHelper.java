@@ -25,7 +25,9 @@ public class TypeHelper {
             PrimitiveType tau2 = (PrimitiveType) t2;
             return tau1.value == tau2.value ||
                      (tau1.value == PrimitiveType.Value.SHORT && tau2.value == PrimitiveType.Value.BYTE) ||
-                     (tau1.value == PrimitiveType.Value.INT && tau2.value == PrimitiveType.Value.CHAR);
+                     (tau1.value == PrimitiveType.Value.INT && tau2.value == PrimitiveType.Value.CHAR) ||
+                     (tau1.value == PrimitiveType.Value.INT && tau2.value == PrimitiveType.Value.SHORT) ||
+                     (tau1.value == PrimitiveType.Value.INT && tau2.value == PrimitiveType.Value.BYTE);
         } else if (t1 instanceof SimpleType) {
             if (t2 instanceof PrimitiveType) {
                 return false;
