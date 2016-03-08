@@ -222,6 +222,7 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
                 if (DecParameters.size() == realParameters.size()) {
                     if (realParameters.size() == 0) {
                         node.attachType(instanceType);
+                        return;
                     } else {
                         boolean matches = checkParameters(realParameters, DecParameters);
                         if (matches) {
@@ -231,6 +232,7 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
                     }
                 }
             }
+            throw new TypeCheckingException("Not found corresponding constructor");
         } catch (Exception e) {
             throw new TypeCheckingException("Type environment not found");
         }
