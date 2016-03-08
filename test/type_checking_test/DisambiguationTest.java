@@ -39,7 +39,7 @@ public class DisambiguationTest {
         @Test
         public void test1() {
         String[] paths = new String[0];
-        paths = FileUtility.getFileNames(System.getProperty("user.dir") + "/assignment_testcases/a3/J1_ambiguousInvoke").toArray(paths);
+        paths = FileUtility.getFileNames(System.getProperty("user.dir") + "/assignment_testcases/a3/J1_implicitstringconcatenation.java").toArray(paths);
         int result = Joosc.compileSTL(paths);
         assertEquals(0, result);
         }
@@ -69,7 +69,43 @@ public class DisambiguationTest {
         @Test
         public void test3() {
         String[] paths = new String[0];
-        paths = FileUtility.getFileNames(System.getProperty("user.dir") + "/assignment_testcases/a3/J1_fieldOwnInit2.java").toArray(paths);
+        paths = FileUtility.getFileNames(System.getProperty("user.dir") + "/assignment_testcases/a3/J1_fieldOwnInit1.java").toArray(paths);
+        int result = Joosc.compileSTL(paths);
+        assertEquals(0, result);
+        }
+        
+        /**
+         * Simple Name cannot be  resolved
+         * 
+         */
+        @Test
+        public void test4() {
+        String[] paths = new String[0];
+        paths = FileUtility.getFileNames(System.getProperty("user.dir") + "/assignment_testcases/a3/J1_6_ProtectedAccess_InstanceField_This").toArray(paths);
+        int result = Joosc.compileSTL(paths);
+        assertEquals(0, result);
+        }
+        
+        /**
+         * Static field not found
+         * J2_6_ProtectedAccess_StaticField_Sub
+         */
+        @Test
+        public void test5() {
+        String[] paths = new String[0];
+        paths = FileUtility.getFileNames(System.getProperty("user.dir") + "/assignment_testcases/a3/J2_6_ProtectedAccess_StaticField_This").toArray(paths);
+        int result = Joosc.compileSTL(paths);
+        assertEquals(0, result);
+        }
+        
+        /**
+         * Field prefix not recognized
+         * J1_6_ProtectedAccess_InstanceField_ThisVar
+         */
+        @Test
+        public void test6() {
+        String[] paths = new String[0];
+        paths = FileUtility.getFileNames(System.getProperty("user.dir") + "/assignment_testcases/a3/J1_6_ProtectedAccess_InstanceField_SubVar").toArray(paths);
         int result = Joosc.compileSTL(paths);
         assertEquals(0, result);
         }
