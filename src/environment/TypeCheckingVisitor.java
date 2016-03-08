@@ -20,8 +20,11 @@ import ast.CharacterLiteral;
 import ast.ClassInstanceCreationExpression;
 import ast.CompilationUnit;
 import ast.Expression;
+import ast.ExpressionStatement;
 import ast.FieldAccess;
 import ast.FieldDeclaration;
+import ast.ForStatement;
+import ast.IfStatement;
 import ast.InfixExpression;
 import ast.InfixExpression.Operator;
 import ast.InstanceofExpression;
@@ -46,6 +49,7 @@ import ast.VariableDeclaration;
 import ast.VariableDeclarationExpression;
 import ast.VariableDeclarationStatement;
 import ast.Visitor;
+import ast.WhileStatement;
 import exceptions.NameException;
 import exceptions.TypeCheckingException;
 
@@ -461,6 +465,63 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
             throw new TypeCheckingException(initializerType + " is not assignable to " + node.varDeclar.type.toString());
         } 
         curr = last;
+    }
+    
+    @Override
+    public void visit(ForStatement node) throws Exception {
+        last = curr;
+        curr = node.getEnvironment();
+        super.visit(node);
+
+        Set<Value> values = new HashSet<Value>();
+        values.add(Value.BOOLEAN);
+        if (!CheckSinglePrimitive(node.forCondition.getType(), null, values)) {
+            throw new TypeCheckingException("If condition has to be boolean");
+        }
+        curr = last;
+    }
+
+    @Override
+    public void visit(IfStatement node) throws Exception {
+        if (node.ifCondition != null) {
+            node.ifCondition.accept(this);
+        }
+        if (node.ifStatement != null) {
+            node.ifStatement.accept(this);
+        }
+        if (node.elseStatement != null) {
+            node.elseStatement.accept(this);
+        }
+        Set<Value> values = new HashSet<Value>();
+        values.add(Value.BOOLEAN);
+        if (!CheckSinglePrimitive(node.ifCondition.getType(), null, values)) {
+            throw new TypeCheckingException("If condition has to be boolean");
+        }
+        visitNextStatement(node);
+    }
+
+    @Override
+    public void visit(WhileStatement node) throws Exception {
+        if (node.whileCondition != null) {
+            node.whileCondition.accept(this);
+        }
+        if (node.whileStatement != null) {
+            node.whileStatement.accept(this);
+        }
+        Set<Value> values = new HashSet<Value>();
+        values.add(Value.BOOLEAN);
+        if (!CheckSinglePrimitive(node.whileCondition.getType(), null, values)) {
+            throw new TypeCheckingException("While condition has to be boolean");
+        }
+        visitNextStatement(node);
+    }
+
+    @Override
+    public void visit(ExpressionStatement node) throws Exception {
+        if (node.statementExpression != null) {
+            node.statementExpression.accept(this);
+        }
+        visitNextStatement(node);
     }
 
     private Type typeCheckInfixExp(Type lhs, Type rhs, Operator op) throws TypeCheckingException {
