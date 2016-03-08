@@ -44,6 +44,7 @@ import ast.Type;
 import ast.TypeDeclaration;
 import ast.VariableDeclaration;
 import ast.VariableDeclarationExpression;
+import ast.VariableDeclarationStatement;
 import ast.Visitor;
 import exceptions.NameException;
 import exceptions.TypeCheckingException;
@@ -448,6 +449,18 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
                                 + this.currentMethod.returnType.toString());
             }
         }
+    }
+
+    @Override
+    public void visit(VariableDeclarationStatement node) throws Exception {
+        last = curr;
+        curr = node.getEnvironment();
+        super.visit(node);
+        Type initializerType = node.varDeclar.initializer.getType();
+        if (!TypeHelper.assignable(node.varDeclar.type, initializerType)) {
+            throw new TypeCheckingException(initializerType + " is not assignable to " + node.varDeclar.type.toString());
+        } 
+        curr = last;
     }
 
     private Type typeCheckInfixExp(Type lhs, Type rhs, Operator op) throws TypeCheckingException {
