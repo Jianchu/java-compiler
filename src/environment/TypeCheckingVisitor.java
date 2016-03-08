@@ -216,7 +216,11 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
         }
 
         try {
-            Map<String, MethodDeclaration> constructors = node.type.getDeclaration().getEnvironment().constructors;
+            TypeDeclaration typeDec = node.type.getDeclaration();
+            if (typeDec.modifiers.contains(Modifier.ABSTRACT)) {
+                throw new TypeCheckingException("The type in a class instance creation expression must be a non-abstract class.");
+            }
+            Map<String, MethodDeclaration> constructors = typeDec.getEnvironment().constructors;
             for (String s : constructors.keySet()) {
                 List<VariableDeclaration> DecParameters = constructors.get(s).parameters;
                 if (DecParameters.size() == realParameters.size()) {
@@ -234,6 +238,7 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
             }
             throw new TypeCheckingException("Not found corresponding constructor");
         } catch (Exception e) {
+            // e.printStackTrace();
             throw new TypeCheckingException("Type environment not found");
         }
     }
