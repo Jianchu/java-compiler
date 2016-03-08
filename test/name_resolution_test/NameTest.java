@@ -24,7 +24,7 @@ public class NameTest {
     @Test
     public void testCheck1() {
         String[] paths = new String[0];
-      paths = FileUtility.getFileNames(System.getProperty("user.dir") + "/assignment_testcases/a2/Je_4_ProtectedOverride_TwoVersionsFromSuperclass").toArray(paths);
+      paths = FileUtility.getFileNames(System.getProperty("user.dir") + "/assignment_testcases/a2/Je_4_AbstractMethod_InheritFromSuperclassInterface").toArray(paths);
         Joosc.compileSTL(paths);
     }
 
