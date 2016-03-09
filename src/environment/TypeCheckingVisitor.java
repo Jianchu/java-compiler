@@ -141,6 +141,13 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
             
         } 
         **/
+        if (node.lhs instanceof QualifiedName) {
+            QualifiedName qlhs = (QualifiedName) node.lhs;
+            if (qlhs.isArrayLength) {
+                throw new TypeCheckingException("Cannot assign a value to Array.length");
+            }
+        }
+        
         if (TypeHelper.assignable(lhsType, exprType)) {
             node.attachType(lhsType);
         } else {
