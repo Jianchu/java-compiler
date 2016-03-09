@@ -127,7 +127,39 @@ public class DisambiguationTest {
         paths = FileUtility.getFileNames(System.getProperty("user.dir") + "/assignment_testcases/a3/J1_typecheck_instanceof3.java").toArray(paths);
         int result = Joosc.compileSTL(paths);
         assertEquals(0, result);
-        }        
+        } 
+        
+        @Test
+        public void test8() {
+        String[] paths = new String[0];
+        paths = FileUtility.getFileNames(System.getProperty("user.dir") + "/assignment_testcases/a3/Je_5_AmbiguousName_FieldVsType_Initializer.java").toArray(paths);
+        int result = Joosc.compileSTL(paths);
+        assertEquals(42, result);
+        }  
+        
+        @Test
+        public void test9() {
+        String[] paths = new String[0];
+        paths = FileUtility.getFileNames(System.getProperty("user.dir") + "/assignment_testcases/a3/Je_6_ConstructorPresent_Super_NoDefault").toArray(paths);
+        int result = Joosc.compileSTL(paths);
+        assertEquals(42, result);
+        }   
+        
+        @Test
+        public void test10() {
+        String[] paths = new String[0];
+        paths = FileUtility.getFileNames(System.getProperty("user.dir") + "/assignment_testcases/a3/J1_interfaceassignable").toArray(paths);
+        int result = Joosc.compileSTL(paths);
+        assertEquals(0, result);
+        }   
+        
+        @Test
+        public void test11() {
+        String[] paths = new String[0];
+        paths = FileUtility.getFileNames(System.getProperty("user.dir") + "/assignment_testcases/a3/J1_InterfaceObject").toArray(paths);
+        int result = Joosc.compileSTL(paths);
+        assertEquals(0, result);
+        }   
         
     /**
      * J1_6_ProtectedAccess_InstanceField_This
@@ -174,10 +206,8 @@ public class DisambiguationTest {
      * Je_5_ForwardReference_FieldDeclaredLater.java
      * 
      * Je_6_ConstructorPresent_Super_NoDefault
-     * Je_6_StaticAccessToNontatic_Field.java
      * Je_6_NonStaticAccessToStatic_Method.java
      * Je_5_AmbiguousName_FieldVsType_Initializer.java
      * Je_6_NonStaticAccessToStatic_Field.java
-     * Je_6_Assignable_ToSubtype_FieldInit.java Je_6_FinalField_ArrayLength.java
      */
 }
