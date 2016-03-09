@@ -424,6 +424,11 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
 
     @Override
     public void visit(ThisExpression node) throws Exception {
+        if (this.currentMethod != null) {
+            if (this.currentMethod.modifiers.contains(Modifier.STATIC)) {
+                throw new TypeCheckingException("Cannot call this expression in static method.");
+            }
+        }
         node.attachType(simpleTypeBuilder(this.currentTypeName));
     }
 
