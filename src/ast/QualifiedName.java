@@ -41,6 +41,17 @@ public class QualifiedName extends Name{
 		}
 	}
 	
+	private QualifiedName(Name quali, String id) {
+		this.qualifier = quali;
+		this.id = id;
+		if (id != null) {
+			fullName.add(id);
+			if (qualifier != null) {
+				fullName.addAll(0, qualifier.getFullName());
+			}
+		}
+	}
+	
 	/**
 	 * 
 	 */
@@ -59,5 +70,35 @@ public class QualifiedName extends Name{
 	
 	public void accept(Visitor v) throws Exception {
 		v.visit(this);
+	}
+	
+	public List<Name> getPrefixList() {
+		List<Name> l = new LinkedList<Name>();
+		getPrefixList(this, l);
+		return l;
+	}
+	
+	private void getPrefixList(QualifiedName n, List<Name> l) {
+		if (n.qualifier != null) {
+			if (n.qualifier instanceof SimpleName) {
+				l.add(n.qualifier);
+				l.add(n);
+			} else {
+				getPrefixList((QualifiedName) n.qualifier, l);
+				l.add(n);
+			}
+		} else {
+			l.add(n);
+		}
+	}
+	
+	public static void main(String[] args) {
+		Name qn = new QualifiedName(new SimpleName("a"), "b");
+		QualifiedName qqn = new QualifiedName(qn, "c");
+		System.out.println(qn);
+		System.out.println(qqn.toString());
+		for (Name n : qqn.getPrefixList()) {
+			System.out.println(n);
+		}
 	}
 }

@@ -73,7 +73,7 @@ public class TypeHelper {
         return false;
     }
 
-    private static boolean inheritsFrom(Type tau1, Type tau2) {
+    public static boolean inheritsFrom(Type tau1, Type tau2) {
         TypeDeclaration tDecl1 = tau1.getDeclaration();
 
         if (!tDecl1.isInterface) {

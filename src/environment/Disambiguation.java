@@ -22,6 +22,8 @@ public class Disambiguation extends EnvTraversalVisitor{
 	boolean isSimpleNameLHS = false;
 	static boolean debug = false;
 	
+	
+	
 	public void visit(TypeDeclaration node) throws Exception {
 		if (debug) {
 			System.out.println(node.getFullName());
@@ -132,6 +134,7 @@ public class Disambiguation extends EnvTraversalVisitor{
 		List<String> fn = node.getFullName();
 		ASTNode a1Decl = curr.lookUpVariable(fn.get(0));
 		if (a1Decl != null) {
+			node.getPrefixList().get(0).attachDeclaration(a1Decl); // attach declaration to qualifier
 			// A1 is variable declaration, the rest are instance field;
 			TypeDeclaration prefixDecl = ((VariableDeclaration) a1Decl).type.getDeclaration();
 			FieldDeclaration fDecl = searchField(node, prefixDecl);
@@ -145,6 +148,7 @@ public class Disambiguation extends EnvTraversalVisitor{
 		
 		a1Decl = curr.lookUpField(fn.get(0));
 		if (a1Decl != null) {
+			node.getPrefixList().get(0).attachDeclaration(a1Decl);	// attach declaration to qualifier
 			// A1 is a field, the rest are instance fields			
 			TypeDeclaration prefixDecl = ((FieldDeclaration) a1Decl).type.getDeclaration();
 			FieldDeclaration fDecl = searchField(node, prefixDecl);
@@ -204,7 +208,6 @@ public class Disambiguation extends EnvTraversalVisitor{
 				// prefix is array type
 				// array.length
 				if (fn.get(i).equals("length") && fn.size() == i+1) {
-//					name.getQualifier().attachDeclaration(fDecl);
 					name.isArrayLength = true;
 					return null;
 				} else {
@@ -224,7 +227,6 @@ public class Disambiguation extends EnvTraversalVisitor{
 		return fDecl;
 	}
 
-	
 	public static void disambiguate(List<AST> trees) throws Exception {
 		for (AST t : trees) {
 			Visitor v = new Disambiguation();
