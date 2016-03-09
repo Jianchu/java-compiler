@@ -59,6 +59,7 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
     private String currentTypeName;
     private MethodDeclaration currentMethod;
     private TypeDeclaration currentTypeDecl;
+    private FieldDeclaration currentField;
     // maybe need to add or delete some methods...
     
 
@@ -594,6 +595,7 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
 
     @Override
     public void visit(FieldDeclaration node) throws Exception {
+        this.currentField = node;
         for (Modifier im : node.modifiers) {
             im.accept(this);
         }
@@ -604,7 +606,7 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
             node.initializer.accept(this);
             isFieldInit = false;
         }
-        
+        this.currentField = null;
         Type decType = node.type;
         if (node.initializer != null) {
             Type realType = node.initializer.getType();
@@ -676,9 +678,21 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
      * only search for variable or field name
      */
     public void visit(SimpleName name) throws TypeCheckingException {
+        if (!checkThisInField()) {
+            throw new TypeCheckingException("Cannot implicitly call this in static field.");
+        }
     	resolveNameType(name);
     }
     
+    private boolean checkThisInField() {
+        if (this.currentField != null) {
+            if (this.currentField.modifiers.contains(Modifier.STATIC)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     /**
      * only search for variable or field name
      */
