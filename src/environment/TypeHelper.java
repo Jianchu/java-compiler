@@ -50,7 +50,7 @@ public class TypeHelper {
         } else if (t1 instanceof ArrayType) {
             if (t2 instanceof SimpleType) {
                 SimpleType tau2 = (SimpleType) t2;
-                return tau2.toString().equals("java.lang.Object");
+                return tau2.getDeclaration().getFullName().equals("java.lang.Object");
             } else if (!(t2 instanceof ArrayType)) {
                 return false;
             }
