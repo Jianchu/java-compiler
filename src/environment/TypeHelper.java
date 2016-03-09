@@ -33,6 +33,9 @@ public class TypeHelper {
                      (tau1.value == PrimitiveType.Value.INT && tau2.value == PrimitiveType.Value.SHORT) ||
                      (tau1.value == PrimitiveType.Value.INT && tau2.value == PrimitiveType.Value.BYTE);
         } else if (t1 instanceof SimpleType) {
+            if (t1.getDeclaration().getFullName().equals("java.lang.Object")) {
+                return true;
+            }
             if (t2 instanceof PrimitiveType) {
                 return false;
             }
