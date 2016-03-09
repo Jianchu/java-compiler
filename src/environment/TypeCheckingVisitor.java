@@ -613,6 +613,9 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
             }
         case NEQ:
         case EQUAL:
+            if ((lhs instanceof PrimitiveType) != (rhs instanceof PrimitiveType)) {
+                throw new TypeCheckingException("Invalid comparison: cannot compare primitive with non-primitive");
+            }
             if (TypeHelper.assignable(lhs, rhs) || TypeHelper.assignable(rhs, lhs)) {
                 return new PrimitiveType(Value.BOOLEAN);
             } else {
