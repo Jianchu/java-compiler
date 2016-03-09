@@ -186,18 +186,11 @@ public class DisambiguationTest {
      * Je_6_ProtectedAccess_TwoSubtypes
      * Je_6_ProtectedAccess_WriteField_OutsidePackage_NotBySubclass
      * Je_6_ProtectedAccess_SuperConstructor_NewExp
-     * Je_6_ProtectedAccess_External 
-     * Je_6_ProtectedAccess_Constructor
+     * Je_6_ProtectedAccess_External Je_6_ProtectedAccess_Constructor
      * Je_6_ProtectedAccess_InstanceField_NoRelation_External
      * 
-     * Je_16_ClosestMatch_Array.java 
-     * Je_6_StaticThis_NonstaticField.java
      * Je_6_StaticThis_NonStaticField_ImplicitThis.java
-     * Je_6_StaticThis_InvokeNonStatic.java
-     * Je_6_StaticThis_InvokeNonstatic_Implicit.java
      * Je_16_StaticThis_StaticFieldInitializer.java
-     * Je_6_StaticThis_AfterStaticInvoke.java 
-     * Je_6_StaticThis_InvokeStatic.java
      * Je_6_NonStaticAccessToStatic_Method.java
      * Je_6_StaticAccessToNontatic_Field.java
      * Je_6_ConstructorPresent_Super_NoDefault
