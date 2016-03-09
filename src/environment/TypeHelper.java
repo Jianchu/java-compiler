@@ -7,6 +7,7 @@ import java.util.Set;
 
 import ast.ArrayType;
 import ast.PrimitiveType;
+import ast.SimpleName;
 import ast.SimpleType;
 import ast.Type;
 import ast.TypeDeclaration;
@@ -33,9 +34,9 @@ public class TypeHelper {
                      (tau1.value == PrimitiveType.Value.INT && tau2.value == PrimitiveType.Value.SHORT) ||
                      (tau1.value == PrimitiveType.Value.INT && tau2.value == PrimitiveType.Value.BYTE);
         } else if (t1 instanceof SimpleType) {
-            if (t1.getDeclaration().getFullName().equals("java.lang.Object")) {
-                return true;
-            }
+//            if (t1.getDeclaration().getFullName().equals("java.lang.Object")) {
+//                return true;
+//            }
             if (t2 instanceof PrimitiveType) {
                 return false;
             }
@@ -73,9 +74,19 @@ public class TypeHelper {
         return false;
     }
 
+    /**
+     * check if tau2 inherits from tau1.
+     * TODO: add Object in here.
+     * @param tau1
+     * @param tau2
+     * @return
+     */
     public static boolean inheritsFrom(Type tau1, Type tau2) {
         TypeDeclaration tDecl1 = tau1.getDeclaration();
-
+        if (tDecl1.getFullName().equals("java.lang.Object")) {
+            return true;
+        }
+        
         if (!tDecl1.isInterface) {
             TypeDeclaration tDecl2 = tau2.getDeclaration();
             if (tDecl2.isInterface) {
@@ -122,4 +133,13 @@ public class TypeHelper {
 
         return false;
     }
+    
+    public static boolean inheritsFrom(TypeDeclaration tau1, TypeDeclaration tau2) {
+    	Type t1 = new SimpleType(new SimpleName(tau1.id));
+    	t1.attachDeclaration(tau1);
+    	Type t2 = new SimpleType(new SimpleName(tau2.id));
+    	t2.attachDeclaration(tau2);
+    	return inheritsFrom(t1, t2);
+    }
+
 }

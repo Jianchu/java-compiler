@@ -58,7 +58,9 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
     private final TypeHelper helper = new TypeHelper();
     private String currentTypeName;
     private MethodDeclaration currentMethod;
+    private TypeDeclaration currentTypeDecl;
     // maybe need to add or delete some methods...
+    
 
     // for forward reference checking
 	Set<FieldDeclaration> unseenFields = new HashSet<FieldDeclaration>();
@@ -548,7 +550,8 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
     
     @Override
 	public void visit(TypeDeclaration node) throws Exception {
-		for (FieldDeclaration fd : node.getEnvironment().fields.values()) {
+		currentTypeDecl = node;
+    	for (FieldDeclaration fd : node.getEnvironment().fields.values()) {
 			unseenFields.add(fd);
 		}
 		super.visit(node);
@@ -645,7 +648,9 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
      * only search for variable or field name
      */
     public void visit(QualifiedName name) throws TypeCheckingException {
+    	checkProtected(name);
     	resolveNameType(name);
+    	
     }
     
     private void resolveNameType(Name name) throws TypeCheckingException {
@@ -680,9 +685,56 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
     	} else {
     		throw new TypeCheckingException("Field or variable name not recoginzed: " + name.toString());
     	}
+    	
     }
     
-    private SimpleType checkeStringConcat(Type type1, Type type2)
+    private void checkProtected(QualifiedName name) throws TypeCheckingException {
+		List<Name> prefixList = name.getPrefixList();
+		ASTNode previousDecl = prefixList.get(0).getDeclaration();
+		
+		
+		for (int i = 1; i < prefixList.size(); i++) {	// skip the first one
+			Name prefix = prefixList.get(i);
+			ASTNode prefixDecl = prefix.getDeclaration();
+			if (prefixDecl instanceof FieldDeclaration) {
+				FieldDeclaration fDecl = (FieldDeclaration) prefixDecl;
+				if (fDecl.modifiers.contains(Modifier.PROTECTED)) {
+//					System.out.println(fDecl.id);
+//					System.out.println(previousDecl);
+					// check preivous declaration
+					TypeDeclaration tDecl = null;	// type declaration containing fDecl
+					if (previousDecl instanceof TypeDeclaration) {
+						// static access
+						tDecl = (TypeDeclaration) previousDecl;
+					} else if (previousDecl instanceof FieldDeclaration || previousDecl instanceof VariableDeclaration) {
+						
+						Type previousType;
+						if (previousDecl instanceof FieldDeclaration) {
+							FieldDeclaration previousFd = (FieldDeclaration) previousDecl;
+							previousType = previousFd.type;
+						} else {
+							VariableDeclaration previousFd = (VariableDeclaration) previousDecl;
+							previousType = previousFd.type;
+						}
+						
+						if (! (previousType instanceof SimpleType)) {
+							throw new TypeCheckingException("unexpected type in qualified name " + name );
+						}
+						TypeDeclaration previousTd = previousType.getDeclaration();
+						if (!(samePkg(previousTd, currentTypeDecl) || TypeHelper.inheritsFrom(currentTypeDecl, previousTd))) {
+							// if not from the same package or subclass
+							throw new TypeCheckingException("Illegal access to protected field: " + name + " : " + fDecl.id);
+						}
+//						System.out.println(TypeHelper.inheritsFrom(previousTd, currentTypeDecl));
+					}
+				}
+			} 
+			// if TypeDeclaration or null, just go on.
+			previousDecl = prefixDecl;
+		}
+	}
+    
+	private SimpleType checkeStringConcat(Type type1, Type type2)
             throws TypeCheckingException {
         if (type1 instanceof SimpleType) {
             if (type1.getDeclaration().getFullName().equals("java.lang.String")) {
@@ -872,5 +924,14 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
 			Visitor tcv = new TypeCheckingVisitor();
 			t.root.accept(tcv);
 		}
+	}
+	
+	private boolean samePkg(TypeDeclaration typeDecl1, TypeDeclaration typeDecl2) {
+		String fn1 = typeDecl1.getFullName();
+		String pkg1 = fn1.substring(0, fn1.length() - typeDecl1.id.length());
+		String fn2 = typeDecl2.getFullName();
+		String pkg2 = fn2.substring(0, fn2.length() - typeDecl2.id.length());
+		return pkg1.equals(pkg2);
+		
 	}
 }
