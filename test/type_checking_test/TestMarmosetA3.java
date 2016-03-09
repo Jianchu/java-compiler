@@ -34,7 +34,7 @@ public class TestMarmosetA3 {
     public static Collection testA1() throws Exception {
         testCases = helper.getTestCases();
         // pass J1&2, Je, or All
-        Object[][] parameters = helper.getParameters("Je");
+        Object[][] parameters = helper.getParameters("All");
         return Arrays.asList(parameters);
     }
 
