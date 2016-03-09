@@ -277,7 +277,8 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
      */
     @Override
     public void visit(FieldAccess node) throws Exception {
-        if (node.expr != null) {
+        // TODO: check protected
+    	if (node.expr != null) {
             node.expr.accept(this);
         }
         Type exprType = node.expr.getType();
@@ -699,8 +700,6 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
 			if (prefixDecl instanceof FieldDeclaration) {
 				FieldDeclaration fDecl = (FieldDeclaration) prefixDecl;
 				if (fDecl.modifiers.contains(Modifier.PROTECTED)) {
-//					System.out.println(fDecl.id);
-//					System.out.println(previousDecl);
 					// check preivous declaration
 					TypeDeclaration tDecl = null;	// type declaration containing fDecl
 					if (previousDecl instanceof TypeDeclaration) {
@@ -725,7 +724,6 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
 							// if not from the same package or subclass
 							throw new TypeCheckingException("Illegal access to protected field: " + name + " : " + fDecl.id);
 						}
-//						System.out.println(TypeHelper.inheritsFrom(previousTd, currentTypeDecl));
 					}
 				}
 			} 
