@@ -420,6 +420,9 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
     
     private boolean checkThisInMethod(Name name) {
         if (name instanceof SimpleName) {
+            if (!checkThisInField()) {
+                return false;
+            }
             if (this.currentMethod != null) {
                 if (this.currentMethod.modifiers.contains(Modifier.STATIC)) {
                     return false;
@@ -702,16 +705,31 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
     	
     }
     
+    private boolean checkThisInMethod(Name name, FieldDeclaration fDecl) {
+        if (name instanceof SimpleName) {
+            if (this.currentMethod != null) {
+                if (this.currentMethod.modifiers.contains(Modifier.STATIC)) {
+                    if ((!fDecl.modifiers.contains(Modifier.STATIC))) {
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
+    }
+
     private void resolveNameType(Name name) throws TypeCheckingException {
 //    	System.out.println("\t" + name + ":" + (name.getDeclaration() == null));
     	ASTNode decl = name.getDeclaration();
-    
     	if (decl instanceof VariableDeclaration) {
     		VariableDeclaration vDecl = (VariableDeclaration) decl;
 //    		System.out.println(name + ":" +vDecl.type +" " + vDecl.id );
     		name.attachType(vDecl.type);
     	} else if (decl instanceof FieldDeclaration) {
     		FieldDeclaration fDecl = (FieldDeclaration) decl;
+    		if (!checkThisInMethod(name, fDecl)) {
+    		    throw new TypeCheckingException("Cannot implicitly call this in static method.");
+    		}
     		name.attachType(fDecl.type);
     	} else if (decl == null && name instanceof QualifiedName){
     		// array.length
