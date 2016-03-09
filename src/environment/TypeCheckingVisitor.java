@@ -541,17 +541,7 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
         }
         visitNextStatement(node);
     }
-    
-    @Override
-    public void visit(FieldDeclaration node) throws Exception {
-        node.type.accept(this);
-        isFieldInit = true;
-        if (node.initializer != null) {
-            node.initializer.accept(this);
-        }
-        isFieldInit = false;
-        unseenFields.remove(node);
-    }
+ 
     
     @Override
 	public void visit(TypeDeclaration node) throws Exception {
@@ -569,7 +559,9 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
             node.type.accept(this);
             
         if (node.initializer != null) {
+            isFieldInit = true;
             node.initializer.accept(this);
+            isFieldInit = false;
         }
         
         Type decType = node.type;
@@ -579,6 +571,7 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
                 throw new TypeCheckingException(realType + " is not assignable to " + decType.toString());
             }
         }
+        unseenFields.remove(node);
     }
     
     private Type typeCheckInfixExp(Type lhs, Type rhs, Operator op) throws TypeCheckingException {
