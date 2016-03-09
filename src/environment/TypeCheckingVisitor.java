@@ -469,7 +469,6 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
         super.visit(node);
         Type initializerType = node.varDeclar.initializer.getType();
         if (!TypeHelper.assignable(node.varDeclar.type, initializerType)) {
-
             throw new TypeCheckingException(initializerType + " is not assignable to " + node.varDeclar.type.toString());
         } 
         curr = last;
@@ -532,6 +531,26 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
         visitNextStatement(node);
     }
 
+    @Override
+    public void visit(FieldDeclaration node) throws Exception {
+        for (Modifier im : node.modifiers) {
+            im.accept(this);
+        }
+            node.type.accept(this);
+            
+        if (node.initializer != null) {
+            node.initializer.accept(this);
+        }
+        
+        Type decType = node.type;
+        if (node.initializer != null) {
+            Type realType = node.initializer.getType();
+            if (!TypeHelper.assignable(decType, realType)) {
+                throw new TypeCheckingException(realType + " is not assignable to " + decType.toString());
+            }
+        }
+    }
+    
     private Type typeCheckInfixExp(Type lhs, Type rhs, Operator op) throws TypeCheckingException {
         switch (op) {
         case PLUS:
