@@ -290,7 +290,7 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
             FieldDeclaration fDecl = prefixDecl.getEnvironment().lookUpField(node.id.toString());
             node.id.attachDeclaration(fDecl);
             node.attachType(fDecl.type);
-            checkSingleProtected(prefixDecl, node.id.toString());
+            checkAllowProtected(prefixDecl, node.id.toString());
             
         } else {
         	throw new TypeCheckingException("field access unrecognized type." );
@@ -299,10 +299,10 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
         
     }
 
-    private void checkSingleProtected(TypeDeclaration prefixDecl, String string) throws TypeCheckingException {
+    private void checkAllowProtected(TypeDeclaration prefixDecl, String name) throws TypeCheckingException {
 		if (!(samePkg(prefixDecl, currentTypeDecl) || TypeHelper.inheritsFrom(currentTypeDecl, prefixDecl))) {
 			// if not from the same package or subclass
-			throw new TypeCheckingException("Illegal access to protected field: " + string );
+			throw new TypeCheckingException("Illegal access to protected field: " + name);
 		}
 	}
 
@@ -391,6 +391,11 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
         	
         	// resolve the declaration of id too
         	node.id.attachDeclaration(mDecl);
+        	
+        	// check protected method
+        	if (mDecl.modifiers.contains(Modifier.PROTECTED)) {
+        		checkAllowProtected(prefixDecl, methodName);
+        	}
         	
         } else if (node.expr instanceof Name) {
         	// Name(...)
@@ -734,7 +739,7 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
 							throw new TypeCheckingException("unexpected type in qualified name " + name );
 						}
 						TypeDeclaration previousTd = previousType.getDeclaration();
-						checkSingleProtected(previousTd, fDecl.id);
+						checkAllowProtected(previousTd, fDecl.id);
 					}
 				}
 			} 
@@ -871,8 +876,11 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
 	
 	private void resolveMethodName(QualifiedName name, List<Type> paramTypes) throws Exception {
 		List<String> fn = name.getFullName();
+		List<Name> prefixList = name.getPrefixList();
 		ASTNode a1Decl;
 		if ((a1Decl  = curr.lookUpVariable(fn.get(0))) != null || (a1Decl = curr.lookUpField(fn.get(0))) != null) {
+			prefixList.get(0).attachDeclaration(a1Decl);
+			
 			// A1 is variable or a field, everything in the middle is an instance field
 			TypeDeclaration prefixDecl;
 			if (a1Decl instanceof VariableDeclaration)
@@ -892,10 +900,14 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
 			String prefix = String.join(".", fn.subList(0, i));
 			TypeDeclaration prefixDecl = curr.lookUpType(prefix);
 			if (prefixDecl != null) { // the prefix resolve to a type
+				prefixList.get(i-1).attachDeclaration(prefixDecl);	// attach type declaration
+				
 				int j = i;
 				while (j != fn.size() - 1) {	// everything in between is fields
-					FieldDeclaration fDecl = prefixDecl.getEnvironment().lookUpField(fn.get(j++));	// increment j here
+					FieldDeclaration fDecl = prefixDecl.getEnvironment().lookUpField(fn.get(j));	
+					prefixList.get(j).attachDeclaration(fDecl);
 					prefixDecl = fDecl.type.getDeclaration();
+					j++;
 				}
 				MethodDeclaration mDecl = prefixDecl.getEnvironment().lookUpMethod(NameHelper.mangle(fn.get(j), paramTypes));
 				if (i == j && !mDecl.modifiers.contains(Modifier.STATIC)) {
@@ -909,17 +921,20 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
 			}
 		}
 		
+		throw new NameException("Qualified Method not recognized: " + name);
 		
 	}
 
 	private MethodDeclaration searchMethod(QualifiedName name, TypeDeclaration prefixDecl, List<Type> paramTypes) throws NameException {
 		List<String> fn = name.getFullName();
+		List<Name> prefixList = name.getPrefixList();
 		int i = 1;
 		while (i < fn.size()-1) {
 			FieldDeclaration fDecl = prefixDecl.getEnvironment().lookUpField(fn.get(i));
 			if (fDecl == null) {
 				throw new NameException("Method prefix not recognized: " + String.join(".", fn.subList(0, i)));
 			}
+			prefixList.get(i).attachDeclaration(fDecl);
 			prefixDecl = fDecl.type.getDeclaration();
 			i++;
 		}
