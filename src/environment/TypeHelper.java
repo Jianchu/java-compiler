@@ -5,7 +5,11 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import ast.*;
+import ast.ArrayType;
+import ast.PrimitiveType;
+import ast.SimpleType;
+import ast.Type;
+import ast.TypeDeclaration;
 
 public class TypeHelper {
     // t1 := t2
@@ -14,7 +18,7 @@ public class TypeHelper {
             return false;
         }
         if (t2 == null) {
-            return (t1 instanceof SimpleType);
+            return ((t1 instanceof SimpleType) || t1 instanceof ArrayType);
         }
 
         if (t1 instanceof PrimitiveType) {
