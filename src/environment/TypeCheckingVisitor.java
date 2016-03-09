@@ -60,6 +60,10 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
     private MethodDeclaration currentMethod;
     // maybe need to add or delete some methods...
 
+    // for forward reference checking
+	Set<FieldDeclaration> unseenFields = new HashSet<FieldDeclaration>();
+	boolean isFieldInit = false;
+    
     @Override
     public void visit(CompilationUnit node) throws Exception {
         for (TypeDeclaration typeDecl : node.types) {
@@ -531,6 +535,25 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
         }
         visitNextStatement(node);
     }
+    
+    @Override
+    public void visit(FieldDeclaration node) throws Exception {
+        node.type.accept(this);
+        isFieldInit = true;
+        if (node.initializer != null) {
+            node.initializer.accept(this);
+        }
+        isFieldInit = false;
+        unseenFields.remove(node);
+    }
+    
+    @Override
+	public void visit(TypeDeclaration node) throws Exception {
+		for (FieldDeclaration fd : node.getEnvironment().fields.values()) {
+			unseenFields.add(fd);
+		}
+		super.visit(node);
+	}
 
     private Type typeCheckInfixExp(Type lhs, Type rhs, Operator op) throws TypeCheckingException {
         switch (op) {
@@ -756,6 +779,7 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
 		MethodDeclaration mDecl = curr.lookUpMethod(NameHelper.mangle(name.toString(), paramTypes));
 		if (mDecl == null)
 			throw new NameException("Simple method name not recognized: " + name );
+		
 		name.attachDeclaration(mDecl);
 	}
 	
@@ -767,9 +791,12 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
 			TypeDeclaration prefixDecl;
 			if (a1Decl instanceof VariableDeclaration)
 				prefixDecl = ((VariableDeclaration) a1Decl).type.getDeclaration();
-			else 
+			else  {
 				prefixDecl = ((FieldDeclaration) a1Decl).type.getDeclaration();
-			
+				if (isFieldInit && unseenFields.contains((FieldDeclaration) a1Decl)) {
+					throw new TypeCheckingException("forward reference of fields in method invocation: " + prefixDecl.id);
+				}
+			}
 			MethodDeclaration mDecl = searchMethod(name, prefixDecl, paramTypes);
 			name.attachDeclaration(mDecl);
 			return;

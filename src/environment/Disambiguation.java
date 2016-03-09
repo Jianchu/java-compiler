@@ -19,6 +19,7 @@ import exceptions.TypeLinkException;
 public class Disambiguation extends EnvTraversalVisitor{
 	Set<FieldDeclaration> unseenFields = new HashSet<FieldDeclaration>();
 	boolean isFieldInit = false;
+	boolean isSimpleNameLHS = false;
 	static boolean debug = false;
 	
 	public void visit(TypeDeclaration node) throws Exception {
@@ -47,6 +48,23 @@ public class Disambiguation extends EnvTraversalVisitor{
         isFieldInit = false;
         unseenFields.remove(node);
 	}
+	
+	/**
+	 * For checking forward reference
+	 */
+    public void visit(AssignmentExpression node) throws Exception {
+        if (node.lhs instanceof SimpleName) {
+        	isSimpleNameLHS = true;
+        }
+        
+    	if (node.lhs != null) {
+            node.lhs.accept(this);
+        }
+    	isSimpleNameLHS = false;
+        if (node.expr != null) {
+            node.expr.accept(this);
+        }
+    }
 	
 	@Override
 	public void visit(SimpleType node) {
@@ -83,7 +101,10 @@ public class Disambiguation extends EnvTraversalVisitor{
 	
 	public void visit(SimpleName node) throws NameException {
 		String name = node.toString();
-//		System.out.println("\t" + name);
+		
+		if (debug) {
+			System.out.println("\t" + name);
+		}
 		VariableDeclaration vDecl = curr.lookUpVariable(name);
 		if (vDecl != null) {
 			node.attachDeclaration(vDecl);
@@ -93,11 +114,9 @@ public class Disambiguation extends EnvTraversalVisitor{
 		if (fDecl == null) {
 			throw new NameException("Simple Name cannot be  resolved: " + node.toString());
 		}
-		if (fDecl.modifiers.contains(Modifier.STATIC)) {
-		    if (isFieldInit && unseenFields.contains(fDecl)) {
-		        throw new NameException("forward reference");
-	            }
-		}
+	    if (isFieldInit && unseenFields.contains(fDecl) && !isSimpleNameLHS) {
+	        throw new NameException("forward reference: " + fDecl.id);
+        }
 
 		
 		node.attachDeclaration(fDecl);

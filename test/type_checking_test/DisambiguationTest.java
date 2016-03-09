@@ -65,11 +65,14 @@ public class DisambiguationTest {
          * J1_fieldInOwnInit.java
          * J1_fieldinit_forward_ref2.java
          * J1_5_ForwardReference_ExplicitThis_InAssignment.java
+         * 
+         * Je_5_ForwardReference_MethodCall.java
+         * Je_5_ForwardReference_InAssignment.java
          */
         @Test
         public void test3() {
         String[] paths = new String[0];
-        paths = FileUtility.getFileNames(System.getProperty("user.dir") + "/assignment_testcases/a3/J1_fieldOwnInit1.java").toArray(paths);
+        paths = FileUtility.getFileNames(System.getProperty("user.dir") + "/assignment_testcases/a3/Je_5_ForwardReference_InAssignment.java").toArray(paths);
         int result = Joosc.compileSTL(paths);
         assertEquals(0, result);
         }
