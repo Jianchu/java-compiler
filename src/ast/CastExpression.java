@@ -1,14 +1,12 @@
 package ast;
 
 import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
 
+import parser.ParseTree;
+import scanner.Symbol;
 import ast.PrimitiveType.Value;
 import exceptions.ASTException;
 import exceptions.NameException;
-import scanner.Symbol;
-import parser.ParseTree;
 
 public class CastExpression extends Expression {
     public Type type;
@@ -32,28 +30,32 @@ public class CastExpression extends Expression {
         }
         
         // tranform the expression to type
-		if (this.expr != null) {
-			if (!(this.expr instanceof Name)) {
-				throw new NameException("Unexpected expresssion in name.");
-			}
-			Name exprN = (Name) this.expr;
-			Type tempType;
-			if (PrimitiveType.primitives().contains(exprN.toString())) {
-				tempType = new PrimitiveType(Value.valueOf(exprN.toString()));
-			} else {
-				tempType = new SimpleType(exprN);
-			}
-			
-			if (this.isArray) {
-				this.type = new ArrayType(tempType);
-			} else {
-				this.type = tempType;
-			}
-			this.expr = null;	// clear the useless expression now
-		}
+        if (this.expr != null) {
+            if (!(this.expr instanceof Name)) {
+                throw new NameException("Unexpected expresssion in name.");
+            }
+            Name exprN = (Name) this.expr;
+            Type tempType;
+            if (PrimitiveType.primitives().contains(exprN.toString())) {
+                tempType = new PrimitiveType(Value.valueOf(exprN.toString()));
+            } else {
+                tempType = new SimpleType(exprN);
+            }
+
+            if (this.isArray) {
+                this.type = new ArrayType(tempType);
+            } else {
+                this.type = tempType;
+            }
+            this.expr = null; // clear the useless expression now
+            // if expr = null, then type = PrimitiveType, and if isArray = true,
+            // type should be array type rather than PrimitiveType
+        } else if (this.expr == null && isArray) {
+            this.type = new ArrayType(this.type);
+        }
     }
     
-	public void accept(Visitor v) throws Exception {
-		v.visit(this);
-	}
+    public void accept(Visitor v) throws Exception {
+        v.visit(this);
+    }
 }
