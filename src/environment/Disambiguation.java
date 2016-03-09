@@ -213,6 +213,9 @@ public class Disambiguation extends EnvTraversalVisitor{
 			if (fDecl == null) {
 				throw new NameException("Field prefix not recognized: "+ String.join(".", fn.subList(0, i+1)));
 			}
+			if (fDecl.modifiers.contains(Modifier.STATIC)) {
+				throw new NameException("Nonstatic access to static field. Static fields can only be accessed by type name in Joos");
+			}
 			prefixDecl = fDecl.type.getDeclaration();
 		}
 		return fDecl;

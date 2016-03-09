@@ -72,9 +72,17 @@ public class DisambiguationTest {
         @Test
         public void test3() {
         String[] paths = new String[0];
-        paths = FileUtility.getFileNames(System.getProperty("user.dir") + "/assignment_testcases/a3/Je_5_ForwardReference_InAssignment.java").toArray(paths);
+        paths = FileUtility.getFileNames(System.getProperty("user.dir") + "/assignment_testcases/a3/J1_5_ForwardReference_ExplicitThis_InAssignment.java").toArray(paths);
         int result = Joosc.compileSTL(paths);
         assertEquals(0, result);
+        }
+        
+        @Test
+        public void testStaticNonstatic() {
+        String[] paths = new String[0];
+        paths = FileUtility.getFileNames(System.getProperty("user.dir") + "/assignment_testcases/a3/Je_6_NonStaticAccessToStatic_Field.java").toArray(paths);
+        int result = Joosc.compileSTL(paths);
+        assertEquals(42, result);
         }
         
         /**
