@@ -109,6 +109,15 @@ public class DisambiguationTest {
         int result = Joosc.compileSTL(paths);
         assertEquals(0, result);
         }
+        
+        @Test
+        public void test7() {
+        String[] paths = new String[0];
+        paths = FileUtility.getFileNames(System.getProperty("user.dir") + "/assignment_testcases/a3/J1_typecheck_instanceof3.java").toArray(paths);
+        int result = Joosc.compileSTL(paths);
+        assertEquals(0, result);
+        }        
+        
     /**
      * J1_6_ProtectedAccess_InstanceField_This
      * J2_6_ProtectedAccess_StaticField_This
