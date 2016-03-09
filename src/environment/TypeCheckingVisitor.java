@@ -323,8 +323,11 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
 
         Type exprType = node.expr.getType();
 
-        if (TypeHelper.assignable(exprType, node.type)
-                || TypeHelper.assignable(node.type, exprType)) {
+        if ((exprType instanceof PrimitiveType) || (node.type instanceof PrimitiveType)) {
+            throw new TypeCheckingException("Expression clause of instanceof must have reference type");
+        }
+        
+        if (TypeHelper.assignable(exprType, node.type) || TypeHelper.assignable(node.type, exprType)) {
             node.attachType(new PrimitiveType(Value.BOOLEAN));
         } else {
             throw new TypeCheckingException("Uncomparable types in instanceof: " + exprType + ":=" + node.type  );
