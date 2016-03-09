@@ -290,6 +290,8 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
             FieldDeclaration fDecl = prefixDecl.getEnvironment().lookUpField(node.id.toString());
             node.id.attachDeclaration(fDecl);
             node.attachType(fDecl.type);
+            checkSingleProtected(prefixDecl, node.id.toString());
+            
         } else {
         	throw new TypeCheckingException("field access unrecognized type." );
         }
@@ -297,7 +299,14 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
         
     }
 
-    @Override
+    private void checkSingleProtected(TypeDeclaration prefixDecl, String string) throws TypeCheckingException {
+		if (!(samePkg(prefixDecl, currentTypeDecl) || TypeHelper.inheritsFrom(currentTypeDecl, prefixDecl))) {
+			// if not from the same package or subclass
+			throw new TypeCheckingException("Illegal access to protected field: " + string );
+		}
+	}
+
+	@Override
     public void visit(InfixExpression node) throws Exception {
         if (node.lhs != null) {
             node.lhs.accept(this);
@@ -725,10 +734,7 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
 							throw new TypeCheckingException("unexpected type in qualified name " + name );
 						}
 						TypeDeclaration previousTd = previousType.getDeclaration();
-						if (!(samePkg(previousTd, currentTypeDecl) || TypeHelper.inheritsFrom(currentTypeDecl, previousTd))) {
-							// if not from the same package or subclass
-							throw new TypeCheckingException("Illegal access to protected field: " + name + " : " + fDecl.id);
-						}
+						checkSingleProtected(previousTd, fDecl.id);
 					}
 				}
 			} 
