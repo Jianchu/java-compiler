@@ -316,7 +316,7 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
                 || TypeHelper.assignable(node.type, exprType)) {
             node.attachType(new PrimitiveType(Value.BOOLEAN));
         } else {
-            throw new TypeCheckingException("Uncomparable types in instanceof");
+            throw new TypeCheckingException("Uncomparable types in instanceof: " + exprType + ":=" + node.type  );
         }
     }
 
