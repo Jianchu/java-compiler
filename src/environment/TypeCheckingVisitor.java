@@ -401,12 +401,8 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
         	// Name(...)
         	Name mn = (Name) node.expr;
                 // TODO: Check whether this check is right...
-        	if (mn instanceof SimpleName) {
-        	    if (this.currentMethod != null) {
-        	        if (this.currentMethod.modifiers.contains(Modifier.STATIC)) {
-                       throw new TypeCheckingException("Cannot implicitly call this expression in static method.");
-        	        }
-        	    }
+        	if (!checkThisInMethod(mn)) {
+        	    throw new TypeCheckingException("Cannot implicitly call this expression in static method.");
         	}
         	resolveMethodName(mn, argTypes);
         	MethodDeclaration mDecl = (MethodDeclaration) mn.getDeclaration();
@@ -419,6 +415,17 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
         	throw new TypeCheckingException("Method invocation: " + node.expr + " " + node.id);
         }
 //        System.out.println("~~~~~~~");
+    }
+    
+    private boolean checkThisInMethod(Name name) {
+        if (name instanceof SimpleName) {
+            if (this.currentMethod != null) {
+                if (this.currentMethod.modifiers.contains(Modifier.STATIC)) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     @Override
