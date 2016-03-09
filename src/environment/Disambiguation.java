@@ -170,9 +170,13 @@ public class Disambiguation extends EnvTraversalVisitor{
 				int j = i + 1;
 				while (j < fn.size()) {
 					TypeDeclaration fType = fDecl.type.getDeclaration();
-					fDecl = fType.getEnvironment().lookUpField(fn.get(j++));	// increment j here
+					fDecl = fType.getEnvironment().lookUpField(fn.get(j));	
+					if (j >= i + 2) {
+						checkNonStatic(fDecl);
+					}
+					j++;
 				}
-				if (j == i && !fDecl.modifiers.contains(Modifier.STATIC)) {
+				if (j == i+2 && !fDecl.modifiers.contains(Modifier.STATIC)) {
 					throw new NameException("Static access to non-static field" + String.join(".", fn.subList(0, j+1)));
 				}
 				
@@ -213,9 +217,8 @@ public class Disambiguation extends EnvTraversalVisitor{
 			if (fDecl == null) {
 				throw new NameException("Field prefix not recognized: "+ String.join(".", fn.subList(0, i+1)));
 			}
-			if (fDecl.modifiers.contains(Modifier.STATIC)) {
-				throw new NameException("Nonstatic access to static field. Static fields can only be accessed by type name in Joos");
-			}
+			checkNonStatic(fDecl);
+			
 			prefixDecl = fDecl.type.getDeclaration();
 		}
 		return fDecl;
@@ -226,6 +229,12 @@ public class Disambiguation extends EnvTraversalVisitor{
 		for (AST t : trees) {
 			Visitor v = new Disambiguation();
 			t.root.accept(v);
+		}
+	}
+	
+	private void checkNonStatic(FieldDeclaration fd) throws NameException {
+		if (fd.modifiers.contains(Modifier.STATIC)) {
+			throw new NameException("Nonstatic access to static field. Static fields can only be accessed by type name in Joos");
 		}
 	}
 	
