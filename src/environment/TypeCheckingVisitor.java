@@ -718,6 +718,17 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
         return true;
     }
 
+    private boolean checkStaticUse(Name name) {
+        if (name instanceof QualifiedName) {
+            QualifiedName qname = (QualifiedName) name;
+            // means statically using
+            if (qname.getQualifier().getDeclaration() instanceof TypeDeclaration) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private void resolveNameType(Name name) throws TypeCheckingException {
 //    	System.out.println("\t" + name + ":" + (name.getDeclaration() == null));
     	ASTNode decl = name.getDeclaration();
@@ -727,6 +738,11 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
     		name.attachType(vDecl.type);
     	} else if (decl instanceof FieldDeclaration) {
     		FieldDeclaration fDecl = (FieldDeclaration) decl;
+                if (!fDecl.modifiers.contains(Modifier.STATIC)) {
+                    if (checkStaticUse(name)) {
+                        throw new TypeCheckingException("Statically using a non-static field");
+                    }
+                }
     		if (!checkThisInMethod(name, fDecl)) {
     		    throw new TypeCheckingException("Cannot implicitly call this in static method.");
     		}
