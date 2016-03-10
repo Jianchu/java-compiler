@@ -253,7 +253,7 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
     private void checkConstructorProtected(TypeDeclaration typeDec) throws TypeCheckingException {
         if (!(samePkg(typeDec, currentTypeDecl))) {
             // if not from the same package
-            throw new TypeCheckingException("Illegal access to protected member: ");
+            throw new TypeCheckingException("Illegal access to protected constructor");
         }
     }
 
