@@ -258,7 +258,7 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
             }
             throw new TypeCheckingException("Not found corresponding constructor");
         } catch (Exception e) {
-            // e.printStackTrace();
+            e.printStackTrace();
             throw new TypeCheckingException("Type environment not found");
         }
     }
