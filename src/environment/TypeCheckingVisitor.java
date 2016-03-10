@@ -590,10 +590,30 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
     @Override
 	public void visit(TypeDeclaration node) throws Exception {
 		currentTypeDecl = node;
-    	for (FieldDeclaration fd : node.getEnvironment().fields.values()) {
+		for (FieldDeclaration fd : node.getEnvironment().fields.values()) {
 			unseenFields.add(fd);
 		}
 		super.visit(node);
+
+		// Because there is no explicit super call in joos1W, so every super
+                // class has to have a constructor without any parameters, otherwise
+                // the implicit super call will fail.
+		boolean hasValidConstructor = false;
+		if ((node.superClass != null) && (node.getEnvironment().constructors.size() > 0)) {
+		    Map<String, MethodDeclaration> superConstructors = node.superClass.getDeclaration().getEnvironment().constructors;
+		    for (String s : superConstructors.keySet()) {
+		        List<VariableDeclaration> parameters = superConstructors.get(s).parameters;
+		        if (parameters.size() == 0) {
+		            hasValidConstructor = true;
+		        }
+		    }
+		} else {
+		    //means implicit super call won't happen.
+		    hasValidConstructor = true;
+		}
+		if (!hasValidConstructor) {
+		    throw new TypeCheckingException("No constructor without parameters in super class");
+		}
 	}
 
     @Override
