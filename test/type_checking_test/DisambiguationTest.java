@@ -27,7 +27,7 @@ public class DisambiguationTest {
         String[] paths = new String[0];
         paths = FileUtility.getFileNames(System.getProperty("user.dir") + "/assignment_testcases/a3/Je_6_ProtectedAccess_InstanceField_SuperVar").toArray(paths);
         int result = Joosc.compileSTL(paths);
-        assertEquals(0, result);
+        assertEquals(42, result);
 	}
 
 	/**
@@ -168,31 +168,34 @@ public class DisambiguationTest {
         int result = Joosc.compileSTL(paths);
         assertEquals(42, result);
         }   
+        
+        @Test
+        public void test13() {
+        String[] paths = new String[0];
+        paths = FileUtility.getFileNames(System.getProperty("user.dir") + "/assignment_testcases/a3/Je_6_NonStaticAccessToStatic_Method.java").toArray(paths);
+        int result = Joosc.compileSTL(paths);
+        assertEquals(42, result);
+        } 
+        
+        @Test
+        public void test14() {
+        String[] paths = new String[0];
+        paths = FileUtility.getFileNames(System.getProperty("user.dir") + "/assignment_testcases/a3/Je_6_StaticAccessToNontatic_Field.java").toArray(paths);
+        int result = Joosc.compileSTL(paths);
+        assertEquals(42, result);
+        } 
     /**
-     * Je_6_ProtectedAccess_InstanceField_SuperVar
      * Je_6_ProtectedAccess_Method_OutsidePackage_NotInSubclass
-     * Je_6_ProtectedAccess_InstanceField_NoRelation_Internal
      * Je_6_ProtectedAccess_Method_OutsidePackage_NotBySubclass
      * Je_6_ProtectedAccess_InstanceField_SubDeclare_SubVar
      * Je_6_ProtectedAccess_StaticMethod_Sub_DeclaredInSub
      * Je_6_ProtectedAccess_InstanceMethod_SuperVar
      * Je_6_ProtectedAccess_ClassCreation_Sub
      * Je_16_ProtectedAccess_StaticField_Sub_DeclaredInSub
-     * Je_6_ProtectedAccess_WriteField_OutsidePackage_NotInSubclass
-     * Je_6_ProtectedAccess_ReadField_OutsidePackage_NotBySubclass
-     * Je_6_ProtectedAccess_ClassCreation_Super
-     * Je_6_ProtectedAccess_ReadField_OutsidePackage_NotInSubclass
-     * Je_6_ProtectedAccess_InstanceMethod_SubDeclare_SubVar
-     * Je_6_ProtectedAccess_TwoSubtypes
-     * Je_6_ProtectedAccess_WriteField_OutsidePackage_NotBySubclass
      * Je_6_ProtectedAccess_SuperConstructor_NewExp
-     * Je_6_ProtectedAccess_External Je_6_ProtectedAccess_Constructor
-     * Je_6_ProtectedAccess_InstanceField_NoRelation_External
+     * Je_6_ProtectedAccess_Constructor 
+     * Je_6_ProtectedAccess_ClassCreation_Super
+     * Je_6_ProtectedAccess_InstanceMethod_SubDeclare_SubVar
      * 
-     * Je_6_StaticThis_NonStaticField_ImplicitThis.java
-     * Je_16_StaticThis_StaticFieldInitializer.java
-     * Je_6_NonStaticAccessToStatic_Method.java
-     * Je_6_StaticAccessToNontatic_Field.java
-     * Je_6_ConstructorPresent_Super_NoDefault
      */
 }
