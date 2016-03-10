@@ -713,11 +713,14 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
      */
     public void visit(QualifiedName name) throws TypeCheckingException {
     	checkProtected(name);
+    	checkStaticUseOfNonStatic(name);
     	resolveNameType(name);
     	
     }
     
-    private boolean checkThisInMethod(Name name, FieldDeclaration fDecl) {
+
+
+	private boolean checkThisInMethod(Name name, FieldDeclaration fDecl) {
         if (name instanceof SimpleName) {
             if (this.currentMethod != null) {
                 if (this.currentMethod.modifiers.contains(Modifier.STATIC)) {
@@ -741,6 +744,22 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
         return false;
     }
 
+    private void checkStaticUseOfNonStatic(QualifiedName name) throws TypeCheckingException {
+    	// TODO Auto-generated method stub
+    	List<Name> prefixList = name.getPrefixList();
+    	for (Name n : prefixList) {
+    		ASTNode decl = name.getDeclaration();
+    		if (decl instanceof FieldDeclaration) {
+    			FieldDeclaration fDecl = (FieldDeclaration) decl;
+    			if (!fDecl.modifiers.contains(Modifier.STATIC)) {
+    				if (checkStaticUse(name)) {
+    					throw new TypeCheckingException("Statically using a non-static field");
+    				}
+    			}
+    		}
+    	}
+	}
+    
     private void resolveNameType(Name name) throws TypeCheckingException {
 //    	System.out.println("\t" + name + ":" + (name.getDeclaration() == null));
     	ASTNode decl = name.getDeclaration();
@@ -750,11 +769,11 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
     		name.attachType(vDecl.type);
     	} else if (decl instanceof FieldDeclaration) {
     		FieldDeclaration fDecl = (FieldDeclaration) decl;
-            if (!fDecl.modifiers.contains(Modifier.STATIC)) {
-                if (checkStaticUse(name)) {
-                    throw new TypeCheckingException("Statically using a non-static field");
-                }
-            }
+//            if (!fDecl.modifiers.contains(Modifier.STATIC)) {
+//                if (checkStaticUse(name)) {
+//                    throw new TypeCheckingException("Statically using a non-static field");
+//                }
+//            }
     		name.attachType(fDecl.type);
     	} else if (decl == null && name instanceof QualifiedName){
     		// array.length
