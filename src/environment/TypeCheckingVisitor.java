@@ -233,35 +233,20 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
         for (Expression e : realParameters) {
             realArgTypes.add(e.getType());
         }
-        String realConstructorName = NameHelper.mangle(node.type.toString(), realArgTypes);
-        
-        try {
-            TypeDeclaration typeDec = node.type.getDeclaration();
-            if (typeDec.modifiers.contains(Modifier.ABSTRACT)) {
-                throw new TypeCheckingException("The type in a class instance creation expression must be a non-abstract class.");
+        String realConstructorName = NameHelper.mangle(node.type.getDeclaration().id, realArgTypes);
+        TypeDeclaration typeDec = node.type.getDeclaration();
+        if (typeDec.modifiers.contains(Modifier.ABSTRACT)) {
+            throw new TypeCheckingException("The type in a class instance creation expression must be a non-abstract class.");
+        }
+        Map<String, MethodDeclaration> constructors = typeDec.getEnvironment().constructors;
+        if (constructors.containsKey(realConstructorName)) {
+            MethodDeclaration conDec = constructors.get(realConstructorName);
+            if (conDec.modifiers.contains(Modifier.PROTECTED)) {
+                checkConstructorProtected(typeDec);
             }
-                        
-            Map<String, MethodDeclaration> constructors = typeDec.getEnvironment().constructors;
-            for (String s : constructors.keySet()) {
-                List<Type> argTypes = new ArrayList<Type>();
-                MethodDeclaration conDec = constructors.get(s);
-                List<VariableDeclaration> DecParameters = conDec.parameters;
-                for (VariableDeclaration varDec : DecParameters) {
-                    argTypes.add(varDec.type);
-                }
-                String decConstructorName = NameHelper.mangle(node.type.toString(), argTypes);
-                if (decConstructorName.equals(realConstructorName)) {
-                    if (conDec.modifiers.contains(Modifier.PROTECTED)) {
-                        checkConstructorProtected(typeDec);
-                    }
-                    node.attachType(instanceType);
-                    return;
-                }
-            }
+            node.attachType(instanceType);
+        } else {
             throw new TypeCheckingException("Not found corresponding constructor");
-        } catch (Exception e) {
-            // e.printStackTrace();
-            throw new TypeCheckingException("Type environment not found");
         }
     }
 
