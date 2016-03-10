@@ -1026,6 +1026,9 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
 				int j = i;
 				while (j != fn.size() - 1) {	// everything in between is fields
 					FieldDeclaration fDecl = prefixDecl.getEnvironment().lookUpField(fn.get(j));	
+					if (j != i) {
+						checkNonStatic(fDecl);
+					}
 					prefixList.get(j).attachDeclaration(fDecl);
 					prefixDecl = fDecl.type.getDeclaration();
 					j++;
@@ -1055,12 +1058,14 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
 			if (fDecl == null) {
 				throw new NameException("Method prefix not recognized: " + String.join(".", fn.subList(0, i)));
 			}
+			checkNonStatic(fDecl);
 			prefixList.get(i).attachDeclaration(fDecl);
 			prefixDecl = fDecl.type.getDeclaration();
 			i++;
 		}
 		
 		MethodDeclaration mDecl = prefixDecl.getEnvironment().lookUpMethod(NameHelper.mangle(fn.get(i), paramTypes));
+		checkNonStatic(mDecl);
 		return mDecl;
 	}
 	
@@ -1078,5 +1083,17 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
 		String pkg2 = fn2.substring(0, fn2.length() - typeDecl2.id.length());
 		return pkg1.equals(pkg2);
 		
+	}
+	
+	private void checkNonStatic(FieldDeclaration fd) throws NameException {
+		if (fd.modifiers.contains(Modifier.STATIC)) {
+			throw new NameException("Nonstatic access to static field. Static fields can only be accessed by type name in Joos");
+		}
+	}
+	
+	private void checkNonStatic(MethodDeclaration fd) throws NameException {
+		if (fd.modifiers.contains(Modifier.STATIC)) {
+			throw new NameException("Nonstatic access to static field. Static fields can only be accessed by type name in Joos");
+		}
 	}
 }
