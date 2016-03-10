@@ -587,10 +587,30 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
     @Override
 	public void visit(TypeDeclaration node) throws Exception {
 		currentTypeDecl = node;
-    	for (FieldDeclaration fd : node.getEnvironment().fields.values()) {
+		for (FieldDeclaration fd : node.getEnvironment().fields.values()) {
 			unseenFields.add(fd);
 		}
 		super.visit(node);
+
+		// Because there is no explicit super call in joos1W, so every super
+                // class has to have a constructor without any parameters, otherwise
+                // the implicit super call will fail.
+		boolean hasValidConstructor = false;
+		if ((node.superClass != null) && (node.getEnvironment().constructors.size() > 0)) {
+		    Map<String, MethodDeclaration> superConstructors = node.superClass.getDeclaration().getEnvironment().constructors;
+		    for (String s : superConstructors.keySet()) {
+		        List<VariableDeclaration> parameters = superConstructors.get(s).parameters;
+		        if (parameters.size() == 0) {
+		            hasValidConstructor = true;
+		        }
+		    }
+		} else {
+		    //means implicit super call won't happen.
+		    hasValidConstructor = true;
+		}
+		if (!hasValidConstructor) {
+		    throw new TypeCheckingException("No constructor without parameters in super class");
+		}
 	}
 
     @Override
@@ -681,6 +701,13 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
         if (!checkThisInField()) {
             throw new TypeCheckingException("Cannot implicitly call this in static field.");
         }
+        ASTNode decl = name.getDeclaration();
+        if (decl instanceof FieldDeclaration) {
+            FieldDeclaration fDecl = (FieldDeclaration) decl;
+            if (!checkThisInMethod(name, fDecl)) {
+                throw new TypeCheckingException("Cannot implicitly call this in static method.");
+            }
+        }
     	resolveNameType(name);
     }
     
@@ -740,11 +767,6 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
                     throw new TypeCheckingException("Statically using a non-static field");
                 }
             }
-        
-            // TODO: incomplete
-    		if (!checkThisInMethod(name, fDecl)) {
-    		    throw new TypeCheckingException("Cannot implicitly call this in static method.");
-    		}
     		name.attachType(fDecl.type);
     	} else if (decl == null && name instanceof QualifiedName){
     		// array.length
