@@ -684,6 +684,13 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
         if (!checkThisInField()) {
             throw new TypeCheckingException("Cannot implicitly call this in static field.");
         }
+        ASTNode decl = name.getDeclaration();
+        if (decl instanceof FieldDeclaration) {
+            FieldDeclaration fDecl = (FieldDeclaration) decl;
+            if (!checkThisInMethod(name, fDecl)) {
+                throw new TypeCheckingException("Cannot implicitly call this in static method.");
+            }
+        }
     	resolveNameType(name);
     }
     
@@ -743,9 +750,6 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
                         throw new TypeCheckingException("Statically using a non-static field");
                     }
                 }
-    		if (!checkThisInMethod(name, fDecl)) {
-    		    throw new TypeCheckingException("Cannot implicitly call this in static method.");
-    		}
     		name.attachType(fDecl.type);
     	} else if (decl == null && name instanceof QualifiedName){
     		// array.length
