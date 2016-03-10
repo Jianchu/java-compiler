@@ -25,7 +25,7 @@ public class DisambiguationTest {
 	@Test
 	public void test() {
         String[] paths = new String[0];
-        paths = FileUtility.getFileNames(System.getProperty("user.dir") + "/assignment_testcases/a3/J1_6_ProtectedAccess_InstanceMethod_ThisVar").toArray(paths);
+        paths = FileUtility.getFileNames(System.getProperty("user.dir") + "/assignment_testcases/a3/J1_ClosestMatchMultiplePath2.java").toArray(paths);
         int result = Joosc.compileSTL(paths);
         assertEquals(42, result);
 	}

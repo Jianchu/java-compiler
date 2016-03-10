@@ -232,7 +232,6 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
 
         try {
             TypeDeclaration typeDec = node.type.getDeclaration();
-            checkInstanceProtected(typeDec, typeDec.id);
             if (typeDec.modifiers.contains(Modifier.ABSTRACT)) {
                 throw new TypeCheckingException("The type in a class instance creation expression must be a non-abstract class.");
             }
