@@ -251,6 +251,7 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
                 }
                 String decConstructorName = NameHelper.mangle(node.type.toString(), argTypes);
                 if (decConstructorName.equals(realConstructorName)) {
+                    checkConstructorProtected(typeDec);
                     node.attachType(instanceType);
                     return;
                 }
@@ -259,6 +260,14 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
         } catch (Exception e) {
             // e.printStackTrace();
             throw new TypeCheckingException("Type environment not found");
+        }
+    }
+
+    private void checkConstructorProtected(TypeDeclaration typeDec) throws TypeCheckingException {
+        if (!(samePkg(typeDec, currentTypeDecl))) {
+            // if not from the same package
+            throw new TypeCheckingException(
+                    "Illegal access to protected member: ");
         }
     }
 
