@@ -14,7 +14,6 @@ import ast.ArrayAccess;
 import ast.ArrayCreationExpression;
 import ast.ArrayType;
 import ast.AssignmentExpression;
-import ast.BodyDeclaration;
 import ast.BooleanLiteral;
 import ast.CastExpression;
 import ast.CharacterLiteral;
@@ -210,6 +209,7 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
     public void visit(CharacterLiteral node) throws Exception {
         node.attachType(new PrimitiveType(Value.CHAR));
     }
+    
 
     /**
      * get the constructors of node.type
@@ -229,26 +229,31 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
             }
             realParameters = node.arglist;
         }
-
+        List<Type> realArgTypes = new ArrayList<Type>();
+        for (Expression e : realParameters) {
+            realArgTypes.add(e.getType());
+        }
+        String realConstructorName = NameHelper.mangle(node.type.toString(), realArgTypes);
+        
         try {
             TypeDeclaration typeDec = node.type.getDeclaration();
             if (typeDec.modifiers.contains(Modifier.ABSTRACT)) {
                 throw new TypeCheckingException("The type in a class instance creation expression must be a non-abstract class.");
             }
+                        
             Map<String, MethodDeclaration> constructors = typeDec.getEnvironment().constructors;
             for (String s : constructors.keySet()) {
-                List<VariableDeclaration> DecParameters = constructors.get(s).parameters;
-                if (DecParameters.size() == realParameters.size()) {
-                    if (realParameters.size() == 0) {
-                        node.attachType(instanceType);
-                        return;
-                    } else {
-                        boolean matches = checkParameters(realParameters, DecParameters);
-                        if (matches) {
-                            node.attachType(instanceType);
-                            return;
-                        }
-                    }
+                List<Type> argTypes = new ArrayList<Type>();
+                MethodDeclaration conDec = constructors.get(s);
+                List<VariableDeclaration> DecParameters = conDec.parameters;
+                for (VariableDeclaration varDec : DecParameters) {
+                    argTypes.add(varDec.type);
+                }
+                String decConstructorName = NameHelper.mangle(node.type.toString(), argTypes);
+                if (decConstructorName.equals(realConstructorName)) {
+                    checkConstructorProtected(typeDec);
+                    node.attachType(instanceType);
+                    return;
                 }
             }
             throw new TypeCheckingException("Not found corresponding constructor");
@@ -258,17 +263,12 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
         }
     }
 
-    private boolean checkParameters(List<Expression> realParameters, List<VariableDeclaration> DecParameters) {
-        int paraSize = realParameters.size();
-        boolean matches = true;
-        for (int i = 0; i < paraSize; i++) {
-            Type realType = realParameters.get(i).getType();
-            Type decType = DecParameters.get(i).type;
-            if (!realType.equals(decType)) {
-                matches = false;
-            }
+    private void checkConstructorProtected(TypeDeclaration typeDec) throws TypeCheckingException {
+        if (!(samePkg(typeDec, currentTypeDecl))) {
+            // if not from the same package
+            throw new TypeCheckingException(
+                    "Illegal access to protected member: ");
         }
-        return matches;
     }
 
     /**
