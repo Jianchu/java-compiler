@@ -394,6 +394,8 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
         	if (mDecl.modifiers.contains(Modifier.PROTECTED)) {
         		checkInstanceProtected(prefixDecl, methodName);
         	}
+        	// check that it is not a static method
+        	checkNonStatic(mDecl);
         	
         } else if (node.expr instanceof Name) {
         	// Name(...)
