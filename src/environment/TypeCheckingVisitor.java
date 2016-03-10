@@ -232,6 +232,7 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
 
         try {
             TypeDeclaration typeDec = node.type.getDeclaration();
+            checkInstanceProtected(typeDec, typeDec.id);
             if (typeDec.modifiers.contains(Modifier.ABSTRACT)) {
                 throw new TypeCheckingException("The type in a class instance creation expression must be a non-abstract class.");
             }
@@ -848,7 +849,7 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
     private void checkInstanceProtected(TypeDeclaration prefixDecl, String name) throws TypeCheckingException {
 		if (!(samePkg(prefixDecl, currentTypeDecl) || TypeHelper.inheritsFrom(currentTypeDecl, prefixDecl))) {
 			// if not from the same package or subclass
-			throw new TypeCheckingException("Illegal access to protected field: " + name);
+			throw new TypeCheckingException("Illegal access to protected member: " + name);
 		}
 	}
     
