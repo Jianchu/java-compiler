@@ -1,5 +1,6 @@
-package static_analysis
+package static_analysis;
 
+import ast.Expression;
 
 public class ConstantExpression {
 
