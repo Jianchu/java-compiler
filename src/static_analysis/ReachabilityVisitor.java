@@ -20,18 +20,17 @@ public class ReachabilityVisitor extends TraversalVisitor {
     
     @Override
     public void visit(Block node) throws Exception {
-        super.visit(node);
         if (node.statements.size() > 0) {
-            Statement firstStatement = node.statements.get(0);
+            Statement currentStatement = node.statements.get(0);
             Statement nextStatement = null;
-            firstStatement.accept(this);
-            while (firstStatement.hasNext()) {
-                nextStatement = firstStatement.next();
-                if (!outMap.get(nextStatement).booleanValue()) {
+            currentStatement.accept(this);
+            while (currentStatement.hasNext()) {
+                nextStatement = currentStatement.next();
+                if (!outMap.get(currentStatement).booleanValue()) {
                     throw new ReachabilityException("Unreachable statement");
                 }
                 nextStatement.accept(this);
-                firstStatement = nextStatement;
+                currentStatement = nextStatement;
             }
             if (nextStatement != null) {
                 outMap.put(node, outMap.get(nextStatement));
@@ -41,32 +40,26 @@ public class ReachabilityVisitor extends TraversalVisitor {
 
     @Override
     public void visit(ExpressionStatement node) throws Exception {
-        super.visit(node);
     }
 
     @Override
     public void visit(ForStatement node) throws Exception {
-        super.visit(node);
     }
 
     @Override
     public void visit(IfStatement node) throws Exception {
-        super.visit(node);
     }
 
     @Override
     public void visit(ReturnStatement node) throws Exception {
-        super.visit(node);
-        outMap.put(node, new Boolean(false));
+        outMap.put(node, false);
     }
 
     @Override
     public void visit(VariableDeclarationStatement node) throws Exception {
-        super.visit(node);
     }
 
     @Override
     public void visit(WhileStatement node) throws Exception {
-        super.visit(node);
     }
 }
