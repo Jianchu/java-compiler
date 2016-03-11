@@ -49,7 +49,9 @@ public class ReachabilityVisitor extends TraversalVisitor {
 
     @Override
     public void visit(ForStatement node) throws Exception {
-        node.forBody.accept(this);
+        if (node.forBody != null) {
+            node.forBody.accept(this);
+        }
         int constantFlag = ConstantExpression.isConstant(node.forCondition);
         if (constantFlag == 0 || constantFlag == 2) {
             outMap.put(node, true);
@@ -62,16 +64,23 @@ public class ReachabilityVisitor extends TraversalVisitor {
     public void visit(IfStatement node) throws Exception {
         if (node.hasElse) {
             Statement ifStatement = node.ifStatement;
-            ifStatement.accept(this);
+            if (ifStatement != null) {
+                ifStatement.accept(this);
+            }
             Statement elseStatement = node.elseStatement;
-            elseStatement.accept(this);
+            if (elseStatement != null) {
+                elseStatement.accept(this);
+            }
             boolean outOfNode = outMap.get(ifStatement) || outMap.get(elseStatement);
             if (!outOfNode) {
                 throw new ReachabilityException("Unreachable statement");
             }
             outMap.put(node, outOfNode);
         } else {
-            node.ifStatement.accept(this);
+            Statement ifStatement = node.ifStatement;
+            if (ifStatement != null) {
+                ifStatement.accept(this);
+            }
             outMap.put(node, true);
         }
     }
@@ -88,7 +97,9 @@ public class ReachabilityVisitor extends TraversalVisitor {
 
     @Override
     public void visit(WhileStatement node) throws Exception {
-        node.whileStatement.accept(this);
+        if (node.whileStatement != null) {
+            node.whileStatement.accept(this);
+        }
         int constantFlag = ConstantExpression.isConstant(node.whileCondition);
         if (constantFlag == 0 || constantFlag == 2) {
             outMap.put(node, true);
