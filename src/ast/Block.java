@@ -52,7 +52,7 @@ public class Block extends Statement {
 	    				last.setNext(s);
 	    			last = s;
 	    			
-	    			statements.add(Statement.parseStatement(child));
+	    			statements.add(s);
     			}
     			break;
     		}
