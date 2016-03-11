@@ -36,8 +36,8 @@ public class ReachabilityVisitor extends TraversalVisitor {
                 nextStatement.accept(this);
                 currentStatement = nextStatement;
             }
-            if (nextStatement != null) {
-                outMap.put(node, outMap.get(nextStatement));
+            if (currentStatement != null) {
+                outMap.put(node, outMap.get(currentStatement));
             }
         }
     }
@@ -72,9 +72,6 @@ public class ReachabilityVisitor extends TraversalVisitor {
                 elseStatement.accept(this);
             }
             boolean outOfNode = outMap.get(ifStatement) || outMap.get(elseStatement);
-            if (!outOfNode) {
-                throw new ReachabilityException("Unreachable statement");
-            }
             outMap.put(node, outOfNode);
         } else {
             Statement ifStatement = node.ifStatement;
