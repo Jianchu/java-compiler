@@ -9,6 +9,7 @@ import ast.Block;
 import ast.ExpressionStatement;
 import ast.ForStatement;
 import ast.IfStatement;
+import ast.MethodDeclaration;
 import ast.ReturnStatement;
 import ast.Statement;
 import ast.VariableDeclarationStatement;
@@ -90,6 +91,14 @@ public class ReachabilityVisitor extends TraversalVisitor {
             outMap.put(node, true);
         } else if (constantFlag == 1) {
             outMap.put(node, false);
+        }
+    }
+
+    @Override
+    public void visit(MethodDeclaration node) throws Exception {
+        outMap.put(node.body, true);
+        if (node.body != null) {
+            node.body.accept(this);
         }
     }
 
