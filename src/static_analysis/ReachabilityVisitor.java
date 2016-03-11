@@ -22,6 +22,7 @@ import exceptions.ReachabilityException;
 public class ReachabilityVisitor extends TraversalVisitor {
 
     private Map<Statement, Boolean> outMap = new HashMap<Statement, Boolean>();
+    private Statement lastStatement;
     private String currentTypeName;
 
     // for testing
@@ -33,6 +34,7 @@ public class ReachabilityVisitor extends TraversalVisitor {
 
     @Override
     public void visit(Block node) throws Exception {
+
         if (node.statements.size() > 0) {
             Statement currentStatement = node.statements.get(0);
             Statement nextStatement = null;
@@ -47,6 +49,7 @@ public class ReachabilityVisitor extends TraversalVisitor {
             }
             if (currentStatement != null) {
                 outMap.put(node, outMap.get(currentStatement));
+                this.lastStatement = currentStatement;
             }
         } else {
             outMap.put(node, true);
@@ -122,6 +125,12 @@ public class ReachabilityVisitor extends TraversalVisitor {
         if (node.body != null) {
             node.body.accept(this);
         }
+        if (node.returnType != null) {
+            if (!(this.lastStatement instanceof ReturnStatement)) {
+                throw new ReachabilityException("The last statement of a method whose return type is not void must be a return statement");
+            }
+        }
+        this.lastStatement = null;
     }
 
     public static void checkReachability(List<AST> trees) throws Exception {
