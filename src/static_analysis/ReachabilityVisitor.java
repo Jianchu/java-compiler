@@ -40,6 +40,7 @@ public class ReachabilityVisitor extends TraversalVisitor {
             Statement nextStatement = null;
             currentStatement.accept(this);
             while (currentStatement.hasNext()) {
+
                 nextStatement = currentStatement.next();
                 if (!outMap.get(currentStatement).booleanValue()) {
                     throw new ReachabilityException("Unreachable statement");
@@ -124,13 +125,17 @@ public class ReachabilityVisitor extends TraversalVisitor {
         outMap.put(node.body, true);
         if (node.body != null) {
             node.body.accept(this);
-        }
-        if (node.returnType != null) {
-            if (!(this.lastStatement instanceof ReturnStatement)) {
-                throw new ReachabilityException("The last statement of a method whose return type is not void must be a return statement");
+            if (node.returnType != null) {
+                if (this.lastStatement instanceof IfStatement) {
+                    if (this.outMap.get(this.lastStatement)) {
+                        throw new ReachabilityException("The last statement of a method whose return type is not void must be a return statement");
+                    }
+                } else if (!(this.lastStatement instanceof ReturnStatement)) {
+                    throw new ReachabilityException("The last statement of a method whose return type is not void must be a return statement");
+                }
             }
+            this.lastStatement = null;
         }
-        this.lastStatement = null;
     }
 
     public static void checkReachability(List<AST> trees) throws Exception {
