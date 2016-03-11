@@ -48,7 +48,12 @@ public class ReachabilityVisitor extends TraversalVisitor {
 
     @Override
     public void visit(ForStatement node) throws Exception {
-
+        int constantFlag = ConstantExpression.isConstant(node.forCondition);
+        if (constantFlag == 0 || constantFlag == 2) {
+            outMap.put(node, true);
+        } else if (constantFlag == 1) {
+            outMap.put(node, false);
+        }
     }
 
     @Override
@@ -86,7 +91,6 @@ public class ReachabilityVisitor extends TraversalVisitor {
         } else if (constantFlag == 1) {
             outMap.put(node, false);
         }
-
     }
 
     public static void checkReachability(List<AST> trees) throws Exception {
