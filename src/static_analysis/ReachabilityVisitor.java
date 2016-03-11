@@ -52,6 +52,16 @@ public class ReachabilityVisitor extends TraversalVisitor {
 
     @Override
     public void visit(IfStatement node) throws Exception {
+        if (node.hasElse) {
+            Statement ifStatement = node.ifStatement;
+            ifStatement.accept(this);
+            Statement elseStatement = node.elseStatement;
+            elseStatement.accept(this);
+            boolean outOfNode = outMap.get(ifStatement) || outMap.get(elseStatement);
+            outMap.put(node, outOfNode);
+        } else {
+            outMap.put(node, true);
+        }
     }
 
     @Override

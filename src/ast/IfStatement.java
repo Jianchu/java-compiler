@@ -9,7 +9,7 @@ public class IfStatement extends Statement{
     public Expression ifCondition;
     public Statement ifStatement;
     public Statement elseStatement;
-    private boolean hasElse = false;
+    public boolean hasElse = false;
 
     public IfStatement(ParseTree ifNode) throws ASTException {
         ParseTree elseNode = ifNode.findChild(Symbol.ELSE);
