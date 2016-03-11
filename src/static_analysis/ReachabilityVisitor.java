@@ -58,6 +58,9 @@ public class ReachabilityVisitor extends TraversalVisitor {
             Statement elseStatement = node.elseStatement;
             elseStatement.accept(this);
             boolean outOfNode = outMap.get(ifStatement) || outMap.get(elseStatement);
+            if (!outOfNode) {
+                throw new ReachabilityException("Unreachable statement");
+            }
             outMap.put(node, outOfNode);
         } else {
             outMap.put(node, true);
@@ -76,6 +79,7 @@ public class ReachabilityVisitor extends TraversalVisitor {
 
     @Override
     public void visit(WhileStatement node) throws Exception {
+
     }
 
     public static void checkReachability(List<AST> trees) throws Exception {
