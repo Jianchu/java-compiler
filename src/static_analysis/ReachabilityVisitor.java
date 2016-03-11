@@ -21,7 +21,7 @@ import exceptions.ReachabilityException;
 public class ReachabilityVisitor extends TraversalVisitor {
 
     private Map<Statement, Boolean> outMap = new HashMap<Statement, Boolean>();
-    
+
     @Override
     public void visit(Block node) throws Exception {
         if (node.statements.size() > 0) {
@@ -39,6 +39,8 @@ public class ReachabilityVisitor extends TraversalVisitor {
             if (currentStatement != null) {
                 outMap.put(node, outMap.get(currentStatement));
             }
+        } else {
+            outMap.put(node, true);
         }
     }
 
