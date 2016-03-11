@@ -56,8 +56,8 @@ public class ReachabilityVisitor extends TraversalVisitor {
 
     @Override
     public void visit(ReturnStatement node) throws Exception {
-        outMap.put(node, new Boolean(false));
         super.visit(node);
+        outMap.put(node, new Boolean(false));
     }
 
     @Override
