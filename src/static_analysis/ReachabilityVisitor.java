@@ -6,6 +6,7 @@ import java.util.Map;
 
 import ast.AST;
 import ast.Block;
+import ast.CompilationUnit;
 import ast.ExpressionStatement;
 import ast.ForStatement;
 import ast.IfStatement;
@@ -21,6 +22,14 @@ import exceptions.ReachabilityException;
 public class ReachabilityVisitor extends TraversalVisitor {
 
     private Map<Statement, Boolean> outMap = new HashMap<Statement, Boolean>();
+    private String currentTypeName;
+
+    // for testing
+    @Override
+    public void visit(CompilationUnit node) throws Exception {
+        this.currentTypeName = node.types.get(0).getFullName();
+        super.visit(node);
+    }
 
     @Override
     public void visit(Block node) throws Exception {
