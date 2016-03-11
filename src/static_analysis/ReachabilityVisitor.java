@@ -126,12 +126,10 @@ public class ReachabilityVisitor extends TraversalVisitor {
         if (node.body != null) {
             node.body.accept(this);
             if (node.returnType != null) {
-                if (this.lastStatement instanceof IfStatement) {
+                if (!(this.lastStatement instanceof ReturnStatement)) {
                     if (this.outMap.get(this.lastStatement)) {
                         throw new ReachabilityException("The last statement of a method whose return type is not void must be a return statement");
                     }
-                } else if (!(this.lastStatement instanceof ReturnStatement)) {
-                    throw new ReachabilityException("The last statement of a method whose return type is not void must be a return statement");
                 }
             }
             this.lastStatement = null;
