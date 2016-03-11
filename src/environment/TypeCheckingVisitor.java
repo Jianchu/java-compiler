@@ -507,10 +507,12 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
         last = curr;
         curr = node.getEnvironment();
         super.visit(node);
-        Type initializerType = node.varDeclar.initializer.getType();
-        if (!TypeHelper.assignable(node.varDeclar.type, initializerType)) {
-            throw new TypeCheckingException(initializerType + " is not assignable to " + node.varDeclar.type.toString());
-        } 
+        if (node.varDeclar.initializer != null) {
+            Type initializerType = node.varDeclar.initializer.getType();
+            if (!TypeHelper.assignable(node.varDeclar.type, initializerType)) {
+                throw new TypeCheckingException(initializerType + " is not assignable to " + node.varDeclar.type.toString());
+            } 
+        }
         curr = last;
     }
     
