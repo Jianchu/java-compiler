@@ -1,8 +1,10 @@
 package static_analysis;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import ast.AST;
 import ast.Block;
 import ast.ExpressionStatement;
 import ast.ForStatement;
@@ -10,6 +12,7 @@ import ast.IfStatement;
 import ast.ReturnStatement;
 import ast.Statement;
 import ast.VariableDeclarationStatement;
+import ast.Visitor;
 import ast.WhileStatement;
 import environment.TraversalVisitor;
 import exceptions.ReachabilityException;
@@ -63,5 +66,12 @@ public class ReachabilityVisitor extends TraversalVisitor {
 
     @Override
     public void visit(WhileStatement node) throws Exception {
+    }
+
+    public static void checkReachability(List<AST> trees) throws Exception {
+        for (AST t : trees) {
+            Visitor rv = new ReachabilityVisitor();
+            t.root.accept(rv);
+        }
     }
 }
