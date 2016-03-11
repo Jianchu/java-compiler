@@ -9,6 +9,7 @@ import parser.ParseTree;
 import parser.Parser;
 import scanner.Scanner;
 import scanner.Token;
+import static_analysis.ReachabilityVisitor;
 import weeder.Weeder;
 import ast.AST;
 import ast.Visitor;
@@ -58,7 +59,7 @@ public class Joosc {
 		    new Hierarchy(trees);
 		    Disambiguation.disambiguate(trees);
 		    TypeCheckingVisitor.typeCheck(trees);
-		    
+		    ReachabilityVisitor.checkReachability(trees);
         } catch (Exception e) {
         	e.printStackTrace();
         	return 42;
