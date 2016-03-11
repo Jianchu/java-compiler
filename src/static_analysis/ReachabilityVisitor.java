@@ -49,6 +49,7 @@ public class ReachabilityVisitor extends TraversalVisitor {
 
     @Override
     public void visit(ForStatement node) throws Exception {
+        node.forBody.accept(this);
         int constantFlag = ConstantExpression.isConstant(node.forCondition);
         if (constantFlag == 0 || constantFlag == 2) {
             outMap.put(node, true);
@@ -70,6 +71,7 @@ public class ReachabilityVisitor extends TraversalVisitor {
             }
             outMap.put(node, outOfNode);
         } else {
+            node.ifStatement.accept(this);
             outMap.put(node, true);
         }
     }
@@ -86,6 +88,7 @@ public class ReachabilityVisitor extends TraversalVisitor {
 
     @Override
     public void visit(WhileStatement node) throws Exception {
+        node.whileStatement.accept(this);
         int constantFlag = ConstantExpression.isConstant(node.whileCondition);
         if (constantFlag == 0 || constantFlag == 2) {
             outMap.put(node, true);
