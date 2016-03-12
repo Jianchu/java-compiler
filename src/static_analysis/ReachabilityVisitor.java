@@ -13,6 +13,7 @@ import ast.IfStatement;
 import ast.MethodDeclaration;
 import ast.ReturnStatement;
 import ast.Statement;
+import ast.VariableDeclaration;
 import ast.VariableDeclarationStatement;
 import ast.Visitor;
 import ast.WhileStatement;

@@ -10,6 +10,7 @@ import parser.Parser;
 import scanner.Scanner;
 import scanner.Token;
 import static_analysis.ReachabilityVisitor;
+import static_analysis.VariableAnalysis;
 import weeder.Weeder;
 import ast.AST;
 import ast.Visitor;
@@ -60,6 +61,7 @@ public class Joosc {
 		    Disambiguation.disambiguate(trees);
 		    TypeCheckingVisitor.typeCheck(trees);
 		    ReachabilityVisitor.checkReachability(trees);
+		    VariableAnalysis.check(trees);
         } catch (Exception e) {
         	e.printStackTrace();
         	return 42;
