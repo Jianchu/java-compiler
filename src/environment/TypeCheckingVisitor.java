@@ -927,7 +927,7 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
         // TODO: Check whether the type of -byte and -short is int.
         case MINUS:
             values = new HashSet<Value>();
-            values.add(Value.CHAR);
+            // values.add(Value.CHAR);
             values.add(Value.BOOLEAN);
             if (CheckSinglePrimitive(expr, values, null)) {
                 return new PrimitiveType(Value.INT);
