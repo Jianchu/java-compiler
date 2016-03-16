@@ -2,6 +2,7 @@ package code_generation;
 
 import ast.ASTNode;
 import ast.ArrayType;
+import ast.FieldDeclaration;
 import ast.MethodDeclaration;
 import ast.PrimitiveType;
 import ast.PrimitiveType.Value;
@@ -38,16 +39,9 @@ public class SigHelper {
     }
 
     public static String getMethodSig(MethodDeclaration md) {
-        String classSig = null;
         StringBuilder methodSig = new StringBuilder();
         ASTNode typeNode = md.getParent();
-        if (typeNode instanceof TypeDeclaration) {
-            TypeDeclaration typeDec = (TypeDeclaration) typeNode;
-            String name = typeDec.getFullName();
-            SimpleType simpleType = new SimpleType(new SimpleName(name));
-            classSig = getTypeSig(simpleType);
-        }
-        methodSig.append(classSig);
+        methodSig.append(getClassSig(typeNode));
         if (md.isConstructor) {
             methodSig.append("/<init>(");
         } else {
@@ -65,5 +59,24 @@ public class SigHelper {
             methodSig.append(getTypeSig(md.returnType));
         }
         return methodSig.toString();
+    }
+
+    public static String getFieldSig(FieldDeclaration fd) {
+        StringBuilder fieldSig = new StringBuilder();
+        ASTNode typeNode = fd.getParent();
+        fieldSig.append(getClassSig(typeNode));
+        fieldSig.append(fd.id);
+        return fieldSig.toString();
+    }
+
+    private static String getClassSig(ASTNode typeNode) {
+        String classSig = null;
+        if (typeNode instanceof TypeDeclaration) {
+            TypeDeclaration typeDec = (TypeDeclaration) typeNode;
+            String name = typeDec.getFullName();
+            SimpleType simpleType = new SimpleType(new SimpleName(name));
+            classSig = getTypeSig(simpleType);
+        }
+        return classSig;
     }
 }
