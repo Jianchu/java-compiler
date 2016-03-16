@@ -1,0 +1,103 @@
+\documentclass[a4paper, notitlepage]{report}
+\usepackage{graphicx}
+
+\usepackage{hyperref}
+\usepackage{algpseudocode}
+\usepackage{algorithm}
+\usepackage{amsmath}
+\usepackage{listings}
+\usepackage[parfill]{parskip}
+\usepackage[a4paper,left=3cm,right=3cm,top=2.5cm,bottom=2.5cm]{geometry}
+\usepackage{titlesec, color}
+%\usepackage[T1]{fontenc}
+\definecolor{gray75}{gray}{0.75}
+\newcommand{\hsp}{\hspace{20pt}}
+\titleformat{\chapter}[hang]{\Huge\bfseries}{\thechapter\hsp\hsp}{0pt}{\Huge\bfseries}
+
+
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd{\chapter}{\if@openright\cleardoublepage\else\clearpage\fi}{}{}{}
+
+\title{CS444/644 Assignment 1 Technical Report}
+\author{Ho-Yi Fung, Jianchu Li, Zhiyuan Lin}
+\date{\today}
+
+\begin{document}
+
+{\let\newpage\relax\maketitle}
+\begin{abstract}
+
+\end{abstract}
+
+
+\tableofcontents
+
+
+
+%\begingroup
+%\let\clearpage\relax
+\chapter{Introduction}
+
+\chapter{Design}
+
+\section{Name resolution}
+
+In this stage of the program, it was decided we would follow closely the 7 steps specified in class:
+\begin{enumerate}
+	\item Constructing a global environment
+	\item Resolving uses of syntactically identifiable type names
+	\item Making sure class hierarchy is correct
+	\item Resolving ambiguous names
+	\item Resolving uses of local variables, formal parameters and static fields
+	\item Type checking
+	\item Resolving uses of methods and non-static fields.
+\end{enumerate}
+
+The first step involves construction of a symbol table and resolution of syntactically identifiable names.
+
+To construct the class environment, we would first need to build the global class environment. The global class environment contains information of all the types (classes and interfaces) defined, including those from the standard library. Once the global environment is in place, we would then construct the scopes within each class. This process  needs to go over the declaration of all the types, methods, fields, and variables, and place these declarations in the proper scope.
+
+The next step is to resolve the use of type names. This step deals with the following use of type names.
+\begin{enumerate}
+\item In a single-type-import
+\item As super class of a type
+\item As interface of a type
+\item As a Type node in the AST, including:
+	\begin{enumerate}
+	\item In a field declaration or variable declaration (including the declaration of formals)
+	\item As the result type of a method
+	\item As the class name used in class instance creation expression, or the element type in an array creation expression
+	\item As the type in a cast expression
+	\item In the right hand side of the instanceof expression
+	\end{enumerate}
+\end{enumerate}
+The above list is derived from the Java Language Specification, which defines syntactically identifiable type names in Section 6.5.1, and modified based on the Joos1W specification. 
+
+The resolution type names would need to deal with both qualified names and simple names.As Java (and thus Joos) allows for use of fully qualified type name without import, and names cannot be partially qualified in Java, the resolution of qualified type name in Java is straightforward. One simply looks out the type from global environment. On the other hand, to resolve simple type names, we would need to look up the name, in the enclosing type declaration (the class or interface in which this type is used), in the single-type-import of the current compilation unit, in the package of the current class, and in the import-on-demand packages, exactly in this order. An error would be raised at this stage if no type under the name could be found. Besides if the name is resolved to more than one type (and thus is ambiguous), error would be thrown too. We also checks for prefix requirement in this process of resolving type name, that is for any qualified type name, its prefix should not be a valid type name in the class environment.
+
+After type names are resolved, the class hierarchy needs to be built and examined.
+
+
+
+
+\include{implementation}
+
+Traversal Visitor
+
+Type Linking Visitor
+
+TopDecl visitor
+
+Hierarchy Class
+
+
+\include{testing}
+%\endgroup
+
+\chapter{Conclusion}
+
+\bibliographystyle{ieeetr}
+\bibliography{a4}
+
+\end{document}
