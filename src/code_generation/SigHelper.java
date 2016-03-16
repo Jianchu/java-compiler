@@ -56,6 +56,7 @@ public class SigHelper {
         if (md.isConstructor) {
             methodSig.append("V");
         } else {
+            // Check void?
             methodSig.append(getTypeSig(md.returnType));
         }
         return methodSig.toString();
@@ -65,6 +66,7 @@ public class SigHelper {
         StringBuilder fieldSig = new StringBuilder();
         ASTNode typeNode = fd.getParent();
         fieldSig.append(getClassSig(typeNode));
+        fieldSig.append("/");
         fieldSig.append(fd.id);
         return fieldSig.toString();
     }
