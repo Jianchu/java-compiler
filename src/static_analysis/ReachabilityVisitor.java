@@ -13,7 +13,6 @@ import ast.IfStatement;
 import ast.MethodDeclaration;
 import ast.ReturnStatement;
 import ast.Statement;
-import ast.VariableDeclaration;
 import ast.VariableDeclarationStatement;
 import ast.Visitor;
 import ast.WhileStatement;
@@ -69,8 +68,10 @@ public class ReachabilityVisitor extends TraversalVisitor {
             node.forBody.accept(this);
         }
         int constantFlag = ConstantExpression.isConstant(node.forCondition);
-        if (constantFlag == 0 || constantFlag == 2) {
+        if (constantFlag == 0) {
             outMap.put(node, true);
+        } else if (constantFlag == 2) {
+            throw new ReachabilityException("Unreachable statement");
         } else if (constantFlag == 1) {
             outMap.put(node, false);
         }
@@ -113,9 +114,12 @@ public class ReachabilityVisitor extends TraversalVisitor {
         if (node.whileStatement != null) {
             node.whileStatement.accept(this);
         }
+
         int constantFlag = ConstantExpression.isConstant(node.whileCondition);
-        if (constantFlag == 0 || constantFlag == 2) {
+        if (constantFlag == 0) {
             outMap.put(node, true);
+        } else if (constantFlag == 2) {
+            throw new ReachabilityException("Unreachable statement");
         } else if (constantFlag == 1) {
             outMap.put(node, false);
         }
