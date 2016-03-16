@@ -10,6 +10,10 @@ public class StringLiteral extends Expression{
 		value = str.substring(1, str.length()-1);
 	}
 	
+        public StringLiteral(String str) {
+                value = str;
+        }
+
 	public void accept(Visitor v) throws Exception {
 		v.visit(this);
 	}

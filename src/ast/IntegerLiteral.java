@@ -14,6 +14,9 @@ public class IntegerLiteral extends Expression {
 		value = pt.getLexeme();
 	}
 	
+        public IntegerLiteral(int i) {
+                value = Integer.toString(i);
+        }
 	public void accept(Visitor v) throws Exception {
 		v.visit(this);
 	}

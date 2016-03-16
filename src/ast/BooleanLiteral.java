@@ -19,6 +19,10 @@ public class BooleanLiteral extends Expression {
 		}
 	}
 	
+        public BooleanLiteral(boolean b) {
+            value = b;
+        }
+
 	public void accept(Visitor v) throws Exception {
 		v.visit(this);
 	}
