@@ -33,7 +33,7 @@
 
 \tableofcontents
 
-
+\newpage
 
 %\begingroup
 %\let\clearpage\relax
@@ -53,6 +53,8 @@ In this stage of the program, it was decided we would follow closely the 7 steps
 	\item Type checking
 	\item Resolving uses of methods and non-static fields.
 \end{enumerate}
+
+In name resolution step, we connect names to their declarations.
 
 The first step involves construction of a symbol table and resolution of syntactically identifiable names.
 
@@ -74,20 +76,68 @@ The next step is to resolve the use of type names. This step deals with the foll
 \end{enumerate}
 The above list is derived from the Java Language Specification, which defines syntactically identifiable type names in Section 6.5.1, and modified based on the Joos1W specification. 
 
-The resolution type names would need to deal with both qualified names and simple names.As Java (and thus Joos) allows for use of fully qualified type name without import, and names cannot be partially qualified in Java, the resolution of qualified type name in Java is straightforward. One simply looks out the type from global environment. On the other hand, to resolve simple type names, we would need to look up the name, in the enclosing type declaration (the class or interface in which this type is used), in the single-type-import of the current compilation unit, in the package of the current class, and in the import-on-demand packages, exactly in this order. An error would be raised at this stage if no type under the name could be found. Besides if the name is resolved to more than one type (and thus is ambiguous), error would be thrown too. We also checks for prefix requirement in this process of resolving type name, that is for any qualified type name, its prefix should not be a valid type name in the class environment.
+The resolution of type names would need to deal with both qualified names and simple names.As Java (and thus Joos) allows for use of fully qualified type name without import, and names cannot be partially qualified in Java, the resolution of qualified type name in Java is straightforward. One simply looks out the type from global environment. On the other hand, to resolve simple type names, we would need to look up the name, in the enclosing type declaration (the class or interface in which this type is used), in the single-type-import of the current compilation unit, in the package of the current class, and in the import-on-demand packages, exactly in this order. An error would be raised at this stage if no type under the name could be found. Besides if the name is resolved to more than one type (and thus is ambiguous), error would be thrown too. We also checks for prefix requirement in this process of resolving type name, that is for any qualified type name, its prefix should not be a valid type name in the class environment.
 
-After type names are resolved, the class hierarchy needs to be built and examined.
+After type names are resolved, the class hierarchy needs to be built and checked for well-formedness. When building the class hierarchy, all classes that do not inherit from a super class implicitly inherit from the $java.lang.Object$ class. Similarly every interface that does not have a super interface would inherit from an abstract version of the Object class. Checking the class hierarchy is straightforward. Besides the constraints given in class, it is also checked at this stage that no cycle exists in the class hierarchy.
+
+The next step is to disambiguate ambiguous names. The Java Language Specification defines an \emph{Ambiguous Name} to be the prefix of an \emph{Expression Name}, a \emph{Method Name}, or another \emph{Ambiguous Name}, where an \emph{Expression Name} could be the reference in an array access expression, a postfix expression, or the left-hand side of an assignment. The disambiguation process follows the simple steps in~\ref{disambiguation}. Every use of local variable or a static field is resolved at this stage.
+
+\begin{algorithm}                      % enter the algorithm environment
+\caption{Disambiguation of Field Name ($A_1.A_2....A_n$)}          % give the algorithm a caption
+\label{disambiguation}                           % and a label for \ref{} commands later in the document
+\begin{algorithmic}[1]
+\Require Qualified Field Name ($A_1.A_2....A_n$)
+\State If lookUp($A_1$) is a local variable, then the rest are all non-static fields 
+\State If lookUp($A_1$) is a  class field, then the rest are all non-static fields
+\State If lookUp($A_1$) is a simple type, then $A_2$ is a static field, $A_3$ and onwards (if they exist) would be non-static fields.
+\State if lookUp($A_1....A_k$) is a qualified type, then $A_{k+1}$ is a static field, and every thing after that if exist would be non-static fields.
+
+\end{algorithmic}
+\end{algorithm}
+
+The resolution of instance fields and methods are slightly more complicated, because it requires static type information of the prefix which would be provided by the type checking step. The type checking step associates every expression (including name) with a static type, and checks that the program is statically type correct. Being statically type correct means that the program satisfies all the type rules, which were provided in class and also available in JLS. 
+
+Once the type information is in place, we only need to look up the field in the field environment of its object's static type to resolve the name. For example, given instance field a.b where the object a has type A, we only need to look for b in the field environment of A. The process for resolving method name is similar. The only difference is that method overloading needs to be taken into consideration, therefore given a method invocation, the static types of its arguments are needed to find out which method is actually being called.
+
+% challenge: overloading
+\section{Static Analysis}
+
+The major part of our static analysis is the reachability analysis. In terms of reachability, Java requires that:
+\begin{enumerate}
+\item all statements are reachable (no dead code); and 
+\item all methods whose return type is not \emph{void} must eventually return a value
+\end{enumerate}
+These properties are non-trivial and thus undecidable by Rice's theorem. However our program provides a conservative approximation to the problem. This means that the reachability analysis implemented would not detect all occurrences of unreachable statements, but the analysis is always correct when it identifies statements as unreachable.
+
+The reachability analysis follows in general the rules provides in Section 14.20 of JLS. The reachability rules define whether a statement is \emph{reachable} and whether it could \emph{complete normally}. A compile-time error would be raised if any statement is identified as unreachable according the rules.
+
+In Java, a local variable must be assigned before its value could be used. A definite assignment analysis is required to ensure this property. In Joos1W, this analysis is greatly simplified by requiring that all local variables are initialized when they are declared. Besides it is required that a variable cannot be used in its own initializer.
+
+\chapter{implementation}
+\section{Name Resolution}
+
+It was discussed in the last report that, when constructing the abstract syntax tree, a \emph{Visitor} interface was created so that future steps could follow the visitor design pattern. And the construction of symbol table is implemented following this pattern.
+
+The \emph{TopDeclVisitor} constructs the symbol table. This class extends the class \emph{TraversalVisitor} which as its name suggests is a visitor that traverses the AST. This inheritance allows \emph{TopDeclVisitor} to focus on the AST nodes that are relevant to its function while skipping the nodes that are useless to the process. Without the \emph{TraversalVisitor} the \emph{TopDeclVisitor} would have to implement every abstract visit method specified in the \emph{Visitor} interface. The use of \emph{TraversalVisitor} avoids repetition and results in clearer code, therefore some of the other visitors implemented also inherit from \emph{TraversalVisitor}.
+
+The \emph{TopDeclVisitor} builds 4 types of scopes: 
+\begin{enumerate}
+\item the \emph{CompilationUnit} scope, which contains information of the imports; and
+\item the \emph{Inherit} scope, which contains fields and methods inherited by this class; and
+\item the \emph{Type} scope, which contains fields and methods declared in the current type; and
+\item the \emph{Block} scope, which is used within and as the method body.
+
+\end{enumerate}
+
+The \emph{Environment} class provides an implementation of scopes. The functions for managing scopes are implemented in the \emph{SymbolTable} class. The \emph{Environment} class also provides methods for looking up names, which would be used in later steps.
+
+The TopDeclVisitor traverses the AST, creates and fills the scopes when appropriate. To be more specific, the \emph{CompilationUnit} scope is first created and then the \emph{Inherit} and \emph{Type} scope. It was decided that the \emph{Inherit} scope would not be populated until later steps where we build the class hierarchy. The \emph{Type} scope however is immediately populated with fields and methods declared in this type. Then every method body is visited, and a new \emph{Block} is created whenever a new block is opened. 
+
+In Java, a local variable must be declared before it is used. To ensure this, we create a new scope whenever a local variable declaration is created.
 
 
-
-
-\include{implementation}
-
-Traversal Visitor
 
 Type Linking Visitor
-
-TopDecl visitor
 
 Hierarchy Class
 
