@@ -1,3 +1,13 @@
 \chapter{Testing}
 \label{testing}
+All components in assignment 2, 3, and 4 are related to semantics analysis, so the main job of them is checking whether the subject program conforms to the Joos 1W semantics rules. Because of a great many rules in the specification, it's hard to test each rule's checker immediately after finishing it. So we created three JUnit 4 test suits to test the modules of each assignment separately in order to ensure the the robustness of our program.  
 
+The JUnit 4 makes our testing procedure easier, so we followed the principle of unit testing, created a bunch of test cases for different situation. For example, in order to test that all accesses of protected class members are legal, we created test cases with different type hierarchy and access scenario, such that we can make sure the protected access checker works appropriately. Both positive and negative test cases, derived from the language specification, were used in this process. For example, each rule that should be checked by the type checker has its own test cases and was verified.
+
+Because of the continuous nature of our project, the program was also tested incrementally, e.g. after each module (environment builder, type checker, etc.) was completed it was tested against all test cases that had been created even for previous modules. This approach ensures that any valid input could be run on all modules, while invalid input would fail at some point. 
+
+In order to make sure that all semantics rules are checked by our compiler, we've also created test cases based on the example code from Joos 1W language specification~\cite{joos1w}.
+
+The test cases from Marmoset were introduced and tested against after each assignment is finished. In each JUnit 4 test suit, the parameterized testing method was used for that purpose, such that we can make sure the program passes every test case. And also, after each addition/modification, those three test suits allow us test all modules again conveniently to prevent bugs being introduced to the program.   
+
+The program so far successfully passes all the test cases devised by the team. This demonstrates the robustness and correctness of our implementation. 
