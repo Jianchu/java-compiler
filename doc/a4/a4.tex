@@ -42,7 +42,7 @@
 \chapter{Design}
 
 \section{Name resolution}
-
+\label{design_name}
 In this stage of the program, it was decided we would follow closely the 7 steps specified in class:
 \begin{enumerate}
 	\item Constructing a global environment
@@ -77,6 +77,8 @@ The next step is to resolve the use of type names. This step deals with the foll
 The above list is derived from the Java Language Specification, which defines syntactically identifiable type names in Section 6.5.1, and modified based on the Joos1W specification. 
 
 The resolution of type names would need to deal with both qualified names and simple names.As Java (and thus Joos) allows for use of fully qualified type name without import, and names cannot be partially qualified in Java, the resolution of qualified type name in Java is straightforward. One simply looks out the type from global environment. On the other hand, to resolve simple type names, we would need to look up the name, in the enclosing type declaration (the class or interface in which this type is used), in the single-type-import of the current compilation unit, in the package of the current class, and in the import-on-demand packages, exactly in this order. An error would be raised at this stage if no type under the name could be found. Besides if the name is resolved to more than one type (and thus is ambiguous), error would be thrown too. We also checks for prefix requirement in this process of resolving type name, that is for any qualified type name, its prefix should not be a valid type name in the class environment.
+
+To increase efficiency the group has decided to conduct both environment construction and type linking in one traversal of the AST. This is feasible because if a simple type name is used within a type declaration (e.g. as return type), it should have already been declared, imported, or exist in the same package as the current type. 
 
 After type names are resolved, the class hierarchy needs to be built and checked for well-formedness. When building the class hierarchy, all classes that do not inherit from a super class implicitly inherit from the $java.lang.Object$ class. Similarly every interface that does not have a super interface would inherit from an abstract version of the Object class. Checking the class hierarchy is straightforward. Besides the constraints given in class, it is also checked at this stage that no cycle exists in the class hierarchy.
 
@@ -116,6 +118,9 @@ In Java, a local variable must be assigned before its value could be used. A def
 \chapter{implementation}
 \section{Name Resolution}
 
+
+The \emph{Environment} class provides an implementation of scopes. The functions for managing scopes are implemented in the \emph{SymbolTable} class. The construction of the global class environment is also implemented in the \emph{SymbolTable} class, as the \emph{buildGlobal()} static method which takes as input all the ASTs (one for each compilation unit). The \emph{Environment} class also provides methods for looking up names, which would be used in later steps.
+
 It was discussed in the last report that, when constructing the abstract syntax tree, a \emph{Visitor} interface was created so that future steps could follow the visitor design pattern. And the construction of symbol table is implemented following this pattern.
 
 The \emph{TopDeclVisitor} constructs the symbol table. This class extends the class \emph{TraversalVisitor} which as its name suggests is a visitor that traverses the AST. This inheritance allows \emph{TopDeclVisitor} to focus on the AST nodes that are relevant to its function while skipping the nodes that are useless to the process. Without the \emph{TraversalVisitor} the \emph{TopDeclVisitor} would have to implement every abstract visit method specified in the \emph{Visitor} interface. The use of \emph{TraversalVisitor} avoids repetition and results in clearer code, therefore some of the other visitors implemented also inherit from \emph{TraversalVisitor}.
@@ -129,17 +134,28 @@ The \emph{TopDeclVisitor} builds 4 types of scopes:
 
 \end{enumerate}
 
-The \emph{Environment} class provides an implementation of scopes. The functions for managing scopes are implemented in the \emph{SymbolTable} class. The \emph{Environment} class also provides methods for looking up names, which would be used in later steps.
-
 The TopDeclVisitor traverses the AST, creates and fills the scopes when appropriate. To be more specific, the \emph{CompilationUnit} scope is first created and then the \emph{Inherit} and \emph{Type} scope. It was decided that the \emph{Inherit} scope would not be populated until later steps where we build the class hierarchy. The \emph{Type} scope however is immediately populated with fields and methods declared in this type. Then every method body is visited, and a new \emph{Block} is created whenever a new block is opened. 
 
 In Java, a local variable must be declared before it is used. To ensure this, we create a new scope whenever a local variable declaration is created.
 
+One challenge here is how to store the scope so that it could be retrieved efficiently in the future. It was decided that the environment created would be attached to the corresponding AST nodes. For example, when we open a new scope for a block, a reference of the scope would be attached to the block.
+
+Another challenge at this stage is how to deal with overloaded methods. The full signature of a method must recorded in the environment so that when a overloaded method is called, it can resolved unambiguously to the correct implementation. To achieve this feature, we have decided to mangle the method name with the fully qualified name of its parameter types. This creates a unique signature for every overloaded function, and allows for very efficient resolution of overloaded methods. The name mangling function is implemented in the \emph{NameHelper.mangle()} method.  
+
+It was mentioned in Section~\ref{design_name} that environment building and type linking would be done in one traversal of the AST for the sake of efficiency. However, in the implementation we still would like to separate the code of these functions and put them in different classes. Therefore type-linking was implemented in the \emph{TypeLinkingVisitor}, and this class is instantiated and used by the \emph{TopDeclVisitor} when appropriate (when visiting the type of a field declaration for example). With this implementation we achieve both efficiency and modularity of code.
+
+The well-formedness of the class hierarchy is checked in the \emph{Hierarchy} class. As it was discussed earlier in this section, the \emph{Inherit} environment for each type was left empty. The \emph{Hierarchy} class starts by populating the \emph{Inherit} environment for each type declared in our program. This is achieved by one traversal through the hierarchy tree.During this process, the \emph{Hierarchy} also conducts implicit inheritance from \emph{java.lang.Object} as was specified by the Java language. Certain simple checks are carried out at this stage. For example, we check that no cycles exist while traversing the hierarchy tree, if a cycle is detected the traversal would be stopped and an error would be thrown immediately. The detection of cycle is fairly simple because the class hierarchy can be view as a directed graph. We simply check whether there is a back edge in the graph during the traversal. A back edge is defined as an edge from a node to itself or to its ancestors. After the \emph{Inherit} environment was populated the \emph{checkHierarhcy()} method was called to check that the hierarchy is well-formed.
+
+The name disambiguation process is implemented in the \emph{Disambiguation} class, this is again an implementation of the Visitor interface. The \emph{Disambiguation} class extends from the \emph{EnvTraversalVisitor} class, which is an extension of the \emph{TraversalVisitor} discussed earlier. The only different between \emph{EnvTraversalVisitor} and \emph{TraversalVisitor} is that the \emph{EnvTraversalVisitor} would keep track of the current scope as it moves down the AST, so that we could look up names in the symbol table with ease.   
+
+Name disambiguation and linking
+
+Type checking
+
+More name linking
 
 
-Type Linking Visitor
 
-Hierarchy Class
 
 
 \include{testing}
