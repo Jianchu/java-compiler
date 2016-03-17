@@ -82,7 +82,7 @@ To increase efficiency the group has decided to conduct both environment constru
 
 After type names are resolved, the class hierarchy needs to be built and checked for well-formedness. When building the class hierarchy, all classes that do not inherit from a super class implicitly inherit from the $java.lang.Object$ class. Similarly every interface that does not have a super interface would inherit from an abstract version of the Object class. Checking the class hierarchy is straightforward. Besides the constraints given in class, it is also checked at this stage that no cycle exists in the class hierarchy.
 
-The next step is to disambiguate ambiguous names. The Java Language Specification defines an \emph{Ambiguous Name} to be the prefix of an \emph{Expression Name}, a \emph{Method Name}, or another \emph{Ambiguous Name}, where an \emph{Expression Name} could be the reference in an array access expression, a postfix expression, or the left-hand side of an assignment. The disambiguation process follows the simple steps in~\ref{disambiguation}. Every use of local variable or a static field is resolved at this stage.
+The next step is to disambiguate ambiguous names. The Java Language Specification defines an \emph{Ambiguous Name} to be the prefix of an \emph{Expression Name}, a \emph{Method Name}, or another \emph{Ambiguous Name}, where an \emph{Expression Name} could be the reference in an array access expression, a postfix expression, or the left-hand side of an assignment. The disambiguation process follows the simple steps in Algorithm~\ref{disambiguation}. Every use of local variable or a static field is resolved at this stage.
 
 \begin{algorithm}                      % enter the algorithm environment
 \caption{Disambiguation of Field Name ($A_1.A_2....A_n$)}          % give the algorithm a caption
@@ -146,11 +146,15 @@ It was mentioned in Section~\ref{design_name} that environment building and type
 
 The well-formedness of the class hierarchy is checked in the \emph{Hierarchy} class. As it was discussed earlier in this section, the \emph{Inherit} environment for each type was left empty. The \emph{Hierarchy} class starts by populating the \emph{Inherit} environment for each type declared in our program. This is achieved by one traversal through the hierarchy tree.During this process, the \emph{Hierarchy} also conducts implicit inheritance from \emph{java.lang.Object} as was specified by the Java language. Certain simple checks are carried out at this stage. For example, we check that no cycles exist while traversing the hierarchy tree, if a cycle is detected the traversal would be stopped and an error would be thrown immediately. The detection of cycle is fairly simple because the class hierarchy can be view as a directed graph. We simply check whether there is a back edge in the graph during the traversal. A back edge is defined as an edge from a node to itself or to its ancestors. After the \emph{Inherit} environment was populated the \emph{checkHierarhcy()} method was called to check that the hierarchy is well-formed.
 
-The name disambiguation process is implemented in the \emph{Disambiguation} class, this is again an implementation of the Visitor interface. The \emph{Disambiguation} class extends from the \emph{EnvTraversalVisitor} class, which is an extension of the \emph{TraversalVisitor} discussed earlier. The only different between \emph{EnvTraversalVisitor} and \emph{TraversalVisitor} is that the \emph{EnvTraversalVisitor} would keep track of the current scope as it moves down the AST, so that we could look up names in the symbol table with ease.   
+The name disambiguation process is implemented in the \emph{Disambiguation} class, this is again an implementation of the Visitor interface. The \emph{Disambiguation} class inherits from the \emph{EnvTraversalVisitor} class, which is an extension of the \emph{TraversalVisitor} discussed earlier. The only different between \emph{EnvTraversalVisitor} and \emph{TraversalVisitor} is that the \emph{EnvTraversalVisitor} would keep track of the current scope as it moves down the AST, so that we could look up names in the symbol table with ease. This disambiguation and name linking process follows Algorithm~\ref{disambiguation} in Section~\ref{design_name}.
 
-Name disambiguation and linking
+\section{Type Checking}
 
-Type checking
+
+Type checking is implemented in the \emph{TypeCheckingVisitor}. This visitor conducts one traversal of the AST and assigns a type to every expression. It also checks that all the type rules are satisfied. The type proof is constructed bottom-up. This means that when checking an expression, its subexpressions would be evaluated first and assigned types, and the expression would itself be evaluated only if all its subexpression satisfy the corresponding type rules.
+
+The group has chosen to hard-code the type rules given into the visitor. 
+
 
 More name linking
 
