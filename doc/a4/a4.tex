@@ -119,7 +119,7 @@ In Java, a local variable must be assigned before its value could be used. A def
 \section{Name Resolution}
 
 
-The \emph{Environment} class provides an implementation of scopes. The functions for managing scopes are implemented in the \emph{SymbolTable} class. The construction of the global class environment is also implemented in the \emph{SymbolTable} class, as the \emph{buildGlobal()} static method which takes as input all the ASTs (one for each compilation unit). The \emph{Environment} class also provides methods for looking up names, which would be used in later steps.
+The \emph{Environment} class provides an implementation of scopes. The functions for managing scopes are implemented in the \emph{SymbolTable} class. The construction of the global class environment is also implemented in the \emph{SymbolTable} class as the \emph{buildGlobal()} static method which takes as input all the ASTs (one for each compilation unit). The \emph{Environment} class also provides methods for looking up names, which would be used in later steps.
 
 It was discussed in the last report that, when constructing the abstract syntax tree, a \emph{Visitor} interface was created so that future steps could follow the visitor design pattern. And the construction of symbol table is implemented following this pattern.
 
@@ -153,10 +153,19 @@ The name disambiguation process is implemented in the \emph{Disambiguation} clas
 
 Type checking is implemented in the \emph{TypeCheckingVisitor}. This visitor conducts one traversal of the AST and assigns a type to every expression. It also checks that all the type rules are satisfied. The type proof is constructed bottom-up. This means that when checking an expression, its subexpressions would be evaluated first and assigned types, and the expression would itself be evaluated only if all its subexpression satisfy the corresponding type rules.
 
-The group has chosen to hard-code the type rules given into the visitor. 
+We have chosen to hard-code the type rules into the visitor. This means that the rules corresponding to each expression are implemented in the visiting methods in \emph{TypeCheckingVisitor} class. For instance, the rules for checking the \emph{assignment} expression is implemented in the \emph{visit(Assignment node)} method. This approach matches the expressions with their corresponding rules efficiently and creates a clear separation of different rules. All checks specified in lecture and in~\cite{a3} have been successfully implemented. The resolution of instance field and methods is done after type is resolved. We implemented this in the same traversal as type checking so that there is no need to traverse the AST again. This method for resolution was already described in Section~\ref{design_name}.
+
+\section{Static Analysis}
+
+The major part of static analysis phase is the reachability analysis, this is implemented in \emph{ReachabilityVisitor} in the \emph{static\_analysis} package. The \emph{ReachabilityVisitor} traverses the AST and makes sure that all statements are reachable at some point of the program.
+
+The major challenge in the reachability analysis is the evaluation of constant expression (as conditions in for-loops or while-loops). The definition of a constant expression is specified in JLS Section 15.27. The actual implementation of this functionality is in the \emph{ConstantExpression} class in the same package. The evaluation not only decide whether an expression is constant, but also computes its value. For example, for the purpose of reachability analysis it is not enough to know that the expression $((1+2) == 2)$  is constant, its value needs to be computed, and to do that the subexpression $(1+2)$ needs to be evaluated and compared to the right hand side ($2$).
+
+The \emph{VariableAnalysis} class implements checks that ensures all local variables are initialized when they are declared.
+ 
 
 
-More name linking
+
 
 
 
