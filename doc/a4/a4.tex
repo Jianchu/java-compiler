@@ -10,9 +10,10 @@
 \usepackage[a4paper,left=3cm,right=3cm,top=2.5cm,bottom=2.5cm]{geometry}
 \usepackage{titlesec, color}
 %\usepackage[T1]{fontenc}
-\definecolor{gray75}{gray}{0.75}
-\newcommand{\hsp}{\hspace{20pt}}
-\titleformat{\chapter}[hang]{\Huge\bfseries}{\thechapter\hsp\hsp}{0pt}{\Huge\bfseries}
+%\definecolor{gray75}{gray}{0.75}
+%\newcommand{\hsp}{\hspace{20pt}}
+%\titleformat{\chapter}[hang]{\Huge\bfseries}{\thechapter\hsp\hsp}{0pt}{\Huge\bfseries}
+\usepackage[Lenny]{fncychap}
 
 
 \usepackage{etoolbox}
@@ -26,8 +27,10 @@
 \begin{document}
 
 {\let\newpage\relax\maketitle}
-\begin{abstract}
 
+\vspace{30pt}
+\begin{abstract}
+In this part of our compiler project, we design and implement the semantic analysis and the static reachability analysis phases of the compiler. These phases have been successfully implemented and work as expected under tests. In this report we discuss the design decisions that we made for our program and the details of the implementation.
 \end{abstract}
 
 
@@ -38,12 +41,16 @@
 %\begingroup
 %\let\clearpage\relax
 \chapter{Introduction}
+This part of our project has two components. The first component is the semantic analysis phase of the compiler. This includes name resolution and type checking. In the process we would also implement checks for the class hierarchy. The second component is the static analysis phase of the compiler. In the Joos1W compiler, this includes two analyses -- the reachability analysis and the definite assignment analysis. The latter as we will see is greatly simplified in Joos.  All the analyses are performed on the abstract syntax trees (ASTs) constructed from the previous phases. Details of the AST design was discussed in the last report.
+
+Chapter~\ref{design} of the report discusses design decisions the team made for the analyses, while Chapter~\ref{implementation} explains in detail how the program is actually organized and implemented. The testing strategies and tools we have adopted for our program are discussed in Chapter~\ref{testing}.
+
 
 \chapter{Design}
-
-\section{Name resolution}
+\label{design}
+\section{Name Resolution and Type Checking}
 \label{design_name}
-In this stage of the program, it was decided we would follow closely the 7 steps specified in class:
+The name resolution and type checking phase of our compiler follows closely the 7 steps specified in class:
 \begin{enumerate}
 	\item Constructing a global environment
 	\item Resolving uses of syntactically identifiable type names
@@ -54,11 +61,9 @@ In this stage of the program, it was decided we would follow closely the 7 steps
 	\item Resolving uses of methods and non-static fields.
 \end{enumerate}
 
-In name resolution step, we connect names to their declarations.
+In the name resolution phase, we connect names to their declarations. The first step involves construction of a symbol table and resolution of syntactically identifiable names.
 
-The first step involves construction of a symbol table and resolution of syntactically identifiable names.
-
-To construct the class environment, we would first need to build the global class environment. The global class environment contains information of all the types (classes and interfaces) defined, including those from the standard library. Once the global environment is in place, we would then construct the scopes within each class. This process  needs to go over the declaration of all the types, methods, fields, and variables, and place these declarations in the proper scope.
+The first part of the symbol table that needs to be constructed is the \emph{global} class environment. The global class environment contains information of all the types (classes and interfaces) declared, including those from the standard library. Once the global environment is in place, we would then construct the symbol table for each class. This process needs to search the AST for all the declarations of types, methods, fields, and variables, and place these declarations in the proper scope.
 
 The next step is to resolve the use of type names. This step deals with the following use of type names.
 \begin{enumerate}
@@ -74,15 +79,15 @@ The next step is to resolve the use of type names. This step deals with the foll
 	\item In the right hand side of the instanceof expression
 	\end{enumerate}
 \end{enumerate}
-The above list is derived from the Java Language Specification, which defines syntactically identifiable type names in Section 6.5.1, and modified based on the Joos1W specification. 
+The above list is derived from the Java Language Specification~\cite{gosling2000java}, which defines syntactically identifiable type names in Section 6.5.1, and modified based on the Joos1W specification~\cite{joos1w}. 
 
-The resolution of type names would need to deal with both qualified names and simple names.As Java (and thus Joos) allows for use of fully qualified type name without import, and names cannot be partially qualified in Java, the resolution of qualified type name in Java is straightforward. One simply looks out the type from global environment. On the other hand, to resolve simple type names, we would need to look up the name, in the enclosing type declaration (the class or interface in which this type is used), in the single-type-import of the current compilation unit, in the package of the current class, and in the import-on-demand packages, exactly in this order. An error would be raised at this stage if no type under the name could be found. Besides if the name is resolved to more than one type (and thus is ambiguous), error would be thrown too. We also checks for prefix requirement in this process of resolving type name, that is for any qualified type name, its prefix should not be a valid type name in the class environment.
+The resolution of type names would need to deal with both qualified names and simple names. As Java (and thus Joos) allows for use of fully qualified type name without import, and names cannot be partially qualified in Java, the resolution of qualified type name in Java is straightforward. One simply looks up the type from global environment. On the other hand, to resolve simple type names, we would need to look up the names in the enclosing type declaration (the class or interface in which this type is used), in the single-type-import of the current compilation unit, in the package of the current class, and in the import-on-demand packages, exactly in this order. An error would be raised at this stage if no type under the name could be found. Besides if the name is resolved to more than one type (and thus is ambiguous), an error would be thrown too. We also checks for prefix requirement in this process of resolving type name. That is, for any qualified type name, its prefix should not be a valid type name in the class environment.
 
-To increase efficiency the group has decided to conduct both environment construction and type linking in one traversal of the AST. This is feasible because if a simple type name is used within a type declaration (e.g. as return type), it should have already been declared, imported, or exist in the same package as the current type. 
+To increase efficiency we have decided to conduct both environment construction and type linking in one traversal of the AST. This is feasible because if a simple type name is used within a type declaration (e.g. as return type), it should have already been declared, imported, or exist in the same package as the current type. 
 
 After type names are resolved, the class hierarchy needs to be built and checked for well-formedness. When building the class hierarchy, all classes that do not inherit from a super class implicitly inherit from the $java.lang.Object$ class. Similarly every interface that does not have a super interface would inherit from an abstract version of the Object class. Checking the class hierarchy is straightforward. Besides the constraints given in class, it is also checked at this stage that no cycle exists in the class hierarchy.
 
-The next step is to disambiguate ambiguous names. The Java Language Specification defines an \emph{Ambiguous Name} to be the prefix of an \emph{Expression Name}, a \emph{Method Name}, or another \emph{Ambiguous Name}, where an \emph{Expression Name} could be the reference in an array access expression, a postfix expression, or the left-hand side of an assignment. The disambiguation process follows the simple steps in Algorithm~\ref{disambiguation}. Every use of local variable or a static field is resolved at this stage.
+The next step is to disambiguate ambiguous names. The Java Language Specification defines an \emph{Ambiguous Name} to be the prefix of an \emph{Expression Name}, a \emph{Method Name}, or another \emph{Ambiguous Name}, where an \emph{Expression Name} could be the reference in an \emph{array access expression}, a \emph{postfix expression}, or the left-hand side of an \emph{assignment}. The disambiguation process follows the simple steps in Algorithm~\ref{disambiguation}. Every use of local variable or a static field is resolved at this stage.
 
 \begin{algorithm}                      % enter the algorithm environment
 \caption{Disambiguation of Field Name ($A_1.A_2....A_n$)}          % give the algorithm a caption
@@ -97,9 +102,11 @@ The next step is to disambiguate ambiguous names. The Java Language Specificatio
 \end{algorithmic}
 \end{algorithm}
 
-The resolution of instance fields and methods are slightly more complicated, because it requires static type information of the prefix which would be provided by the type checking step. The type checking step associates every expression (including name) with a static type, and checks that the program is statically type correct. Being statically type correct means that the program satisfies all the type rules, which were provided in class and also available in JLS. 
+Static fields and local variables are immediately linked to their declarations during the lookup in Algorithm~\ref{disambiguation}. The resolution of instance fields and methods could not be done yet, because it requires static type information of the prefix which would be provided by the type checking step. The type checking step associates every expression (including name) with a static type, and checks that the program is \emph{statically type correct}. Being statically type correct means that the program satisfies all the type rules specified in JLS~\ref{gosling2000java}. 
 
-Once the type information is in place, we only need to look up the field in the field environment of its object's static type to resolve the name. For example, given instance field a.b where the object a has type A, we only need to look for b in the field environment of A. The process for resolving method name is similar. The only difference is that method overloading needs to be taken into consideration, therefore given a method invocation, the static types of its arguments are needed to find out which method is actually being called.
+Once the type information is in place, to resolve a field name, we only need to look up the name in the field environment of its object's static type. For example, given instance field a.b where the object a has static type A, we only need to look for b in the field environment of A. The process for resolving method name is similar. The only difference is that method overloading needs to be taken into consideration, therefore given a method invocation, the static types of its arguments are needed to find out which method is actually being called.
+
+
 
 % challenge: overloading
 \section{Static Analysis}
@@ -113,9 +120,12 @@ These properties are non-trivial and thus undecidable by Rice's theorem. However
 
 The reachability analysis follows in general the rules provides in Section 14.20 of JLS. The reachability rules define whether a statement is \emph{reachable} and whether it could \emph{complete normally}. A compile-time error would be raised if any statement is identified as unreachable according the rules.
 
-In Java, a local variable must be assigned before its value could be used. A definite assignment analysis is required to ensure this property. In Joos1W, this analysis is greatly simplified by requiring that all local variables are initialized when they are declared. Besides it is required that a variable cannot be used in its own initializer.
+In Java, a local variable must be assigned before its value could be used. A definite assignment analysis is required to ensure this property. In Joos 1W, this analysis is simplified because it requires that all local variables are initialized when they are declared. Besides a variable cannot be used in its own initializer.
 
-\chapter{implementation}
+\clearpage
+\chapter{Implementation}
+\label{implementation}
+
 \section{Name Resolution}
 
 
@@ -140,7 +150,7 @@ In Java, a local variable must be declared before it is used. To ensure this, we
 
 One challenge here is how to store the scope so that it could be retrieved efficiently in the future. It was decided that the environment created would be attached to the corresponding AST nodes. For example, when we open a new scope for a block, a reference of the scope would be attached to the block.
 
-Another challenge at this stage is how to deal with overloaded methods. The full signature of a method must recorded in the environment so that when a overloaded method is called, it can resolved unambiguously to the correct implementation. To achieve this feature, we have decided to mangle the method name with the fully qualified name of its parameter types. This creates a unique signature for every overloaded function, and allows for very efficient resolution of overloaded methods. The name mangling function is implemented in the \emph{NameHelper.mangle()} method.  
+Another challenge at this stage is how to deal with overloaded methods. The full signature of a method must recorded in the environment so that when a overloaded method is called, it can be resolved unambiguously to the correct implementation. To achieve this feature, we have decided to mangle the method name with the fully qualified name of its parameter types. This creates a unique signature for every overloaded function, and allows for very efficient resolution of overloaded methods. The name mangling function is implemented in the \emph{NameHelper.mangle()} method. 
 
 It was mentioned in Section~\ref{design_name} that environment building and type linking would be done in one traversal of the AST for the sake of efficiency. However, in the implementation we still would like to separate the code of these functions and put them in different classes. Therefore type-linking was implemented in the \emph{TypeLinkingVisitor}, and this class is instantiated and used by the \emph{TopDeclVisitor} when appropriate (when visiting the type of a field declaration for example). With this implementation we achieve both efficiency and modularity of code.
 
@@ -157,24 +167,30 @@ We have chosen to hard-code the type rules into the visitor. This means that the
 
 \section{Static Analysis}
 
-The major part of static analysis phase is the reachability analysis, this is implemented in \emph{ReachabilityVisitor} in the \emph{static\_analysis} package. The \emph{ReachabilityVisitor} traverses the AST and makes sure that all statements are reachable at some point of the program.
+The major part of static analysis phase is the reachability analysis, this is implemented in \emph{ReachabilityVisitor} in the \emph{static\_analysis} package. The \emph{ReachabilityVisitor} traverses the AST and makes sure that all statements are reachable at some point of the program. The \emph{VariableAnalysis} class  implements the definite assignment checks.
 
-The major challenge in the reachability analysis is the evaluation of constant expression (as conditions in for-loops or while-loops). The definition of a constant expression is specified in JLS Section 15.27. The actual implementation of this functionality is in the \emph{ConstantExpression} class in the same package. The evaluation not only decide whether an expression is constant, but also computes its value. For example, for the purpose of reachability analysis it is not enough to know that the expression $((1+2) == 2)$  is constant, its value needs to be computed, and to do that the subexpression $(1+2)$ needs to be evaluated and compared to the right hand side ($2$).
+The major challenge in the reachability analysis is the evaluation of constant expression (as conditions in for-loops or while-loops). The definition of a constant expression is specified in JLS Section 15.27. The actual implementation of this functionality is in the \emph{ConstantExpression} class in the same package. The evaluation not only decide whether an expression is constant, but also computes its value. For example, for the purpose of reachability analysis it is not enough to know that the expression $((1+2) == 2)$  is constant. The value of the expression needs to be computed, and to do that the subexpression $(1+2)$ needs to be evaluated and compared to the right hand side.
 
-The \emph{VariableAnalysis} class implements checks that ensures all local variables are initialized when they are declared.
- 
-
-
-
-
-
-
-
-
-\include{testing}
+%\begingroup
+%\let\clearpage\relax
+%\include{testing}
 %\endgroup
 
+\chapter{Testing}
+\label{testing}
+Following the practice during implementation of the scanner and parser phases, we adopt the unit testing strategy, and utilizes the JUnit 4 testing framework to test our program. The unit testing strategy allows us to ensure that each requirement from the assignments are satisfied. For example, in order to test that all accesses of protected class members are legal, we created test cases with different class hierarchy and access scenario, so that we can make sure the protected access checking works as expected. Both positive and negative test cases, derived from the language specification, were used in this process. For instance, each rule that should be checked by the type checker has its own test cases to verify that the implementation is correct.
+
+A major purpose of the semantic analysis is to ensure that the subject program conforms to the Joos 1W specification semantically. In each step, a large number of checks is performed. To allow for more efficient testing, we combined smaller test cases for different scenarios into three test suites, one for each assignment.
+
+Because the development includes occasional modifications and bug fixes to the previous modules, we decided to test the program incrementally. Once a module is integrated into the compiler or a major change is made, all the previous test suites are run to ensure that no new bugs are introduced to the program, and the changes work as planned.
+
+The test cases from Marmoset were added to our test suites and tested against after each assignment is finished. In each JUnit 4 test suite, the parameterized testing method was used to run the test cases from Marmoset, so that we can make sure the program passes every test case. 
+
+The final product has successfully passes all the test cases from our test suites. This includes both the test cases created by the team, and those from Marmoset. This shows that our program is correct and robust.
+
 \chapter{Conclusion}
+In this report we discussed the design and implementation of the semantic analysis phase of our compiler. The implementation is complete and successful. All requirements from the assignments are covered, and all test cases, both those devised by the team and those obtained from marmoset, are passed. The analyses are performed in time linear to the size of the ASTs, therefore their running time is acceptable and would work for even very large programs. There are, of course, ways to improve the program. For example, reachability analysis and variable analysis could be combined to save one traversal of the AST. It was a conscious choice to separate the two functions to achieve better modularized code. Besides, this choice does not affect the program's runtime asymptotically.
+
 
 \bibliographystyle{ieeetr}
 \bibliography{a4}
