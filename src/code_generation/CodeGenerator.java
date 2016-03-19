@@ -22,12 +22,14 @@ public class CodeGenerator extends TraversalVisitor {
         }
 
         whileAssemblyText.append("cmp eax, " + FALSE + delimiter);
-        whileAssemblyText.append("je LOOP_END_" + loopCount + ":" + delimiter);
+        whileAssemblyText.append("je LOOP_END_" + loopCount + delimiter);
+
+        whileAssemblyText.append("LOOP_BLOCK_" + loopCount + ":" + delimiter);
         if (node.whileStatement != null) {
             node.whileStatement.accept(this);
         }
         whileAssemblyText.append("jmp LOOP_" + loopCount + delimiter);
-        whileAssemblyText.append("LOOP_END_" + loopCount + delimiter);
+        whileAssemblyText.append("LOOP_END_" + loopCount + ":" + delimiter);
 
         assemblyText.append(whileAssemblyText + delimiter);
         visitNextStatement(node);
