@@ -12,6 +12,7 @@ public abstract class ASTNode {
 	
 	ASTNode parentNode = null;
 	Environment env = null;
+	String code = null;
 	/**
 	 * Not implemented by default.
 	 * @param v
@@ -35,5 +36,15 @@ public abstract class ASTNode {
 	public Environment getEnvironment() {
 		return env;
 	}
+	
+	public void attachCode(String code) {
+	    this.code = code;
+	}
+	
+	public String getCode() {
+	    return this.code;
+	}
+	
+	
 	
 }

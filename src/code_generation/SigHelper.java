@@ -45,7 +45,7 @@ public class SigHelper {
         if (md.isConstructor) {
             methodSig.append("/<init>(");
         } else {
-            methodSig.append("/m(");
+            methodSig.append("/" + md.id + "(");
         }
         if (md.parameters != null) {
             for (VariableDeclaration varDec : md.parameters) {
@@ -53,12 +53,12 @@ public class SigHelper {
             }
         }
         methodSig.append(")");
-        if (md.isConstructor) {
-            methodSig.append("V");
-        } else {
-            // Check void?
-            methodSig.append(getTypeSig(md.returnType));
-        }
+//        if (md.isConstructor) {
+//            methodSig.append("V");
+//        } else {
+//            // Check void?
+//            methodSig.append(getTypeSig(md.returnType));
+//        }
         return methodSig.toString();
     }
 
