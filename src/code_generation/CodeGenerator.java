@@ -9,27 +9,27 @@ public class CodeGenerator extends TraversalVisitor {
     private static final String TRUE = "0xffffffff";
     // instead of using delimiter all the time, list may be a better choice...
     private static final String delimiter = "\n";
-    private Integer loopCount = 0;
+    private Integer loopCounter = 0;
     StringBuilder assemblyText = new StringBuilder();
 
     public void visit(WhileStatement node) throws Exception {
-        loopCount++;
+        loopCounter++;
         StringBuilder whileAssemblyText = new StringBuilder();
-        whileAssemblyText.append("LOOP_" + loopCount + ":" + delimiter);
+        whileAssemblyText.append("LOOP_" + loopCounter + ":" + delimiter);
 
         if (node.whileCondition != null) {
             node.whileCondition.accept(this);
         }
 
         whileAssemblyText.append("cmp eax, " + FALSE + delimiter);
-        whileAssemblyText.append("je LOOP_END_" + loopCount + delimiter);
+        whileAssemblyText.append("je LOOP_END_" + loopCounter + delimiter);
 
-        whileAssemblyText.append("LOOP_BLOCK_" + loopCount + ":" + delimiter);
+        whileAssemblyText.append("LOOP_BLOCK_" + loopCounter + ":" + delimiter);
         if (node.whileStatement != null) {
             node.whileStatement.accept(this);
         }
-        whileAssemblyText.append("jmp LOOP_" + loopCount + delimiter);
-        whileAssemblyText.append("LOOP_END_" + loopCount + ":" + delimiter);
+        whileAssemblyText.append("jmp LOOP_" + loopCounter + delimiter);
+        whileAssemblyText.append("LOOP_END_" + loopCounter + ":" + delimiter);
 
         assemblyText.append(whileAssemblyText + delimiter);
         visitNextStatement(node);
