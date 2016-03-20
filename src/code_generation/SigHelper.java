@@ -12,13 +12,22 @@ import ast.Type;
 import ast.TypeDeclaration;
 import ast.VariableDeclaration;
 
+/**
+ * "/" -> "#"
+ * "(" and ")" -> "$"
+ * "<" and ">" -> "~"
+ * "[" -> "@"
+ * @author jianchu
+ *
+ */
+
 public class SigHelper {
 
     public static String getTypeSig(Type type) {
         String sigName = null;
         if (type instanceof SimpleType) {
             SimpleType stype = (SimpleType)type;
-            sigName = stype.getDeclaration().getFullName().replace('.', '/');
+            sigName = stype.getDeclaration().getFullName().replace('.', '#');
         } else if (type instanceof PrimitiveType) {
             PrimitiveType ptype = (PrimitiveType)type;
             if (ptype.value.equals(Value.BOOLEAN)) {
@@ -30,9 +39,9 @@ public class SigHelper {
             ArrayType atype = (ArrayType) type;
             String arrayTypeName = getTypeSig(atype.type);
             if (atype.type instanceof SimpleType) {
-                sigName = "[L" + arrayTypeName;
+                sigName = "@L" + arrayTypeName;
             } else {
-                sigName = "[" + arrayTypeName;
+                sigName = "@" + arrayTypeName;
             }
         }
         return sigName;
@@ -43,16 +52,16 @@ public class SigHelper {
         ASTNode typeNode = md.getParent();
         methodSig.append(getClassSig(typeNode));
         if (md.isConstructor) {
-            methodSig.append("/<init>(");
+            methodSig.append("#~init~$");
         } else {
-            methodSig.append("/" + md.id + "(");
+            methodSig.append("#" + md.id + "$");
         }
         if (md.parameters != null) {
             for (VariableDeclaration varDec : md.parameters) {
                 methodSig.append(getTypeSig(varDec.type));
             }
         }
-        methodSig.append(")");
+        methodSig.append("$");
 //        if (md.isConstructor) {
 //            methodSig.append("V");
 //        } else {
@@ -66,7 +75,7 @@ public class SigHelper {
         StringBuilder fieldSig = new StringBuilder();
         ASTNode typeNode = fd.getParent();
         fieldSig.append(getClassSig(typeNode));
-        fieldSig.append("/");
+        fieldSig.append("#");
         fieldSig.append(fd.id);
         return fieldSig.toString();
     }
