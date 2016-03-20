@@ -77,6 +77,7 @@ public class SigHelper {
             TypeDeclaration typeDec = (TypeDeclaration) typeNode;
             String name = typeDec.getFullName();
             SimpleType simpleType = new SimpleType(new SimpleName(name));
+            simpleType.attachDeclaration(typeDec);
             classSig = getTypeSig(simpleType);
         }
         return classSig;
