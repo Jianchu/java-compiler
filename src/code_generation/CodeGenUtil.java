@@ -3,6 +3,7 @@ package code_generation;
 import java.util.ArrayList;
 import java.util.List;
 
+import ast.VariableDeclaration;
 import utility.StringUtility;
 
 public class CodeGenUtil {
@@ -57,6 +58,24 @@ public class CodeGenUtil {
 		StringUtility.appendIndLn(sb, "ret \t; end of subroutine");
 		return sb.toString();
 	}
+	
+	/**
+	 * template for variable and formal access
+	 * @param base
+	 * @param vDecl
+	 * @return
+	 */
+	public String varAccess(String base, VariableDeclaration vDecl) {
+		int offset = vDecl.getOffSet();		
+		if (offset < 0) {
+			// e.g. offset = -1, return "[base + 3 & 4]"
+			return "[" + base + "+" + ((-offset)+2) + "* 4]"; 
+		} else {
+			// e.g. offset = 1, return [base + 1*4]
+			return "[" + base + "-" + offset + "*4]";
+		}
+	}
+	
 	
 	public static void main(String[] args) {
 		String fn = "multiply";
