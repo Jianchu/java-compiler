@@ -13,6 +13,7 @@ public class FieldDeclaration extends BodyDeclaration{
 	public Type type = null; 
 	public String id = null;
 	public Expression initializer = null;
+	int offset;
 	
 	public FieldDeclaration(ParseTree pt) throws ASTException {
 		for (ParseTree child : pt.getChildren()) {
@@ -52,4 +53,11 @@ public class FieldDeclaration extends BodyDeclaration{
 		v.visit(this);
 	}
 	
+	public void setOffSet(int offset) {
+		this.offset = offset;
+	}
+	
+	public int getOffSet() {
+		return offset;
+	}
 }

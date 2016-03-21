@@ -3,6 +3,7 @@ package code_generation;
 import java.util.ArrayList;
 import java.util.List;
 
+import ast.FieldDeclaration;
 import ast.VariableDeclaration;
 import utility.StringUtility;
 
@@ -74,6 +75,10 @@ public class CodeGenUtil {
 			// e.g. offset = 1, return [base + 1*4]
 			return "[" + base + "-" + offset + "*4]";
 		}
+	}
+	
+	public String fieldAccess(String base, FieldDeclaration fDecl) {
+		return "[" + base + "+" + fDecl.getOffSet() + "*4]";
 	}
 	
 	

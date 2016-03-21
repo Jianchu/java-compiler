@@ -71,7 +71,7 @@ public class VariableDeclaration extends ASTNode {
 		this.offset = offset;
 	}
 	
-	public int getOffSet() {
+	public int getOffSet() {		
 		return offset;
 	}
 }
