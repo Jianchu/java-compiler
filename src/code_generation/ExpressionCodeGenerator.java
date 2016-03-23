@@ -16,8 +16,9 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
 
     // String is Object.
     public void visit(StringLiteral node) throws Exception {
+        // can use counter because string literal is not global.
         stringLitCounter++;
-        // integrate stringLitData into data section.
+        // TODO:integrate stringLitData into data section.
         StringBuilder stringLitData = new StringBuilder();
         StringUtility.appendLine(stringLitData, "STRING_" + stringLitCounter + ":" + "\t; define label for string literal");
         StringUtility.appendLine(stringLitData, "\t" + "dw " + '\'' + node.value + '\'');
