@@ -8,6 +8,7 @@ import ast.PrimitiveType;
 import ast.PrimitiveType.Value;
 import ast.SimpleName;
 import ast.SimpleType;
+import ast.StringLiteral;
 import ast.Type;
 import ast.TypeDeclaration;
 import ast.VariableDeclaration;
@@ -57,8 +58,15 @@ public class SigHelper {
             methodSig.append("#" + md.id + "$");
         }
         if (md.parameters != null) {
+            boolean first = true;
             for (VariableDeclaration varDec : md.parameters) {
+                if (first) {
+                    first = false;
+                } else {
+                    methodSig.append("?");
+                }
                 methodSig.append(getTypeSig(varDec.type));
+
             }
         }
         methodSig.append("$");
@@ -90,5 +98,10 @@ public class SigHelper {
             classSig = getTypeSig(simpleType);
         }
         return classSig;
+    }
+
+    public static String getConstantSig(StringLiteral node) {
+
+        return "";
     }
 }
