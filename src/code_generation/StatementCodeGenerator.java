@@ -34,7 +34,7 @@ public class StatementCodeGenerator extends TraversalVisitor {
         StringUtility.appendLine(whileAssemblyText, "jne LOOP_" + loopCounter);
 
         node.attachCode(whileAssemblyText.toString());
-        visitNextStatement(node);
+        // visitNextStatement(node);
     }
 
 }
