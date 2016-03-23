@@ -8,7 +8,6 @@ import ast.PrimitiveType;
 import ast.PrimitiveType.Value;
 import ast.SimpleName;
 import ast.SimpleType;
-import ast.StringLiteral;
 import ast.Type;
 import ast.TypeDeclaration;
 import ast.VariableDeclaration;
@@ -98,10 +97,5 @@ public class SigHelper {
             classSig = getTypeSig(simpleType);
         }
         return classSig;
-    }
-
-    public static String getConstantSig(StringLiteral node) {
-
-        return "";
     }
 }

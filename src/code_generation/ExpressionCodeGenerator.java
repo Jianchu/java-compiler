@@ -1,5 +1,6 @@
 package code_generation;
 
+import utility.StringUtility;
 import ast.BooleanLiteral;
 import ast.CharacterLiteral;
 import ast.IntegerLiteral;
@@ -11,9 +12,17 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
 
     private static final String FALSE = "0x0";
     private static final String TRUE = "0xffffffff";
+    private int stringLitCounter = 0;
 
+    // String is Object.
     public void visit(StringLiteral node) throws Exception {
-        String stringSig = SigHelper.getConstantSig(node);
+        stringLitCounter++;
+        // integrate stringLitData into data section.
+        StringBuilder stringLitData = new StringBuilder();
+        StringUtility.appendLine(stringLitData, "STRING_" + stringLitCounter + ":" + "\t; define label for string literal");
+        StringUtility.appendLine(stringLitData, "\t" + "dw " + '\'' + node.value + '\'');
+
+        node.attachCode("mov eax, " + "STRING_" + stringLitCounter);
     }
 
     public void visit(NullLiteral node) throws Exception {
