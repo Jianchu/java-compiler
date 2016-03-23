@@ -31,36 +31,15 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
     }
 
     public void visit(CharacterLiteral node) throws Exception {
-        char c = node.value.charAt(0);
         String charText;
-        if (c == '\\' && node.value.length() < 3) {
-            c = node.value.charAt(1);
-            if (c == 'b') {
-                c = '\b';
-            } else if (c == 't') {
-                c = '\t';
-            } else if (c == 'n') {
-                c = '\n';
-            } else if (c == 'f') {
-                c = '\f';
-            } else if (c == 'r') {
-                c = '\r';
-            } else if (c == '"') {
-                c = '\"';
-            } else if (c == '\'') {
-                c = '\'';
-            } else if (c == '\\') {
-                c = '\\';
-            } else {
-                c = '\0';
-            }
-            charText = "mov eax, " + c;
-            // Assuming octal is valid.
-        } else if (node.value.length() > 3) {
+
+        // Assuming octal is valid.
+        if (node.value.length() > 3) {
             charText = "mov eax, " + "0o" + node.value.substring(1);
         } else {
-            charText = "mov eax, " + ((int) c);
+            charText = "mov eax, " + node.value;
         }
+
         node.attachCode(charText);
     }
 
