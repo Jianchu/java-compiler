@@ -60,6 +60,8 @@ public class VariableOffSetVisitor extends TraversalVisitor{
         
         // store offset
         currMethod.addVarOffSet(node, offsetCounter);
+        currMethod.frameSize ++;	// increment framesize
         offsetCounter ++;
+        
     }
 }

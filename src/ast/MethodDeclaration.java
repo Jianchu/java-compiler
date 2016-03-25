@@ -21,7 +21,9 @@ public class MethodDeclaration extends BodyDeclaration{
 	public List<VariableDeclaration> parameters = new LinkedList<VariableDeclaration>();
 	public Block body = null;
 	
+	// for local var and args offset
 	private Map<VariableDeclaration, Integer> varOffSet = new HashMap<VariableDeclaration, Integer>();
+	public int frameSize = 0;
 	
 	public MethodDeclaration(ParseTree pt) throws ASTException {
 		if (pt.getTokenType() == Symbol.MethodDeclaration
