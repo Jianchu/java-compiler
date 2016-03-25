@@ -20,7 +20,7 @@ public class OffSet {
 	// for classes compute offset through inheritance
 	static Map<TypeDeclaration, List<String>> ugly = new HashMap<TypeDeclaration, List<String>>();
 	static List<String> itfMethods;
-	static boolean debug = true;
+	static boolean debug = false;
 	
 	public static void computeOffSet(List<AST> trees) throws NameException {
 		List<TypeDeclaration> clsDecls = new LinkedList<TypeDeclaration>();
@@ -78,6 +78,18 @@ public class OffSet {
 			ugly.put(cls, ptrs);	// add column to table, kinda
 		}
 		
+		if (debug) {
+			for (TypeDeclaration cls : ugly.keySet()) {
+				System.out.printf("%10s",cls.id);
+			}
+			System.out.println();
+			for (int i = 0; i < itfMethods.size(); i++) {
+				for (TypeDeclaration cls : ugly.keySet()) {
+					System.out.printf("%10s", ugly.get(cls).get(i));
+				}
+				System.out.println();
+			}
+		}
 	}
 	
 	private static void fillUglyColumn(Map<String, MethodDeclaration> methodEnv, List<String> itfMethods, List<String> ptrs) {

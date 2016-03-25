@@ -1,5 +1,5 @@
 
-public class OffSet1 {
+public class OffSet1 implements OffSetInterface1{
 	public int x = 1;
 	public int y = 1;
 	

@@ -1,5 +1,5 @@
 
-public class OffSet2 extends OffSet1{
+public class OffSet2 extends OffSet1 implements OffSetInterface2{
 	public int z = 1;
 	
 	public OffSet2() {}
