@@ -229,4 +229,12 @@ public class TypeDeclaration extends BodyDeclaration{
 		}
 		return offset;
 	}
+	
+	public List<String> getFieldOffSetList() {
+		return fOffSet;
+	}
+	
+	public List<String> getMethodOffSetList() {
+		return mOffSet;
+	}
 }

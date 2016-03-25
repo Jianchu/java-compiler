@@ -9,6 +9,8 @@ import java.util.Map;
 import java.util.Set;
 
 import ast.*;
+import environment.NameHelper;
+import exceptions.NameException;
 
 public class OffSet {
 	// separate classes from interfaces
@@ -17,7 +19,7 @@ public class OffSet {
 	static Map<TypeDeclaration, List<String>> ugly = new HashMap<TypeDeclaration, List<String>>();
 	static List<String> itfMethods;
 	
-	public static void computeOffSet(List<AST> trees) {
+	public static void computeOffSet(List<AST> trees) throws NameException {
 		List<TypeDeclaration> clsDecls = new LinkedList<TypeDeclaration>();
 		List<TypeDeclaration> itfDecls = new LinkedList<TypeDeclaration>();
 		
@@ -100,7 +102,7 @@ public class OffSet {
 		return offset;
 	}
 	
-	private static void classOffSet(List<TypeDeclaration> clsDecls) {
+	private static void classOffSet(List<TypeDeclaration> clsDecls) throws NameException {
 		Set<TypeDeclaration> visited = new HashSet<TypeDeclaration>();
 		for (TypeDeclaration cls : clsDecls) {
 			if (!visited.contains(cls)) {
@@ -109,7 +111,7 @@ public class OffSet {
 		}
 	}
 
-	private static void singleClassOffSet(TypeDeclaration cls, Set<TypeDeclaration> visited) {
+	private static void singleClassOffSet(TypeDeclaration cls, Set<TypeDeclaration> visited) throws NameException {
 		if (cls.superClass != null) {
 			TypeDeclaration superCls = cls.superClass.getDeclaration();
 			if (!visited.contains(superCls)) {
@@ -117,9 +119,30 @@ public class OffSet {
 				singleClassOffSet(superCls, visited);
 			}
 			
+			cls.cloneFieldOffSet(superCls.getFieldOffSetList());	// offset is there for inherited method
+			cls.cloneMethodOffSet(superCls.getMethodOffSetList());
 		}
 		
 		// compute offset for fields and methods separately
+		// no need to process inherited methods, because they are offset has been inherited
+		for (BodyDeclaration bDecl : cls.members) {
+			if (bDecl instanceof FieldDeclaration) {	// field
+				FieldDeclaration fDecl = (FieldDeclaration) bDecl;
+				int offset = cls.getFieldOffSetList().indexOf(fDecl.id);
+				if (offset < 0) {
+					// this field has not been declared in super class, append to offset
+					cls.addFieldOffSet(fDecl.id);
+				}	// else the name is already there, do nothing.
+				
+			} else {	// method
+				MethodDeclaration mDecl = (MethodDeclaration) bDecl;
+				String mangledName = NameHelper.mangle(mDecl);
+				int offset = cls.getMethodOffSetList().indexOf(mangledName);	// use mangled name
+				if (offset < 0) {
+					cls.addMethodOffSet(mangledName);
+				}
+			}
+		}
 		
 	}
 	
