@@ -1,7 +1,10 @@
 package ast;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import exceptions.ASTException;
 import parser.ParseTree;
@@ -18,6 +21,7 @@ public class MethodDeclaration extends BodyDeclaration{
 	public List<VariableDeclaration> parameters = new LinkedList<VariableDeclaration>();
 	public Block body = null;
 	
+	private Map<VariableDeclaration, Integer> varOffSet = new HashMap<VariableDeclaration, Integer>();
 	
 	public MethodDeclaration(ParseTree pt) throws ASTException {
 		if (pt.getTokenType() == Symbol.MethodDeclaration
@@ -145,4 +149,16 @@ public class MethodDeclaration extends BodyDeclaration{
 		v.visit(this);
 	}
 
+	public void addVarOffSet(VariableDeclaration vd, int offset) {
+		varOffSet.put(vd, offset);
+	}
+	
+	public int getVarOffSet(VariableDeclaration vd) throws Exception {
+		Integer offset = varOffSet.get(vd);
+		if (offset == null) {
+			throw new Exception("Variable OffSet not found: " + vd.id);
+		}
+		return offset;
+	}
+	
 }
