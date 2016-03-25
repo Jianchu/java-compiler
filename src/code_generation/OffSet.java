@@ -1,5 +1,6 @@
 package code_generation;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -41,6 +42,7 @@ public class OffSet {
 	private static void interfaceOffSet(List<TypeDeclaration> itfDecls, List<TypeDeclaration> clsDecls) {
 		
 		List<String> itfMethods = new LinkedList<String>();	// a methods index in the list is its offset
+		// results in linear search, but O(number of methods) is ok
 		
 		for (TypeDeclaration itf : itfDecls) {
 			
@@ -59,7 +61,16 @@ public class OffSet {
 			}
 		}
 		
-		
+		// build up big ugly table
+		for (TypeDeclaration cls :clsDecls) {
+			List<String> ptrs = new ArrayList<String>(itfMethods.size());
+			for (int i = 0; i < itfMethods.size(); i ++) {
+				ptrs.add("0"); 	// initialize to string 0
+			}
+			
+			fillUglyColumn(cls.getEnvironment().methods, itfMethods, ptrs);		
+			fillUglyColumn(cls.getEnvironment().getEnclosing().methods, itfMethods, ptrs);	// inherited methods
+		}
 		
 	}
 
@@ -67,5 +78,14 @@ public class OffSet {
 		
 	}
 	
-	
+	private static void fillUglyColumn(Map<String, MethodDeclaration> methodEnv, List<String> itfMethods, List<String> ptrs) {
+		for (String mName : methodEnv.keySet()) {
+			int offset = itfMethods.indexOf(mName);
+			if (offset > -1) {
+				// if it is an interface method, don't even care if this class implements the interface
+				// add signature label to the entry, to be used later as pointer
+				ptrs.set(offset, SigHelper.getMethodSig(methodEnv.get(mName)));
+			}
+		}
+	}
 }
