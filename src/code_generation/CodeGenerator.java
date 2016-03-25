@@ -40,6 +40,7 @@ public class CodeGenerator extends TraversalVisitor {
             // inherited fields
 
         }
+
         // methods
     }
     

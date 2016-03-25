@@ -47,7 +47,7 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
         if (node.value.length() > 3) {
             charText = "mov eax, " + "0o" + node.value.substring(1);
         } else {
-            charText = "mov eax, " + node.value;
+            charText = "mov eax, " + "'" + node.value + "'";
         }
 
         node.attachCode(charText);
