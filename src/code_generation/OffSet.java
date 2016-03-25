@@ -110,10 +110,13 @@ public class OffSet {
 	}
 
 	private static void singleClassOffSet(TypeDeclaration cls, Set<TypeDeclaration> visited) {
-		TypeDeclaration superCls = cls.superClass.getDeclaration();
-		if (!visited.contains(superCls)) {
-			// builds offset for super class
-			singleClassOffSet(superCls, visited);
+		if (cls.superClass != null) {
+			TypeDeclaration superCls = cls.superClass.getDeclaration();
+			if (!visited.contains(superCls)) {
+				// builds offset for super class
+				singleClassOffSet(superCls, visited);
+			}
+			
 		}
 		
 		// compute offset for fields and methods separately

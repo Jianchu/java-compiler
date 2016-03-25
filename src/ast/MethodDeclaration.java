@@ -18,7 +18,6 @@ public class MethodDeclaration extends BodyDeclaration{
 	public List<VariableDeclaration> parameters = new LinkedList<VariableDeclaration>();
 	public Block body = null;
 	
-	private int _offset;
 	
 	public MethodDeclaration(ParseTree pt) throws ASTException {
 		if (pt.getTokenType() == Symbol.MethodDeclaration
@@ -145,12 +144,5 @@ public class MethodDeclaration extends BodyDeclaration{
 	public void accept(Visitor v) throws Exception {
 		v.visit(this);
 	}
-	
-	public void setOffSet(int offset) {
-		this._offset = offset;
-	}
-	
-	public int getOffSet() {
-		return _offset;
-	}
+
 }

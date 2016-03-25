@@ -1,5 +1,6 @@
 package ast;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -21,16 +22,17 @@ public class TypeDeclaration extends BodyDeclaration{
 	
 	// extends 
 	public Type superClass = null;
-	
 	// implements
 	public List<Type> interfaces = new LinkedList<Type>();
-	
 	// field or method declarations, but no type delcarations
 	public List<BodyDeclaration> members = new LinkedList<BodyDeclaration>();
 	
 	public TypeDeclaration next = null;
 	
 	private String fullName = null;
+	
+	private List<String> fOffSet = new ArrayList<String>();
+	private List<String> mOffSet = new ArrayList<String>();
 	
 	public TypeDeclaration(ParseTree pt) throws ASTException {
 		for (ParseTree child : pt.getChildren()) {
@@ -196,4 +198,35 @@ public class TypeDeclaration extends BodyDeclaration{
 		v.visit(this);
 	}
 	
+	public void addFieldOffSet(String fn) {
+		fOffSet.add(fn);
+	}
+	
+	public void addMethodOffSet(String mn) {
+		mOffSet.add(mn);
+	}
+	
+	public void cloneFieldOffSet(List<String> fo) {
+		fOffSet = new ArrayList<String>(fo);
+	}
+	
+	public void cloneMethodOffSet(List<String> mo) {
+		mOffSet = new ArrayList<String>(mo);
+	}
+	
+	public int getFieldOffSet(String fd) throws Exception {
+		int offset = fOffSet.indexOf(fd);
+		if (offset < 0) {
+			throw new Exception("no offset information for the field: " + fd);
+		}
+		return offset;
+	}
+	
+	public int getMethodOffSet(String md) throws Exception {
+		int offset = mOffSet.indexOf(md);
+		if (offset < 0) {
+			throw new Exception("no offset information for the method: " + md);
+		}
+		return offset;
+	}
 }

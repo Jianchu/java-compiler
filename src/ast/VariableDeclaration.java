@@ -16,7 +16,7 @@ public class VariableDeclaration extends ASTNode {
 	public Type type = null;
 	public String id = null;
 	public Expression initializer = null;
-	private int offset;
+//	private int offset;
 	
 	public VariableDeclaration(ParseTree pt) throws ASTException {		
 		if (pt.getTokenType() == Symbol.LocalVariableDeclaration) {	
@@ -67,11 +67,11 @@ public class VariableDeclaration extends ASTNode {
 		v.visit(this);
 	}
 	
-	public void setOffSet(int offset) {
-		this.offset = offset;
-	}
-	
-	public int getOffSet() {		
-		return offset;
-	}
+//	public void setOffSet(int offset) {
+//		this.offset = offset;
+//	}
+//	
+//	public int getOffSet() {		
+//		return offset;
+//	}
 }

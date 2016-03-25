@@ -67,14 +67,16 @@ public class CodeGenUtil {
 	 * @return
 	 */
 	public String varAccess(String base, VariableDeclaration vDecl) {
-		int offset = vDecl.getOffSet();		
-		if (offset < 0) {
-			// e.g. offset = -1, return "[base + 3 & 4]"
-			return "[" + base + "+" + ((-offset)+2) + "* 4]"; 
-		} else {
-			// e.g. offset = 1, return [base + 1*4]
-			return "[" + base + "-" + offset + "*4]";
-		}
+		// TODO: get offset from map;
+		return null;
+//		int offset = vDecl.getOffSet();		
+//		if (offset < 0) {
+//			// e.g. offset = -1, return "[base + 3 & 4]"
+//			return "[" + base + "+" + ((-offset)+2) + "* 4]"; 
+//		} else {
+//			// e.g. offset = 1, return [base + 1*4]
+//			return "[" + base + "-" + offset + "*4]";
+//		}
 	}
 	
 	public String fieldAccess(String base, FieldDeclaration fDecl) {
