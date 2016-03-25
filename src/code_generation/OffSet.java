@@ -2,9 +2,11 @@ package code_generation;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import ast.*;
 
@@ -12,7 +14,8 @@ public class OffSet {
 	// separate classes from interfaces
 	// for interfaces compute global offset used in big ugly table
 	// for classes compute offset through inheritance
-	Map<TypeDeclaration, List<String>> ugly = new HashMap<TypeDeclaration, List<String>>();
+	static Map<TypeDeclaration, List<String>> ugly = new HashMap<TypeDeclaration, List<String>>();
+	static List<String> itfMethods;
 	
 	public static void computeOffSet(List<AST> trees) {
 		List<TypeDeclaration> clsDecls = new LinkedList<TypeDeclaration>();
@@ -41,7 +44,7 @@ public class OffSet {
 	 */
 	private static void interfaceOffSet(List<TypeDeclaration> itfDecls, List<TypeDeclaration> clsDecls) {
 		
-		List<String> itfMethods = new LinkedList<String>();	// a methods index in the list is its offset
+		itfMethods = new LinkedList<String>();	// a methods index in the list is its offset
 		// results in linear search, but O(number of methods) is ok
 		
 		for (TypeDeclaration itf : itfDecls) {
@@ -52,11 +55,7 @@ public class OffSet {
 				int offset = itfMethods.indexOf(mName);
 				if (offset == -1) {
 					// if the name has not been seen and no offset is knows
-					itfMethods.add(mName);
-					methodNamespace.get(mName).setOffSet(itfMethods.size() - 1); 	//set offset in the declaration
-				} else {
-					// if the name has been seen, use the offsets
-					methodNamespace.get(mName).setOffSet(offset);
+					itfMethods.add(mName);	// add to list, index is offset
 				}
 			}
 		}
@@ -70,11 +69,9 @@ public class OffSet {
 			
 			fillUglyColumn(cls.getEnvironment().methods, itfMethods, ptrs);		
 			fillUglyColumn(cls.getEnvironment().getEnclosing().methods, itfMethods, ptrs);	// inherited methods
+			
+			ugly.put(cls, ptrs);	// add column to table, kinda
 		}
-		
-	}
-
-	private static void classOffSet(List<TypeDeclaration> clsDecls) {
 		
 	}
 	
@@ -88,4 +85,42 @@ public class OffSet {
 			}
 		}
 	}
+	
+	/**
+	 * get the offset of an interface method, undefined for class method
+	 * @param mangledMethodName
+	 * @return
+	 * @throws Exception
+	 */
+	public static int getInterfaceMethodOffset(String mangledMethodName) throws Exception {
+		int offset = itfMethods.indexOf(mangledMethodName);
+		if (offset == -1) {
+			throw new Exception("No interface of name is found: " + mangledMethodName);
+		}
+		return offset;
+	}
+	
+	private static void classOffSet(List<TypeDeclaration> clsDecls) {
+		Set<TypeDeclaration> visited = new HashSet<TypeDeclaration>();
+		for (TypeDeclaration cls : clsDecls) {
+			if (!visited.contains(cls)) {
+				singleClassOffSet(cls, visited);
+			}
+		}
+	}
+
+	private static void singleClassOffSet(TypeDeclaration cls, Set<TypeDeclaration> visited) {
+		TypeDeclaration superCls = cls.superClass.getDeclaration();
+		if (!visited.contains(superCls)) {
+			// builds offset for super class
+			singleClassOffSet(superCls, visited);
+		}
+		
+		// compute offset for fields and methods separately
+		
+	}
+	
+	
+	
+
 }
