@@ -38,14 +38,16 @@ public class OffSet {
 			}
 		}
 		
-		classOffSet(clsDecls);
+		classOffSet(clsDecls);	
 		interfaceOffSet(itfDecls, clsDecls);
 		
 	}
 
-	/*
+	/**
 	 * computes global offset for interface methods,
 	 * and construct big ugly table
+	 * @param itfDecls
+	 * @param clsDecls
 	 */
 	private static void interfaceOffSet(List<TypeDeclaration> itfDecls, List<TypeDeclaration> clsDecls) {
 		
@@ -117,6 +119,11 @@ public class OffSet {
 		return offset;
 	}
 	
+	/**
+	 * Computes offset of instance fields and methods
+	 * @param clsDecls
+	 * @throws NameException
+	 */
 	private static void classOffSet(List<TypeDeclaration> clsDecls) throws NameException {
 		Set<TypeDeclaration> visited = new HashSet<TypeDeclaration>();
 		for (TypeDeclaration cls : clsDecls) {
@@ -143,6 +150,10 @@ public class OffSet {
 		for (BodyDeclaration bDecl : cls.members) {
 			if (bDecl instanceof FieldDeclaration) {	// field
 				FieldDeclaration fDecl = (FieldDeclaration) bDecl;
+				if (fDecl.modifiers.contains(Modifier.STATIC)) {	// offset do not apply for static fields
+					continue;
+				}
+				
 				int offset = cls.getFieldOffSetList().indexOf(fDecl.id);
 				if (offset < 0) {
 					// this field has not been declared in super class, append to offset
@@ -151,7 +162,7 @@ public class OffSet {
 				
 			} else {	// method
 				MethodDeclaration mDecl = (MethodDeclaration) bDecl;
-				if (mDecl.isConstructor){	// do not compute offset for constructors
+				if (mDecl.isConstructor || mDecl.modifiers.contains(Modifier.STATIC)){	// do not compute offset for constructors
 					continue;
 				}
 				String mangledName = NameHelper.mangle(mDecl);
