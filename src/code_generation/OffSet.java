@@ -11,6 +11,8 @@ import java.util.Set;
 import ast.*;
 import environment.NameHelper;
 import exceptions.NameException;
+import joosc.Joosc;
+import utility.FileUtility;
 
 public class OffSet {
 	// separate classes from interfaces
@@ -18,6 +20,7 @@ public class OffSet {
 	// for classes compute offset through inheritance
 	static Map<TypeDeclaration, List<String>> ugly = new HashMap<TypeDeclaration, List<String>>();
 	static List<String> itfMethods;
+	static boolean debug = true;
 	
 	public static void computeOffSet(List<AST> trees) throws NameException {
 		List<TypeDeclaration> clsDecls = new LinkedList<TypeDeclaration>();
@@ -136,6 +139,9 @@ public class OffSet {
 				
 			} else {	// method
 				MethodDeclaration mDecl = (MethodDeclaration) bDecl;
+				if (mDecl.isConstructor){	// do not compute offset for constructors
+					continue;
+				}
 				String mangledName = NameHelper.mangle(mDecl);
 				int offset = cls.getMethodOffSetList().indexOf(mangledName);	// use mangled name
 				if (offset < 0) {
@@ -144,9 +150,26 @@ public class OffSet {
 			}
 		}
 		
+		visited.add(cls);
+		
+		if (debug) {
+			System.out.println(cls.id);
+			for (int i = 0; i < cls.getFieldOffSetList().size(); i++) {
+				System.out.println("\t" + cls.getFieldOffSetList().get(i) + " " + i);
+			}
+			for (int i = 0; i < cls.getMethodOffSetList().size(); i++) {
+				System.out.println("\t" + cls.getMethodOffSetList().get(i) + " " + i);
+			}
+		}
+		
 	}
 	
 	
+	public static void main(String[] args) {
+		String[] paths = new String[0];
+        paths = FileUtility.getFileNames(System.getProperty("user.dir") + "/test/testprogram/offset1/").toArray(paths);
+        Joosc.compileSTL(paths);
+	}
 	
 
 }

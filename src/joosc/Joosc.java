@@ -14,6 +14,7 @@ import static_analysis.VariableAnalysis;
 import weeder.Weeder;
 import ast.AST;
 import ast.Visitor;
+import code_generation.OffSet;
 import environment.Disambiguation;
 import environment.Hierarchy;
 import environment.SymbolTable;
@@ -62,6 +63,7 @@ public class Joosc {
 		    TypeCheckingVisitor.typeCheck(trees);
 		    ReachabilityVisitor.checkReachability(trees);
 		    VariableAnalysis.check(trees);
+		    OffSet.computeOffSet(trees);
         } catch (Exception e) {
         	e.printStackTrace();
         	return 42;
