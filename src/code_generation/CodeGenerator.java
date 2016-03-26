@@ -18,6 +18,7 @@ import environment.TraversalVisitor;
 public class CodeGenerator extends TraversalVisitor {
     StatementCodeGenerator stmtGen;
     ExpressionCodeGenerator expGen;
+    Map<Integer, String> SigOffsets = new HashMap<Integer, String>();
     static boolean debug = true;
     public CodeGenerator() {
         stmtGen = new StatementCodeGenerator();
@@ -58,33 +59,16 @@ public class CodeGenerator extends TraversalVisitor {
         }
         
         // methods
-        Map<Integer, String> SigOffsets = new HashMap<Integer, String>();
         
-        for (String mName: node.getEnvironment().methods.keySet()) {
-            MethodDeclaration mDecl = node.getEnvironment().methods.get(mName);
-            String methodSig = SigHelper.getMethodSig(node, mDecl);
-            if (mDecl.modifiers.contains(Modifier.STATIC)) {
-                StringUtility.appendLine(textSection, "gloabl " + methodSig);
-                StringUtility.appendIndLn(textSection, methodSig + ":");
-                StringUtility.appendLine(textSection, "dd " + methodSig + "implementation", 2);
-            } else {
-                int offSet = node.getMethodOffSet(mName);
-                SigOffsets.put(offSet, methodSig);
-            }
+
+        for (Map.Entry<String, MethodDeclaration> entry : node.getEnvironment().methods.entrySet()) {
+            staticMethodVTableHandler(entry, node, textSection);
         }
         
-        for (String mName : node.getEnvironment().getEnclosing().methods.keySet()) {
-            MethodDeclaration mDecl = node.getEnvironment().getEnclosing().methods.get(mName);
-            String methodSig = SigHelper.getMethodSig(node, mDecl);
-            if (mDecl.modifiers.contains(Modifier.STATIC)) {
-                StringUtility.appendLine(textSection, "gloabl " + methodSig);
-                StringUtility.appendIndLn(textSection, methodSig + ":");
-                StringUtility.appendLine(textSection, "dd " + methodSig + "implementation", 2);
-            } else {
-                int offSet = node.getMethodOffSet(mName);
-                SigOffsets.put(offSet, methodSig);
-            }
+        for (Map.Entry<String, MethodDeclaration> entry : node.getEnvironment().getEnclosing().methods.entrySet()) {
+            staticMethodVTableHandler(entry, node, textSection);
         }
+        
         
         for (Integer i = 0; i < SigOffsets.size(); i++) {
             StringUtility.appendLine(vTableText, "dd " + SigOffsets.get(i), 2);
@@ -101,6 +85,20 @@ public class CodeGenerator extends TraversalVisitor {
         
         for (MethodDeclaration mDecl: node.getEnvironment().getEnclosing().methods.values()) {
             mDecl.accept(this);
+        }
+    }
+    
+    private void staticMethodVTableHandler(Map.Entry<String, MethodDeclaration> entry, TypeDeclaration node, StringBuilder textSection) throws Exception {
+        String mName = entry.getKey();
+        MethodDeclaration mDecl = entry.getValue();
+        String methodSig = SigHelper.getMethodSig(node, mDecl);
+        if (mDecl.modifiers.contains(Modifier.STATIC)) {
+            StringUtility.appendLine(textSection, "gloabl " + methodSig);
+            StringUtility.appendIndLn(textSection, methodSig + ":");
+            StringUtility.appendLine(textSection, "dd " + methodSig + "implementation", 2);
+        } else {
+            int offSet = node.getMethodOffSet(mName);
+            SigOffsets.put(offSet, methodSig);
         }
     }
 
