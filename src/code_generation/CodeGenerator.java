@@ -29,8 +29,9 @@ public class CodeGenerator extends TraversalVisitor {
         StringBuilder dataSection = new StringBuilder();
         StringBuilder vTableText = new StringBuilder();
         StringBuilder textSection = new StringBuilder();
-        StringUtility.appendLine(vTableText, "gloabl VTable_" + SigHelper.getClassSig(node));
-        StringUtility.appendIndLn(vTableText, "VTable_" + SigHelper.getClassSig(node) + ":");        
+        StringUtility.appendLine(vTableText, "section. text");
+        StringUtility.appendLine(vTableText, "gloabl VTable#" + SigHelper.getClassSig(node));
+        StringUtility.appendIndLn(vTableText, "VTable#" + SigHelper.getClassSig(node) + ":");        
         
         // creating .data section for static field
         StringUtility.appendLine(dataSection, "section .data");
@@ -75,30 +76,33 @@ public class CodeGenerator extends TraversalVisitor {
         }
 
         if (debug) {
-            System.out.println(vTableText.toString());
+            // System.out.println(vTableText.toString());
             System.out.println(textSection.toString());
+            // System.out.println(dataSection.toString());
         }
         
         for (MethodDeclaration mDecl: node.getEnvironment().methods.values()) {
             mDecl.accept(this);
         }
         
-        for (MethodDeclaration mDecl: node.getEnvironment().getEnclosing().methods.values()) {
-            mDecl.accept(this);
-        }
+        // for (MethodDeclaration mDecl:
+        // node.getEnvironment().getEnclosing().methods.values()) {
+        // mDecl.accept(this);
+        // }
     }
     
     private void staticMethodVTableHandler(Map.Entry<String, MethodDeclaration> entry, TypeDeclaration node, StringBuilder textSection) throws Exception {
         String mName = entry.getKey();
         MethodDeclaration mDecl = entry.getValue();
         String methodSig = SigHelper.getMethodSig(node, mDecl);
+        String methodSigInDec = SigHelper.getMethodSig(mDecl);
         if (mDecl.modifiers.contains(Modifier.STATIC)) {
             StringUtility.appendLine(textSection, "gloabl " + methodSig);
             StringUtility.appendIndLn(textSection, methodSig + ":");
-            StringUtility.appendLine(textSection, "dd " + methodSig + "implementation", 2);
+            StringUtility.appendLine(textSection, "dd " + methodSigInDec + "implementation", 2);
         } else {
             int offSet = node.getMethodOffSet(mName);
-            SigOffsets.put(offSet, methodSig);
+            SigOffsets.put(offSet, methodSigInDec + "implementation");
         }
     }
 
@@ -139,6 +143,8 @@ public class CodeGenerator extends TraversalVisitor {
                     System.out.println(t.root.types.get(0).getFullName().toString());
                     t.root.accept(rv);
                 }
+            } else {
+                t.root.accept(rv);
             }
         }
     }

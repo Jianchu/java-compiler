@@ -14,6 +14,7 @@ import static_analysis.VariableAnalysis;
 import weeder.Weeder;
 import ast.AST;
 import ast.Visitor;
+import code_generation.CodeGenerator;
 import code_generation.OffSet;
 import code_generation.UglyTableBuilder;
 import environment.Disambiguation;
@@ -66,6 +67,7 @@ public class Joosc {
 		    VariableAnalysis.check(trees);
 		    OffSet.computeOffSet(trees);
 		    UglyTableBuilder.build();
+		    CodeGenerator.generate(trees);
         } catch (Exception e) {
         	e.printStackTrace();
         	return 42;
