@@ -10,10 +10,14 @@ import environment.TraversalVisitor;
 public class VariableOffSetVisitor extends TraversalVisitor{
     int offsetCounter = 0;	// local variable offset starts from 0 
     MethodDeclaration currMethod;
-	
+	boolean debug = false;
+    
 	@Override
 	public void visit(MethodDeclaration node) throws Exception {
 		currMethod = node;
+        if (debug) {
+        	System.out.println(node.id);
+        }
 		
 		for (Modifier mo : node.modifiers) {
             mo.accept(this);
@@ -39,6 +43,7 @@ public class VariableOffSetVisitor extends TraversalVisitor{
         }
         
         currMethod = null;
+        
     }
 	
 	@Override
@@ -53,15 +58,18 @@ public class VariableOffSetVisitor extends TraversalVisitor{
 	
 	@Override
     public void visit(VariableDeclaration node) throws Exception {
-        node.type.accept(this);
+		node.type.accept(this);
         if (node.initializer != null) {
             node.initializer.accept(this);
         }
-        
+        if (debug) {
+        	System.out.println("\t" + node.id + " " + offsetCounter);
+        }
         // store offset
         currMethod.addVarOffSet(node, offsetCounter);
         currMethod.frameSize ++;	// increment framesize
         offsetCounter ++;
         
+
     }
 }

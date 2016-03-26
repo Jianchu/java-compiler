@@ -22,7 +22,7 @@ public class OffSet {
 	static List<String> itfMethods;
 	static boolean debug = false;
 	
-	public static void computeOffSet(List<AST> trees) throws NameException {
+	public static void computeOffSet(List<AST> trees) throws Exception {
 		List<TypeDeclaration> clsDecls = new LinkedList<TypeDeclaration>();
 		List<TypeDeclaration> itfDecls = new LinkedList<TypeDeclaration>();
 		
@@ -38,8 +38,14 @@ public class OffSet {
 			}
 		}
 		
-		classOffSet(clsDecls);	
-		interfaceOffSet(itfDecls, clsDecls);
+		classOffSet(clsDecls);	// offset for fields and methods
+		interfaceOffSet(itfDecls, clsDecls);	// big ugly table
+		
+		for (TypeDeclaration cls : clsDecls) {
+			// compute local variable offsets, no need for interface because there won't be local variables
+			Visitor vov = new VariableOffSetVisitor();
+			cls.accept(vov);
+		}
 		
 	}
 
