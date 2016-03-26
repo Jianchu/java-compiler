@@ -28,7 +28,7 @@ public class SigHelper {
         String sigName = null;
         if (type instanceof SimpleType) {
             SimpleType stype = (SimpleType)type;
-            sigName = stype.getDeclaration().getFullName().replace('.', '#');
+            sigName = stype.getDeclaration().getFullName();
         } else if (type instanceof PrimitiveType) {
             PrimitiveType ptype = (PrimitiveType)type;
             if (ptype.value.equals(Value.BOOLEAN)) {
