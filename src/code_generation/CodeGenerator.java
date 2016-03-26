@@ -63,7 +63,7 @@ public class CodeGenerator extends TraversalVisitor {
             if (mDecl.modifiers.contains(Modifier.STATIC)) {
                 StringUtility.appendLine(textSection, "gloabl " + methodSig);
                 StringUtility.appendIndLn(textSection, methodSig + ":");
-                StringUtility.appendLine(vTableText, "dd " + methodSig + "implementation");
+                StringUtility.appendLine(textSection, "dd " + methodSig + "implementation", 2);
             } else {
                 int offSet = node.getMethodOffSet(mName);
                 SigOffsets.put(offSet, methodSig);
@@ -76,7 +76,7 @@ public class CodeGenerator extends TraversalVisitor {
             if (mDecl.modifiers.contains(Modifier.STATIC)) {
                 StringUtility.appendLine(textSection, "gloabl " + methodSig);
                 StringUtility.appendIndLn(textSection, methodSig + ":");
-                StringUtility.appendLine(vTableText, "dd " + methodSig + "implementation");
+                StringUtility.appendLine(textSection, "dd " + methodSig + "implementation", 2);
             } else {
                 int offSet = node.getMethodOffSet(mName);
                 SigOffsets.put(offSet, methodSig);
