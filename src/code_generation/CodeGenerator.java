@@ -24,6 +24,7 @@ public class CodeGenerator extends TraversalVisitor {
     public void visit(TypeDeclaration node) throws Exception {
         StringBuilder dataSection = new StringBuilder();
         StringBuilder vTableText = new StringBuilder();
+        StringBuilder textSection = new StringBuilder();
         StringUtility.appendLine(vTableText, "gloabl VTable_" + SigHelper.getClassSig(node));
         StringUtility.appendIndLn(vTableText, "VTable_" + SigHelper.getClassSig(node) + ":");        
         
@@ -60,7 +61,9 @@ public class CodeGenerator extends TraversalVisitor {
             MethodDeclaration mDecl = node.getEnvironment().methods.get(mName);
             String methodSig = SigHelper.getMethodSig(mDecl);
             if (mDecl.modifiers.contains(Modifier.STATIC)) {
-                
+                StringUtility.appendLine(textSection, "gloabl " + methodSig);
+                StringUtility.appendIndLn(textSection, methodSig + ":");
+                StringUtility.appendLine(vTableText, "dd " + methodSig + "implementation");
             } else {
                 int offSet = node.getMethodOffSet(mName);
                 SigOffsets.put(offSet, methodSig);
@@ -71,7 +74,9 @@ public class CodeGenerator extends TraversalVisitor {
             MethodDeclaration mDecl = node.getEnvironment().getEnclosing().methods.get(mName);
             String methodSig = SigHelper.getMethodSig(mDecl);
             if (mDecl.modifiers.contains(Modifier.STATIC)) {
-                
+                StringUtility.appendLine(textSection, "gloabl " + methodSig);
+                StringUtility.appendIndLn(textSection, methodSig + ":");
+                StringUtility.appendLine(vTableText, "dd " + methodSig + "implementation");
             } else {
                 int offSet = node.getMethodOffSet(mName);
                 SigOffsets.put(offSet, methodSig);
@@ -81,8 +86,16 @@ public class CodeGenerator extends TraversalVisitor {
         for (Integer i = 0; i < SigOffsets.size(); i++) {
             StringUtility.appendLine(vTableText, "dd " + SigOffsets.get(i), 2);
         }
+        
+        for (MethodDeclaration mDecl: node.getEnvironment().methods.values()) {
+            mDecl.accept(this);
+        }
+        
+        for (MethodDeclaration mDecl: node.getEnvironment().getEnclosing().methods.values()) {
+            mDecl.accept(this);
+        }
     }
-    
+
     private void putFieldInData(StringBuilder sb, FieldDeclaration fDecl, TypeDeclaration typeDec) {
         String fieldSig = SigHelper.getStaticFieldSig(typeDec, fDecl);
         StringUtility.appendLine(sb, "global " + fieldSig + "\t; define global label for field");

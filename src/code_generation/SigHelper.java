@@ -17,6 +17,7 @@ import ast.VariableDeclaration;
  * "(" and ")" -> "$"
  * "<" and ">" -> "~"
  * "[" -> "@"
+ * "," -> "?"
  * @author jianchu
  *
  */
