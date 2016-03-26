@@ -86,6 +86,14 @@ public class SigHelper {
         fieldSig.append(fd.id);
         return fieldSig.toString();
     }
+    
+    public static String getStaticFieldSig(TypeDeclaration td, FieldDeclaration fd) {
+        StringBuilder fieldSig = new StringBuilder();
+        fieldSig.append(getClassSig(td));
+        fieldSig.append("#");
+        fieldSig.append(fd.id);
+        return fieldSig.toString();
+    }
 
     public static String getClassSig(ASTNode typeNode) {
         String classSig = null;

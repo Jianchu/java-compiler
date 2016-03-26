@@ -3,6 +3,7 @@ package code_generation;
 
 import utility.StringUtility;
 import ast.FieldDeclaration;
+import ast.MethodDeclaration;
 import ast.Modifier;
 import ast.TypeDeclaration;
 import ast.WhileStatement;
@@ -19,6 +20,10 @@ public class CodeGenerator extends TraversalVisitor {
 
     public void visit(TypeDeclaration node) throws Exception {
         StringBuilder dataSection = new StringBuilder();
+        StringBuilder vTableText = new StringBuilder();
+        StringUtility.appendLine(vTableText, "gloabl VTable_" + SigHelper.getClassSig(node));
+        StringUtility.appendIndLn(vTableText, "VTable_" + SigHelper.getClassSig(node) + ":");        
+        
         // creating .data section
         StringUtility.appendLine(dataSection, "section .data");
         for (FieldDeclaration fDecl : node.getEnvironment().fields.values()) {
@@ -38,10 +43,24 @@ public class CodeGenerator extends TraversalVisitor {
             fDecl.accept(this);
 
             // inherited fields
-
         }
-
+        
         // methods
+
+        for (String mName: node.getEnvironment().methods.keySet()) {
+            MethodDeclaration mDecl = node.getEnvironment().methods.get(mName);
+            if (mDecl.modifiers.contains(Modifier.STATIC)) {
+                
+            }
+        }
+        
+        for (String mName : node.getEnvironment().getEnclosing().methods.keySet()) {
+            MethodDeclaration mDecl = node.getEnvironment().getEnclosing().methods.get(mName);
+            if (mDecl.modifiers.contains(Modifier.STATIC)) {
+                
+            }
+            
+        }
     }
     
     private void putFieldInData(StringBuilder sb, FieldDeclaration fDecl) {
