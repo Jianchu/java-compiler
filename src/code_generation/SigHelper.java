@@ -52,6 +52,18 @@ public class SigHelper {
         StringBuilder methodSig = new StringBuilder();
         ASTNode typeNode = md.getParent();
         methodSig.append(getClassSig(typeNode));
+        methodSigHelper(md, methodSig);
+        return methodSig.toString();
+    }
+    
+    public static String getMethodSig(TypeDeclaration td, MethodDeclaration md) {
+        StringBuilder methodSig = new StringBuilder();
+        methodSig.append(getClassSig(td));
+        methodSigHelper(md, methodSig);
+        return methodSig.toString();
+    }
+    
+    private static void methodSigHelper(MethodDeclaration md, StringBuilder methodSig) {
         if (md.isConstructor) {
             methodSig.append("#~init~$");
         } else {
@@ -76,7 +88,6 @@ public class SigHelper {
 //            // Check void?
 //            methodSig.append(getTypeSig(md.returnType));
 //        }
-        return methodSig.toString();
     }
 
     public static String getFieldSig(FieldDeclaration fd) {

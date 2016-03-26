@@ -62,7 +62,7 @@ public class CodeGenerator extends TraversalVisitor {
         
         for (String mName: node.getEnvironment().methods.keySet()) {
             MethodDeclaration mDecl = node.getEnvironment().methods.get(mName);
-            String methodSig = SigHelper.getMethodSig(mDecl);
+            String methodSig = SigHelper.getMethodSig(node, mDecl);
             if (mDecl.modifiers.contains(Modifier.STATIC)) {
                 StringUtility.appendLine(textSection, "gloabl " + methodSig);
                 StringUtility.appendIndLn(textSection, methodSig + ":");
@@ -75,7 +75,7 @@ public class CodeGenerator extends TraversalVisitor {
         
         for (String mName : node.getEnvironment().getEnclosing().methods.keySet()) {
             MethodDeclaration mDecl = node.getEnvironment().getEnclosing().methods.get(mName);
-            String methodSig = SigHelper.getMethodSig(mDecl);
+            String methodSig = SigHelper.getMethodSig(node, mDecl);
             if (mDecl.modifiers.contains(Modifier.STATIC)) {
                 StringUtility.appendLine(textSection, "gloabl " + methodSig);
                 StringUtility.appendIndLn(textSection, methodSig + ":");
