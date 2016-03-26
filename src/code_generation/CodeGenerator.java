@@ -1,6 +1,9 @@
 package code_generation;
 
 
+import java.util.HashMap;
+import java.util.Map;
+
 import utility.StringUtility;
 import ast.FieldDeclaration;
 import ast.MethodDeclaration;
@@ -46,20 +49,32 @@ public class CodeGenerator extends TraversalVisitor {
         }
         
         // methods
-
+        Map<Integer, String> SigOffsets = new HashMap<Integer, String>();
+        
         for (String mName: node.getEnvironment().methods.keySet()) {
             MethodDeclaration mDecl = node.getEnvironment().methods.get(mName);
+            String methodSig = SigHelper.getMethodSig(mDecl);
             if (mDecl.modifiers.contains(Modifier.STATIC)) {
                 
+            } else {
+                int offSet = node.getMethodOffSet(mName);
+                SigOffsets.put(offSet, methodSig);
             }
         }
         
         for (String mName : node.getEnvironment().getEnclosing().methods.keySet()) {
             MethodDeclaration mDecl = node.getEnvironment().getEnclosing().methods.get(mName);
+            String methodSig = SigHelper.getMethodSig(mDecl);
             if (mDecl.modifiers.contains(Modifier.STATIC)) {
                 
+            } else {
+                int offSet = node.getMethodOffSet(mName);
+                SigOffsets.put(offSet, methodSig);
             }
-            
+        }
+        
+        for (Integer i = 0; i < SigOffsets.size(); i++) {
+            StringUtility.appendLine(vTableText, "dd " + SigOffsets.get(i), 2);
         }
     }
     
