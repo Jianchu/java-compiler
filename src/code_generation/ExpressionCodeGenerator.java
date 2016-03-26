@@ -55,7 +55,7 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
 
     public void visit(IntegerLiteral node) throws Exception {
         String intText;
-        intText = "mov eax, " + Integer.valueOf(node.value);
+        intText = "mov eax, " + node.value;
         node.attachCode(intText);
     }
 }
