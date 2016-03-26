@@ -87,7 +87,7 @@ public class SigHelper {
         return fieldSig.toString();
     }
 
-    private static String getClassSig(ASTNode typeNode) {
+    public static String getClassSig(ASTNode typeNode) {
         String classSig = null;
         if (typeNode instanceof TypeDeclaration) {
             TypeDeclaration typeDec = (TypeDeclaration) typeNode;
