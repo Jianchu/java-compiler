@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ast.FieldDeclaration;
+import ast.MethodDeclaration;
+import ast.TypeDeclaration;
 import ast.VariableDeclaration;
 import utility.StringUtility;
 
@@ -17,7 +19,7 @@ public class CodeGenUtil {
 	public static String fnCall(String subLabel, String obj, List<String> params) {
 		StringBuilder sb = new StringBuilder();
 		
-		for (int i = params.size() -1; i >= 0; i--) {
+		for (int i = 0; i < params.size(); i++) {
 			String p = params.get(i);
 			StringUtility.appendIndLn(sb, "push " + p + "\t; pushing parameter " + i);
 		}
@@ -65,22 +67,22 @@ public class CodeGenUtil {
 	 * @param base
 	 * @param vDecl
 	 * @return
+	 * @throws Exception 
 	 */
-	public String varAccess(String base, VariableDeclaration vDecl) {
-		// TODO: get offset from map;
-		return null;
-//		int offset = vDecl.getOffSet();		
-//		if (offset < 0) {
-//			// e.g. offset = -1, return "[base + 3 & 4]"
-//			return "[" + base + "+" + ((-offset)+2) + "* 4]"; 
-//		} else {
-//			// e.g. offset = 1, return [base + 1*4]
-//			return "[" + base + "-" + offset + "*4]";
-//		}
+	public String varAccess(String base, MethodDeclaration mDecl, VariableDeclaration vDecl) throws Exception {
+//		 TODO: get offset from map;
+		int offset = mDecl.getVarOffSet(vDecl);
+		if (offset < 0) {
+			// e.g. offset = -1, return "[base + 3 & 4]"
+			return "[" + base + "+" + ((-offset)+2) + "* 4]"; 
+		} else {
+			// e.g. offset = 1, return [base + 1*4]
+			return "[" + base + "-" + offset + "*4]";
+		}
 	}
 	
-	public String fieldAccess(String base, FieldDeclaration fDecl) {
-		return "[" + base + "+" + fDecl.getOffSet() + "*4]";
+	public String fieldAccess(String base, TypeDeclaration tDecl, FieldDeclaration fDecl) throws Exception {
+		return "[" + base + "+" + tDecl.getFieldOffSet(fDecl.id) + "*4]";
 	}
 	
 	
