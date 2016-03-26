@@ -20,7 +20,7 @@ public class OffSet {
 	// for classes compute offset through inheritance
 	static Map<TypeDeclaration, List<String>> ugly = new HashMap<TypeDeclaration, List<String>>();
 	static List<String> itfMethods;
-	static boolean debug = true;
+	static boolean debug = false;
 	
 	public static void computeOffSet(List<AST> trees) throws Exception {
 		List<TypeDeclaration> clsDecls = new LinkedList<TypeDeclaration>();
