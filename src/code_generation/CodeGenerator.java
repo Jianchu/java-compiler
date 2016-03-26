@@ -27,13 +27,18 @@ public class CodeGenerator extends TraversalVisitor {
         StringUtility.appendLine(vTableText, "gloabl VTable_" + SigHelper.getClassSig(node));
         StringUtility.appendIndLn(vTableText, "VTable_" + SigHelper.getClassSig(node) + ":");        
         
-        // creating .data section
+        // creating .data section for static field
         StringUtility.appendLine(dataSection, "section .data");
         for (FieldDeclaration fDecl : node.getEnvironment().fields.values()) {
-            putFieldInData(dataSection, fDecl);
+            if (fDecl.modifiers.contains(Modifier.STATIC)) {
+                putFieldInData(dataSection, fDecl, node);
+            }
+            
         }
         for (FieldDeclaration fDecl : node.getEnvironment().getEnclosing().fields.values()) {
-            putFieldInData(dataSection, fDecl);
+            if (fDecl.modifiers.contains(Modifier.STATIC)) {
+                putFieldInData(dataSection, fDecl, node);
+            }
             // inherited fields
         }
 
@@ -78,8 +83,8 @@ public class CodeGenerator extends TraversalVisitor {
         }
     }
     
-    private void putFieldInData(StringBuilder sb, FieldDeclaration fDecl) {
-        String fieldSig = SigHelper.getFieldSig(fDecl);
+    private void putFieldInData(StringBuilder sb, FieldDeclaration fDecl, TypeDeclaration typeDec) {
+        String fieldSig = SigHelper.getStaticFieldSig(typeDec, fDecl);
         StringUtility.appendLine(sb, "global " + fieldSig + "\t; define global label for field");
         StringUtility.appendLine(sb, fieldSig + ":" + "\t; label start");
         StringUtility.appendLine(sb, "\t" + "dw 0x0" + "\t; default value: 0 false null");
