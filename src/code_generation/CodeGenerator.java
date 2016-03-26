@@ -2,20 +2,23 @@ package code_generation;
 
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import utility.StringUtility;
+import ast.AST;
 import ast.FieldDeclaration;
 import ast.MethodDeclaration;
 import ast.Modifier;
 import ast.TypeDeclaration;
+import ast.Visitor;
 import ast.WhileStatement;
 import environment.TraversalVisitor;
 
 public class CodeGenerator extends TraversalVisitor {
     StatementCodeGenerator stmtGen;
     ExpressionCodeGenerator expGen;
-
+    static boolean debug = true;
     public CodeGenerator() {
         stmtGen = new StatementCodeGenerator();
         expGen = new ExpressionCodeGenerator();
@@ -86,6 +89,11 @@ public class CodeGenerator extends TraversalVisitor {
         for (Integer i = 0; i < SigOffsets.size(); i++) {
             StringUtility.appendLine(vTableText, "dd " + SigOffsets.get(i), 2);
         }
+
+        if (debug) {
+            System.out.println(vTableText.toString());
+            System.out.println(textSection.toString());
+        }
         
         for (MethodDeclaration mDecl: node.getEnvironment().methods.values()) {
             mDecl.accept(this);
@@ -123,5 +131,17 @@ public class CodeGenerator extends TraversalVisitor {
 
     public void visit(WhileStatement node) throws Exception {
         node.accept(stmtGen);
+    }
+
+    public static void generate(List<AST> trees) throws Exception {
+        for (AST t : trees) {
+            Visitor rv = new CodeGenerator();
+            if (debug) {
+                if (t.root.types.get(0).getFullName().contains("String")) {
+                    System.out.println(t.root.types.get(0).getFullName().toString());
+                    t.root.accept(rv);
+                }
+            }
+        }
     }
 }
