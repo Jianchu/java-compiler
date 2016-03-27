@@ -107,7 +107,7 @@ public class SigHelper {
         return fieldSig.toString();
     }
     
-    public static String getStaticFieldSig(TypeDeclaration td, FieldDeclaration fd) {
+    public static String getFieldSig(TypeDeclaration td, FieldDeclaration fd) {
         StringBuilder fieldSig = new StringBuilder();
         fieldSig.append(getClassSig(td));
         fieldSig.append("#");
@@ -125,5 +125,9 @@ public class SigHelper {
             classSig = getTypeSig(simpleType);
         }
         return classSig;
+    }
+
+    public static String instanceFieldInitSig(Type type) {
+        return getTypeSig(type) + "$instance_field_init";
     }
 }
