@@ -22,7 +22,7 @@ public class CodeGenerator extends TraversalVisitor {
     private static StringBuilder[] staticFieldInit = {new StringBuilder(), new StringBuilder()};
     private static StringBuilder[] instanceFieldInit = {new StringBuilder(), new StringBuilder()};
     TypeDeclaration currentTypeDec;
-    static boolean debug = true;
+    static boolean debug = false;
 
     public CodeGenerator() {
         stmtGen = new StatementCodeGenerator();
@@ -32,8 +32,8 @@ public class CodeGenerator extends TraversalVisitor {
     public void visit(TypeDeclaration node) throws Exception {
         this.currentTypeDec = node;
         String classSig = SigHelper.getClassSig(node);
-        String testSig = classSig + "#test$$";
-        StringUtility.appendLine(instanceFieldInit[0], classSig + "$instance_field_init:");
+        String testSig = classSig + "#test$$implementation";
+        StringUtility.appendLine(instanceFieldInit[0], "instance_field_init$" + classSig + ":");
         StringBuilder dataSection = new StringBuilder();
         StringBuilder vTableText = new StringBuilder();
         StringBuilder textSection = new StringBuilder();
@@ -67,6 +67,7 @@ public class CodeGenerator extends TraversalVisitor {
 
             // inherited fields
         }
+        StringUtility.appendIndLn(instanceFieldInit[0], "ret");
         
         // methods
         
@@ -79,9 +80,10 @@ public class CodeGenerator extends TraversalVisitor {
             staticMethodVTableHandler(entry, node, textSection);
         }
         
-        
-        for (Integer i = 0; i < SigOffsets.size(); i++) {
-            StringUtility.appendLine(vTableText, "dd " + SigOffsets.get(i), 2);
+        if (!node.isInterface) {
+            for (Integer i = 0; i < SigOffsets.size(); i++) {
+                StringUtility.appendLine(vTableText, "dd " + SigOffsets.get(i), 2);
+            }
         }
 
         if (debug) {
@@ -92,11 +94,17 @@ public class CodeGenerator extends TraversalVisitor {
         }
         
         for (MethodDeclaration mDecl: node.getEnvironment().methods.values()) {
-            if (SigHelper.getMethodSig(mDecl).equals(testSig)) {
+            if (SigHelper.getMethodSigWithImp(mDecl).equals(testSig)) {
                 generateStart(start, testSig);
             }
             mDecl.accept(this);
+            String methodText = mDecl.getCode();
+            textSection.append(methodText);
         }
+        dataSection.append(vTableText);
+        textSection.append(getInstanceFieldInit());
+        textSection.append(start);
+        node.attachCode(dataSection.toString() + textSection.toString());
     }
     
     private void generateStart(StringBuilder start, String testSig) {
@@ -110,14 +118,16 @@ public class CodeGenerator extends TraversalVisitor {
         String mName = entry.getKey();
         MethodDeclaration mDecl = entry.getValue();
         String methodSig = SigHelper.getMethodSig(node, mDecl);
-        String methodSigInDec = SigHelper.getMethodSig(mDecl);
+        String methodSigInDec = SigHelper.getMethodSigWithImp(mDecl);
         if (mDecl.modifiers.contains(Modifier.STATIC)) {
             StringUtility.appendLine(textSection, "gloabl " + methodSig);
             StringUtility.appendIndLn(textSection, methodSig + ":");
-            StringUtility.appendLine(textSection, "dd " + methodSigInDec + "implementation", 2);
+            StringUtility.appendLine(textSection, "dd " + methodSigInDec, 2);
         } else {
-            int offSet = node.getMethodOffSet(mName);
-            SigOffsets.put(offSet, methodSigInDec + "implementation");
+            if (!node.isInterface) {
+                int offSet = node.getMethodOffSet(mName);
+                SigOffsets.put(offSet, methodSigInDec);
+            }
         }
     }
 
@@ -131,7 +141,7 @@ public class CodeGenerator extends TraversalVisitor {
 
     public void visit(FieldDeclaration node) throws Exception {
         String fieldSig = SigHelper.getFieldSig(currentTypeDec, node);
-        StringBuilder fieldAssemblyText = new StringBuilder();
+        // StringBuilder fieldAssemblyText = new StringBuilder();
         for (Modifier im : node.modifiers) {
             im.accept(this);
         }
@@ -146,7 +156,7 @@ public class CodeGenerator extends TraversalVisitor {
             if (node.modifiers.contains(Modifier.STATIC)) {
                 StringUtility.appendIndLn(staticFieldInit[1], "static_init_" + fieldSig + ":");
                 StringUtility.appendLine(staticFieldInit[1], initCode, 2);
-                StringUtility.appendLine(staticFieldInit[1], "mov " + fieldSig + " eax", 2);
+                StringUtility.appendLine(staticFieldInit[1], "mov " + fieldSig + ", eax", 2);
             } else {
                 StringUtility.appendIndLn(instanceFieldInit[0], "call instance_init_" + fieldSig);
                 StringUtility.appendIndLn(instanceFieldInit[1], "instance_init_" + fieldSig + ":");
@@ -159,7 +169,7 @@ public class CodeGenerator extends TraversalVisitor {
                 
             }
         }
-        node.attachCode(fieldAssemblyText.toString());
+        // node.attachCode(fieldAssemblyText.toString());
     }
 
     public void visit(WhileStatement node) throws Exception {

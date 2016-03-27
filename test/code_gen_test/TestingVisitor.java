@@ -25,7 +25,7 @@ public class TestingVisitor extends TraversalVisitor {
     }
 
     public void visit(MethodDeclaration node) throws Exception {
-        System.out.println(SigHelper.getMethodSig(node));
+        System.out.println(SigHelper.getMethodSigWithImp(node));
         for (Modifier mo : node.modifiers) {
             mo.accept(this);
         }

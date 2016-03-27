@@ -106,7 +106,7 @@ public class OffSet {
 			if (offset > -1) {
 				// if it is an interface method, don't even care if this class implements the interface
 				// add signature label to the entry, to be used later as pointer
-				ptrs.set(offset, SigHelper.getMethodSig(methodEnv.get(mName)));
+				ptrs.set(offset, SigHelper.getMethodSigWithImp(methodEnv.get(mName)));
 			}
 		}
 	}

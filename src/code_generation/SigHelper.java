@@ -1,6 +1,5 @@
 package code_generation;
 
-import ast.ASTNode;
 import ast.ArrayType;
 import ast.FieldDeclaration;
 import ast.MethodDeclaration;
@@ -48,9 +47,9 @@ public class SigHelper {
         return sigName;
     }
 
-    public static String getMethodSig(MethodDeclaration md) {
+    private static String getMethodSig(MethodDeclaration md) {
         StringBuilder methodSig = new StringBuilder();
-        ASTNode typeNode = md.getParent();
+        TypeDeclaration typeNode = (TypeDeclaration) md.getParent();
         methodSig.append(getClassSig(typeNode));
         methodSigHelper(md, methodSig);
         return methodSig.toString();
@@ -58,7 +57,7 @@ public class SigHelper {
     
     public static String getMethodSigWithImp(MethodDeclaration md) {
         StringBuilder methodSig = new StringBuilder();
-        ASTNode typeNode = md.getParent();
+        TypeDeclaration typeNode = (TypeDeclaration) md.getParent();
         methodSig.append(getClassSig(typeNode));
         methodSigHelper(md, methodSig);
         return methodSig.toString() + "implementation";
@@ -100,7 +99,7 @@ public class SigHelper {
 
     public static String getFieldSig(FieldDeclaration fd) {
         StringBuilder fieldSig = new StringBuilder();
-        ASTNode typeNode = fd.getParent();
+        TypeDeclaration typeNode = (TypeDeclaration) fd.getParent();
         fieldSig.append(getClassSig(typeNode));
         fieldSig.append("#");
         fieldSig.append(fd.id);
@@ -115,16 +114,17 @@ public class SigHelper {
         return fieldSig.toString();
     }
 
-    public static String getClassSig(ASTNode typeNode) {
+    public static String getClassSig(TypeDeclaration typeDec) {
         String classSig = null;
-        if (typeNode instanceof TypeDeclaration) {
-            TypeDeclaration typeDec = (TypeDeclaration) typeNode;
-            String name = typeDec.getFullName();
-            SimpleType simpleType = new SimpleType(new SimpleName(name));
-            simpleType.attachDeclaration(typeDec);
-            classSig = getTypeSig(simpleType);
-        }
+        String name = typeDec.getFullName();
+        SimpleType simpleType = new SimpleType(new SimpleName(name));
+        simpleType.attachDeclaration(typeDec);
+        classSig = getTypeSig(simpleType);
         return classSig;
+    }
+
+    public static String getClassSigWithUgly(TypeDeclaration typeDec) {
+        return "ugly#" + getClassSig(typeDec);
     }
 
     public static String instanceFieldInitSig(Type type) {

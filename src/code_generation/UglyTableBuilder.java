@@ -13,7 +13,7 @@ public class UglyTableBuilder {
     public static void build() {
         StringUtility.appendLine(uglyText, "section .text " + uglyText);
         for (TypeDeclaration typeDec : ugly.keySet()) {
-            String typeSig = SigHelper.getClassSig(typeDec);
+            String typeSig = SigHelper.getClassSigWithUgly(typeDec);
             StringUtility.appendLine(uglyText, "global " + typeSig);
             StringUtility.appendIndLn(uglyText, typeSig + ":");
             List<String> methodSigs = ugly.get(typeDec);
