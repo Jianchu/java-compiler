@@ -28,9 +28,11 @@ public class CodeGenerator extends TraversalVisitor {
     }
 
     public void visit(TypeDeclaration node) throws Exception {
+        String testSig = SigHelper.getClassSig(node) + "#test$$";
         StringBuilder dataSection = new StringBuilder();
         StringBuilder vTableText = new StringBuilder();
         StringBuilder textSection = new StringBuilder();
+        StringBuilder start = new StringBuilder();
         StringUtility.appendLine(vTableText, "section. text");
         StringUtility.appendLine(vTableText, "gloabl VTable#" + SigHelper.getClassSig(node));
         StringUtility.appendIndLn(vTableText, "VTable#" + SigHelper.getClassSig(node) + ":");        
@@ -84,10 +86,22 @@ public class CodeGenerator extends TraversalVisitor {
         }
         
         for (MethodDeclaration mDecl: node.getEnvironment().methods.values()) {
+            if (SigHelper.getMethodSig(mDecl).equals(testSig)) {
+                generateStart(start, testSig);
+                System.out.println(SigHelper.getMethodSig(mDecl));
+            }
             mDecl.accept(this);
         }
+
     }
     
+    private void generateStart(StringBuilder start, String testSig) {
+        StringUtility.appendLine(start, "gloabl _start");
+        StringUtility.appendIndLn(start, "_start:");
+        StringUtility.appendLine(start, "call " + testSig, 2);
+        StringUtility.appendLine(start, "call debexit", 2);
+    }
+
     private void staticMethodVTableHandler(Map.Entry<String, MethodDeclaration> entry, TypeDeclaration node, StringBuilder textSection) throws Exception {
         String mName = entry.getKey();
         MethodDeclaration mDecl = entry.getValue();
@@ -103,10 +117,19 @@ public class CodeGenerator extends TraversalVisitor {
         }
     }
 
-    private void putFieldInData(StringBuilder sb, FieldDeclaration fDecl, TypeDeclaration typeDec) {
+    private void putFieldInData(StringBuilder sb, FieldDeclaration fDecl, TypeDeclaration typeDec) throws Exception {
         String fieldSig = SigHelper.getStaticFieldSig(typeDec, fDecl);
-        String fieldSigInDec = SigHelper.getFieldSig(fDecl);
-        StringUtility.appendLine(staticFieldInit[0], "call static_init_" + fieldSigInDec, 2);
+        StringUtility.appendLine(staticFieldInit[0], "call static_init_" + fieldSig, 2);
+        if (fDecl.initializer != null) {
+            fDecl.initializer.accept(expGen);
+            String initCode = fDecl.initializer.getCode();
+            if (initCode == null) {
+                initCode = "; no right hand side yet.";
+            }
+            StringUtility.appendIndLn(staticFieldInit[1], "static_init_" + fieldSig + ":");
+            StringUtility.appendLine(staticFieldInit[1], initCode, 2);
+            StringUtility.appendLine(staticFieldInit[1], "mov " + fieldSig + " eax", 2);
+        }
         StringUtility.appendLine(sb, "global " + fieldSig + "\t; define global label for field");
         StringUtility.appendLine(sb, fieldSig + ":" + "\t; label start");
         StringUtility.appendLine(sb, "\t" + "dw 0x0" + "\t; default value: 0 false null");
@@ -127,14 +150,8 @@ public class CodeGenerator extends TraversalVisitor {
             if (initCode == null) {
                 initCode = "; no right hand side yet.";
             }
-            if (node.modifiers.contains(Modifier.STATIC)) {
-                StringUtility.appendIndLn(staticFieldInit[1], "static_init_" + fieldSig + ":");
-                StringUtility.appendLine(staticFieldInit[1], initCode, 2);
-                StringUtility.appendLine(staticFieldInit[1], "mov " + fieldSig + " eax", 2);
-            } else {
-                StringUtility.appendLine(fieldAssemblyText, initCode);
-                StringUtility.appendLine(fieldAssemblyText, "mov dword [" + fieldSig + "], eax" + "/t; initiallize field");
-            }
+            StringUtility.appendLine(fieldAssemblyText, initCode);
+            StringUtility.appendLine(fieldAssemblyText, "mov dword [" + fieldSig + "], eax" + "/t; initiallize field");
         }
         node.attachCode(fieldAssemblyText.toString());
     }
@@ -151,7 +168,7 @@ public class CodeGenerator extends TraversalVisitor {
         for (AST t : trees) {
             Visitor rv = new CodeGenerator();
             if (debug) {
-                if (t.root.types.get(0).getFullName().contains("Byte")) {
+                if (t.root.types.get(0).getFullName().contains("J1e_A_CastToArray")) {
                     System.out.println(t.root.types.get(0).getFullName().toString());
                     t.root.accept(rv);
                 }
