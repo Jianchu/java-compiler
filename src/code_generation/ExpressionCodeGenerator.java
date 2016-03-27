@@ -62,7 +62,11 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
     }
     
     /*
-     * 
+     * OO features
+     */
+    
+    /**
+     * Deals with method names
      */
     @Override
     public void visit(MethodInvocation node) throws Exception {
@@ -73,17 +77,16 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
     	for (numArgs =0; numArgs < node.arglist.size() ; numArgs++) {
     		Expression expr = node.arglist.get(numArgs);
     		expr.accept(this);
-    		StringUtility.appendIndLn(sb, expr.getCode());
+    		StringUtility.appendLine(sb, expr.getCode());
     		StringUtility.appendIndLn(sb, "push eax \t; push argument " + numArgs);
     	}
     	
     	if (node.id != null) {
     		// Primary.ID(...)
     		node.expr.accept(this);	// generate code for Primary expression
-    		StringUtility.appendIndLn(sb, node.getCode());	// by this point eax should contain address to object return by Primary expression
+    		StringUtility.appendLine(sb, node.getCode());	// by this point eax should contain address to object return by Primary expression
     		StringUtility.appendIndLn(sb, "push eax \t; push object for method invocation");
     		MethodDeclaration mDecl = (MethodDeclaration) node.id.getDeclaration();	// the actual method being called
-    		
     		// call method
     		StringUtility.appendIndLn(sb, generateMethodCall(mDecl));
     		
@@ -95,13 +98,21 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
     			StringUtility.appendIndLn(sb, "push eax \t; push object address");
     			MethodDeclaration mDecl = (MethodDeclaration) sn.getDeclaration();
     			StringUtility.appendIndLn(sb, generateMethodCall(mDecl));
-    			
+
     		} else {	// QualifiedName(...)
-    			
-    			
-    			
+    			QualifiedName qn = (QualifiedName) node.expr;
+    			MethodDeclaration mDecl = (MethodDeclaration) qn.getDeclaration();
+    			if (qn.getQualifier().getDeclaration() instanceof TypeDeclaration) {	// static methods
+    				StringUtility.appendIndLn(sb, "push 0 \t; place holder because there is no this object for static method");
+    				StringUtility.appendIndLn(sb, generateMethodCall(mDecl));
+    			} else {	// instance method
+    				qn.accept(this); 	// generate code from name (accessing instance field, or local variable
+    				StringUtility.appendLine(sb, qn.getCode());
+    	    		StringUtility.appendIndLn(sb, "push eax \t; push object for method invocation");
+    	    		// call method
+    	    		StringUtility.appendIndLn(sb, generateMethodCall(mDecl));
+    			}
     		}
-    		
     	}
     	
 		// clean up
