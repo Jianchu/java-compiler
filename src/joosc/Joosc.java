@@ -69,7 +69,7 @@ public class Joosc {
 		    OffSet.computeOffSet(trees);
 		    UglyTableBuilder.build();
 		    CodeGenerator.generate(trees);
-		    CodePrinter.printCode();
+		    CodePrinter.printCode(trees);
         } catch (Exception e) {
         	e.printStackTrace();
         	return 42;

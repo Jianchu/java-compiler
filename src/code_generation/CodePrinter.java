@@ -3,16 +3,21 @@ package code_generation;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
+import java.util.List;
 
 import utility.StringUtility;
+import ast.AST;
+import ast.TypeDeclaration;
+import ast.Visitor;
+import environment.TraversalVisitor;
 
-public class CodePrinter {
+public class CodePrinter extends TraversalVisitor {
 
     private static final File output = new File(System.getProperty("user.dir") + "/output");
     private static final String uglyText = UglyTableBuilder.getUgly();
     private static final String staticFieldInit = CodeGenerator.getStaticFieldInit();
 
-    public static void printCode() throws FileNotFoundException {
+    public static void printCode(List<AST> trees) throws Exception {
         if (!output.exists()) {
             output.mkdirs();
         } else {
@@ -22,6 +27,10 @@ public class CodePrinter {
         }
         wirteUgly();
         wirteStaticFieldInit();
+        for (AST t : trees) {
+            Visitor rv = new CodePrinter();
+            t.root.accept(rv);
+        }
     }
 
     private static void wirteUgly() throws FileNotFoundException {
@@ -41,5 +50,17 @@ public class CodePrinter {
         writer.write(fileHead.toString());
         writer.write(staticFieldInit);
         writer.close();
+    }
+
+    @Override
+    public void visit(TypeDeclaration node) throws Exception {
+        String classAssembly = node.getCode();
+        if (classAssembly != null) {
+            String fullName = node.getFullName();
+            File classAssemblyFile = new File(output.getAbsolutePath() + "/" + fullName + ".s");
+            PrintWriter writer = new PrintWriter(classAssemblyFile);
+            writer.write(classAssembly);
+            writer.close();
+        }
     }
 }
