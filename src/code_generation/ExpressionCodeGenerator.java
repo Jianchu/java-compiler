@@ -65,6 +65,11 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
      * OO features
      */
     
+    @Override
+    public void visit(ClassInstanceCreationExpression node) throws Exception {
+    	
+    }
+    
     /**
      * Deals with method names
      */
