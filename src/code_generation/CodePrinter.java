@@ -54,9 +54,9 @@ public class CodePrinter extends TraversalVisitor {
 
     @Override
     public void visit(TypeDeclaration node) throws Exception {
+        String fullName = node.getFullName();
         String classAssembly = node.getCode();
         if (classAssembly != null) {
-            String fullName = node.getFullName();
             File classAssemblyFile = new File(output.getAbsolutePath() + "/" + fullName + ".s");
             PrintWriter writer = new PrintWriter(classAssemblyFile);
             writer.write(classAssembly);

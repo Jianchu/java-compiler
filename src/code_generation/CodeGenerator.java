@@ -94,11 +94,9 @@ public class CodeGenerator extends TraversalVisitor {
         for (MethodDeclaration mDecl: node.getEnvironment().methods.values()) {
             if (SigHelper.getMethodSig(mDecl).equals(testSig)) {
                 generateStart(start, testSig);
-                System.out.println(SigHelper.getMethodSig(mDecl));
             }
             mDecl.accept(this);
         }
-
     }
     
     private void generateStart(StringBuilder start, String testSig) {
@@ -180,12 +178,12 @@ public class CodeGenerator extends TraversalVisitor {
         for (AST t : trees) {
             Visitor rv = new CodeGenerator();
             if (debug) {
-                if (t.root.types.get(0).getFullName().contains("Byte")) {
+                if (t.root.types.get(0).getFullName().contains("Object")) {
                     System.out.println(t.root.types.get(0).getFullName().toString());
                     t.root.accept(rv);
                 }
             } else {
-                // t.root.accept(rv);
+                t.root.accept(rv);
             }
         }
     }
