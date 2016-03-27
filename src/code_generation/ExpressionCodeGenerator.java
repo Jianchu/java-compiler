@@ -1,15 +1,7 @@
 package code_generation;
 
 import utility.StringUtility;
-import ast.BooleanLiteral;
-import ast.CharacterLiteral;
-import ast.Expression;
-import ast.IntegerLiteral;
-import ast.MethodDeclaration;
-import ast.MethodInvocation;
-import ast.NullLiteral;
-import ast.StringLiteral;
-import ast.TypeDeclaration;
+import ast.*;
 import environment.NameHelper;
 import environment.TraversalVisitor;
 import exceptions.NameException;
@@ -95,12 +87,27 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
     		// call method
     		StringUtility.appendIndLn(sb, generateMethodCall(mDecl));
     		
-    		// clean up
-    		StringUtility.appendIndLn(sb, "add esp " + (numArgs+1) + "*4" + "\t; caller cleanup arguments.");	
     	} else {
     		// Name(...)
+    		if (node.expr instanceof SimpleName) {	// SimpleName(...), implicit this
+    			SimpleName sn = (SimpleName) node.expr;
+    			StringUtility.appendIndLn(sb, "mov eax, [ebp + 8] \t; move object address to eax"); // this only happens in the method of the same class
+    			StringUtility.appendIndLn(sb, "push eax \t; push object address");
+    			MethodDeclaration mDecl = (MethodDeclaration) sn.getDeclaration();
+    			StringUtility.appendIndLn(sb, generateMethodCall(mDecl));
+    			
+    		} else {	// QualifiedName(...)
+    			
+    			
+    			
+    		}
     		
     	}
+    	
+		// clean up
+		StringUtility.appendIndLn(sb, "add esp " + (numArgs+1) + "*4" + "\t; caller cleanup arguments.");	
+		node.attachCode(sb.toString());
+    	
     }
     
     /**
@@ -113,14 +120,19 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
     private String generateMethodCall(MethodDeclaration mDecl) throws NameException, Exception {
     	String call;
     	TypeDeclaration tDecl = (TypeDeclaration) mDecl.getParent();
-		// generate method call
-		if (tDecl.isInterface) {	// interface method
-			int offset = OffSet.getInterfaceMethodOffset(NameHelper.mangle(mDecl));
-			call = "call [[eax] + " + offset + "*4] \t; call interface method.";		//TODO: check if the level of indirection is proper 
-		} else {
-			int offset = tDecl.getMethodOffSet(NameHelper.mangle(mDecl));
-			call = "call [[eax] + " + offset + "*4] \t; call class method.";
-		}
+    	if (mDecl.modifiers.contains(Modifier.STATIC)) {
+    		call = "call " + SigHelper.getMethodSigWithImp(mDecl);	// call static methods
+    		
+    	} else {	// instance method
+			// generate method call
+			if (tDecl.isInterface) {	// interface method
+				int offset = OffSet.getInterfaceMethodOffset(NameHelper.mangle(mDecl));
+				call = "call [[eax] + " + offset + "*4] \t; call interface method.";		//TODO: check if the level of indirection is proper 
+			} else {
+				int offset = tDecl.getMethodOffSet(NameHelper.mangle(mDecl));
+				call = "call [[eax] + " + offset + "*4] \t; call class method.";
+			}
+    	}
 		return call;
     }
     
