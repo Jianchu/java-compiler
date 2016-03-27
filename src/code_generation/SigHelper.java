@@ -56,6 +56,14 @@ public class SigHelper {
         return methodSig.toString();
     }
     
+    public static String getMethodSigWithImp(MethodDeclaration md) {
+        StringBuilder methodSig = new StringBuilder();
+        ASTNode typeNode = md.getParent();
+        methodSig.append(getClassSig(typeNode));
+        methodSigHelper(md, methodSig);
+        return methodSig.toString() + "implementation";
+    }
+
     public static String getMethodSig(TypeDeclaration td, MethodDeclaration md) {
         StringBuilder methodSig = new StringBuilder();
         methodSig.append(getClassSig(td));

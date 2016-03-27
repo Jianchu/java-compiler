@@ -21,4 +21,8 @@ public class UglyTableBuilder {
             }
         }
     }
+
+    public static String getUgly() {
+        return uglyText.toString();
+    }
 }
