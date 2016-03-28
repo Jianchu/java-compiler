@@ -89,7 +89,7 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
             String rhsText = node.expr.getCode();
             assignText.append(rhsText);
         } else {
-            StringUtility.appendIndLn(assignText, "move eax, " + FALSE + "\t; rhs is null");
+            StringUtility.appendIndLn(assignText, "mov eax, " + FALSE + "\t; rhs is null");
         }
         StringUtility.appendIndLn(assignText, "pop ebx" + "\t; pop lhs to ebx");
         StringUtility.appendIndLn(assignText, "mov [ebx], eax" + "\t; assignment");
@@ -104,11 +104,11 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
                 if (node.expr instanceof IntegerLiteral) {
                     ((IntegerLiteral)node.expr).value = "-" + ((IntegerLiteral)node.expr).value;
                 } else {
-                    StringUtility.appendIndLn(prefixText, "move eax, -eax" + "\t; negation operation");
+                    StringUtility.appendIndLn(prefixText, "mov eax, -eax" + "\t; negation operation");
                 }
                 
             } else if (node.op.equals(Operator.NOT)) {
-                StringUtility.appendIndLn(prefixText, "move eax, !eax" + "\t; logical negation operation");
+                StringUtility.appendIndLn(prefixText, "mov eax, !eax" + "\t; logical negation operation");
             }
             node.expr.accept(this);
             String exprCode = node.expr.getCode();
