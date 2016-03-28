@@ -38,7 +38,7 @@ public class CodeGenerator extends TraversalVisitor {
         StringBuilder vTableText = new StringBuilder();
         StringBuilder textSection = new StringBuilder();
         StringBuilder start = new StringBuilder();
-        StringUtility.appendLine(vTableText, "section. text");
+        StringUtility.appendLine(textSection, "section .text");
         StringUtility.appendLine(vTableText, "gloabl VTable#" + SigHelper.getClassSig(node));
         StringUtility.appendIndLn(vTableText, "VTable#" + SigHelper.getClassSig(node) + ":");        
         
@@ -101,9 +101,9 @@ public class CodeGenerator extends TraversalVisitor {
             String methodText = mDecl.getCode();
             textSection.append(methodText);
         }
-        dataSection.append(vTableText);
-        textSection.append(getInstanceFieldInit());
-        textSection.append(start);
+        dataSection.append(vTableText + "\n");
+        textSection.append(getInstanceFieldInit() + "\n");
+        textSection.append(start + "\n");
         node.attachCode(dataSection.toString() + textSection.toString());
     }
     
