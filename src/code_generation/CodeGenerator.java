@@ -40,7 +40,7 @@ public class CodeGenerator extends TraversalVisitor {
         StringBuilder textSection = new StringBuilder();
         StringBuilder start = new StringBuilder();
         StringUtility.appendLine(textSection, "section .text");
-        StringUtility.appendLine(vTableText, "gloabl VTable#" + SigHelper.getClassSig(node));
+        StringUtility.appendLine(vTableText, "global VTable#" + SigHelper.getClassSig(node));
         StringUtility.appendIndLn(vTableText, "VTable#" + SigHelper.getClassSig(node) + ":");        
         
         // creating .data section for static field
@@ -107,10 +107,10 @@ public class CodeGenerator extends TraversalVisitor {
     }
     
     private void generateStart(StringBuilder start, String testSig) {
-        StringUtility.appendLine(start, "gloabl _start");
+        StringUtility.appendLine(start, "global _start");
         StringUtility.appendIndLn(start, "_start:");
         StringUtility.appendLine(start, "call " + testSig, 2);
-        StringUtility.appendLine(start, "call debexit", 2);
+        StringUtility.appendLine(start, "call __debexit", 2);
     }
 
     private void staticMethodVTableHandler(Map.Entry<String, MethodDeclaration> entry, TypeDeclaration node, StringBuilder textSection) throws Exception {
@@ -119,7 +119,7 @@ public class CodeGenerator extends TraversalVisitor {
         String methodSig = SigHelper.getMethodSig(node, mDecl);
         String methodSigInDec = SigHelper.getMethodSigWithImp(mDecl);
         if (mDecl.modifiers.contains(Modifier.STATIC)) {
-            StringUtility.appendLine(textSection, "gloabl " + methodSig);
+            StringUtility.appendLine(textSection, "global " + methodSig);
             StringUtility.appendIndLn(textSection, methodSig + ":");
             StringUtility.appendLine(textSection, "dd " + methodSigInDec, 2);
         } else {
@@ -173,11 +173,11 @@ public class CodeGenerator extends TraversalVisitor {
 
     public void visit(MethodDeclaration node) throws Exception {
     	StringBuilder sb = new StringBuilder();
-    	StringUtility.appendLine(sb, SigHelper.getMethodSigWithImp(node));	// generate method label
+    	StringUtility.appendLine(sb, SigHelper.getMethodSigWithImp(node) + ":");	// generate method label
     	
 		StringUtility.appendIndLn(sb, "push ebp \t; save old frame pointer");
-		StringUtility.appendIndLn(sb, "mov ebp esp \t; move ebp to top of stack");
-		StringUtility.appendIndLn(sb, "sub esp " + node.frameSize + "\t; space for local variables");
+		StringUtility.appendIndLn(sb, "mov ebp, esp \t; move ebp to top of stack");
+		StringUtility.appendIndLn(sb, "sub esp, " + node.frameSize + "\t; space for local variables");
 		
 		if (node.body != null) {
 			node.body.accept(this);
@@ -185,7 +185,7 @@ public class CodeGenerator extends TraversalVisitor {
 		}
 		
 		// clean up in case there is no return statement
-		StringUtility.appendIndLn(sb, "mov eax 0 \t; in the case of no return, make sure eax is null"); 
+		StringUtility.appendIndLn(sb, "mov eax, 0 \t; in the case of no return, make sure eax is null"); 
 		StringUtility.appendIndLn(sb, "mov esp, ebp \t; delete frame");
 		StringUtility.appendIndLn(sb, "pop ebp \t; restore to previous frame");
 		StringUtility.appendIndLn(sb, "ret \t; end of method");

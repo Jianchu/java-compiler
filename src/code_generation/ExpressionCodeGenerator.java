@@ -180,7 +180,7 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
     	}
     	
 		// clean up
-		StringUtility.appendIndLn(sb, "add esp " + (numArgs+1) + "*4" + "\t; caller cleanup arguments.");	
+		StringUtility.appendIndLn(sb, "add esp, " + (numArgs+1) + "*4" + "\t; caller cleanup arguments.");	
 		node.attachCode(sb.toString());
     	
     }

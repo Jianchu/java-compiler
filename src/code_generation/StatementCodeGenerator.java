@@ -21,7 +21,7 @@ public class StatementCodeGenerator extends TraversalVisitor {
     public void visit(WhileStatement node) throws Exception {
         loopCounter++;
         StringBuilder whileAssemblyText = new StringBuilder();
-        StringUtility.appendLine(whileAssemblyText, "jmp COND_" + loopCounter + ":");
+        StringUtility.appendLine(whileAssemblyText, "jmp COND_" + loopCounter);
         StringUtility.appendLine(whileAssemblyText, "LOOP_" + loopCounter + ":");
         if (node.whileStatement != null) {
             node.whileStatement.accept(this);
