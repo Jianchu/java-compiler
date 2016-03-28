@@ -55,7 +55,6 @@ import exceptions.TypeCheckingException;
 
 public class TypeCheckingVisitor extends EnvTraversalVisitor {
     private final Map<String, TypeDeclaration> global = SymbolTable.getGlobal();
-    private final TypeHelper helper = new TypeHelper();
     private String currentTypeName;
     private MethodDeclaration currentMethod;
     private TypeDeclaration currentTypeDecl;
@@ -241,6 +240,7 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
         Map<String, MethodDeclaration> constructors = typeDec.getEnvironment().constructors;
         if (constructors.containsKey(realConstructorName)) {
             MethodDeclaration conDec = constructors.get(realConstructorName);
+            node.addConstructor(conDec); 	// add pointer from expression to actual method declaration
             if (conDec.modifiers.contains(Modifier.PROTECTED)) {
                 checkConstructorProtected(typeDec);
             }
