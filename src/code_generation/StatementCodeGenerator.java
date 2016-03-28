@@ -27,7 +27,7 @@ public class StatementCodeGenerator extends TraversalVisitor {
         StringUtility.appendLine(whileAssemblyText, "COND_" + loopCounter + ":");
         
         if (node.whileCondition != null) {
-            node.whileCondition.accept(this);
+            node.whileCondition.accept(expGen);
             StringUtility.appendLine(whileAssemblyText, node.whileCondition.getCode());
         }
         StringUtility.appendLine(whileAssemblyText, "cmp eax, " + FALSE);
