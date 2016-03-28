@@ -31,7 +31,7 @@ public class UglyTableBuilder {
             StringUtility.appendLine(uglyHeader, "extern " + sig);
         }
         uglyHeader.append("\n");
-        //uglyText.insert(0, uglyHeader);
+        uglyText.insert(0, uglyHeader);
     }
 
     public static String getUgly() {

@@ -26,7 +26,7 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
     private static final String FALSE = "0x0";
     private static final String TRUE = "0xffffffff";
     private int stringLitCounter = 0;
-    
+    public static StringBuilder stringLitData = new StringBuilder();
     /*
      * Literals
      */
@@ -35,11 +35,10 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
         // can use counter because string literal is not global.
         stringLitCounter++;
         // TODO:integrate stringLitData into data section.
-        StringBuilder stringLitData = new StringBuilder();
         StringUtility.appendLine(stringLitData, "STRING_" + stringLitCounter + ":" + "\t; define label for string literal");
         StringUtility.appendLine(stringLitData, "\t" + "dw " + '\'' + node.value + '\'');
 
-        node.attachCode("mov eax, " + "STRING_" + stringLitCounter);
+        node.attachCode("mov eax, " + "STRING_" + stringLitCounter + "\n");
     }
 
     public void visit(NullLiteral node) throws Exception {

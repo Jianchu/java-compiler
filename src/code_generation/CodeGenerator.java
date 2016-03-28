@@ -39,6 +39,7 @@ public class CodeGenerator extends TraversalVisitor {
         StringBuilder vTableText = new StringBuilder();
         StringBuilder textSection = new StringBuilder();
         StringBuilder start = new StringBuilder();
+        StringBuilder header = new StringBuilder();
         StringUtility.appendLine(textSection, "section .text");
         StringUtility.appendLine(vTableText, "global VTable#" + SigHelper.getClassSig(node));
         StringUtility.appendIndLn(vTableText, "VTable#" + SigHelper.getClassSig(node) + ":");        
@@ -78,17 +79,21 @@ public class CodeGenerator extends TraversalVisitor {
         }
         
         for (Map.Entry<String, MethodDeclaration> entry : node.getEnvironment().getEnclosing().methods.entrySet()) {
+            String methodSigInDec = SigHelper.getMethodSigWithImp(entry.getValue());
+            StringUtility.appendLine(header, "extern " + methodSigInDec);
             staticMethodVTableHandler(entry, node, textSection);
         }
         
         if (!node.isInterface) {
             for (Integer i = 0; i < SigOffsets.size(); i++) {
                 StringUtility.appendLine(vTableText, "dd " + SigOffsets.get(i), 2);
+                
             }
         }
         
         for (MethodDeclaration mDecl: node.getEnvironment().methods.values()) {
             if (SigHelper.getMethodSigWithImp(mDecl).equals(testSig)) {
+                StringUtility.appendLine(header, "extern __debexit");
                 generateStart(start, testSig);
             }
             mDecl.accept(this);
@@ -99,11 +104,14 @@ public class CodeGenerator extends TraversalVisitor {
             textSection.append(methodText);
         }
         
-
-        dataSection.append(vTableText + "\n");
+        dataSection.append(ExpressionCodeGenerator.stringLitData);
         textSection.append(getInstanceFieldInit() + "\n");
         textSection.append(start + "\n");
-        node.attachCode(dataSection.toString() + textSection.toString());
+        textSection.append(vTableText + "\n");
+        StringUtility.appendLine(header, "extern __malloc");
+        StringUtility.appendLine(header, "extern __exception");
+        header.append("\n");
+        node.attachCode(header.toString() + dataSection.toString() + textSection.toString());
     }
     
     private void generateStart(StringBuilder start, String testSig) {
@@ -173,6 +181,7 @@ public class CodeGenerator extends TraversalVisitor {
 
     public void visit(MethodDeclaration node) throws Exception {
     	StringBuilder sb = new StringBuilder();
+    	StringUtility.appendLine(sb, "global " + SigHelper.getMethodSigWithImp(node));
     	StringUtility.appendLine(sb, SigHelper.getMethodSigWithImp(node) + ":");	// generate method label
     	
 		StringUtility.appendIndLn(sb, "push ebp \t; save old frame pointer");
