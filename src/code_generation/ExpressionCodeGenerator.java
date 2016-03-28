@@ -1,6 +1,7 @@
 package code_generation;
 
 import utility.StringUtility;
+import ast.AssignmentExpression;
 import ast.BooleanLiteral;
 import ast.CharacterLiteral;
 import ast.ClassInstanceCreationExpression;
@@ -74,6 +75,27 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
         node.attachCode(intText);
     }
     
+    @Override
+    public void visit(AssignmentExpression node) throws Exception {
+        StringBuilder assignText = new StringBuilder();
+        if (node.lhs != null) {
+            node.lhs.accept(this);
+            String lhsText = node.lhs.getCode();
+            assignText.append(lhsText);
+            StringUtility.appendIndLn(assignText, "push eax" + "\t; push lhs to stack");
+        }
+        if (node.expr != null) {
+            node.expr.accept(this);
+            String rhsText = node.expr.getCode();
+            assignText.append(rhsText);
+        } else {
+            StringUtility.appendIndLn(assignText, "move eax, " + FALSE + "\t; rhs is null");
+        }
+        StringUtility.appendIndLn(assignText, "pop ebx" + "\t; pop lhs to ebx");
+        StringUtility.appendIndLn(assignText, "mov [ebx], eax" + "\t; assignment");
+        node.attachCode(assignText.toString());
+    }
+
     @Override
     public void visit(PrefixExpression node) throws Exception {
         StringBuilder prefixText = new StringBuilder();
