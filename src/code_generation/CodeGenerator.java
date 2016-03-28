@@ -158,11 +158,11 @@ public class CodeGenerator extends TraversalVisitor {
                 StringUtility.appendIndLn(instanceFieldInit[0], "call instance_init_" + fieldSig);
                 StringUtility.appendIndLn(instanceFieldInit[1], "instance_init_" + fieldSig + ":");
                 // TODO: add a method for evaluating the address of instance field, and putting it to eax. 
-                StringUtility.appendLine(instanceFieldInit[1], "push eax /t;store field address", 2);
+                StringUtility.appendLine(instanceFieldInit[1], "push eax \t;store field address", 2);
                 StringUtility.appendLine(instanceFieldInit[1], initCode, 2);
-                StringUtility.appendLine(instanceFieldInit[1], "mov edx, eax /t; put value of field to edx", 2);
-                StringUtility.appendLine(instanceFieldInit[1], "pop eax /t; pop field address back to eax", 2);
-                StringUtility.appendLine(instanceFieldInit[1], "mov dword [eax], edx /t; initiallize field", 2);
+                StringUtility.appendLine(instanceFieldInit[1], "mov edx, eax \t; put value of field to edx", 2);
+                StringUtility.appendLine(instanceFieldInit[1], "pop eax \t; pop field address back to eax", 2);
+                StringUtility.appendLine(instanceFieldInit[1], "mov dword [eax], edx \t; initiallize field", 2);
                 
             }
         }
