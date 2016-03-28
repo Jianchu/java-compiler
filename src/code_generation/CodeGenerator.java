@@ -177,11 +177,17 @@ public class CodeGenerator extends TraversalVisitor {
     }
 
     protected static String getStaticFieldInit() {
-        return staticFieldInit[0].toString() + staticFieldInit[1].toString();
+        String staticFieldInitString = staticFieldInit[0].toString() + staticFieldInit[1].toString();
+        staticFieldInit[0].setLength(0);
+        staticFieldInit[1].setLength(0);
+        return staticFieldInitString;
     }
     
     private String getInstanceFieldInit() {
-        return instanceFieldInit[0].toString() + instanceFieldInit[1].toString();
+        String instanceFieldInitString = instanceFieldInit[0].toString() + instanceFieldInit[1].toString();
+        instanceFieldInit[0].setLength(0);
+        instanceFieldInit[1].setLength(0);
+        return instanceFieldInitString;
     }
 
     public static void generate(List<AST> trees) throws Exception {
