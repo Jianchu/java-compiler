@@ -22,7 +22,6 @@ public class CodeGenerator extends TraversalVisitor {
     private static StringBuilder[] staticFieldInit = {new StringBuilder(), new StringBuilder()};
     private static StringBuilder[] instanceFieldInit = {new StringBuilder(), new StringBuilder()};
     TypeDeclaration currentTypeDec;
-    static boolean debug = true;
 
     public CodeGenerator() {
         stmtGen = new StatementCodeGenerator();
@@ -84,13 +83,6 @@ public class CodeGenerator extends TraversalVisitor {
             for (Integer i = 0; i < SigOffsets.size(); i++) {
                 StringUtility.appendLine(vTableText, "dd " + SigOffsets.get(i), 2);
             }
-        }
-
-        if (debug) {
-            // System.out.println(vTableText.toString());
-            System.out.println(textSection.toString());
-            // System.out.println(dataSection.toString());
-            // System.out.println(getInstanceFieldInit());
         }
         
         for (MethodDeclaration mDecl: node.getEnvironment().methods.values()) {
@@ -198,14 +190,7 @@ public class CodeGenerator extends TraversalVisitor {
     public static void generate(List<AST> trees) throws Exception {
         for (AST t : trees) {
             Visitor rv = new CodeGenerator();
-            if (debug) {
-                if (t.root.types.get(0).getFullName().contains("String")) {
-                    System.out.println(t.root.types.get(0).getFullName().toString());
-                    t.root.accept(rv);
-                }
-            } else {
-                t.root.accept(rv);
-            }
+            t.root.accept(rv);
         }
     }
 }
