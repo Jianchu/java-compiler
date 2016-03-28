@@ -22,7 +22,7 @@ public class CodeGenerator extends TraversalVisitor {
     private static StringBuilder[] staticFieldInit = {new StringBuilder(), new StringBuilder()};
     private static StringBuilder[] instanceFieldInit = {new StringBuilder(), new StringBuilder()};
     TypeDeclaration currentTypeDec;
-    static boolean debug = false;
+    static boolean debug = true;
 
     public CodeGenerator() {
         stmtGen = new StatementCodeGenerator();
@@ -90,7 +90,7 @@ public class CodeGenerator extends TraversalVisitor {
             // System.out.println(vTableText.toString());
             System.out.println(textSection.toString());
             // System.out.println(dataSection.toString());
-            System.out.println(getInstanceFieldInit());
+            // System.out.println(getInstanceFieldInit());
         }
         
         for (MethodDeclaration mDecl: node.getEnvironment().methods.values()) {
@@ -99,8 +99,13 @@ public class CodeGenerator extends TraversalVisitor {
             }
             mDecl.accept(this);
             String methodText = mDecl.getCode();
+            if (methodText == null) {
+                methodText = "; no method body yet\n";
+            }
             textSection.append(methodText);
         }
+        
+
         dataSection.append(vTableText + "\n");
         textSection.append(getInstanceFieldInit() + "\n");
         textSection.append(start + "\n");
@@ -151,7 +156,7 @@ public class CodeGenerator extends TraversalVisitor {
             node.initializer.accept(expGen);
             String initCode = node.initializer.getCode();
             if (initCode == null) {
-                initCode = "; no right hand side yet.";
+                initCode = "; no right hand side yet.\n";
             }
             if (node.modifiers.contains(Modifier.STATIC)) {
                 StringUtility.appendIndLn(staticFieldInit[1], "static_init_" + fieldSig + ":");
@@ -194,7 +199,7 @@ public class CodeGenerator extends TraversalVisitor {
         for (AST t : trees) {
             Visitor rv = new CodeGenerator();
             if (debug) {
-                if (t.root.types.get(0).getFullName().contains("Object")) {
+                if (t.root.types.get(0).getFullName().contains("String")) {
                     System.out.println(t.root.types.get(0).getFullName().toString());
                     t.root.accept(rv);
                 }

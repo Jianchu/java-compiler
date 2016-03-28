@@ -128,6 +128,6 @@ public class SigHelper {
     }
 
     public static String instanceFieldInitSig(Type type) {
-        return getTypeSig(type) + "$instance_field_init";
+        return "instance_field_init$" + getTypeSig(type);
     }
 }
