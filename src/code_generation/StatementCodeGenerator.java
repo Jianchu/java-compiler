@@ -1,6 +1,9 @@
 package code_generation;
 
 import utility.StringUtility;
+import ast.Block;
+import ast.ReturnStatement;
+import ast.Statement;
 import ast.WhileStatement;
 import environment.TraversalVisitor;
 
@@ -37,4 +40,26 @@ public class StatementCodeGenerator extends TraversalVisitor {
         // visitNextStatement(node);
     }
 
+    public void visit(ReturnStatement node) throws Exception {
+        StringBuilder returnText = new StringBuilder();
+        if (node.returnExpression != null) {
+            node.returnExpression.accept(expGen);
+            returnText.append(node.returnExpression.getCode());
+        }
+        StringUtility.appendIndLn(returnText, "mov esp, ebp \t; delete frame");
+        StringUtility.appendIndLn(returnText, "pop ebp \t; restore to previous frame");
+        StringUtility.appendIndLn(returnText, "ret \t; end of method");
+        node.attachCode(returnText.toString());
+    }
+
+    public void visit(Block node) throws Exception {
+        StringBuilder blockText = new StringBuilder();
+        if (node.statements.size() > 0) {
+            for (Statement statement : node.statements) {
+                statement.accept(this);
+                blockText.append(statement.getCode());
+            }
+        }
+        node.attachCode(blockText.toString());
+    }
 }

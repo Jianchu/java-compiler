@@ -7,9 +7,11 @@ import java.util.Map;
 
 import utility.StringUtility;
 import ast.AST;
+import ast.Block;
 import ast.FieldDeclaration;
 import ast.MethodDeclaration;
 import ast.Modifier;
+import ast.ReturnStatement;
 import ast.TypeDeclaration;
 import ast.Visitor;
 import ast.WhileStatement;
@@ -192,6 +194,14 @@ public class CodeGenerator extends TraversalVisitor {
     }
     
     public void visit(WhileStatement node) throws Exception {
+        node.accept(stmtGen);
+    }
+
+    public void visit(Block node) throws Exception {
+        node.accept(stmtGen);
+    }
+
+    public void visit(ReturnStatement node) throws Exception {
         node.accept(stmtGen);
     }
 

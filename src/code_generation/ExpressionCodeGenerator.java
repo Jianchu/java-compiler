@@ -1,7 +1,19 @@
 package code_generation;
 
 import utility.StringUtility;
-import ast.*;
+import ast.BooleanLiteral;
+import ast.CharacterLiteral;
+import ast.ClassInstanceCreationExpression;
+import ast.Expression;
+import ast.IntegerLiteral;
+import ast.MethodDeclaration;
+import ast.MethodInvocation;
+import ast.Modifier;
+import ast.NullLiteral;
+import ast.QualifiedName;
+import ast.SimpleName;
+import ast.StringLiteral;
+import ast.TypeDeclaration;
 import environment.NameHelper;
 import environment.TraversalVisitor;
 import exceptions.NameException;
@@ -28,17 +40,17 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
     }
 
     public void visit(NullLiteral node) throws Exception {
-        node.attachCode("mov eax, " + FALSE);
+        node.attachCode("\tmov eax, " + FALSE + "\n");
     }
 
     public void visit(BooleanLiteral node) throws Exception {
         String booleanText;
         if (node.value == true) {
-            booleanText = "mov eax, " + TRUE;
+            booleanText = "\tmov eax, " + TRUE;
         } else {
-            booleanText = "mov eax, " + FALSE;
+            booleanText = "\tmov eax, " + FALSE;
         }
-        node.attachCode(booleanText);
+        node.attachCode(booleanText + "\n");
     }
 
     public void visit(CharacterLiteral node) throws Exception {
@@ -46,17 +58,17 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
 
         // Assuming octal is valid.
         if (node.value.length() > 3) {
-            charText = "mov eax, " + "0o" + node.value.substring(1);
+            charText = "\tmov eax, " + "0o" + node.value.substring(1);
         } else {
-            charText = "mov eax, " + "'" + node.value + "'";
+            charText = "\tmov eax, " + "'" + node.value + "'";
         }
 
-        node.attachCode(charText);
+        node.attachCode(charText + "\n");
     }
 
     public void visit(IntegerLiteral node) throws Exception {
         String intText;
-        intText = "mov eax, " + node.value;
+        intText = "\tmov eax, " + node.value + "\n";
         node.attachCode(intText);
     }
     
