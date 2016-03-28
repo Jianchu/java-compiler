@@ -177,9 +177,11 @@ public class CodeGenerator extends TraversalVisitor {
 		StringUtility.appendIndLn(sb, "mov ebp esp \t; move ebp to top of stack");
 		StringUtility.appendIndLn(sb, "sub esp " + node.frameSize + "\t; space for local variables");
 		
-		node.body.accept(this);
-		sb.append(node.body.getCode());
-
+		if (node.body != null) {
+			node.body.accept(this);
+			sb.append(node.body.getCode());
+		}
+		
 		// clean up in case there is no return statement
 		StringUtility.appendIndLn(sb, "mov eax 0 \t; in the case of no return, make sure eax is null"); 
 		StringUtility.appendIndLn(sb, "mov esp, ebp \t; delete frame");

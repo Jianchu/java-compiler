@@ -68,13 +68,15 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
     public void visit(ClassInstanceCreationExpression node) throws Exception {
     	StringBuilder sb = new StringBuilder();    	
     	// generate code for arguments
-    	int numArgs;
-    	for (numArgs =0; numArgs < node.arglist.size() ; numArgs++) {
-    		Expression expr = node.arglist.get(numArgs);
-    		expr.accept(this);
-    		StringUtility.appendLine(sb, expr.getCode());
-    		StringUtility.appendIndLn(sb, "push eax \t; push argument " + numArgs);
-    	}    	
+    	int numArgs = 0;
+    	if (node.arglist != null) {
+	    	for (numArgs =0; numArgs < node.arglist.size() ; numArgs++) {
+	    		Expression expr = node.arglist.get(numArgs);
+	    		expr.accept(this);
+	    		StringUtility.appendLine(sb, expr.getCode());
+	    		StringUtility.appendIndLn(sb, "push eax \t; push argument " + numArgs);
+	    	}    	
+    	}
     	
     	// malloc
     	TypeDeclaration tDecl = node.type.getDeclaration();
@@ -121,12 +123,14 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
     	StringBuilder sb = new StringBuilder();
 
     	// generate code for arguments
-    	int numArgs;
-    	for (numArgs =0; numArgs < node.arglist.size() ; numArgs++) {
-    		Expression expr = node.arglist.get(numArgs);
-    		expr.accept(this);
-    		StringUtility.appendLine(sb, expr.getCode());
-    		StringUtility.appendIndLn(sb, "push eax \t; push argument " + numArgs);
+    	int numArgs = 0;
+    	if (node.arglist != null) {
+	    	for (numArgs =0; numArgs < node.arglist.size() ; numArgs++) {
+	    		Expression expr = node.arglist.get(numArgs);
+	    		expr.accept(this);
+	    		StringUtility.appendLine(sb, expr.getCode());
+	    		StringUtility.appendIndLn(sb, "push eax \t; push argument " + numArgs);
+	    	}
     	}
     	
     	if (node.id != null) {
