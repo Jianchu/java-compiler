@@ -169,6 +169,25 @@ public class CodeGenerator extends TraversalVisitor {
         // node.attachCode(fieldAssemblyText.toString());
     }
 
+    public void visit(MethodDeclaration node) throws Exception {
+    	StringBuilder sb = new StringBuilder();
+    	StringUtility.appendLine(sb, SigHelper.getMethodSigWithImp(node));	// generate method label
+    	
+		StringUtility.appendIndLn(sb, "push ebp \t; save old frame pointer");
+		StringUtility.appendIndLn(sb, "mov ebp esp \t; move ebp to top of stack");
+		StringUtility.appendIndLn(sb, "sub esp " + node.frameSize + "\t; space for local variables");
+		
+		node.body.accept(this);
+		sb.append(node.body.getCode());
+
+		// clean up in case there is no return statement
+		StringUtility.appendIndLn(sb, "mov esp, ebp \t; delete frame");
+		StringUtility.appendIndLn(sb, "pop ebp \t; restore to previous frame");
+		StringUtility.appendIndLn(sb, "ret \t; end of method");
+		
+		node.attachCode(sb.toString());
+    }
+    
     public void visit(WhileStatement node) throws Exception {
         node.accept(stmtGen);
     }
