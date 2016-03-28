@@ -181,6 +181,7 @@ public class CodeGenerator extends TraversalVisitor {
 		sb.append(node.body.getCode());
 
 		// clean up in case there is no return statement
+		StringUtility.appendIndLn(sb, "mov eax 0 \t; in the case of no return, make sure eax is null"); 
 		StringUtility.appendIndLn(sb, "mov esp, ebp \t; delete frame");
 		StringUtility.appendIndLn(sb, "pop ebp \t; restore to previous frame");
 		StringUtility.appendIndLn(sb, "ret \t; end of method");

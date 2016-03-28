@@ -13,7 +13,6 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
     private int stringLitCounter = 0;
     
     /*
-     * (non-Javadoc)
      * Literals
      */
     // String is Object.
@@ -67,7 +66,33 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
     
     @Override
     public void visit(ClassInstanceCreationExpression node) throws Exception {
+    	StringBuilder sb = new StringBuilder();    	
+    	// generate code for arguments
+    	int numArgs;
+    	for (numArgs =0; numArgs < node.arglist.size() ; numArgs++) {
+    		Expression expr = node.arglist.get(numArgs);
+    		expr.accept(this);
+    		StringUtility.appendLine(sb, expr.getCode());
+    		StringUtility.appendIndLn(sb, "push eax \t; push argument " + numArgs);
+    	}    	
     	
+    	// malloc
+    	TypeDeclaration tDecl = node.type.getDeclaration();
+    	int objSize = tDecl.getFieldOffSetList().size() + 2;
+    	StringUtility.appendIndLn(sb, "mov eax, 4*" + objSize + "\t; size of object");
+    	StringUtility.appendIndLn(sb, "call __malloc");
+    	StringUtility.appendIndLn(sb, "push eax \t; push object address");
+    	
+    	// call field initializer
+    	StringUtility.appendIndLn(sb, "call " + SigHelper.instanceFieldInitSig(node.type));
+    	
+    	// call actual constructor
+    	StringUtility.appendIndLn(sb, "call " + SigHelper.getMethodSigWithImp(node.getConstructor()));
+    	
+    	// clean up
+    	StringUtility.appendIndLn(sb, "pop eax \t; pop object address back in eax");
+    	StringUtility.appendIndLn(sb, "add esp, 4 * " + numArgs);
+    	node.attachCode(sb.toString());
     }
     
     /**

@@ -28,7 +28,7 @@ public class ClassInstanceCreationExpression extends Expression {
 		this.constructor = constructor;
 	}
 	
-	public MethodDeclaration getConstructor(MethodDeclaration constructor) throws Exception {
+	public MethodDeclaration getConstructor() throws Exception {
 		if (this.constructor == null) {
 			throw new Exception("Constructor not found.");
 		}
