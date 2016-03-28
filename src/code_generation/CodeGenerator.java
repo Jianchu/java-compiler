@@ -32,6 +32,7 @@ public class CodeGenerator extends TraversalVisitor {
 
     public void visit(TypeDeclaration node) throws Exception {
         this.currentTypeDec = node;
+        ExpressionCodeGenerator.stringLitData.setLength(0);
         String classSig = SigHelper.getClassSig(node);
         String testSig = classSig + "#test$$implementation";
         StringUtility.appendLine(instanceFieldInit[0], "instance_field_init$" + classSig + ":");

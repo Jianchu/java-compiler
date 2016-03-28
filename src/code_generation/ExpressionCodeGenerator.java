@@ -38,7 +38,7 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
         StringUtility.appendLine(stringLitData, "STRING_" + stringLitCounter + ":" + "\t; define label for string literal");
         StringUtility.appendLine(stringLitData, "\t" + "dw " + '\'' + node.value + '\'');
 
-        node.attachCode("mov eax, " + "STRING_" + stringLitCounter + "\n");
+        node.attachCode("\tmov eax, " + "STRING_" + stringLitCounter + "\n");
     }
 
     public void visit(NullLiteral node) throws Exception {
