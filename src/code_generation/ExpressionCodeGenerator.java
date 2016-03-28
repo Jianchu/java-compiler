@@ -85,6 +85,12 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
     	
     	// call field initializer
     	StringUtility.appendIndLn(sb, "call " + SigHelper.instanceFieldInitSig(node.type));
+
+    	// implicit super call
+    	if (tDecl.superClass != null) {
+    		MethodDeclaration superConstructor = getDefaultConstructor(tDecl.superClass.getDeclaration());
+        	StringUtility.appendIndLn(sb, "call " + SigHelper.getMethodSigWithImp(superConstructor));
+    	}
     	
     	// call actual constructor
     	StringUtility.appendIndLn(sb, "call " + SigHelper.getMethodSigWithImp(node.getConstructor()));
@@ -95,7 +101,19 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
     	node.attachCode(sb.toString());
     }
     
-    /**
+    private MethodDeclaration getDefaultConstructor(TypeDeclaration superClass) throws Exception {
+    	MethodDeclaration result = null;
+    	for (MethodDeclaration constructor : superClass.getEnvironment().constructors.values()) {
+    		if (constructor.parameters.size() == 0)
+    			result = constructor;
+    	}
+		if (result == null)
+			throw new Exception("No default constructor is defined for super class: " + superClass.id);
+    	
+    	return result;
+	}
+
+	/**
      * Deals with method names
      */
     @Override
