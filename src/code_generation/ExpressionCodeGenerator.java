@@ -10,6 +10,8 @@ import ast.MethodDeclaration;
 import ast.MethodInvocation;
 import ast.Modifier;
 import ast.NullLiteral;
+import ast.PrefixExpression;
+import ast.PrefixExpression.Operator;
 import ast.QualifiedName;
 import ast.SimpleName;
 import ast.StringLiteral;
@@ -72,6 +74,28 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
         node.attachCode(intText);
     }
     
+    @Override
+    public void visit(PrefixExpression node) throws Exception {
+        StringBuilder prefixText = new StringBuilder();
+        if (node.expr != null) {
+            if (node.op.equals(Operator.MINUS)) {
+                if (node.expr instanceof IntegerLiteral) {
+                    ((IntegerLiteral)node.expr).value = "-" + ((IntegerLiteral)node.expr).value;
+                } else {
+                    StringUtility.appendIndLn(prefixText, "move eax, -eax" + "\t; negation operation");
+                }
+                
+            } else if (node.op.equals(Operator.NOT)) {
+                StringUtility.appendIndLn(prefixText, "move eax, !eax" + "\t; logical negation operation");
+            }
+            node.expr.accept(this);
+            String exprCode = node.expr.getCode();
+            prefixText.insert(0, exprCode);
+        }
+        node.attachCode(prefixText.toString());
+    }
+
+
     /*
      * OO features
      */
