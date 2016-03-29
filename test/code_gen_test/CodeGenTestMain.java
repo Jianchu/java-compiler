@@ -9,22 +9,18 @@ import utility.FileUtility;
 
 public class CodeGenTestMain {
 
-    public static void main(String[] args) throws IOException,
-            InterruptedException {
+    final static String myDir = System.getProperty("user.dir");
 
-        final String myDir = System.getProperty("user.dir");
-
+    public static void main(String[] args) throws IOException,InterruptedException {
         String[] paths = new String[0];
         paths = FileUtility.getFileNames(myDir + "/test/testprogram/TestCode.java").toArray(paths);
         Joosc.compileSTL(paths);
-
         callBash();
     }
 
-    private static void callBash() throws IOException, InterruptedException {
-        String myDir = System.getProperty("user.dir");
+    private static String callBash() throws IOException, InterruptedException {
+        final String[] exitCode = new String[1];
         String command = "bash " + myDir + "/test/runnasm.sh";
-        // String command = "ls";
         final Process p = Runtime.getRuntime().exec(command);
         StringBuilder sb = new StringBuilder();
         Thread getOutPut = new Thread() {
@@ -34,6 +30,7 @@ public class CodeGenTestMain {
                 try {
                     while ((s = stdInput.readLine()) != null) {
                         sb.append(s + "\n");
+                        exitCode[0] = s;
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -59,6 +56,14 @@ public class CodeGenTestMain {
         getOutPut.join();
         getError.join();
         p.waitFor();
-        System.out.println(sb.toString());
+        // System.out.println(sb.toString());
+        return exitCode[0];
+    }
+
+    public static int testA5(String[] paths) throws IOException, InterruptedException {
+        Joosc.compileSTL(paths);
+        String exitCode = callBash();
+        int result = Integer.parseInt(exitCode);
+        return result;
     }
  }
