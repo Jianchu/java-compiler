@@ -130,4 +130,9 @@ public class SigHelper {
     public static String instanceFieldInitSig(Type type) {
         return "instance_field_init$" + getTypeSig(type);
     }
+    
+    public static String instanceFieldInitSig(TypeDeclaration tDecl) {
+		return "instance_field_init$" + getClassSig(tDecl);
+    	
+    }
 }

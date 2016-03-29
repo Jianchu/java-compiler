@@ -8,6 +8,7 @@ import java.util.Map;
 import utility.StringUtility;
 import ast.AST;
 import ast.Block;
+import ast.BodyDeclaration;
 import ast.FieldDeclaration;
 import ast.MethodDeclaration;
 import ast.Modifier;
@@ -92,18 +93,22 @@ public class CodeGenerator extends TraversalVisitor {
             }
         }
         
-        for (MethodDeclaration mDecl: node.getEnvironment().methods.values()) {
-            if (SigHelper.getMethodSigWithImp(mDecl).equals(testSig)) {
-                StringUtility.appendLine(header, "extern __debexit");
-                generateStart(start, testSig);
-            }
-            mDecl.accept(this);
-            String methodText = mDecl.getCode();
-            if (methodText == null) {
-                methodText = "; no method body yet\n";
-            }
-            textSection.append(methodText);
-        }
+        	
+        for (BodyDeclaration bDecl : node.members) {
+        	if (bDecl instanceof MethodDeclaration) {
+        		MethodDeclaration mDecl = (MethodDeclaration) bDecl;
+	            if (SigHelper.getMethodSigWithImp(mDecl).equals(testSig)) {
+	                StringUtility.appendLine(header, "extern __debexit");
+	                generateStart(start, testSig);
+	            }
+	            mDecl.accept(this);
+	            String methodText = mDecl.getCode();
+	            if (methodText == null) {
+	                methodText = "; no method body yet\n";
+	            }
+	            textSection.append(methodText);
+        	}
+       	}
         
         dataSection.append(ExpressionCodeGenerator.stringLitData);
         textSection.append(getInstanceFieldInit() + "\n");
@@ -184,10 +189,21 @@ public class CodeGenerator extends TraversalVisitor {
     	StringBuilder sb = new StringBuilder();
     	StringUtility.appendLine(sb, "global " + SigHelper.getMethodSigWithImp(node));
     	StringUtility.appendLine(sb, SigHelper.getMethodSigWithImp(node) + ":");	// generate method label
+
+    	//TODO: save registers 
     	
 		StringUtility.appendIndLn(sb, "push ebp \t; save old frame pointer");
 		StringUtility.appendIndLn(sb, "mov ebp, esp \t; move ebp to top of stack");
 		StringUtility.appendIndLn(sb, "sub esp, " + node.frameSize + "\t; space for local variables");
+		
+		// if constructor, call field initializer
+		if (node.isConstructor) {
+			TypeDeclaration tDecl = (TypeDeclaration) node.getParent();
+			StringUtility.appendIndLn(sb, "push [ebp+8] \t; push object for initialiser"); 	// push object for initializer call
+			StringUtility.appendIndLn(sb, "call " + SigHelper.instanceFieldInitSig(tDecl));
+			StringUtility.appendIndLn(sb, "add esp, 4 \t; remove object for initializer");
+		}
+		
 		
 		if (node.body != null) {
 			node.body.accept(this);

@@ -143,7 +143,7 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
     	StringUtility.appendIndLn(sb, "push eax \t; push object address");
     	
     	// call field initializer
-    	StringUtility.appendIndLn(sb, "call " + SigHelper.instanceFieldInitSig(node.type));
+//    	StringUtility.appendIndLn(sb, "call " + SigHelper.instanceFieldInitSig(node.type));
 
     	// implicit super call
     	if (tDecl.superClass != null) {
