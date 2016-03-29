@@ -31,8 +31,8 @@ public class CodeGenerator extends TraversalVisitor {
 
     public CodeGenerator() {
         this.extern = new HashSet<String>();
-        stmtGen = new StatementCodeGenerator(new HashSet<String>());
-        expGen = new ExpressionCodeGenerator(new HashSet<String>());
+        stmtGen = new StatementCodeGenerator(extern);
+        expGen = new ExpressionCodeGenerator(extern);
     }
 
     public void visit(TypeDeclaration node) throws Exception {
