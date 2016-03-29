@@ -1,5 +1,7 @@
 package code_generation;
 
+import java.util.Set;
+
 import utility.StringUtility;
 import ast.AssignmentExpression;
 import ast.BooleanLiteral;
@@ -27,6 +29,11 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
     private static final String TRUE = "0xffffffff";
     private int stringLitCounter = 0;
     public static StringBuilder stringLitData = new StringBuilder();
+    private Set<String> extern;
+
+    public ExpressionCodeGenerator(Set<String> extern) {
+        this.extern = extern;
+    }
     /*
      * Literals
      */
