@@ -12,7 +12,7 @@ public abstract class ASTNode {
 	
 	ASTNode parentNode = null;
 	Environment env = null;
-	String code = null;
+	String code = "";
 	/**
 	 * Not implemented by default.
 	 * @param v

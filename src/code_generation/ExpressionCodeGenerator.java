@@ -1,5 +1,7 @@
 package code_generation;
 
+import java.util.Set;
+
 import utility.StringUtility;
 import ast.AssignmentExpression;
 import ast.BooleanLiteral;
@@ -27,6 +29,11 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
     private static final String TRUE = "0xffffffff";
     private int stringLitCounter = 0;
     public static StringBuilder stringLitData = new StringBuilder();
+    private Set<String> extern;
+
+    public ExpressionCodeGenerator(Set<String> extern) {
+        this.extern = extern;
+    }
     /*
      * Literals
      */
@@ -143,7 +150,7 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
     	StringUtility.appendIndLn(sb, "push eax \t; push object address");
     	
     	// call field initializer
-    	StringUtility.appendIndLn(sb, "call " + SigHelper.instanceFieldInitSig(node.type));
+//    	StringUtility.appendIndLn(sb, "call " + SigHelper.instanceFieldInitSig(node.type));
 
     	// implicit super call
     	if (tDecl.superClass != null) {
@@ -179,6 +186,8 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
     public void visit(MethodInvocation node) throws Exception {
     	StringBuilder sb = new StringBuilder();
 
+    	//TODO: caller save registers
+    	
     	// generate code for arguments
     	int numArgs = 0;
     	if (node.arglist != null) {
@@ -197,29 +206,28 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
     		StringUtility.appendIndLn(sb, "push eax \t; push object for method invocation");
     		MethodDeclaration mDecl = (MethodDeclaration) node.id.getDeclaration();	// the actual method being called
     		// call method
-    		StringUtility.appendIndLn(sb, generateMethodCall(mDecl));
+    		generateMethodCall(sb, mDecl);
     		
     	} else {
     		// Name(...)
     		if (node.expr instanceof SimpleName) {	// SimpleName(...), implicit this
     			SimpleName sn = (SimpleName) node.expr;
-    			StringUtility.appendIndLn(sb, "mov eax, [ebp + 8] \t; move object address to eax"); // this only happens in the method of the same class
+    			StringUtility.appendIndLn(sb, "mov dword eax, [ebp + 8] \t; move object address to eax"); // this only happens in the method of the same class
     			StringUtility.appendIndLn(sb, "push eax \t; push object address");
     			MethodDeclaration mDecl = (MethodDeclaration) sn.getDeclaration();
-    			StringUtility.appendIndLn(sb, generateMethodCall(mDecl));
-
+    			generateMethodCall(sb, mDecl);
     		} else {	// QualifiedName(...)
     			QualifiedName qn = (QualifiedName) node.expr;
     			MethodDeclaration mDecl = (MethodDeclaration) qn.getDeclaration();
     			if (qn.getQualifier().getDeclaration() instanceof TypeDeclaration) {	// static methods
     				StringUtility.appendIndLn(sb, "push 0 \t; place holder because there is no this object for static method");
-    				StringUtility.appendIndLn(sb, generateMethodCall(mDecl));
+    				generateMethodCall(sb, mDecl);
     			} else {	// instance method
     				qn.accept(this); 	// generate code from name (accessing instance field, or local variable
     				StringUtility.appendLine(sb, qn.getCode());
     	    		StringUtility.appendIndLn(sb, "push eax \t; push object for method invocation");
     	    		// call method
-    	    		StringUtility.appendIndLn(sb, generateMethodCall(mDecl));
+    	    		generateMethodCall(sb, mDecl);
     			}
     		}
     	}
@@ -237,23 +245,25 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
      * @throws NameException
      * @throws Exception
      */
-    private String generateMethodCall(MethodDeclaration mDecl) throws NameException, Exception {
-    	String call;
+    private void generateMethodCall(StringBuilder sb, MethodDeclaration mDecl) throws NameException, Exception {
+    	
     	TypeDeclaration tDecl = (TypeDeclaration) mDecl.getParent();
     	if (mDecl.modifiers.contains(Modifier.STATIC)) {
-    		call = "call " + SigHelper.getMethodSigWithImp(mDecl);	// call static methods
-    		
+    		StringUtility.appendIndLn(sb, "call " + SigHelper.getMethodSigWithImp(mDecl));
     	} else {	// instance method
 			// generate method call
 			if (tDecl.isInterface) {	// interface method
 				int offset = OffSet.getInterfaceMethodOffset(NameHelper.mangle(mDecl));
-				call = "call [[eax] + " + offset + "*4] \t; call interface method.";		//TODO: check if the level of indirection is proper 
+				StringUtility.appendIndLn(sb, "mov eax, [eax] \t; point to VTable");
+				StringUtility.appendIndLn(sb, "mov eax, [eax] \t; point to Ugly");
+				StringUtility.appendIndLn(sb, "call [eax + " + offset + "*4] \t; call interface method.");
+				//TODO: check if the level of indirection is proper 
 			} else {
 				int offset = tDecl.getMethodOffSet(NameHelper.mangle(mDecl));
-				call = "call [[eax] + " + offset + "*4] \t; call class method.";
+				StringUtility.appendIndLn(sb, "mov eax, [eax] \t; point to VTable");
+				StringUtility.appendIndLn(sb, "call [eax + " + (offset + 2) + "*4] \t; call interface method."); //skip VTable and Inheritance Table
 			}
     	}
-		return call;
     }
     
 }

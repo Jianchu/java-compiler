@@ -44,7 +44,10 @@ public class CodePrinter extends TraversalVisitor {
         File staticFieldInitFile = new File(output.getAbsolutePath() + "/staticinit.s");
         PrintWriter writer = new PrintWriter(staticFieldInitFile);
         StringBuilder fileHead = new StringBuilder();
-        StringUtility.appendLine(fileHead, "section. text");
+        StringUtility.appendLine(fileHead, "extern __malloc");
+        StringUtility.appendLine(fileHead, "extern __exception");
+        StringUtility.appendLine(fileHead, "extern __debexit");
+        StringUtility.appendLine(fileHead, "section .text");
         StringUtility.appendLine(fileHead, "global static_init");
         StringUtility.appendIndLn(fileHead, "static_init:");
         writer.write(fileHead.toString());
