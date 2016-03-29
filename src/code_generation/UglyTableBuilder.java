@@ -15,7 +15,7 @@ public class UglyTableBuilder {
     public static void build() {
         StringBuilder uglyHeader = new StringBuilder();
         Set<String> sigs = new HashSet<String>();
-        StringUtility.appendLine(uglyText, "section .data " + uglyText);
+        StringUtility.appendLine(uglyText, "section .data");
         for (TypeDeclaration typeDec : ugly.keySet()) {
             String typeSig = SigHelper.getClassSigWithUgly(typeDec);
             StringUtility.appendLine(uglyText, "global " + typeSig);
