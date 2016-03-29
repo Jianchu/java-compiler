@@ -1,5 +1,8 @@
 package code_generation;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import utility.StringUtility;
 import ast.Block;
 import ast.ReturnStatement;
@@ -13,9 +16,11 @@ public class StatementCodeGenerator extends TraversalVisitor {
     private static final String TRUE = "0xffffffff";
     private ExpressionCodeGenerator expGen;
     private Integer loopCounter = 0;
+    private Set<String> extern;
 
-    public StatementCodeGenerator() {
-        this.expGen = new ExpressionCodeGenerator();
+    public StatementCodeGenerator(Set<String> extern) {
+        this.extern = extern;
+        this.expGen = new ExpressionCodeGenerator(new HashSet<String>());
     }
 
     public void visit(WhileStatement node) throws Exception {

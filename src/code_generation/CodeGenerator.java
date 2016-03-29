@@ -2,8 +2,10 @@ package code_generation;
 
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import utility.StringUtility;
 import ast.AST;
@@ -25,10 +27,12 @@ public class CodeGenerator extends TraversalVisitor {
     private static StringBuilder[] staticFieldInit = {new StringBuilder(), new StringBuilder()};
     private static StringBuilder[] instanceFieldInit = {new StringBuilder(), new StringBuilder()};
     TypeDeclaration currentTypeDec;
+    Set<String> extern;
 
     public CodeGenerator() {
-        stmtGen = new StatementCodeGenerator();
-        expGen = new ExpressionCodeGenerator();
+        this.extern = new HashSet<String>();
+        stmtGen = new StatementCodeGenerator(new HashSet<String>());
+        expGen = new ExpressionCodeGenerator(new HashSet<String>());
     }
 
     public void visit(TypeDeclaration node) throws Exception {
@@ -174,6 +178,7 @@ public class CodeGenerator extends TraversalVisitor {
                 StringUtility.appendIndLn(instanceFieldInit[0], "call instance_init_" + fieldSig);
                 StringUtility.appendIndLn(instanceFieldInit[1], "instance_init_" + fieldSig + ":");
                 // TODO: add a method for evaluating the address of instance field, and putting it to eax. 
+                StringUtility.appendIndLn(instanceFieldInit[1], codeGenFieldAddr(node));
                 StringUtility.appendLine(instanceFieldInit[1], "push eax \t;store field address", 2);
                 StringUtility.appendLine(instanceFieldInit[1], initCode, 2);
                 StringUtility.appendLine(instanceFieldInit[1], "mov edx, eax \t; put value of field to edx", 2);
@@ -183,6 +188,11 @@ public class CodeGenerator extends TraversalVisitor {
             }
         }
         // node.attachCode(fieldAssemblyText.toString());
+    }
+
+    private String codeGenFieldAddr(FieldDeclaration node) {
+        // TODO Auto-generated method stub
+        return null;
     }
 
     public void visit(MethodDeclaration node) throws Exception {

@@ -1,5 +1,6 @@
 package code_gen_test;
 
+import java.util.HashSet;
 import java.util.List;
 
 import ast.AST;
@@ -16,7 +17,7 @@ public class TestingVisitor extends TraversalVisitor {
     
     public static void test(List<AST> trees) throws Exception {
         for (AST t : trees) {
-            Visitor rv = new ExpressionCodeGenerator();
+            Visitor rv = new ExpressionCodeGenerator(new HashSet<String>());
             if (t.root.types.get(0).getFullName().contains("J1e_A_CastToArray")) {
                 System.out.println(t.root.types.get(0).getFullName().toString());
                 t.root.accept(rv);
