@@ -69,7 +69,7 @@ public class SigHelper {
         fieldSig.append(getClassSig(typeNode));
         fieldSig.append("#");
         fieldSig.append(fd.id);
-        return fieldSig.toString() + "$fieldimplementation";
+        return fieldSig.toString() + "$realfield";
     }
 
     public static String getMethodSig(TypeDeclaration td, MethodDeclaration md) {
