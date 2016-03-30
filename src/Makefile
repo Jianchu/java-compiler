@@ -1,11 +1,8 @@
 JC = javac
 JFLAGS = -g -d ${classpath}
 
-<<<<<<< HEAD
+
 SUBDIR = exceptions scanner parser weeder ast environment static_analysis joosc utility code_generation
-=======
-SUBDIR = exceptions scanner parser weeder ast environment static_analysis code_generation joosc
->>>>>>> 3e26199630cfe46ef6753bebad6bc28af6edf76d
 SOURCES = Joosc.java
 
 ifndef classpath
