@@ -9,15 +9,12 @@ import java.util.Set;
 
 import utility.StringUtility;
 import ast.AST;
-import ast.Block;
 import ast.BodyDeclaration;
 import ast.FieldDeclaration;
 import ast.MethodDeclaration;
 import ast.Modifier;
-import ast.ReturnStatement;
 import ast.TypeDeclaration;
 import ast.Visitor;
-import ast.WhileStatement;
 import environment.TraversalVisitor;
 
 public class CodeGenerator extends TraversalVisitor {
@@ -133,7 +130,8 @@ public class CodeGenerator extends TraversalVisitor {
         // StringUtility.appendLine(header, "extern __exception");
         // header.append(getExtern());
         // header.append("\n");
-        node.attachCode(getExtern().toString() + dataSection.toString() + textSection.toString());
+        node.attachCode(getExtern().toString() + dataSection.toString() + textSection.toString() + staticFieldInit[1].toString());
+        staticFieldInit[1].setLength(0);
     }
     
     private StringBuilder getExtern() {
@@ -196,6 +194,7 @@ public class CodeGenerator extends TraversalVisitor {
                 initCode = "; no right hand side yet.\n";
             }
             if (node.modifiers.contains(Modifier.STATIC)) {
+                StringUtility.appendIndLn(staticFieldInit[1], "global static_init_" + fieldSig);
                 StringUtility.appendIndLn(staticFieldInit[1], "static_init_" + fieldSig + ":");
                 StringUtility.appendLine(staticFieldInit[1], initCode, 2);
                 StringUtility.appendLine(staticFieldInit[1], "mov " + "[" + fieldSig + "]" + ", eax", 2);
@@ -239,7 +238,7 @@ public class CodeGenerator extends TraversalVisitor {
 		
 		
 		if (node.body != null) {
-			node.body.accept(this);
+			node.body.accept(stmtGen);
 			sb.append(node.body.getCode());
 		}
 		
@@ -252,29 +251,17 @@ public class CodeGenerator extends TraversalVisitor {
 		node.attachCode(sb.toString());
     }
     
-    public void visit(WhileStatement node) throws Exception {
-        node.accept(stmtGen);
-    }
-
-    public void visit(Block node) throws Exception {
-        node.accept(stmtGen);
-    }
-
-    public void visit(ReturnStatement node) throws Exception {
-        node.accept(stmtGen);
-    }
-
     protected static String getStaticFieldInit() {
-        String staticFieldInitString = staticFieldInit[0].toString() + staticFieldInit[1].toString();
+        String staticFieldInitString = staticFieldInit[0].toString();
         staticFieldInit[0].setLength(0);
-        staticFieldInit[1].setLength(0);
+        //staticFieldInit[1].setLength(0);
         return getStaticFieldInitExtern() + staticFieldInitString;
     }
     
     private static String getStaticFieldInitExtern() {
         StringBuilder sb = new StringBuilder();
         for (String s : staticInitExtern) {
-            StringUtility.appendLine(sb, "extern " + s);
+            StringUtility.appendLine(sb, "extern static_init_" + s);
         }
         sb.append("\n");
         StringUtility.appendLine(sb, "global static_init");

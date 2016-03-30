@@ -1,6 +1,10 @@
 public class TestCode {
     public TestCode() {}
     public static int test() {
-        return 123;
+        if (1 == 2) {
+            return 123;
+        } else {
+            return 12;
+        }
     }
 }

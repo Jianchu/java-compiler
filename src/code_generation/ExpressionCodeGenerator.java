@@ -114,11 +114,11 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
                 if (node.expr instanceof IntegerLiteral) {
                     ((IntegerLiteral)node.expr).value = "-" + ((IntegerLiteral)node.expr).value;
                 } else {
-                    StringUtility.appendIndLn(prefixText, "mov eax, -eax" + "\t; negation operation");
+                    StringUtility.appendIndLn(prefixText, "mov eax, - eax" + "\t; negation operation");
                 }
                 
             } else if (node.op.equals(Operator.NOT)) {
-                StringUtility.appendIndLn(prefixText, "mov eax, neg eax" + "\t; logical negation operation");
+                StringUtility.appendIndLn(prefixText, "neg eax" + "\t; logical negation operation");
             }
             node.expr.accept(this);
             String exprCode = node.expr.getCode();
@@ -132,12 +132,11 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
     public void visit(InfixExpression node) throws Exception {
         StringBuilder infixText = new StringBuilder();
         if (node.lhs != null && node.rhs != null) {
-            int n = 0;
+            int n = infixCounter;
+            infixCounter++;
             node.lhs.accept(this);
             infixText.append(node.lhs.getCode());
             if (node.op == InfixExpression.Operator.LOR || node.op == InfixExpression.Operator.AND) {
-                n = infixCounter;
-                infixCounter++;
                 StringUtility.appendLine(infixText, "cmp eax," + (node.op == InfixExpression.Operator.LOR ? FALSE : TRUE));
                 StringUtility.appendLine(infixText, "jne INFIX_" + n);
             }
