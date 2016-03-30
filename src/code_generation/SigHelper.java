@@ -63,6 +63,15 @@ public class SigHelper {
         return methodSig.toString() + "implementation";
     }
 
+    public static String getFieldSigWithImp(FieldDeclaration fd) {
+        StringBuilder fieldSig = new StringBuilder();
+        TypeDeclaration typeNode = (TypeDeclaration) fd.getParent();
+        fieldSig.append(getClassSig(typeNode));
+        fieldSig.append("#");
+        fieldSig.append(fd.id);
+        return fieldSig.toString() + "$fieldimplementation";
+    }
+
     public static String getMethodSig(TypeDeclaration td, MethodDeclaration md) {
         StringBuilder methodSig = new StringBuilder();
         methodSig.append(getClassSig(td));
@@ -130,4 +139,13 @@ public class SigHelper {
     public static String instanceFieldInitSig(Type type) {
         return "instance_field_init$" + getTypeSig(type);
     }
+    
+    public static String instanceFieldInitSig(TypeDeclaration tDecl) {
+        return "instance_field_init$" + getClassSig(tDecl);
+    }
+
+    public static String getClssSigWithVTable(TypeDeclaration typeDec) {
+        return "VTable#" + getClassSig(typeDec);
+    }
+
 }

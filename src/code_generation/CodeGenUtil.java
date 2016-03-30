@@ -2,6 +2,7 @@ package code_generation;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import ast.FieldDeclaration;
 import ast.MethodDeclaration;
@@ -27,7 +28,7 @@ public class CodeGenUtil {
 		StringUtility.appendIndLn(sb, "push " + obj + "\t; push object to offset zero");
 		
 		StringUtility.appendIndLn(sb, "call " + subLabel);
-		StringUtility.appendIndLn(sb, "add esp " + (params.size()+1) + "*4" + "\t; caller cleanup arguments.");	
+		StringUtility.appendIndLn(sb, "add esp, " + (params.size()+1) + "*4" + "\t; caller cleanup arguments.");	
 		
 		return sb.toString();
 	}
@@ -49,13 +50,13 @@ public class CodeGenUtil {
 		StringUtility.appendLine(sb, fnName + ": \t; label for subroutine");
 		
 		StringUtility.appendIndLn(sb, "push ebp \t; save old frame pointer");
-		StringUtility.appendIndLn(sb, "mov ebp esp \t; move ebp to top of stack");
+		StringUtility.appendIndLn(sb, "mov ebp, esp \t; move ebp to top of stack");
 		
 		StringUtility.appendIndLn(sb, "sub esp " + maxOffSet + "\t; space for local variables");
 		
 		StringUtility.appendIndLn(sb, fnBody);
 		
-		StringUtility.appendIndLn(sb, "add esp " + maxOffSet + "\t; pop local variables");
+		StringUtility.appendIndLn(sb, "add esp, " + maxOffSet + "\t; pop local variables");
 		StringUtility.appendIndLn(sb, "pop ebp \t; restore to previosu frame.");
 		
 		StringUtility.appendIndLn(sb, "ret \t; end of subroutine");
@@ -85,6 +86,24 @@ public class CodeGenUtil {
 		return "[" + base + "+" + tDecl.getFieldOffSet(fDecl.id) + "*4]";
 	}
 	
+	public static void callExternLabel(StringBuilder sb, Set<String> extern, String label) {
+		extern.add(label.trim());
+		StringUtility.appendLine(sb, "call " + label);
+	}
+	
+	public static void saveRegisters(StringBuilder sb) {
+		StringUtility.appendIndLn(sb, "push ecx");
+		StringUtility.appendIndLn(sb, "push edx");
+		StringUtility.appendIndLn(sb, "push esi");
+		StringUtility.appendIndLn(sb, "push edi");
+	}
+	
+	public static void restoreRegisters(StringBuilder sb) {
+		StringUtility.appendIndLn(sb, "pop edi");
+		StringUtility.appendIndLn(sb, "pop esi");
+		StringUtility.appendIndLn(sb, "pop edx");
+		StringUtility.appendIndLn(sb, "pop ecx");
+	}
 	
 	public static void main(String[] args) {
 		String fn = "multiply";
