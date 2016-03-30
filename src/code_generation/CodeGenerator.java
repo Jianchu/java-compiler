@@ -197,6 +197,7 @@ public class CodeGenerator extends TraversalVisitor {
                 initCode = "; no right hand side yet.\n";
             }
             if (node.modifiers.contains(Modifier.STATIC)) {
+                StringUtility.appendIndLn(staticFieldInit[1], "global static_init_" + fieldSig);
                 StringUtility.appendIndLn(staticFieldInit[1], "static_init_" + fieldSig + ":");
                 StringUtility.appendLine(staticFieldInit[1], initCode, 2);
                 StringUtility.appendLine(staticFieldInit[1], "mov " + "[" + fieldSig + "]" + ", eax", 2);
