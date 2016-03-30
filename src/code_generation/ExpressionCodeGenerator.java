@@ -38,6 +38,7 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
     public static StringBuilder stringLitData = new StringBuilder();
     private Set<String> extern;
     public int infixCounter = 0;
+    public static MethodDeclaration currentMethod;
 
     public ExpressionCodeGenerator(Set<String> extern) {
         this.extern = extern;
@@ -342,7 +343,7 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
     	
     	// malloc
     	TypeDeclaration tDecl = node.type.getDeclaration();
-    	int objSize = tDecl.getFieldOffSetList().size() + 2;
+    	int objSize = tDecl.getFieldOffSetList().size() + 1;	//	leave space for counter
     	StringUtility.appendIndLn(sb, "mov eax, 4*" + objSize + "\t; size of object");
     	extern.add("__malloc");
     	StringUtility.appendIndLn(sb, "call __malloc");
@@ -351,7 +352,8 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
     	// pointer to VTable
     	String vt = SigHelper.getClssSigWithVTable(tDecl);
     	extern.add(vt);
-    	StringUtility.appendIndLn(sb, "mov dword [eax], " + vt);
+    	StringUtility.appendIndLn(sb, "mov eax, [eax] \t; enter object");
+    	StringUtility.appendIndLn(sb, "mov dword eax, " + vt);
 
     	// implicit super call
     	if (tDecl.superClass != null) {
@@ -462,13 +464,13 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
 			// generate method call
 			if (tDecl.isInterface) {	// interface method
 				int offset = OffSet.getInterfaceMethodOffset(NameHelper.mangle(mDecl));
-				StringUtility.appendIndLn(sb, "mov eax, [eax] \t; point to VTable");
-				StringUtility.appendIndLn(sb, "mov eax, [eax] \t; point to Ugly");
+				StringUtility.appendIndLn(sb, "mov dword eax, [eax] \t; point to VTable");
+				StringUtility.appendIndLn(sb, "mov dword eax, [eax + 1] \t; point to Ugly");	// ASSUME: the second entry of VTable is ugly column
 				StringUtility.appendIndLn(sb, "call [eax + " + offset + "*4] \t; call interface method.");
 				//TODO: check if the level of indirection is proper 
 			} else {
 				int offset = tDecl.getMethodOffSet(NameHelper.mangle(mDecl));
-				StringUtility.appendIndLn(sb, "mov eax, [eax] \t; point to VTable");
+				StringUtility.appendIndLn(sb, "mov dword eax, [eax] \t; point to VTable");
 				StringUtility.appendIndLn(sb, "call [eax + " + (offset + 2) + "*4] \t; call class method."); //skip VTable and Inheritance Table
 			}
     	}
@@ -481,11 +483,19 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
     		FieldDeclaration fDecl = (FieldDeclaration) decl;
     		TypeDeclaration parent = (TypeDeclaration) fDecl.getParent();
     		int offset = parent.getFieldOffSet(fDecl.id);
-    		StringUtility.appendIndLn(sb, "mov eax, [ebp + 8] \t; put object address in eax");
-    		StringUtility.appendIndLn(sb, "mov eax, [eax] \t; enter object");
-    		StringUtility.appendIndLn(sb, "mov eax, [eax + " + offset + "*4] \t; access object");
+    		StringUtility.appendIndLn(sb, "mov dword eax, [ebp + 8] \t; put object address in eax");
+    		StringUtility.appendIndLn(sb, "mov dword eax, [eax] \t; enter object");
+    		StringUtility.appendIndLn(sb, "mov dword eax, [eax + " + offset + "*4] \t; access object");
     	} else if (decl instanceof VariableDeclaration) {	// variable
     		VariableDeclaration vDecl = (VariableDeclaration) decl;
+    		int offset = currentMethod.getVarOffSet(vDecl);
+    		if (offset < 0) {	// formals starts from -1
+    			offset = (-(offset - 1)) * 4;	// real offset 
+    			StringUtility.appendIndLn(sb, "mov dword eax, [ebp + " + offset + "]");
+    		} else {	// locals starts from 0
+    			offset = (offset + 1) * 4;
+    			StringUtility.appendIndLn(sb, "mov dword eax, [ebp - " + offset + "]");
+    		}
     		
     	}
     }
