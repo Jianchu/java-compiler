@@ -253,8 +253,8 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
     	StringUtility.appendIndLn(sb, "call __malloc");
     	StringUtility.appendIndLn(sb, "push eax \t; push object address");
     	
-    	// call field initializer
-//    	StringUtility.appendIndLn(sb, "call " + SigHelper.instanceFieldInitSig(node.type));
+    	// pointer to VTable
+    	StringUtility.appendIndLn(sb, "mov [eax], " + "");
 
     	// implicit super call
     	if (tDecl.superClass != null) {
