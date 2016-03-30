@@ -9,15 +9,12 @@ import java.util.Set;
 
 import utility.StringUtility;
 import ast.AST;
-import ast.Block;
 import ast.BodyDeclaration;
 import ast.FieldDeclaration;
 import ast.MethodDeclaration;
 import ast.Modifier;
-import ast.ReturnStatement;
 import ast.TypeDeclaration;
 import ast.Visitor;
-import ast.WhileStatement;
 import environment.TraversalVisitor;
 
 public class CodeGenerator extends TraversalVisitor {
@@ -241,7 +238,7 @@ public class CodeGenerator extends TraversalVisitor {
 		
 		
 		if (node.body != null) {
-			node.body.accept(this);
+			node.body.accept(stmtGen);
 			sb.append(node.body.getCode());
 		}
 		
@@ -254,18 +251,6 @@ public class CodeGenerator extends TraversalVisitor {
 		node.attachCode(sb.toString());
     }
     
-    public void visit(WhileStatement node) throws Exception {
-        node.accept(stmtGen);
-    }
-
-    public void visit(Block node) throws Exception {
-        node.accept(stmtGen);
-    }
-
-    public void visit(ReturnStatement node) throws Exception {
-        node.accept(stmtGen);
-    }
-
     protected static String getStaticFieldInit() {
         String staticFieldInitString = staticFieldInit[0].toString();
         staticFieldInit[0].setLength(0);
