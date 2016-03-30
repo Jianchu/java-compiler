@@ -253,7 +253,7 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
     	StringUtility.appendIndLn(sb, "push eax \t; push object address");
     	
     	// pointer to VTable
-    	StringUtility.appendIndLn(sb, "mov [eax], " + "");
+    	StringUtility.appendIndLn(sb, "mov [eax], " + SigHelper.getClssSigWithVTable(tDecl));
 
     	// implicit super call
     	if (tDecl.superClass != null) {
