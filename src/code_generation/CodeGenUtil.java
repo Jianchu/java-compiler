@@ -2,6 +2,7 @@ package code_generation;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import ast.FieldDeclaration;
 import ast.MethodDeclaration;
@@ -85,6 +86,10 @@ public class CodeGenUtil {
 		return "[" + base + "+" + tDecl.getFieldOffSet(fDecl.id) + "*4]";
 	}
 	
+	public static void callExternLabel(StringBuilder sb, Set<String> extern, String label) {
+		extern.add(label.trim());
+		StringUtility.appendLine(sb, "call " + label);
+	}
 	
 	public static void main(String[] args) {
 		String fn = "multiply";
