@@ -82,13 +82,13 @@ public class StatementCodeGenerator extends TraversalVisitor {
 
         appendNode(forText, node.forInit, expGen);
         StringUtility.appendLine(forText, "jmp COND_" + n);
-        StringUtility.appendLine(forText, "LOD_" + n + ":");
+        StringUtility.appendLine(forText, "LOOP_" + n + ":");
         appendNode(forText, node.forBody, this);
         appendNode(forText, node.forUpdate, expGen);
         StringUtility.appendLine(forText, "COND_" + n + ":");
         appendNode(forText, node.forCondition, expGen);
-        StringUtility.appendLine(forText, "cmp eak, " + FALSE);
-        StringUtility.appendLine(forText, "jne Loop_" + n);
+        StringUtility.appendLine(forText, "cmp eax, " + FALSE);
+        StringUtility.appendLine(forText, "jne LOOP_" + n);
 
         node.attachCode(forText.toString());
     }
