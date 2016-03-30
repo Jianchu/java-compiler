@@ -498,10 +498,10 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
     		} else {	// locals starts from 0
     			offset = (offset + 1) * 4;
     			StringUtility.appendIndLn(sb, "mov dword eax, ebp ");
-    			StringUtility.appendIndLn(sb, "sub eax, offset \t; eax contains local address");	// eax now points to object
+    			StringUtility.appendIndLn(sb, "sub eax, " + offset + "\t; eax contains local address");	// eax now points to object
     		}
     	} else {
-    		throw new Exception("Simple name declaration unexpected");
+    		throw new Exception("Simple name declaration unexpected: " + node);
     	}
     	node.attachCode(sb.toString());
     }
@@ -509,12 +509,23 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
     public void visit(QualifiedName node) throws Exception {
     	StringBuilder sb = new StringBuilder();
     	Name qualifier = node.getQualifier();
-    	if (qualifier.getDeclaration() != null) {
+    	ASTNode qDecl = qualifier.getDeclaration();
+    	if (qDecl instanceof TypeDeclaration) {	//A.B.c.d, node is static field
+    		String label = SigHelper.getFieldSig((FieldDeclaration) node.getDeclaration());	// directs to parent, not instance field
+    		StringUtility.appendIndLn(sb, "mov dword eax, " + label);
+    	} else if (qDecl instanceof FieldDeclaration || qDecl instanceof VariableDeclaration) {
     		qualifier.accept(this);
     		StringUtility.appendIndLn(sb, qualifier.getCode());
+    		// node instance field, with object in eax
+    		FieldDeclaration fDecl = (FieldDeclaration) node.getDeclaration();
+    		TypeDeclaration tDecl = (TypeDeclaration) fDecl.getParent();
+    		int offset = tDecl.getFieldOffSet(fDecl.id);
+    		offset = (offset + 1) * 4;	// real offset 
+    		StringUtility.appendIndLn(sb, "mov eax [eax]");	// enter object
+    		StringUtility.appendIndLn(sb, "add eax, " + offset);
+    	} else {
+    		throw new Exception("qualified name prefix not recoginsed: " + qualifier.toString());
     	}
-    	
-    	
     }
     
 }
