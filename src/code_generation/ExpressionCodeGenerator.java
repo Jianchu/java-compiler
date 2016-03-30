@@ -458,14 +458,16 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
 			// generate method call
 			if (tDecl.isInterface) {	// interface method
 				int offset = OffSet.getInterfaceMethodOffset(NameHelper.mangle(mDecl));
-				StringUtility.appendIndLn(sb, "mov dword eax, [eax] \t; point to VTable");
+				offset = offset*4;
+				StringUtility.appendIndLn(sb, "mov dword eax, [eax] \t; point to VTable");	//enter object
 				StringUtility.appendIndLn(sb, "mov dword eax, [eax + 1] \t; point to Ugly");	// ASSUME: the second entry of VTable is ugly column
-				StringUtility.appendIndLn(sb, "call [eax + " + offset + "*4] \t; call interface method.");
+				StringUtility.appendIndLn(sb, "call [eax + " + offset + "] \t; call interface method.");
 				//TODO: check if the level of indirection is proper 
 			} else {
 				int offset = tDecl.getMethodOffSet(NameHelper.mangle(mDecl));
+				offset = (offset + 2) * 4;	// real offset
 				StringUtility.appendIndLn(sb, "mov dword eax, [eax] \t; point to VTable");
-				StringUtility.appendIndLn(sb, "call [eax + " + (offset + 2) + "*4] \t; call class method."); //skip VTable and Inheritance Table
+				StringUtility.appendIndLn(sb, "call [eax + " + offset + "] \t; call class method."); //skip ugly and hierarchy Table
 			}
     	}
     }
