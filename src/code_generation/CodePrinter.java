@@ -16,6 +16,7 @@ public class CodePrinter extends TraversalVisitor {
     private static final File output = new File(System.getProperty("user.dir") + "/output");
     private static final String uglyText = UglyTableBuilder.getUgly();
     private static final String staticFieldInit = CodeGenerator.getStaticFieldInit();
+    private static final String HierarchyTable = HierarchyTableBuilder.getHierarchyTable();
 
     public static void printCode(List<AST> trees) throws Exception {
         if (!output.exists()) {
@@ -25,22 +26,23 @@ public class CodePrinter extends TraversalVisitor {
                 file.delete();
             }
         }
-        wirteUgly();
-        wirteStaticFieldInit();
+        writeUgly();
+        writeStaticFieldInit();
+        writeHierarchyTable();
         for (AST t : trees) {
             Visitor rv = new CodePrinter();
             t.root.accept(rv);
         }
     }
 
-    private static void wirteUgly() throws FileNotFoundException {
+    private static void writeUgly() throws FileNotFoundException {
         File uglyFile = new File(output.getAbsolutePath() + "/ugly.s");
         PrintWriter writer = new PrintWriter(uglyFile);
         writer.write(uglyText);
         writer.close();
     }
 
-    private static void wirteStaticFieldInit() throws FileNotFoundException {
+    private static void writeStaticFieldInit() throws FileNotFoundException {
         File staticFieldInitFile = new File(output.getAbsolutePath() + "/staticinit.s");
         PrintWriter writer = new PrintWriter(staticFieldInitFile);
         StringBuilder fileHead = new StringBuilder();
@@ -50,6 +52,13 @@ public class CodePrinter extends TraversalVisitor {
         StringUtility.appendLine(fileHead, "section .text");
         writer.write(fileHead.toString());
         writer.write(staticFieldInit);
+        writer.close();
+    }
+
+    private static void writeHierarchyTable() throws FileNotFoundException {
+        File hierarchyFile = new File(output.getAbsolutePath() + "/hierarchy.s");
+        PrintWriter writer = new PrintWriter(hierarchyFile);
+        writer.write(HierarchyTable);
         writer.close();
     }
 

@@ -11,6 +11,7 @@ import ast.ClassInstanceCreationExpression;
 import ast.Expression;
 import ast.FieldDeclaration;
 import ast.InfixExpression;
+import ast.InstanceofExpression;
 import ast.IntegerLiteral;
 import ast.MethodDeclaration;
 import ast.MethodInvocation;
@@ -41,6 +42,15 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
 
     public ExpressionCodeGenerator(Set<String> extern) {
         this.extern = extern;
+    }
+
+    public void visit(InstanceofExpression node) throws Exception {
+        if (node.expr != null) {
+            node.expr.accept(this);
+        }
+        if (node.type != null) {
+            node.type.accept(this);
+        }
     }
 
     /*

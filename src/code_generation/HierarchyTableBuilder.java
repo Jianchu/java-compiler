@@ -6,6 +6,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import utility.StringUtility;
 import ast.AST;
 import ast.ArrayType;
 import ast.Name;
@@ -19,7 +20,7 @@ import environment.TypeHelper;
 
 public class HierarchyTableBuilder {
     
-    static Map<String, List<String>> hierarchyTable = new HashMap<String, List<String>>();
+    static Map<Type, List<String>> hierarchyTable = new HashMap<Type, List<String>>();
     static Map<Type, Integer> offSets = new HashMap<Type, Integer>();
     static Integer offSetCounter = new Integer(0);
     static List<String> Alltypes = new ArrayList<String>();
@@ -56,15 +57,15 @@ public class HierarchyTableBuilder {
                 boolean isSubType = TypeHelper.assignable(typeInLeft, typeInTop);
                 if (isSubType) {
                     //System.out.println("super: " + typeInLeft + ", sub: " + typeInTop);
-                    column.add("1");
+                    column.add("0xffffffff");
                 } else {
-                    column.add("0");
+                    column.add("0x0");
                 }
             }
             Alltypes.add(typeInTop.toString());
-            hierarchyTable.put(typeInTop.toString(), column);
+            hierarchyTable.put(typeInTop, column);
         }
-//        for (String type : hierarchyTable.keySet()) {
+//        for (Type type : hierarchyTable.keySet()) {
 //            System.out.println(type);
 //            for (int i = 0; i < hierarchyTable.get(type).size(); i++) {
 //                System.out.println(Alltypes.get(i) + " " + hierarchyTable.get(type).get(i));
@@ -130,6 +131,25 @@ public class HierarchyTableBuilder {
 
     public static int getTypeOffSet(Type type) {
         return Alltypes.indexOf(type.toString());
+    }
+
+    public static String getHierarchyTable() {
+
+        return buildText();
+    }
+
+    private static String buildText() {
+        StringBuilder hierarchyText = new StringBuilder();
+        StringUtility.appendLine(hierarchyText, "section .data");
+        for (Type type : hierarchyTable.keySet()) {
+            String typeSig = SigHelper.getClassSigWithHierarchy(type);
+            StringUtility.appendLine(hierarchyText, "global " + typeSig);
+            StringUtility.appendIndLn(hierarchyText, typeSig + ":");
+            for (int i = 0; i < hierarchyTable.get(type).size(); i++) {
+                StringUtility.appendLine(hierarchyText, "dd " + hierarchyTable.get(type).get(i), 2);
+            }
+        }
+        return hierarchyText.toString();
     }
 
     private static void printOffSets() {
