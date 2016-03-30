@@ -9,8 +9,10 @@
 .DS_Store
 /data/gen
 src/TestMain.java
+src/joosc/TestMain.java
 output/
 
+*~
 .pdf
 *.aux
 *.glo
