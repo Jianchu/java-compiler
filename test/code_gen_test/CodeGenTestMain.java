@@ -56,7 +56,7 @@ public class CodeGenTestMain {
         getOutPut.join();
         getError.join();
         p.waitFor();
-        // System.out.println(sb.toString());
+        System.out.println(sb.toString());
         return exitCode[0];
     }
 
