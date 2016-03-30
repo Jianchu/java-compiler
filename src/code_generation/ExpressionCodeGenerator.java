@@ -269,7 +269,7 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
 			} else {
 				int offset = tDecl.getMethodOffSet(NameHelper.mangle(mDecl));
 				StringUtility.appendIndLn(sb, "mov eax, [eax] \t; point to VTable");
-				StringUtility.appendIndLn(sb, "call [eax + " + (offset + 2) + "*4] \t; call interface method."); //skip VTable and Inheritance Table
+				StringUtility.appendIndLn(sb, "call [eax + " + (offset + 2) + "*4] \t; call class method."); //skip VTable and Inheritance Table
 			}
     	}
     }
