@@ -4,14 +4,15 @@ import java.util.List;
 import java.util.Set;
 
 import utility.StringUtility;
-import ast.*;
 import ast.ASTNode;
+import ast.ArrayType;
 import ast.AssignmentExpression;
 import ast.BooleanLiteral;
 import ast.CastExpression;
 import ast.CharacterLiteral;
 import ast.ClassInstanceCreationExpression;
 import ast.Expression;
+import ast.FieldAccess;
 import ast.FieldDeclaration;
 import ast.InfixExpression;
 import ast.InstanceofExpression;
@@ -28,6 +29,7 @@ import ast.QualifiedName;
 import ast.SimpleName;
 import ast.SimpleType;
 import ast.StringLiteral;
+import ast.ThisExpression;
 import ast.Type;
 import ast.TypeDeclaration;
 import ast.VariableDeclaration;
@@ -51,6 +53,7 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
     }
 
     public void visit(InstanceofExpression node) throws Exception {
+        instanceOfCounter++;
         StringBuilder instanceofText = new StringBuilder();
         if (node.expr != null) {
             node.expr.accept(this);
@@ -69,18 +72,33 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
             StringUtility.appendLine(instanceofText, "mov eax, " + TRUE, 2);
             StringUtility.appendLine(instanceofText, "_INSTANCEOFEND_" + instanceOfCounter + ":", 2);
         }
+        node.attachCode(instanceofText.toString());
     }
 
     public void visit(CastExpression node) throws Exception {
+        StringBuilder castText = new StringBuilder();
+        Type castToType = null;
         if (node.type != null) {
             node.type.accept(this);
+            castToType = node.type;
         }
         if (node.expr != null) {
             node.expr.accept(this);
+            castToType = node.expr.getType();
         }
         if (node.unary != null) {
             node.unary.accept(this);
         }
+
+        Type unaryType = node.unary.getType();
+        String unaryVTableSig = SigHelper.getClssSigWithVTable(unaryType);
+        this.extern.add(unaryVTableSig);
+
+        int offset = HierarchyTableBuilder.getTypeOffSet(castToType);
+        int frame = offset * 4;
+        StringUtility.appendLine(castText, "cmp [[" + unaryVTableSig + "]"
+                + frame + "], " + TRUE, 2);
+        StringUtility.appendLine(castText, "jne __exception:", 2);
     }
 
     /*
