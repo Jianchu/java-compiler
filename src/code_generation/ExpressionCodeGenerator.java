@@ -146,6 +146,7 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
     	TypeDeclaration tDecl = node.type.getDeclaration();
     	int objSize = tDecl.getFieldOffSetList().size() + 2;
     	StringUtility.appendIndLn(sb, "mov eax, 4*" + objSize + "\t; size of object");
+    	extern.add("__malloc");
     	StringUtility.appendIndLn(sb, "call __malloc");
     	StringUtility.appendIndLn(sb, "push eax \t; push object address");
     	
@@ -155,11 +156,16 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
     	// implicit super call
     	if (tDecl.superClass != null) {
     		MethodDeclaration superConstructor = getDefaultConstructor(tDecl.superClass.getDeclaration());
-        	StringUtility.appendIndLn(sb, "call " + SigHelper.getMethodSigWithImp(superConstructor));
+    		
+    		String superConstructorLabel = SigHelper.getMethodSigWithImp(superConstructor);
+    		extern.add(superConstructorLabel.trim());
+        	StringUtility.appendIndLn(sb, "call " + superConstructorLabel);
     	}
     	
     	// call actual constructor
-    	StringUtility.appendIndLn(sb, "call " + SigHelper.getMethodSigWithImp(node.getConstructor()));
+    	String constructorLabel = SigHelper.getMethodSigWithImp(node.getConstructor());
+    	extern.add(constructorLabel.trim());
+    	StringUtility.appendIndLn(sb, "call " + constructorLabel);
     	
     	// clean up
     	StringUtility.appendIndLn(sb, "pop eax \t; pop object address back in eax");
@@ -249,7 +255,9 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
     	
     	TypeDeclaration tDecl = (TypeDeclaration) mDecl.getParent();
     	if (mDecl.modifiers.contains(Modifier.STATIC)) {
-    		StringUtility.appendIndLn(sb, "call " + SigHelper.getMethodSigWithImp(mDecl));
+    		String label = SigHelper.getMethodSigWithImp(mDecl);
+    		extern.add(label.trim());
+    		StringUtility.appendIndLn(sb, "call " + label);
     	} else {	// instance method
 			// generate method call
 			if (tDecl.isInterface) {	// interface method
