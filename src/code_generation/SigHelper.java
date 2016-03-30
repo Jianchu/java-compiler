@@ -148,8 +148,15 @@ public class SigHelper {
         return "VTable#" + getClassSig(typeDec);
     }
 
+    public static String getClssSigWithVTable(Type type) {
+        return "VTable#" + getTypeSig(type);
+    }
+
     public static String getClassSigWithHierarchy(Type type) {
         return "hierarchy#" + getTypeSig(type);
     }
 
+    public static String getClassSigWithHierarchy(TypeDeclaration typeDec) {
+        return "hierarchy#" + getClassSig(typeDec);
+    }
 }

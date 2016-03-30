@@ -7,6 +7,7 @@ import utility.StringUtility;
 import ast.ASTNode;
 import ast.AssignmentExpression;
 import ast.BooleanLiteral;
+import ast.CastExpression;
 import ast.CharacterLiteral;
 import ast.ClassInstanceCreationExpression;
 import ast.Expression;
@@ -41,6 +42,7 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
     public static StringBuilder stringLitData = new StringBuilder();
     private Set<String> extern;
     public int infixCounter = 0;
+    private int instanceOfCounter = 0;
     public static MethodDeclaration currentMethod;
 
     public ExpressionCodeGenerator(Set<String> extern) {
@@ -48,11 +50,35 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
     }
 
     public void visit(InstanceofExpression node) throws Exception {
+        StringBuilder instanceofText = new StringBuilder();
         if (node.expr != null) {
             node.expr.accept(this);
         }
+        Type exprType = node.expr.getType();
+        String exprVTableSig = SigHelper.getClssSigWithVTable(exprType);
+        this.extern.add(exprVTableSig);
+        //[[vtable] + offset * 4] 
         if (node.type != null) {
             node.type.accept(this);
+            int offset = HierarchyTableBuilder.getTypeOffSet(node.type);
+            int frame = offset * 4;
+            StringUtility.appendLine(instanceofText, "mov eax, " + FALSE, 2);
+            StringUtility.appendLine(instanceofText, "cmp [[" + exprVTableSig + "]" + frame + "], " + TRUE, 2);
+            StringUtility.appendLine(instanceofText, "jne _INSTANCEOFEND_" + instanceOfCounter, 2);
+            StringUtility.appendLine(instanceofText, "mov eax, " + TRUE, 2);
+            StringUtility.appendLine(instanceofText, "_INSTANCEOFEND_" + instanceOfCounter + ":", 2);
+        }
+    }
+
+    public void visit(CastExpression node) throws Exception {
+        if (node.type != null) {
+            node.type.accept(this);
+        }
+        if (node.expr != null) {
+            node.expr.accept(this);
+        }
+        if (node.unary != null) {
+            node.unary.accept(this);
         }
     }
 

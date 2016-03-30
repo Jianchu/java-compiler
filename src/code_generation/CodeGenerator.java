@@ -83,6 +83,9 @@ public class CodeGenerator extends TraversalVisitor {
             staticMethodVTableHandler(entry, node, textSection);
         }
         
+        StringUtility.appendLine(vTableText, "dd " + SigHelper.getClassSigWithHierarchy(node), 2);
+        this.extern.add(SigHelper.getClassSigWithHierarchy(node));
+        
         if (!node.isInterface) {
             StringUtility.appendLine(vTableText, "dd " + SigHelper.getClassSigWithUgly(node), 2);
             this.extern.add(SigHelper.getClassSigWithUgly(node));
