@@ -86,8 +86,6 @@ public class CodeGenerator extends TraversalVisitor {
         
 
         for (Map.Entry<String, MethodDeclaration> entry : node.getEnvironment().methods.entrySet()) {
-            String methodSigInDec = SigHelper.getMethodSigWithImp(entry.getValue());
-            this.exclude.add(methodSigInDec);
             staticMethodVTableHandler(entry, node, textSection);
         }
         
@@ -109,6 +107,8 @@ public class CodeGenerator extends TraversalVisitor {
         for (BodyDeclaration bDecl : node.members) {
         	if (bDecl instanceof MethodDeclaration) {
         		MethodDeclaration mDecl = (MethodDeclaration) bDecl;
+        	        String methodSigInDec = SigHelper.getMethodSigWithImp(mDecl);
+        	        this.exclude.add(methodSigInDec);
 	            if (SigHelper.getMethodSigWithImp(mDecl).equals(testSig)) {
 	                this.extern.add("__debexit");
 	                //StringUtility.appendLine(header, "extern __debexit");
