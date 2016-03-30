@@ -421,16 +421,19 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
     		} else {	// QualifiedName(...)
     			QualifiedName qn = (QualifiedName) node.expr;
     			MethodDeclaration mDecl = (MethodDeclaration) qn.getDeclaration();
-    			if (qn.getQualifier().getDeclaration() instanceof TypeDeclaration) {	// static methods
+    			Name qualifier = qn.getQualifier();
+			if (qualifier.getDeclaration() instanceof TypeDeclaration) {	// static methods
     				StringUtility.appendIndLn(sb, "push 0 \t; place holder because there is no this object for static method");
     				generateMethodCall(sb, mDecl);
-    			} else {	// instance method
+    			} else if (qualifier.getDeclaration() instanceof FieldDeclaration || qualifier.getDeclaration() instanceof VariableDeclaration) {	// instance method
     				qn.getQualifier().accept(this); 	// generate code from name (accessing instance field, or local variable
     				StringUtility.appendLine(sb, qn.getCode());
-    	    		StringUtility.appendIndLn(sb, "push eax \t; push object for method invocation");
-    	    		// call method
-    	    		generateMethodCall(sb, mDecl);
-    			}
+				StringUtility.appendIndLn(sb, "push eax \t; push object for method invocation");
+				// call method
+				generateMethodCall(sb, mDecl);
+    			} else {
+			    throw new Exception("qualifier type unexpected: " + qualifier + ":" + qualifier.getDeclaration());
+			}
     		}
     	}
     	
@@ -502,7 +505,7 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
     		if (offset < 0) {	// formals starts from -1
     			offset = (-(offset - 1)) * 4;	// real offset 
     			StringUtility.appendIndLn(sb, "mov dword eax, ebp ");
-    			StringUtility.appendIndLn(sb, "add eax, offset \t; eax contains formal address");
+    			StringUtility.appendIndLn(sb, "add eax, " + offset + " \t; eax contains formal address");
     		} else {	// locals starts from 0
     			offset = (offset + 1) * 4;
     			StringUtility.appendIndLn(sb, "mov dword eax, ebp ");
@@ -524,9 +527,17 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
     	} else if (qDecl instanceof FieldDeclaration || qDecl instanceof VariableDeclaration) {
     		qualifier.accept(this);
     		StringUtility.appendIndLn(sb, qualifier.getCode());
-    		// node is instance field, with object in eax
-    		FieldDeclaration fDecl = (FieldDeclaration) node.getDeclaration();
-    		TypeDeclaration tDecl = (TypeDeclaration) fDecl.getParent();
+    		
+		if (node.getDeclaration() == null && node.getID().equals("length")) {
+		    // fucking array length
+		    StringUtility.appendIndLn(sb, "mov eax [eax]"); // enter array 
+		    StringUtility.appendIndLn(sb, "add eax, 1"); // array length
+		    return;
+		}
+		
+		// node is instance field, with object in eax
+		FieldDeclaration fDecl = (FieldDeclaration) node.getDeclaration();
+		TypeDeclaration tDecl = (TypeDeclaration) fDecl.getParent();
     		int offset = tDecl.getFieldOffSet(fDecl.id);
     		offset = (offset + 1) * 4;	// real offset 
     		StringUtility.appendIndLn(sb, "mov eax [eax]");	// enter object
@@ -534,6 +545,10 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
     	} else {
     		throw new Exception("qualified name prefix not recoginsed: " + qualifier.toString());
     	}
+    }
+
+    public void visit(SimpleType node) throws Exception {
+	// intentionally do nothing
     }
     
 }
