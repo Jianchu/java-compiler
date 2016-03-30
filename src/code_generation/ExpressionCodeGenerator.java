@@ -132,12 +132,11 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
     public void visit(InfixExpression node) throws Exception {
         StringBuilder infixText = new StringBuilder();
         if (node.lhs != null && node.rhs != null) {
-            int n = 0;
+            int n = infixCounter;
+            infixCounter++;
             node.lhs.accept(this);
             infixText.append(node.lhs.getCode());
             if (node.op == InfixExpression.Operator.LOR || node.op == InfixExpression.Operator.AND) {
-                n = infixCounter;
-                infixCounter++;
                 StringUtility.appendLine(infixText, "cmp eax," + (node.op == InfixExpression.Operator.LOR ? FALSE : TRUE));
                 StringUtility.appendLine(infixText, "jne INFIX_" + n);
             }
