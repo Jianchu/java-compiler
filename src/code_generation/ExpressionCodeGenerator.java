@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Set;
 
 import utility.StringUtility;
+import ast.*;
 import ast.ASTNode;
 import ast.AssignmentExpression;
 import ast.BooleanLiteral;
@@ -388,7 +389,11 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
     	return result;
 	}
 
-	/**
+    public void visit(ThisExpression node) throws Exception {
+	node.attachCode("\tmov eax, [ebp+8] \n"); // simply move object from ebp to 8
+    }
+
+    	/**
      * Deals with method names
      */
     @Override
@@ -531,7 +536,7 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
 		if (node.getDeclaration() == null && node.getID().equals("length")) {
 		    // fucking array length
 		    StringUtility.appendIndLn(sb, "mov eax [eax]"); // enter array 
-		    StringUtility.appendIndLn(sb, "add eax, 1"); // array length
+		    StringUtility.appendIndLn(sb, "add eax, 4"); // array length
 		    return;
 		}
 		
@@ -545,8 +550,30 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
     	} else {
     		throw new Exception("qualified name prefix not recoginsed: " + qualifier.toString());
     	}
-    }
 
+	node.attachCode(sb.toString());
+    }
+    
+    public void visit(FieldAccess node) throws Exception {
+	StringBuilder sb = new StringBuilder();
+	
+	node.expr.accept(this);
+	StringUtility.appendLine(sb, node.getCode());
+	// assume object at eax
+	if (node.expr.getType() instanceof ArrayType && node.id.equals("length")) {    // array.length
+	    StringUtility.appendIndLn(sb, "mov eax, [eax] \t; enter array"); // enter array
+	    StringUtility.appendIndLn(sb, "add eax, 4");
+	} else {// instance field
+	    TypeDeclaration tDecl = node.expr.getType().getDeclaration();
+	    int offset = tDecl.getFieldOffSet(node.id.toString());
+	    offset = offset * 4;// real offset
+	    StringUtility.appendIndLn(sb, "mov eax, [eax] \t; enter object");
+	    StringUtility.appendIndLn(sb, "add eax, " + offset);
+	}
+	
+	node.attachCode(sb.toString());
+    }
+    
     public void visit(SimpleType node) throws Exception {
 	// intentionally do nothing
     }
