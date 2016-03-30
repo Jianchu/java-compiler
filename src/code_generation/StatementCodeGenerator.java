@@ -20,7 +20,7 @@ public class StatementCodeGenerator extends TraversalVisitor {
 
     public StatementCodeGenerator(Set<String> extern) {
         this.extern = extern;
-        this.expGen = new ExpressionCodeGenerator(new HashSet<String>());
+        this.expGen = new ExpressionCodeGenerator(extern);
     }
 
     public void visit(WhileStatement node) throws Exception {
