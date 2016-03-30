@@ -1,5 +1,6 @@
 package code_generation;
 
+import java.util.List;
 import java.util.Set;
 
 import utility.StringUtility;
@@ -333,14 +334,7 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
     	StringBuilder sb = new StringBuilder();    	
     	// generate code for arguments
     	int numArgs = 0;
-    	if (node.arglist != null) {
-	    	for (numArgs =0; numArgs < node.arglist.size() ; numArgs++) {
-	    		Expression expr = node.arglist.get(numArgs);
-	    		expr.accept(this);
-	    		StringUtility.appendLine(sb, expr.getCode());
-	    		StringUtility.appendIndLn(sb, "push eax \t; push argument " + numArgs);
-	    	}    	
-    	}
+    	numArgs = generateArgs(sb, node.arglist);
     	
     	// malloc
     	TypeDeclaration tDecl = node.type.getDeclaration();
@@ -399,14 +393,7 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
     	
     	// generate code for arguments
     	int numArgs = 0;
-    	if (node.arglist != null) {
-	    	for (numArgs =0; numArgs < node.arglist.size() ; numArgs++) {
-	    		Expression expr = node.arglist.get(numArgs);
-	    		expr.accept(this);
-	    		StringUtility.appendLine(sb, expr.getCode());
-	    		StringUtility.appendIndLn(sb, "push eax \t; push argument " + numArgs);
-	    	}
-    	}
+    	numArgs = generateArgs(sb, node.arglist);
     	
     	if (node.id != null) {
     		// Primary.ID(...)
@@ -477,6 +464,19 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
     	}
     }
     
+    private int generateArgs(StringBuilder sb, List<Expression> argList) throws Exception {
+    	int numArgs = 0;
+    	if (argList != null) {
+	    	for (numArgs =0; numArgs < argList.size() ; numArgs++) {
+	    		Expression expr = argList.get(numArgs);
+	    		expr.accept(this);
+	    		StringUtility.appendLine(sb, expr.getCode());
+	    		StringUtility.appendIndLn(sb, "push eax \t; push argument " + numArgs);
+	    	}
+    	}
+    	return numArgs;
+    }
+    
     public void visit(SimpleName node) throws Exception {
     	StringBuilder sb = new StringBuilder();
     	ASTNode decl = node.getDeclaration();
@@ -516,7 +516,7 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
     	} else if (qDecl instanceof FieldDeclaration || qDecl instanceof VariableDeclaration) {
     		qualifier.accept(this);
     		StringUtility.appendIndLn(sb, qualifier.getCode());
-    		// node instance field, with object in eax
+    		// node is instance field, with object in eax
     		FieldDeclaration fDecl = (FieldDeclaration) node.getDeclaration();
     		TypeDeclaration tDecl = (TypeDeclaration) fDecl.getParent();
     		int offset = tDecl.getFieldOffSet(fDecl.id);
