@@ -14,7 +14,6 @@ import ast.SimpleName;
 import ast.SimpleType;
 import ast.Type;
 import ast.TypeDeclaration;
-import environment.SymbolTable;
 
 public class HierarchyTableBuilder {
     
@@ -31,12 +30,6 @@ public class HierarchyTableBuilder {
             }
         }
         setOffSet(typeDecs);
-        printOffSets();
-        Name name = new SimpleName("java.lang.String");
-        SimpleType type = new SimpleType(name);
-        TypeDeclaration typeDec = SymbolTable.getGlobal().get(name);
-        type.attachDeclaration(typeDec);
-        System.out.println(offSets.keySet().contains(type));
     }
     
     private static void setOffSet(List<TypeDeclaration> typeDecs) {
