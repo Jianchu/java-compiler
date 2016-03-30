@@ -28,9 +28,11 @@ public class CodeGenerator extends TraversalVisitor {
     private static StringBuilder[] instanceFieldInit = {new StringBuilder(), new StringBuilder()};
     TypeDeclaration currentTypeDec;
     Set<String> extern;
+    Set<String> exclude;
 
     public CodeGenerator() {
         this.extern = new HashSet<String>();
+        this.exclude = new HashSet<String>();
         stmtGen = new StatementCodeGenerator(extern);
         expGen = new ExpressionCodeGenerator(extern);
     }
@@ -45,7 +47,7 @@ public class CodeGenerator extends TraversalVisitor {
         StringBuilder vTableText = new StringBuilder();
         StringBuilder textSection = new StringBuilder();
         StringBuilder start = new StringBuilder();
-        StringBuilder header = new StringBuilder();
+        // StringBuilder header = new StringBuilder();
         StringUtility.appendLine(textSection, "section .text");
         StringUtility.appendLine(vTableText, "global VTable#" + SigHelper.getClassSig(node));
         StringUtility.appendIndLn(vTableText, "VTable#" + SigHelper.getClassSig(node) + ":");        
@@ -54,6 +56,8 @@ public class CodeGenerator extends TraversalVisitor {
         StringUtility.appendLine(dataSection, "section .data");
         for (FieldDeclaration fDecl : node.getEnvironment().fields.values()) {
             if (fDecl.modifiers.contains(Modifier.STATIC)) {
+                String fieldSig = SigHelper.getFieldSig(fDecl);
+                this.exclude.add(fieldSig);
                 putFieldInData(dataSection, fDecl, node);
             }
             
@@ -81,12 +85,15 @@ public class CodeGenerator extends TraversalVisitor {
         
 
         for (Map.Entry<String, MethodDeclaration> entry : node.getEnvironment().methods.entrySet()) {
+            String methodSigInDec = SigHelper.getMethodSigWithImp(entry.getValue());
+            this.exclude.add(methodSigInDec);
             staticMethodVTableHandler(entry, node, textSection);
         }
         
         for (Map.Entry<String, MethodDeclaration> entry : node.getEnvironment().getEnclosing().methods.entrySet()) {
             String methodSigInDec = SigHelper.getMethodSigWithImp(entry.getValue());
-            StringUtility.appendLine(header, "extern " + methodSigInDec);
+            this.extern.add(methodSigInDec);
+            //StringUtility.appendLine(header, "extern " + methodSigInDec);
             staticMethodVTableHandler(entry, node, textSection);
         }
         
@@ -102,7 +109,8 @@ public class CodeGenerator extends TraversalVisitor {
         	if (bDecl instanceof MethodDeclaration) {
         		MethodDeclaration mDecl = (MethodDeclaration) bDecl;
 	            if (SigHelper.getMethodSigWithImp(mDecl).equals(testSig)) {
-	                StringUtility.appendLine(header, "extern __debexit");
+	                this.extern.add("__debexit");
+	                //StringUtility.appendLine(header, "extern __debexit");
 	                generateStart(start, testSig);
 	            }
 	            mDecl.accept(this);
@@ -118,17 +126,22 @@ public class CodeGenerator extends TraversalVisitor {
         textSection.append(getInstanceFieldInit() + "\n");
         textSection.append(start + "\n");
         textSection.append(vTableText + "\n");
-        StringUtility.appendLine(header, "extern __malloc");
-        StringUtility.appendLine(header, "extern __exception");
-        header.append(getExtern());
-        header.append("\n");
-        node.attachCode(header.toString() + dataSection.toString() + textSection.toString());
+        this.extern.add("__malloc");
+        this.extern.add("__exception");
+        // StringUtility.appendLine(header, "extern __malloc");
+        // StringUtility.appendLine(header, "extern __exception");
+        // header.append(getExtern());
+        // header.append("\n");
+        node.attachCode(getExtern().toString() + dataSection.toString() + textSection.toString());
     }
     
     private StringBuilder getExtern() {
         StringBuilder sb = new StringBuilder();
         for (String s : this.extern) {
-            sb.append(s);
+            if (this.exclude.contains(s)) {
+                continue;
+            }
+            StringUtility.appendLine(sb, "extern " + s);
         }
         return sb;
     }
