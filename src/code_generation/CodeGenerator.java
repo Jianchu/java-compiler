@@ -172,11 +172,13 @@ public class CodeGenerator extends TraversalVisitor {
 
     private void putFieldInData(StringBuilder sb, FieldDeclaration fDecl, TypeDeclaration typeDec) throws Exception {
         String fieldSig = SigHelper.getFieldSig(typeDec, fDecl);
+        String fieldSigWithImp = SigHelper.getFieldSigWithImp(fDecl);
         StringUtility.appendLine(staticFieldInit[0], "call static_init_" + fieldSig, 2);
         staticInitExtern.add(fieldSig);
         StringUtility.appendLine(sb, "global " + fieldSig + "\t; define global label for field");
         StringUtility.appendLine(sb, fieldSig + ":" + "\t; label start");
-        StringUtility.appendLine(sb, "\t" + "dw 0x0" + "\t; default value: 0 false null");
+        StringUtility.appendLine(sb, "\t" + "dd " +  fieldSigWithImp + "\t; points to the dec");
+        // TODO: .........
     }
 
     public void visit(FieldDeclaration node) throws Exception {
