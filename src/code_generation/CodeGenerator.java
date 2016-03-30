@@ -133,7 +133,8 @@ public class CodeGenerator extends TraversalVisitor {
         // StringUtility.appendLine(header, "extern __exception");
         // header.append(getExtern());
         // header.append("\n");
-        node.attachCode(getExtern().toString() + dataSection.toString() + textSection.toString());
+        node.attachCode(getExtern().toString() + dataSection.toString() + textSection.toString() + staticFieldInit[1].toString());
+        staticFieldInit[1].setLength(0);
     }
     
     private StringBuilder getExtern() {
@@ -265,16 +266,16 @@ public class CodeGenerator extends TraversalVisitor {
     }
 
     protected static String getStaticFieldInit() {
-        String staticFieldInitString = staticFieldInit[0].toString() + staticFieldInit[1].toString();
+        String staticFieldInitString = staticFieldInit[0].toString();
         staticFieldInit[0].setLength(0);
-        staticFieldInit[1].setLength(0);
+        //staticFieldInit[1].setLength(0);
         return getStaticFieldInitExtern() + staticFieldInitString;
     }
     
     private static String getStaticFieldInitExtern() {
         StringBuilder sb = new StringBuilder();
         for (String s : staticInitExtern) {
-            StringUtility.appendLine(sb, "extern " + s);
+            StringUtility.appendLine(sb, "extern static_init_" + s);
         }
         sb.append("\n");
         StringUtility.appendLine(sb, "global static_init");
