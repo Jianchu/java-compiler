@@ -199,8 +199,99 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
                 StringUtility.appendLine(infixText, "INFIX_" + n + ":");
                 break;
               case PLUS:
-                if (node.lhs.getType() instanceof SimpleType && node.lhs.getType().getDeclaration().getFullName().equals("java.lang.String")) {
-                    //
+                Type lhsType = node.lhs.getType();
+                Type rhsType = node.rhs.getType();
+                if (lhsType instanceof SimpleType &&
+                    lhsType.getDeclaration().getFullName().equals("java.lang.String")) {
+                    StringUtility.appendLine(infixText, "push eax");
+                    if (rhsType instanceof PrimitiveType) {
+                        StringUtility.appendLine(infixText, "push ebx");
+                        extern.add("__malloc");
+                        StringUtility.appendLine(infixText, "call __malloc");
+                        StringUtility.appendLine(infixText, "push eax \t; push object address");
+                        switch (((PrimtiveType) rhsType).value) {
+                          case BOOLEAN:
+                            extern.add("java.lang.Boolean#~init~$B$implementation");
+                            StringUtility.appendLine(infixText, "call java.lang.Boolean#~init~$B$implementation");
+                            StringUtility.appendLine(infixText, "pop ebx\t; clean up");
+                            StringUtility.appendLine(infixText, "pop ebx\t; clean up");
+                            StringUtility.appendLine(infixText, "push eax");
+                            extern.add("java.lang.Boolean#toString$$implementation");
+                            StringUtility.appendLine(infixText, "call java.lang.Boolean#toString$$implementation");
+                            break;
+                          case CHAR:
+                            extern.add("java.lang.Character#~init~$B$implementation");
+                            StringUtility.appendLine(infixText, "call java.lang.Character#~init~$C$implementation");
+                            StringUtility.appendLine(infixText, "pop ebx\t; clean up");
+                            StringUtility.appendLine(infixText, "pop ebx\t; clean up");
+                            StringUtility.appendLine(infixText, "push eax");
+                            extern.add("java.lang.Character#toString$$implementation");
+                            StringUtility.appendLine(infixText, "call java.lang.Character#toString$$implementation");
+                            break;
+                          default:
+                            extern.add("java.lang.Integer#~init~$I$implementation");
+                            StringUtility.appendLine(infixText, "call java.lang.Inteter#~init~$I$implementation");
+                            StringUtility.appendLine(infixText, "pop ebx\t; clean up");
+                            StringUtility.appendLine(infixText, "pop ebx\t; clean up");
+                            StringUtility.appendLine(infixText, "push eax");
+                            extern.add("java.lang.Integer#toString$$implementation");
+                            StringUtility.appendLine(infixText, "call java.lang.Integer#toString$$implementation");
+                        }
+                        StringUtility.appendLine(infixText, "pop ebx\t; clean up");
+                        StringUtility.appendLine(infixText, "push eax");
+                    } else if (rhsType instanceof SimpleType &&
+                               rhsType.getDeclaration().getFullName().equals("java.lang.String")) {
+                        StringUtility.appendLine(infixText, "push ebx");
+                    }
+                    extern.add("java.lang.String#concat$java.lang.String$implementation");
+                    StringUtility.appendLine(infixText, "call java.lang.String#concat$java.lang.String$implementation");
+                    StringUtility.appendLine(infixText, "pop ebx\t; clean up");
+                    StringUtility.appendLine(infixText, "pop ebx\t; clean up");
+                } else if (rhsType instanceof SimpleType &&
+                           rhsType.getDeclaration().getFullName().equals("java.lang.String")) {
+                    StringUtility.appendLine(infixText, "push ebx");
+                    if (rhsType instanceof PrimitiveType) {
+                        StringUtility.appendLine(infixText, "push eax");
+                        extern.add("__malloc");
+                        StringUtility.appendLine(infixText, "call __malloc");
+                        StringUtility.appendLine(infixText, "push eax \t; push object address");
+                        switch (((PrimtiveType) rhsType).value) {
+                          case BOOLEAN:
+                            extern.add("java.lang.Boolean#~init~$B$implementation");
+                            StringUtility.appendLine(infixText, "call java.lang.Boolean#~init~$B$implementation");
+                            StringUtility.appendLine(infixText, "pop ebx\t; clean up");
+                            StringUtility.appendLine(infixText, "pop ebx\t; clean up");
+                            StringUtility.appendLine(infixText, "push eax");
+                            extern.add("java.lang.Boolean#toString$$implementation");
+                            StringUtility.appendLine(infixText, "call java.lang.Boolean#toString$$implementation");
+                            break;
+                          case CHAR:
+                            extern.add("java.lang.Character#~init~$B$implementation");
+                            StringUtility.appendLine(infixText, "call java.lang.Character#~init~$C$implementation");
+                            StringUtility.appendLine(infixText, "pop ebx\t; clean up");
+                            StringUtility.appendLine(infixText, "pop ebx\t; clean up");
+                            StringUtility.appendLine(infixText, "push eax");
+                            extern.add("java.lang.Character#toString$$implementation");
+                            StringUtility.appendLine(infixText, "call java.lang.Character#toString$$implementation");
+                            break;
+                          default:
+                            extern.add("java.lang.Integer#~init~$I$implementation");
+                            StringUtility.appendLine(infixText, "call java.lang.Inteter#~init~$I$implementation");
+                            StringUtility.appendLine(infixText, "pop ebx\t; clean up");
+                            StringUtility.appendLine(infixText, "pop ebx\t; clean up");
+                            StringUtility.appendLine(infixText, "push eax");
+                            extern.add("java.lang.Integer#toString$$implementation");
+                            StringUtility.appendLine(infixText, "call java.lang.Integer#toString$$implementation");
+                        }
+                        StringUtility.appendLine(infixText, "pop ebx\t; clean up");
+                    }
+                    StringUtility.appendLine(infixText, "pop ebx");
+                    StringUtility.appendLine(infixText, "push eax");
+                    StringUtility.appendLine(infixText, "push ebx");
+                    extern.add("java.lang.String#concat$java.lang.String$implementation");
+                    StringUtility.appendLine(infixText, "call java.lang.String#concat$java.lang.String$implementation");
+                    StringUtility.appendLine(infixText, "pop ebx\t; clean up");
+                    StringUtility.appendLine(infixText, "pop ebx\t; clean up");
                 } else {
                     StringUtility.appendLine(infixText, "add eax, ebx");
                 }
