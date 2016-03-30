@@ -479,7 +479,7 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
     public void visit(SimpleName node) throws Exception {
     	StringBuilder sb = new StringBuilder();
     	ASTNode decl = node.getDeclaration();
-    	if (decl instanceof FieldDeclaration) {	// field
+    	if (decl instanceof FieldDeclaration) {	// field, has to be instance field
     		FieldDeclaration fDecl = (FieldDeclaration) decl;
     		TypeDeclaration parent = (TypeDeclaration) fDecl.getParent();
     		int offset = parent.getFieldOffSet(fDecl.id);
@@ -496,8 +496,10 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
     			offset = (offset + 1) * 4;
     			StringUtility.appendIndLn(sb, "mov dword eax, [ebp - " + offset + "]");
     		}
-    		
+    	} else {
+    		throw new Exception("Simple name declaration unexpected");
     	}
+    	node.attachCode(sb.toString());
     }
     
 }
