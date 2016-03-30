@@ -52,55 +52,6 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
         this.extern = extern;
     }
 
-    public void visit(InstanceofExpression node) throws Exception {
-        instanceOfCounter++;
-        StringBuilder instanceofText = new StringBuilder();
-        if (node.expr != null) {
-            node.expr.accept(this);
-        }
-        Type exprType = node.expr.getType();
-        String exprVTableSig = SigHelper.getClssSigWithVTable(exprType);
-        this.extern.add(exprVTableSig);
-        //[[vtable] + offset * 4] 
-        if (node.type != null) {
-            node.type.accept(this);
-            int offset = HierarchyTableBuilder.getTypeOffSet(node.type);
-            int frame = offset * 4;
-            StringUtility.appendLine(instanceofText, "mov eax, " + FALSE, 2);
-            StringUtility.appendLine(instanceofText, "cmp [[" + exprVTableSig + "]" + frame + "], " + TRUE, 2);
-            StringUtility.appendLine(instanceofText, "jne _INSTANCEOFEND_" + instanceOfCounter, 2);
-            StringUtility.appendLine(instanceofText, "mov eax, " + TRUE, 2);
-            StringUtility.appendLine(instanceofText, "_INSTANCEOFEND_" + instanceOfCounter + ":", 2);
-        }
-        node.attachCode(instanceofText.toString());
-    }
-
-    public void visit(CastExpression node) throws Exception {
-        StringBuilder castText = new StringBuilder();
-        Type castToType = null;
-        if (node.type != null) {
-            node.type.accept(this);
-            castToType = node.type;
-        }
-        if (node.expr != null) {
-            node.expr.accept(this);
-            castToType = node.expr.getType();
-        }
-        if (node.unary != null) {
-            node.unary.accept(this);
-        }
-
-        Type unaryType = node.unary.getType();
-        String unaryVTableSig = SigHelper.getClssSigWithVTable(unaryType);
-        this.extern.add(unaryVTableSig);
-
-        int offset = HierarchyTableBuilder.getTypeOffSet(castToType);
-        int frame = offset * 4;
-        StringUtility.appendLine(castText, "cmp [[" + unaryVTableSig + "]"
-                + frame + "], " + TRUE, 2);
-        StringUtility.appendLine(castText, "jne __exception:", 2);
-    }
-
     /*
      * Literals
      */
@@ -379,6 +330,73 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
         node.attachCode(infixText.toString());
     }
 
+    public void visit(InstanceofExpression node) throws Exception {
+        instanceOfCounter++;
+        StringBuilder instanceofText = new StringBuilder();
+        if (node.expr != null) {
+            node.expr.accept(this);
+        }
+        Type exprType = node.expr.getType();
+        String exprVTableSig = SigHelper.getClssSigWithVTable(exprType);
+        this.extern.add(exprVTableSig);
+        //[[vtable] + offset * 4] 
+        if (node.type != null) {
+            node.type.accept(this);
+            int offset = 0;
+            if (node.type instanceof SimpleType) {
+                SimpleType sType = (SimpleType)node.type;
+                offset = HierarchyTableBuilder.getTypeOffSet(sType.getDeclaration().getFullName());
+            } else if (node.type instanceof ArrayType) {
+                ArrayType aType = (ArrayType)node.type;
+                offset = HierarchyTableBuilder.getTypeOffSet(aType.toString());
+            }
+            int frame = offset * 4;
+            StringUtility.appendLine(instanceofText, "mov eax, " + FALSE, 2);
+            StringUtility.appendLine(instanceofText, "mov ecx, [" + exprVTableSig + "]", 2);
+            StringUtility.appendLine(instanceofText, "add ecx, " + frame, 2);
+            StringUtility.appendLine(instanceofText, "cmp dword [ecx], " + TRUE, 2);
+            //StringUtility.appendLine(instanceofText, "cmp [[" + exprVTableSig + "]+" + frame + "], " + TRUE, 2);
+            StringUtility.appendLine(instanceofText, "jne _INSTANCEOFEND_" + instanceOfCounter, 2);
+            StringUtility.appendLine(instanceofText, "mov eax, " + TRUE, 2);
+            StringUtility.appendLine(instanceofText, "_INSTANCEOFEND_" + instanceOfCounter + ":", 2);
+        }
+        node.attachCode(instanceofText.toString());
+    }
+
+    public void visit(CastExpression node) throws Exception {
+        StringBuilder castText = new StringBuilder();
+        Type castToType = null;
+        if (node.type != null) {
+            node.type.accept(this);
+            castToType = node.type;
+        }
+        if (node.expr != null) {
+            node.expr.accept(this);
+            castToType = node.expr.getType();
+        }
+        if (node.unary != null) {
+            node.unary.accept(this);
+        }
+
+        Type unaryType = node.unary.getType();
+        String unaryVTableSig = SigHelper.getClssSigWithVTable(unaryType);
+        this.extern.add(unaryVTableSig);
+
+        int offset = 0;
+        if (castToType instanceof SimpleType) {
+            SimpleType sType = (SimpleType)castToType;
+            offset = HierarchyTableBuilder.getTypeOffSet(sType.getDeclaration().getFullName());
+        } else if (node.type instanceof ArrayType) {
+            ArrayType aType = (ArrayType)castToType;
+            offset = HierarchyTableBuilder.getTypeOffSet(aType.toString());
+        }
+        int frame = offset * 4;
+        //StringUtility.appendLine(castText, "cmp [[" + unaryVTableSig + "]+"  + frame + "], " + TRUE, 2);
+        StringUtility.appendLine(castText, "mov ecx, [" + unaryVTableSig + "]", 2);
+        StringUtility.appendLine(castText, "add ecx, " + frame, 2);
+        StringUtility.appendLine(castText, "cmp dword [ecx], " + TRUE, 2);
+        StringUtility.appendLine(castText, "jne __exception:", 2);
+    }
 
     /*
      * OO features
