@@ -15,6 +15,7 @@ import ast.IntegerLiteral;
 import ast.MethodDeclaration;
 import ast.MethodInvocation;
 import ast.Modifier;
+import ast.Name;
 import ast.NullLiteral;
 import ast.PrefixExpression;
 import ast.PrefixExpression.Operator;
@@ -483,23 +484,37 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
     		FieldDeclaration fDecl = (FieldDeclaration) decl;
     		TypeDeclaration parent = (TypeDeclaration) fDecl.getParent();
     		int offset = parent.getFieldOffSet(fDecl.id);
+    		offset = 4 * offset;
     		StringUtility.appendIndLn(sb, "mov dword eax, [ebp + 8] \t; put object address in eax");
     		StringUtility.appendIndLn(sb, "mov dword eax, [eax] \t; enter object");
-    		StringUtility.appendIndLn(sb, "mov dword eax, [eax + " + offset + "*4] \t; access object");
+    		StringUtility.appendIndLn(sb, "add eax, " +  offset + " \t; field address");	// eax contains field address
     	} else if (decl instanceof VariableDeclaration) {	// variable
     		VariableDeclaration vDecl = (VariableDeclaration) decl;
     		int offset = currentMethod.getVarOffSet(vDecl);
     		if (offset < 0) {	// formals starts from -1
     			offset = (-(offset - 1)) * 4;	// real offset 
-    			StringUtility.appendIndLn(sb, "mov dword eax, [ebp + " + offset + "]");
+    			StringUtility.appendIndLn(sb, "mov dword eax, ebp ");
+    			StringUtility.appendIndLn(sb, "add eax, offset \t; eax contains formal address");
     		} else {	// locals starts from 0
     			offset = (offset + 1) * 4;
-    			StringUtility.appendIndLn(sb, "mov dword eax, [ebp - " + offset + "]");
+    			StringUtility.appendIndLn(sb, "mov dword eax, ebp ");
+    			StringUtility.appendIndLn(sb, "sub eax, offset \t; eax contains local address");	// eax now points to object
     		}
     	} else {
     		throw new Exception("Simple name declaration unexpected");
     	}
     	node.attachCode(sb.toString());
+    }
+    
+    public void visit(QualifiedName node) throws Exception {
+    	StringBuilder sb = new StringBuilder();
+    	Name qualifier = node.getQualifier();
+    	if (qualifier.getDeclaration() != null) {
+    		qualifier.accept(this);
+    		StringUtility.appendIndLn(sb, qualifier.getCode());
+    	}
+    	
+    	
     }
     
 }
