@@ -37,6 +37,7 @@ public class CodeGenerator extends TraversalVisitor {
 
     public void visit(TypeDeclaration node) throws Exception {
         this.currentTypeDec = node;
+        this.exclude.add(SigHelper.getClssSigWithVTable(node));
         ExpressionCodeGenerator.stringLitData.setLength(0);
         String classSig = SigHelper.getClassSig(node);
         String testSig = classSig + "#test$$implementation";
@@ -45,43 +46,33 @@ public class CodeGenerator extends TraversalVisitor {
         StringBuilder vTableText = new StringBuilder();
         StringBuilder textSection = new StringBuilder();
         StringBuilder start = new StringBuilder();
-        // StringBuilder header = new StringBuilder();
         StringUtility.appendLine(textSection, "section .text");
         StringUtility.appendLine(vTableText, "global VTable#" + SigHelper.getClassSig(node));
         StringUtility.appendIndLn(vTableText, "VTable#" + SigHelper.getClassSig(node) + ":");        
-        
         // creating .data section for static field
         StringUtility.appendLine(dataSection, "section .data");
         for (FieldDeclaration fDecl : node.getEnvironment().fields.values()) {
             if (fDecl.modifiers.contains(Modifier.STATIC)) {
                 String fieldSig = SigHelper.getFieldSig(fDecl);
                 this.exclude.add(fieldSig);
-                putFieldInData(dataSection, fDecl, node);
+                putFieldInData(dataSection, fDecl, node, false);
             }
             
         }
         for (FieldDeclaration fDecl : node.getEnvironment().getEnclosing().fields.values()) {
             if (fDecl.modifiers.contains(Modifier.STATIC)) {
-                putFieldInData(dataSection, fDecl, node);
+                putFieldInData(dataSection, fDecl, node, true);
             }
             // inherited fields
         }
 
-        // creating .text section
         for (FieldDeclaration fDecl : node.getEnvironment().fields.values()) {
             fDecl.accept(this);
 
         }
-        for (FieldDeclaration fDecl : node.getEnvironment().getEnclosing().fields.values()) {
-            fDecl.accept(this);
-
-            // inherited fields
-        }
         StringUtility.appendIndLn(instanceFieldInit[0], "ret");
         
         // methods
-        
-
         for (Map.Entry<String, MethodDeclaration> entry : node.getEnvironment().methods.entrySet()) {
             staticMethodVTableHandler(entry, node, textSection);
         }
@@ -89,11 +80,12 @@ public class CodeGenerator extends TraversalVisitor {
         for (Map.Entry<String, MethodDeclaration> entry : node.getEnvironment().getEnclosing().methods.entrySet()) {
             String methodSigInDec = SigHelper.getMethodSigWithImp(entry.getValue());
             this.extern.add(methodSigInDec);
-            //StringUtility.appendLine(header, "extern " + methodSigInDec);
             staticMethodVTableHandler(entry, node, textSection);
         }
         
         if (!node.isInterface) {
+            StringUtility.appendLine(vTableText, "dd " + SigHelper.getClassSigWithUgly(node), 2);
+            this.extern.add(SigHelper.getClassSigWithUgly(node));
             for (Integer i = 0; i < SigOffsets.size(); i++) {
                 StringUtility.appendLine(vTableText, "dd " + SigOffsets.get(i), 2);
                 
@@ -108,7 +100,6 @@ public class CodeGenerator extends TraversalVisitor {
         	        this.exclude.add(methodSigInDec);
 	            if (SigHelper.getMethodSigWithImp(mDecl).equals(testSig)) {
 	                this.extern.add("__debexit");
-	                //StringUtility.appendLine(header, "extern __debexit");
 	                generateStart(start, testSig);
 	            }
 	            mDecl.accept(this);
@@ -126,10 +117,6 @@ public class CodeGenerator extends TraversalVisitor {
         textSection.append(vTableText + "\n");
         this.extern.add("__malloc");
         this.extern.add("__exception");
-        // StringUtility.appendLine(header, "extern __malloc");
-        // StringUtility.appendLine(header, "extern __exception");
-        // header.append(getExtern());
-        // header.append("\n");
         node.attachCode(getExtern().toString() + dataSection.toString() + textSection.toString() + staticFieldInit[1].toString());
         staticFieldInit[1].setLength(0);
     }
@@ -170,18 +157,27 @@ public class CodeGenerator extends TraversalVisitor {
         }
     }
 
-    private void putFieldInData(StringBuilder sb, FieldDeclaration fDecl, TypeDeclaration typeDec) throws Exception {
+    private void putFieldInData(StringBuilder sb, FieldDeclaration fDecl, TypeDeclaration typeDec, boolean fromEnclosing) throws Exception {
         String fieldSig = SigHelper.getFieldSig(typeDec, fDecl);
-        StringUtility.appendLine(staticFieldInit[0], "call static_init_" + fieldSig, 2);
-        staticInitExtern.add(fieldSig);
+        String fieldSigWithImp = SigHelper.getFieldSigWithImp(fDecl);
         StringUtility.appendLine(sb, "global " + fieldSig + "\t; define global label for field");
         StringUtility.appendLine(sb, fieldSig + ":" + "\t; label start");
-        StringUtility.appendLine(sb, "\t" + "dw 0x0" + "\t; default value: 0 false null");
+        StringUtility.appendLine(sb, "\t" + "dd " + fieldSigWithImp + "\t; points to the dec");
+        if (!fromEnclosing ) {
+            staticInitExtern.add(fieldSig);
+            StringUtility.appendLine(staticFieldInit[0], "call static_init_"
+                    + fieldSig, 2);
+            StringUtility.appendLine(sb, "global " + fieldSigWithImp + "\t; define global label for field");
+            StringUtility.appendLine(sb, fieldSigWithImp + ":" + "\t; label start");
+            StringUtility.appendLine(sb, "\t" + "dw 0x0" + "\t; default value: 0 false null");
+        } else {
+            this.extern.add(fieldSigWithImp);
+        }
     }
 
     public void visit(FieldDeclaration node) throws Exception {
         String fieldSig = SigHelper.getFieldSig(currentTypeDec, node);
-        // StringBuilder fieldAssemblyText = new StringBuilder();
+        String fieldSigInDec = SigHelper.getFieldSigWithImp(node);
         for (Modifier im : node.modifiers) {
             im.accept(this);
         }
@@ -258,7 +254,6 @@ public class CodeGenerator extends TraversalVisitor {
     protected static String getStaticFieldInit() {
         String staticFieldInitString = staticFieldInit[0].toString();
         staticFieldInit[0].setLength(0);
-        //staticFieldInit[1].setLength(0);
         return getStaticFieldInitExtern() + staticFieldInitString;
     }
     

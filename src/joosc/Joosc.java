@@ -16,6 +16,7 @@ import ast.AST;
 import ast.Visitor;
 import code_generation.CodeGenerator;
 import code_generation.CodePrinter;
+import code_generation.HierarchyTableBuilder;
 import code_generation.OffSet;
 import code_generation.UglyTableBuilder;
 import environment.Disambiguation;
@@ -68,6 +69,7 @@ public class Joosc {
 		    VariableAnalysis.check(trees);
 		    OffSet.computeOffSet(trees);
 		    UglyTableBuilder.build();
+		    HierarchyTableBuilder.build(trees);
 		    CodeGenerator.generate(trees);
 		    CodePrinter.printCode(trees);
         } catch (Exception e) {
