@@ -425,7 +425,7 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
     				StringUtility.appendIndLn(sb, "push 0 \t; place holder because there is no this object for static method");
     				generateMethodCall(sb, mDecl);
     			} else {	// instance method
-    				qn.accept(this); 	// generate code from name (accessing instance field, or local variable
+    				qn.getQualifier().accept(this); 	// generate code from name (accessing instance field, or local variable
     				StringUtility.appendLine(sb, qn.getCode());
     	    		StringUtility.appendIndLn(sb, "push eax \t; push object for method invocation");
     	    		// call method
