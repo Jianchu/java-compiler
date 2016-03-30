@@ -29,6 +29,7 @@ public class CodeGenerator extends TraversalVisitor {
     TypeDeclaration currentTypeDec;
     Set<String> extern;
     Set<String> exclude;
+    private static Set<String> staticInitExtern = new HashSet<String>();
 
     public CodeGenerator() {
         this.extern = new HashSet<String>();
@@ -173,6 +174,7 @@ public class CodeGenerator extends TraversalVisitor {
     private void putFieldInData(StringBuilder sb, FieldDeclaration fDecl, TypeDeclaration typeDec) throws Exception {
         String fieldSig = SigHelper.getFieldSig(typeDec, fDecl);
         StringUtility.appendLine(staticFieldInit[0], "call static_init_" + fieldSig, 2);
+        staticInitExtern.add(fieldSig);
         StringUtility.appendLine(sb, "global " + fieldSig + "\t; define global label for field");
         StringUtility.appendLine(sb, fieldSig + ":" + "\t; label start");
         StringUtility.appendLine(sb, "\t" + "dw 0x0" + "\t; default value: 0 false null");
@@ -265,9 +267,18 @@ public class CodeGenerator extends TraversalVisitor {
         String staticFieldInitString = staticFieldInit[0].toString() + staticFieldInit[1].toString();
         staticFieldInit[0].setLength(0);
         staticFieldInit[1].setLength(0);
-        return staticFieldInitString;
+        return getStaticFieldInitExtern() + staticFieldInitString;
     }
     
+    private static String getStaticFieldInitExtern() {
+        StringBuilder sb = new StringBuilder();
+        for (String s : staticInitExtern) {
+            sb.append("extern static_init_" + s);
+        }
+        sb.append("\n");
+        return sb.toString();
+    }
+
     private String getInstanceFieldInit() {
         String instanceFieldInitString = instanceFieldInit[0].toString() + instanceFieldInit[1].toString();
         instanceFieldInit[0].setLength(0);
