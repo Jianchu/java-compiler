@@ -144,6 +144,7 @@ public class CodeGenerator extends TraversalVisitor {
             }
             StringUtility.appendLine(sb, "extern " + s);
         }
+        sb.append("\n");
         return sb;
     }
 
@@ -197,7 +198,7 @@ public class CodeGenerator extends TraversalVisitor {
             if (node.modifiers.contains(Modifier.STATIC)) {
                 StringUtility.appendIndLn(staticFieldInit[1], "static_init_" + fieldSig + ":");
                 StringUtility.appendLine(staticFieldInit[1], initCode, 2);
-                StringUtility.appendLine(staticFieldInit[1], "mov " + fieldSig + ", eax", 2);
+                StringUtility.appendLine(staticFieldInit[1], "mov " + "[" + fieldSig + "]" + ", eax", 2);
             } else {
                 StringUtility.appendIndLn(instanceFieldInit[0], "call instance_init_" + fieldSig);
                 StringUtility.appendIndLn(instanceFieldInit[1], "instance_init_" + fieldSig + ":");
@@ -273,9 +274,11 @@ public class CodeGenerator extends TraversalVisitor {
     private static String getStaticFieldInitExtern() {
         StringBuilder sb = new StringBuilder();
         for (String s : staticInitExtern) {
-            sb.append("extern static_init_" + s);
+            StringUtility.appendLine(sb, "extern " + s);
         }
         sb.append("\n");
+        StringUtility.appendLine(sb, "global static_init");
+        StringUtility.appendIndLn(sb, "static_init:");
         return sb.toString();
     }
 

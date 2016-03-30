@@ -8,6 +8,7 @@ import ast.BooleanLiteral;
 import ast.CharacterLiteral;
 import ast.ClassInstanceCreationExpression;
 import ast.Expression;
+import ast.InfixExpression;
 import ast.IntegerLiteral;
 import ast.MethodDeclaration;
 import ast.MethodInvocation;
@@ -17,6 +18,7 @@ import ast.PrefixExpression;
 import ast.PrefixExpression.Operator;
 import ast.QualifiedName;
 import ast.SimpleName;
+import ast.SimpleType;
 import ast.StringLiteral;
 import ast.TypeDeclaration;
 import environment.NameHelper;
@@ -30,10 +32,12 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
     private int stringLitCounter = 0;
     public static StringBuilder stringLitData = new StringBuilder();
     private Set<String> extern;
+    public int infixCounter = 0;
 
     public ExpressionCodeGenerator(Set<String> extern) {
         this.extern = extern;
     }
+
     /*
      * Literals
      */
@@ -121,6 +125,105 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
             prefixText.insert(0, exprCode);
         }
         node.attachCode(prefixText.toString());
+    }
+
+
+    @Override
+    public void visit(InfixExpression node) throws Exception {
+        StringBuilder infixText = new StringBuilder();
+        if (node.lhs != null && node.rhs != null) {
+            int n = -1;
+            node.lhs.accept(this);
+            infixText.append(node.lhs.getCode());
+            if (node.op == InfixExpression.Operator.LOR || node.op == InfixExpression.Operator.AND) {
+                n = infixCounter;
+                infixCounter++;
+                StringUtility.appendLine(infixText, "cmp eax," + (node.op == InfixExpression.Operator.LOR ? FALSE : TRUE));
+                StringUtility.appendLine(infixText, "jne INFIX_" + n);
+            }
+            StringUtility.appendLine(infixText, "push eax\t; push lhs to stack");
+            node.rhs.accept(this);
+            infixText.append(node.rhs.getCode());
+            StringUtility.appendLine(infixText, "mov ebx, eax\t; move rhs to ebx");
+            StringUtility.appendLine(infixText, "pop eax\t; pop lhs back to eax");
+            switch (node.op) {
+              case LOR: // fall through
+              case AND:
+                StringUtility.appendLine(infixText, "INFIX_" + n + ":");
+                break;
+              case BITOR:
+                StringUtility.appendLine(infixText, "or eax, ebx");
+                break;
+              case BITAND:
+                StringUtility.appendLine(infixText, "and eax, ebx");
+                break;
+              case NEQ:
+                StringUtility.appendLine(infixText, "cmp eax, ebx");
+                StringUtility.appendLine(infixText, "mov eax, " + TRUE);
+                StringUtility.appendLine(infixText, "jne INFIX_" + n);
+                StringUtility.appendLine(infixText, "mov eax, " + FALSE);
+                StringUtility.appendLine(infixText, "INFIX_" + n + ":");
+                break;
+              case EQUAL:
+                StringUtility.appendLine(infixText, "cmp eax, ebx");
+                StringUtility.appendLine(infixText, "mov eax, " + FALSE);
+                StringUtility.appendLine(infixText, "jne INFIX_" + n);
+                StringUtility.appendLine(infixText, "mov eax, " + TRUE);
+                StringUtility.appendLine(infixText, "INFIX_" + n + ":");
+                break;
+              case LANGLE:
+                StringUtility.appendLine(infixText, "cmp eax, ebx");
+                StringUtility.appendLine(infixText, "mov eax, " + FALSE);
+                StringUtility.appendLine(infixText, "jge INFIX_" + n);
+                StringUtility.appendLine(infixText, "mov eax, " + TRUE);
+                StringUtility.appendLine(infixText, "INFIX_" + n + ":");
+                break;
+              case RANGLE:
+                StringUtility.appendLine(infixText, "cmp eax, ebx");
+                StringUtility.appendLine(infixText, "mov eax, " + FALSE);
+                StringUtility.appendLine(infixText, "jle INFIX_" + n);
+                StringUtility.appendLine(infixText, "mov eax, " + TRUE);
+                StringUtility.appendLine(infixText, "INFIX_" + n + ":");
+                break;
+              case LEQ:
+                StringUtility.appendLine(infixText, "cmp eax, ebx");
+                StringUtility.appendLine(infixText, "mov eax, " + TRUE);
+                StringUtility.appendLine(infixText, "jle INFIX_" + n);
+                StringUtility.appendLine(infixText, "mov eax, " + FALSE);
+                StringUtility.appendLine(infixText, "INFIX_" + n + ":");
+                break;
+              case GEQ:
+                StringUtility.appendLine(infixText, "cmp eax, ebx");
+                StringUtility.appendLine(infixText, "mov eax, " + TRUE);
+                StringUtility.appendLine(infixText, "jge INFIX_" + n);
+                StringUtility.appendLine(infixText, "mov eax, " + FALSE);
+                StringUtility.appendLine(infixText, "INFIX_" + n + ":");
+                break;
+              case PLUS:
+                if (node.lhs.getType() instanceof SimpleType && node.lhs.getType().getDeclaration().getFullName().equals("java.lang.String")) {
+                    //
+                } else {
+                    StringUtility.appendLine(infixText, "add eax, ebx");
+                }
+                break;
+              case MINUS:
+                StringUtility.appendLine(infixText, "sub eax, ebx");
+                break;
+              case STAR:
+                StringUtility.appendLine(infixText, "imul eax, ebx");
+                break;
+              case SLASH:
+                StringUtility.appendLine(infixText, "mov edx, 0");
+                StringUtility.appendLine(infixText, "idiv ebx");
+                break;
+              case MOD:
+                StringUtility.appendLine(infixText, "mov edx, 0");
+                StringUtility.appendLine(infixText, "idiv ebx");
+                StringUtility.appendLine(infixText, "mov eax, edx");
+                break;
+            }
+        }
+        node.attachCode(infixText.toString());
     }
 
 
