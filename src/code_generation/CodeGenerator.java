@@ -31,8 +31,8 @@ public class CodeGenerator extends TraversalVisitor {
 
     public CodeGenerator() {
         this.extern = new HashSet<String>();
-        stmtGen = new StatementCodeGenerator(new HashSet<String>());
-        expGen = new ExpressionCodeGenerator(new HashSet<String>());
+        stmtGen = new StatementCodeGenerator(extern);
+        expGen = new ExpressionCodeGenerator(extern);
     }
 
     public void visit(TypeDeclaration node) throws Exception {
@@ -120,10 +120,19 @@ public class CodeGenerator extends TraversalVisitor {
         textSection.append(vTableText + "\n");
         StringUtility.appendLine(header, "extern __malloc");
         StringUtility.appendLine(header, "extern __exception");
+        header.append(getExtern());
         header.append("\n");
         node.attachCode(header.toString() + dataSection.toString() + textSection.toString());
     }
     
+    private StringBuilder getExtern() {
+        StringBuilder sb = new StringBuilder();
+        for (String s : this.extern) {
+            sb.append(s);
+        }
+        return sb;
+    }
+
     private void generateStart(StringBuilder start, String testSig) {
         StringUtility.appendLine(start, "global _start");
         StringUtility.appendIndLn(start, "_start:");
