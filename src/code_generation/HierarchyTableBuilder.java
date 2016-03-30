@@ -1,5 +1,6 @@
 package code_generation;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -14,12 +15,14 @@ import ast.SimpleName;
 import ast.SimpleType;
 import ast.Type;
 import ast.TypeDeclaration;
+import environment.TypeHelper;
 
 public class HierarchyTableBuilder {
     
-    static Map<Type, List<String>> hierarchyTable = new HashMap<Type, List<String>>();
+    static Map<String, List<String>> hierarchyTable = new HashMap<String, List<String>>();
     static Map<Type, Integer> offSets = new HashMap<Type, Integer>();
     static Integer offSetCounter = new Integer(0);
+    static List<String> Alltypes = new ArrayList<String>();
 
     public static void build(List<AST> trees) throws Exception {
         List<TypeDeclaration> typeDecs = new LinkedList<TypeDeclaration>();
@@ -30,8 +33,45 @@ public class HierarchyTableBuilder {
             }
         }
         setOffSet(typeDecs);
+        setHierarchy();
+        // printOffSets();
     }
     
+    private static void sort(List<Type> types) {
+        for (int i = 0; i < offSetCounter; i++) {
+            for (Map.Entry<Type, Integer> entry : offSets.entrySet()) {
+                if (entry.getValue() == i) {
+                    types.add(entry.getKey());
+                }
+            }
+        }
+    }
+
+    private static void setHierarchy() {
+        List<Type> types = new ArrayList<Type>();
+        sort(types);
+        for (Type typeInTop : types) {
+            List<String> column = new ArrayList<String>();
+            for (Type typeInLeft : types) {
+                boolean isSubType = TypeHelper.assignable(typeInLeft, typeInTop);
+                if (isSubType) {
+                    //System.out.println("super: " + typeInLeft + ", sub: " + typeInTop);
+                    column.add("1");
+                } else {
+                    column.add("0");
+                }
+            }
+            Alltypes.add(typeInTop.toString());
+            hierarchyTable.put(typeInTop.toString(), column);
+        }
+//        for (String type : hierarchyTable.keySet()) {
+//            System.out.println(type);
+//            for (int i = 0; i < hierarchyTable.get(type).size(); i++) {
+//                System.out.println(Alltypes.get(i) + " " + hierarchyTable.get(type).get(i));
+//            }
+//        }
+    }
+
     private static void setOffSet(List<TypeDeclaration> typeDecs) {
 
         setPrimitiveOffSet();
@@ -47,10 +87,6 @@ public class HierarchyTableBuilder {
     }
 
     private static void setPrimitiveOffSet() {
-        // null type:
-        offSets.put(null, offSetCounter);
-        offSetCounter++;
-
         // primitive type:
         primitiveOffSetHelper(Value.BOOLEAN);
         primitiveOffSetHelper(Value.BYTE);
@@ -88,17 +124,17 @@ public class HierarchyTableBuilder {
         return arrayType;
     }
 
-    private static void setHierarchy(List<TypeDeclaration> typeDecs) {
-
+    public static int getTypeOffSet(String typeName) {
+        return Alltypes.indexOf(typeName);
     }
 
-    public static void printOffSets() {
-        for (int i = 0; i < offSetCounter; i++) {
-            for (Map.Entry<Type, Integer> entry : offSets.entrySet()) {
-                if (entry.getValue() == i) {
-                    System.out.println(entry.getKey() + " " + entry.getValue());
-                }
-            }
+    public static int getTypeOffSet(Type type) {
+        return Alltypes.indexOf(type.toString());
+    }
+
+    private static void printOffSets() {
+        for (String type : Alltypes) {
+            System.out.println(Alltypes.indexOf(type) + " " + type);
         }
     }
 }
