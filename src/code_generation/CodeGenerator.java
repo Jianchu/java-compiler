@@ -234,8 +234,12 @@ public class CodeGenerator extends TraversalVisitor {
 		
 		
 		if (node.body != null) {
+			// TODO: check occasions where this would be null
+			ExpressionCodeGenerator.currentMethod = node;	// set current method 
 			node.body.accept(stmtGen);
+			ExpressionCodeGenerator.currentMethod = null;	// remove current method
 			sb.append(node.body.getCode());
+			
 		}
 		
 		// clean up in case there is no return statement

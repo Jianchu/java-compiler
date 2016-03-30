@@ -26,7 +26,15 @@ if __name__=='__main__':
             fn = os.path.join(root, f)
             nasm = subprocess.Popen('/u/cs444/bin/nasm -O1 -f elf -g -F dwarf'.split() + [fn])
             nasm.wait()
-    ld = subprocess.Popen('ld -melf_i386 -o output/main output/*.o'.split())
+    
+    ldl = list()
+    for root,_,filenames in os.walk('output'):
+        for f in filenames:
+            if f[-2:] == '.o':
+                fn = os.path.join(root, f)
+                ldl.append(fn)
+    
+    ld = subprocess.Popen('ld -melf_i386 -o output/main'.split() + ldl)
     ld.wait()
     
     main = subprocess.Popen(['./output/main']).wait()

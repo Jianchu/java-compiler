@@ -1,5 +1,6 @@
 package code_generation;
 
+import java.util.List;
 import java.util.Set;
 
 import utility.StringUtility;
@@ -16,6 +17,7 @@ import ast.IntegerLiteral;
 import ast.MethodDeclaration;
 import ast.MethodInvocation;
 import ast.Modifier;
+import ast.Name;
 import ast.NullLiteral;
 import ast.PrefixExpression;
 import ast.PrefixExpression.Operator;
@@ -39,6 +41,7 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
     public static StringBuilder stringLitData = new StringBuilder();
     private Set<String> extern;
     public int infixCounter = 0;
+    public static MethodDeclaration currentMethod;
 
     public ExpressionCodeGenerator(Set<String> extern) {
         this.extern = extern;
@@ -341,46 +344,46 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
     	StringBuilder sb = new StringBuilder();    	
     	// generate code for arguments
     	int numArgs = 0;
-    	if (node.arglist != null) {
-	    	for (numArgs =0; numArgs < node.arglist.size() ; numArgs++) {
-	    		Expression expr = node.arglist.get(numArgs);
-	    		expr.accept(this);
-	    		StringUtility.appendLine(sb, expr.getCode());
-	    		StringUtility.appendIndLn(sb, "push eax \t; push argument " + numArgs);
-	    	}    	
-    	}
+    	numArgs = generateArgs(sb, node.arglist);
     	
     	// malloc
     	TypeDeclaration tDecl = node.type.getDeclaration();
-    	int objSize = tDecl.getFieldOffSetList().size() + 2;
+    	int objSize = tDecl.getFieldOffSetList().size() + 1;	//	leave space for counter
     	StringUtility.appendIndLn(sb, "mov eax, 4*" + objSize + "\t; size of object");
     	extern.add("__malloc");
     	StringUtility.appendIndLn(sb, "call __malloc");
+    	
     	StringUtility.appendIndLn(sb, "push eax \t; push object address");
     	
     	// pointer to VTable
     	String vt = SigHelper.getClssSigWithVTable(tDecl);
     	extern.add(vt);
-    	StringUtility.appendIndLn(sb, "mov dword [eax], " + vt);
-
+    	StringUtility.appendIndLn(sb, "push eax");	// save object reference to exit vtable
+    	StringUtility.appendIndLn(sb, "mov eax, [eax] \t; enter object");	
+    	StringUtility.appendIndLn(sb, "mov dword eax, " + vt);
+    	StringUtility.appendIndLn(sb, "pop eax	\n");
+    	
     	// implicit super call
     	if (tDecl.superClass != null) {
     		MethodDeclaration superConstructor = getDefaultConstructor(tDecl.superClass.getDeclaration());
-    		
-    		String superConstructorLabel = SigHelper.getMethodSigWithImp(superConstructor);
-    		extern.add(superConstructorLabel.trim());
-        	StringUtility.appendIndLn(sb, "call " + superConstructorLabel);
+    		generateConstructorCall(sb, superConstructor);
     	}
-    	
+
     	// call actual constructor
-    	String constructorLabel = SigHelper.getMethodSigWithImp(node.getConstructor());
-    	extern.add(constructorLabel.trim());
-    	StringUtility.appendIndLn(sb, "call " + constructorLabel);
+    	generateConstructorCall(sb, node.getConstructor());
     	
     	// clean up
     	StringUtility.appendIndLn(sb, "pop eax \t; pop object address back in eax");
     	StringUtility.appendIndLn(sb, "add esp, 4 * " + numArgs);
     	node.attachCode(sb.toString());
+    }
+    
+    private void generateConstructorCall(StringBuilder sb, MethodDeclaration constructorDecl) {
+    	StringUtility.appendIndLn(sb, "push eax");	// save object reference
+		String constructorLabel = SigHelper.getMethodSigWithImp(constructorDecl);
+		extern.add(constructorLabel.trim());
+    	StringUtility.appendIndLn(sb, "call " + constructorLabel);
+    	StringUtility.appendIndLn(sb, "pop eax	\n");
     }
     
     private MethodDeclaration getDefaultConstructor(TypeDeclaration superClass) throws Exception {
@@ -406,14 +409,7 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
     	
     	// generate code for arguments
     	int numArgs = 0;
-    	if (node.arglist != null) {
-	    	for (numArgs =0; numArgs < node.arglist.size() ; numArgs++) {
-	    		Expression expr = node.arglist.get(numArgs);
-	    		expr.accept(this);
-	    		StringUtility.appendLine(sb, expr.getCode());
-	    		StringUtility.appendIndLn(sb, "push eax \t; push argument " + numArgs);
-	    	}
-    	}
+    	numArgs = generateArgs(sb, node.arglist);
     	
     	if (node.id != null) {
     		// Primary.ID(...)
@@ -435,16 +431,19 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
     		} else {	// QualifiedName(...)
     			QualifiedName qn = (QualifiedName) node.expr;
     			MethodDeclaration mDecl = (MethodDeclaration) qn.getDeclaration();
-    			if (qn.getQualifier().getDeclaration() instanceof TypeDeclaration) {	// static methods
+    			Name qualifier = qn.getQualifier();
+			if (qualifier.getDeclaration() instanceof TypeDeclaration) {	// static methods
     				StringUtility.appendIndLn(sb, "push 0 \t; place holder because there is no this object for static method");
     				generateMethodCall(sb, mDecl);
-    			} else {	// instance method
-    				qn.accept(this); 	// generate code from name (accessing instance field, or local variable
+    			} else if (qualifier.getDeclaration() instanceof FieldDeclaration || qualifier.getDeclaration() instanceof VariableDeclaration) {	// instance method
+    				qn.getQualifier().accept(this); 	// generate code from name (accessing instance field, or local variable
     				StringUtility.appendLine(sb, qn.getCode());
-    	    		StringUtility.appendIndLn(sb, "push eax \t; push object for method invocation");
-    	    		// call method
-    	    		generateMethodCall(sb, mDecl);
-    			}
+				StringUtility.appendIndLn(sb, "push eax \t; push object for method invocation");
+				// call method
+				generateMethodCall(sb, mDecl);
+    			} else {
+			    throw new Exception("qualifier type unexpected: " + qualifier + ":" + qualifier.getDeclaration());
+			}
     		}
     	}
     	
@@ -472,32 +471,94 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
 			// generate method call
 			if (tDecl.isInterface) {	// interface method
 				int offset = OffSet.getInterfaceMethodOffset(NameHelper.mangle(mDecl));
-				StringUtility.appendIndLn(sb, "mov eax, [eax] \t; point to VTable");
-				StringUtility.appendIndLn(sb, "mov eax, [eax] \t; point to Ugly");
-				StringUtility.appendIndLn(sb, "call [eax + " + offset + "*4] \t; call interface method.");
+				offset = offset*4;
+				StringUtility.appendIndLn(sb, "mov dword eax, [eax] \t; point to VTable");	//enter object
+				StringUtility.appendIndLn(sb, "mov dword eax, [eax + 1] \t; point to Ugly");	// ASSUME: the second entry of VTable is ugly column
+				StringUtility.appendIndLn(sb, "call [eax + " + offset + "] \t; call interface method.");
 				//TODO: check if the level of indirection is proper 
 			} else {
 				int offset = tDecl.getMethodOffSet(NameHelper.mangle(mDecl));
-				StringUtility.appendIndLn(sb, "mov eax, [eax] \t; point to VTable");
-				StringUtility.appendIndLn(sb, "call [eax + " + (offset + 2) + "*4] \t; call class method."); //skip VTable and Inheritance Table
+				offset = (offset + 2) * 4;	// real offset
+				StringUtility.appendIndLn(sb, "mov dword eax, [eax] \t; point to VTable");
+				StringUtility.appendIndLn(sb, "call [eax + " + offset + "] \t; call class method."); //skip ugly and hierarchy Table
 			}
     	}
+    }
+    
+    private int generateArgs(StringBuilder sb, List<Expression> argList) throws Exception {
+    	int numArgs = 0;
+    	if (argList != null) {
+	    	for (numArgs =0; numArgs < argList.size() ; numArgs++) {
+	    		Expression expr = argList.get(numArgs);
+	    		expr.accept(this);
+	    		StringUtility.appendLine(sb, expr.getCode());
+	    		StringUtility.appendIndLn(sb, "push eax \t; push argument " + numArgs);
+	    	}
+    	}
+    	return numArgs;
     }
     
     public void visit(SimpleName node) throws Exception {
     	StringBuilder sb = new StringBuilder();
     	ASTNode decl = node.getDeclaration();
-    	if (decl instanceof FieldDeclaration) {	// field
+    	if (decl instanceof FieldDeclaration) {	// field, has to be instance field
     		FieldDeclaration fDecl = (FieldDeclaration) decl;
     		TypeDeclaration parent = (TypeDeclaration) fDecl.getParent();
     		int offset = parent.getFieldOffSet(fDecl.id);
-    		StringUtility.appendIndLn(sb, "mov eax, [ebp + 8] \t; put object address in eax");
-    		StringUtility.appendIndLn(sb, "mov eax, [eax] \t; enter object");
-    		StringUtility.appendIndLn(sb, "mov eax, [eax + " + offset + "*4] \t; access object");
+    		offset = 4 * offset;
+    		StringUtility.appendIndLn(sb, "mov dword eax, [ebp + 8] \t; put object address in eax");
+    		StringUtility.appendIndLn(sb, "mov dword eax, [eax] \t; enter object");
+    		StringUtility.appendIndLn(sb, "add eax, " +  offset + " \t; field address");	// eax contains field address
     	} else if (decl instanceof VariableDeclaration) {	// variable
     		VariableDeclaration vDecl = (VariableDeclaration) decl;
-    		
+    		int offset = currentMethod.getVarOffSet(vDecl);
+    		if (offset < 0) {	// formals starts from -1
+    			offset = (-(offset - 1)) * 4;	// real offset 
+    			StringUtility.appendIndLn(sb, "mov dword eax, ebp ");
+    			StringUtility.appendIndLn(sb, "add eax, " + offset + " \t; eax contains formal address");
+    		} else {	// locals starts from 0
+    			offset = (offset + 1) * 4;
+    			StringUtility.appendIndLn(sb, "mov dword eax, ebp ");
+    			StringUtility.appendIndLn(sb, "sub eax, " + offset + "\t; eax contains local address");	// eax now points to object
+    		}
+    	} else {
+    		throw new Exception("Simple name declaration unexpected: " + node);
     	}
+    	node.attachCode(sb.toString());
+    }
+    
+    public void visit(QualifiedName node) throws Exception {
+    	StringBuilder sb = new StringBuilder();
+    	Name qualifier = node.getQualifier();
+    	ASTNode qDecl = qualifier.getDeclaration();
+    	if (qDecl instanceof TypeDeclaration) {	//A.B.c.d, node is static field
+    		String label = SigHelper.getFieldSig((FieldDeclaration) node.getDeclaration());	// directs to parent, not instance field
+    		StringUtility.appendIndLn(sb, "mov dword eax, " + label);
+    	} else if (qDecl instanceof FieldDeclaration || qDecl instanceof VariableDeclaration) {
+    		qualifier.accept(this);
+    		StringUtility.appendIndLn(sb, qualifier.getCode());
+    		
+		if (node.getDeclaration() == null && node.getID().equals("length")) {
+		    // fucking array length
+		    StringUtility.appendIndLn(sb, "mov eax [eax]"); // enter array 
+		    StringUtility.appendIndLn(sb, "add eax, 1"); // array length
+		    return;
+		}
+		
+		// node is instance field, with object in eax
+		FieldDeclaration fDecl = (FieldDeclaration) node.getDeclaration();
+		TypeDeclaration tDecl = (TypeDeclaration) fDecl.getParent();
+    		int offset = tDecl.getFieldOffSet(fDecl.id);
+    		offset = (offset + 1) * 4;	// real offset 
+    		StringUtility.appendIndLn(sb, "mov eax [eax]");	// enter object
+    		StringUtility.appendIndLn(sb, "add eax, " + offset);
+    	} else {
+    		throw new Exception("qualified name prefix not recoginsed: " + qualifier.toString());
+    	}
+    }
+
+    public void visit(SimpleType node) throws Exception {
+	// intentionally do nothing
     }
     
 }

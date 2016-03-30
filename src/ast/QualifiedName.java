@@ -78,6 +78,10 @@ public class QualifiedName extends Name{
 		return l;
 	}
 	
+    public String getID() {
+	return this.id;
+    }
+
 	private void getPrefixList(QualifiedName n, List<Name> l) {
 		if (n.qualifier != null) {
 			if (n.qualifier instanceof SimpleName) {
