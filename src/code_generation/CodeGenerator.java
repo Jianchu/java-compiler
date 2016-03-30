@@ -178,6 +178,7 @@ public class CodeGenerator extends TraversalVisitor {
 		StringUtility.appendIndLn(sb, "sub esp " + node.frameSize + "\t; space for local variables");
 		
 		if (node.body != null) {
+			// TODO: check occasions where this would be null
 			node.body.accept(this);
 			sb.append(node.body.getCode());
 		}
