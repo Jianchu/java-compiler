@@ -342,32 +342,38 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
     	StringUtility.appendIndLn(sb, "mov eax, 4*" + objSize + "\t; size of object");
     	extern.add("__malloc");
     	StringUtility.appendIndLn(sb, "call __malloc");
+    	
     	StringUtility.appendIndLn(sb, "push eax \t; push object address");
     	
     	// pointer to VTable
     	String vt = SigHelper.getClssSigWithVTable(tDecl);
     	extern.add(vt);
-    	StringUtility.appendIndLn(sb, "mov eax, [eax] \t; enter object");
+    	StringUtility.appendIndLn(sb, "push eax");	// save object reference to exit vtable
+    	StringUtility.appendIndLn(sb, "mov eax, [eax] \t; enter object");	
     	StringUtility.appendIndLn(sb, "mov dword eax, " + vt);
-
+    	StringUtility.appendIndLn(sb, "pop eax	\n");
+    	
     	// implicit super call
     	if (tDecl.superClass != null) {
     		MethodDeclaration superConstructor = getDefaultConstructor(tDecl.superClass.getDeclaration());
-    		
-    		String superConstructorLabel = SigHelper.getMethodSigWithImp(superConstructor);
-    		extern.add(superConstructorLabel.trim());
-        	StringUtility.appendIndLn(sb, "call " + superConstructorLabel);
+    		generateConstructorCall(sb, superConstructor);
     	}
-    	
+
     	// call actual constructor
-    	String constructorLabel = SigHelper.getMethodSigWithImp(node.getConstructor());
-    	extern.add(constructorLabel.trim());
-    	StringUtility.appendIndLn(sb, "call " + constructorLabel);
+    	generateConstructorCall(sb, node.getConstructor());
     	
     	// clean up
     	StringUtility.appendIndLn(sb, "pop eax \t; pop object address back in eax");
     	StringUtility.appendIndLn(sb, "add esp, 4 * " + numArgs);
     	node.attachCode(sb.toString());
+    }
+    
+    private void generateConstructorCall(StringBuilder sb, MethodDeclaration constructorDecl) {
+    	StringUtility.appendIndLn(sb, "push eax");	// save object reference
+		String constructorLabel = SigHelper.getMethodSigWithImp(constructorDecl);
+		extern.add(constructorLabel.trim());
+    	StringUtility.appendIndLn(sb, "call " + constructorLabel);
+    	StringUtility.appendIndLn(sb, "pop eax	\n");
     }
     
     private MethodDeclaration getDefaultConstructor(TypeDeclaration superClass) throws Exception {
