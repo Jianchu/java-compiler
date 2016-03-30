@@ -132,7 +132,7 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
     public void visit(InfixExpression node) throws Exception {
         StringBuilder infixText = new StringBuilder();
         if (node.lhs != null && node.rhs != null) {
-            int n = -1;
+            int n = 0;
             node.lhs.accept(this);
             infixText.append(node.lhs.getCode());
             if (node.op == InfixExpression.Operator.LOR || node.op == InfixExpression.Operator.AND) {
