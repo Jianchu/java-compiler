@@ -132,6 +132,10 @@ public class SigHelper {
     }
     
     public static String instanceFieldInitSig(TypeDeclaration tDecl) {
-		return "instance_field_init$" + getClassSig(tDecl);
+        return "instance_field_init$" + getClassSig(tDecl);
+    }
+
+    public static String getClssSigWithVTable(TypeDeclaration typeDec) {
+        return "VTable#" + getClassSig(typeDec);
     }
 }
