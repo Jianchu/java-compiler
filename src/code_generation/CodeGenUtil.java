@@ -91,6 +91,20 @@ public class CodeGenUtil {
 		StringUtility.appendLine(sb, "call " + label);
 	}
 	
+	public static void saveRegisters(StringBuilder sb) {
+		StringUtility.appendIndLn(sb, "push ecx");
+		StringUtility.appendIndLn(sb, "push edx");
+		StringUtility.appendIndLn(sb, "push esi");
+		StringUtility.appendIndLn(sb, "push edi");
+	}
+	
+	public static void restoreRegisters(StringBuilder sb) {
+		StringUtility.appendIndLn(sb, "pop edi");
+		StringUtility.appendIndLn(sb, "pop esi");
+		StringUtility.appendIndLn(sb, "pop edx");
+		StringUtility.appendIndLn(sb, "pop ecx");
+	}
+	
 	public static void main(String[] args) {
 		String fn = "multiply";
 		List<String> params = new ArrayList<String>();
