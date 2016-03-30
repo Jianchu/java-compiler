@@ -4,9 +4,14 @@ import java.util.HashSet;
 import java.util.Set;
 
 import utility.StringUtility;
+import ast.ASTNode;
 import ast.Block;
+import ast.ExpressionStatement;
+import ast.ForStatement;
+import ast.IfStatement;
 import ast.ReturnStatement;
 import ast.Statement;
+import ast.VariableDeclarationStatement;
 import ast.WhileStatement;
 import environment.TraversalVisitor;
 
@@ -64,18 +69,16 @@ public class StatementCodeGenerator extends TraversalVisitor {
         node.attachCode(exprStmtText.toString());
     }
 
+    // TODO: VariableDeclaration Expression
     public void visit(VariableDeclarationStatement node) throws Exception {
-        Stringbuilder varDeclText = new StringBuilder();
-
-        // TODO: map to lvalue
-        appendNode(varDeclText, node.initializer, expGen);
-
+        StringBuilder varDeclText = new StringBuilder();
+        appendNode(varDeclText, node.varDeclar, expGen);
         node.attachCode(varDeclText.toString());
     }
 
     public void visit(ForStatement node) throws Exception {
-        int i = nextStmtCounter();
-        Stringbuilder forText = new StringBuilder();
+        int n = nextStmtCounter();
+        StringBuilder forText = new StringBuilder();
 
         appendNode(forText, node.forInit, expGen);
         StringUtility.appendLine(forText, "jmop COND_" + n);
@@ -92,16 +95,16 @@ public class StatementCodeGenerator extends TraversalVisitor {
 
     public void visit(IfStatement node) throws Exception {
         int n = nextStmtCounter();
-        Stringbuilder ifText = new StringBuilder();
+        StringBuilder ifText = new StringBuilder();
 
-        appendNode(ifText, node.ifCondition, expGen)
+        appendNode(ifText, node.ifCondition, expGen);
         StringUtility.appendLine(ifText, "cmp eax, " + TRUE);
         StringUtility.appendLine(ifText, "jne ELSE_" + n);
         appendNode(ifText, node.ifStatement, this);
-        StringUtility.appendLinst(ifText, "jmp ENDIF_" + n);
-        StringUtility.appendLinst(ifText, "ELSE_" + n + ":");
+        StringUtility.appendLine(ifText, "jmp ENDIF_" + n);
+        StringUtility.appendLine(ifText, "ELSE_" + n + ":");
         appendNode(ifText, node.elseStatement, this);
-        StringUtility.appendLinst(ifText, "ENDIF_" + n + ":");
+        StringUtility.appendLine(ifText, "ENDIF_" + n + ":");
 
         node.attachCode(ifText.toString());
     }
@@ -112,7 +115,7 @@ public class StatementCodeGenerator extends TraversalVisitor {
         return n;
     }
 
-    private void appendNode(StringBuilder sb, ASTNode node, TraversalVisitor visitor) {
+    private void appendNode(StringBuilder sb, ASTNode node, TraversalVisitor visitor) throws Exception {
         if (node != null) {
             node.accept(visitor);
             StringUtility.appendLine(sb, node.getCode());
