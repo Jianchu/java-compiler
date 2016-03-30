@@ -3,11 +3,13 @@ package code_generation;
 import java.util.Set;
 
 import utility.StringUtility;
+import ast.ASTNode;
 import ast.AssignmentExpression;
 import ast.BooleanLiteral;
 import ast.CharacterLiteral;
 import ast.ClassInstanceCreationExpression;
 import ast.Expression;
+import ast.FieldDeclaration;
 import ast.InfixExpression;
 import ast.IntegerLiteral;
 import ast.MethodDeclaration;
@@ -21,6 +23,7 @@ import ast.SimpleName;
 import ast.SimpleType;
 import ast.StringLiteral;
 import ast.TypeDeclaration;
+import ast.VariableDeclaration;
 import environment.NameHelper;
 import environment.TraversalVisitor;
 import exceptions.NameException;
@@ -373,6 +376,21 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
 				StringUtility.appendIndLn(sb, "mov eax, [eax] \t; point to VTable");
 				StringUtility.appendIndLn(sb, "call [eax + " + (offset + 2) + "*4] \t; call class method."); //skip VTable and Inheritance Table
 			}
+    	}
+    }
+    
+    public void visit(SimpleName node) throws Exception {
+    	StringBuilder sb = new StringBuilder();
+    	ASTNode decl = node.getDeclaration();
+    	if (decl instanceof FieldDeclaration) {	// field
+    		FieldDeclaration fDecl = (FieldDeclaration) decl;
+    		TypeDeclaration parent = (TypeDeclaration) fDecl.getParent();
+    		int offset = parent.getFieldOffSet(fDecl.id);
+    		StringUtility.appendIndLn(sb, "mov eax, [ebp + 8] \t; put object address in eax");
+    		StringUtility.appendIndLn(sb, "mov eax, [eax] \t; enter object");
+    		StringUtility.appendIndLn(sb, "mov eax, [eax + " + offset + "*4] \t; access object");
+    	} else if (decl instanceof VariableDeclaration) {	// variable
+    		
     	}
     }
     
