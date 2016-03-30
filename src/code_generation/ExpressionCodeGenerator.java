@@ -347,7 +347,7 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
     	StringUtility.appendIndLn(sb, "push eax \t; push object address");
     	
     	// pointer to VTable
-    	StringUtility.appendIndLn(sb, "mov [eax], " + SigHelper.getClssSigWithVTable(tDecl));
+    	StringUtility.appendIndLn(sb, "mov dword [eax], " + SigHelper.getClssSigWithVTable(tDecl));
 
     	// implicit super call
     	if (tDecl.superClass != null) {
@@ -481,6 +481,7 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
     		StringUtility.appendIndLn(sb, "mov eax, [eax] \t; enter object");
     		StringUtility.appendIndLn(sb, "mov eax, [eax + " + offset + "*4] \t; access object");
     	} else if (decl instanceof VariableDeclaration) {	// variable
+    		VariableDeclaration vDecl = (VariableDeclaration) decl;
     		
     	}
     }
