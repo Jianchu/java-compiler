@@ -18,10 +18,12 @@ import ast.Modifier;
 import ast.NullLiteral;
 import ast.PrefixExpression;
 import ast.PrefixExpression.Operator;
+import ast.PrimitiveType;
 import ast.QualifiedName;
 import ast.SimpleName;
 import ast.SimpleType;
 import ast.StringLiteral;
+import ast.Type;
 import ast.TypeDeclaration;
 import ast.VariableDeclaration;
 import environment.NameHelper;
@@ -212,7 +214,7 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
                         extern.add("__malloc");
                         StringUtility.appendLine(infixText, "call __malloc");
                         StringUtility.appendLine(infixText, "push eax \t; push object address");
-                        switch (((PrimtiveType) rhsType).value) {
+                        switch (((PrimitiveType) rhsType).value) {
                           case BOOLEAN:
                             extern.add("java.lang.Boolean#~init~$B$implementation");
                             StringUtility.appendLine(infixText, "call java.lang.Boolean#~init~$B$implementation");
@@ -258,7 +260,7 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
                         extern.add("__malloc");
                         StringUtility.appendLine(infixText, "call __malloc");
                         StringUtility.appendLine(infixText, "push eax \t; push object address");
-                        switch (((PrimtiveType) rhsType).value) {
+                        switch (((PrimitiveType) rhsType).value) {
                           case BOOLEAN:
                             extern.add("java.lang.Boolean#~init~$B$implementation");
                             StringUtility.appendLine(infixText, "call java.lang.Boolean#~init~$B$implementation");
