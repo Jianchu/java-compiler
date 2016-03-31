@@ -2,13 +2,16 @@ import java.lang.System;
 import java.io.PrintStream;
 
 public class TestCode extends System {
-    public static PrintStream out = null;
+//    public static PrintStream out = null;
     public TestCode() {}
     public static int test()  {
-        if (1 == 2) {
-            return 123;
+        int i = 0;
+        i = 2 + 3;
+        if (i == 5) {
+            return 3;
         } else {
-            return 12;
+            return 4;
         }
+        
     }
 }
