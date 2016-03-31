@@ -43,7 +43,7 @@ import exceptions.NameException;
 public class ExpressionCodeGenerator extends TraversalVisitor {
 
     private static final String FALSE = "0x0";
-    private static final String TRUE = "0xffffffff";
+    private static final String TRUE = "1";
     private int litCounter = 0;
     public static StringBuilder stringLitData = new StringBuilder();
     private Set<String> extern;
