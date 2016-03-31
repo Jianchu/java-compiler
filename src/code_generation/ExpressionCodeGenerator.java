@@ -70,7 +70,7 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
         StringUtility.appendLine(dataSection, "STRING_" + litCounter + ":" + "\t; define label for string literal");
         StringUtility.appendLine(dataSection, "\t" + "dd " + '\'' + node.value + '\'');
 
-        node.attachCode("\tmov eax, " + "STRING_" + litCounter + "\n");
+        node.attachCode("\tmov dword eax, " + "[STRING_" + litCounter + "]" + "\n");
     }
 
     public void visit(NullLiteral node) throws Exception {
@@ -78,7 +78,7 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
         litCounter++;
         StringUtility.appendLine(dataSection, "NULL_" + litCounter + ":" + "\t; define label for null literal");
         StringUtility.appendLine(dataSection, "\t" + "dd " + FALSE);
-        StringUtility.appendLine(nullText, "\t" + "mov eax, " + "NULL_" + litCounter);
+        StringUtility.appendLine(nullText, "\t" + "mov dword eax, " + "[NULL_" + litCounter + "]");
         node.attachCode(nullText.toString());
         
     }
@@ -92,7 +92,7 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
         } else {
             StringUtility.appendLine(dataSection, "\t" + "dd " + FALSE);
         }
-        StringUtility.appendLine(booleanText, "\t" + "mov eax, " + "BOOLEAN_" + litCounter);
+        StringUtility.appendLine(booleanText, "\t" + "mov dword eax, " + "[BOOLEAN_" + litCounter + "]");
         node.attachCode(booleanText + "\n");
     }
 
@@ -107,7 +107,7 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
         } else {
             StringUtility.appendLine(dataSection, "\t" + "dd " + "'" + node.value + "'");
         }
-        StringUtility.appendLine(charText, "\t" + "mov eax, " + "CHAR_" + litCounter);
+        StringUtility.appendLine(charText, "\t" + "mov dword eax, " + "[CHAR_" + litCounter + "]");
         node.attachCode(charText + "\n");
     }
 
@@ -116,7 +116,7 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
         litCounter++;
         StringUtility.appendLine(dataSection, "INT_" + litCounter + ":" + "\t; define label for int literal");
         StringUtility.appendLine(dataSection, "\t" + "dd " + node.value);
-        StringUtility.appendLine(intText, "\t" + "mov eax, " + "INT_" + litCounter);
+        StringUtility.appendLine(intText, "\t" + "mov dword eax, " + "[INT_" + litCounter + "]");
         node.attachCode(intText.toString());
     }
     
@@ -137,7 +137,7 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
             StringUtility.appendIndLn(assignText, "mov eax, " + FALSE + "\t; rhs is null");
         }
         StringUtility.appendIndLn(assignText, "pop ebx" + "\t; pop lhs to ebx");
-        StringUtility.appendIndLn(assignText, "mov eax, [eax]" + "\t; assignment");
+        //StringUtility.appendIndLn(assignText, "mov eax, [eax]" + "\t; assignment");
         StringUtility.appendIndLn(assignText, "mov [ebx], eax" + "\t; assignment");
         node.attachCode(assignText.toString());
     }
@@ -442,7 +442,7 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
             StringUtility.appendIndLn(varDecText, "mov eax, " + FALSE + "\t; init is null");
         }
         StringUtility.appendIndLn(varDecText, "pop ebx" + "\t; pop variable address to ebx");
-        StringUtility.appendIndLn(varDecText, "mov eax, [eax]" + "\t; assignment");
+        //StringUtility.appendIndLn(varDecText, "mov eax, [eax]" + "\t; assignment");
         StringUtility.appendIndLn(varDecText, "mov [ebx], eax" + "\t; assignment");
         node.attachCode(varDecText.toString());
     }

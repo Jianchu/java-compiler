@@ -47,7 +47,7 @@ public class StatementCodeGenerator extends TraversalVisitor {
     public void visit(ReturnStatement node) throws Exception {
         StringBuilder returnText = new StringBuilder();
         appendNode(returnText, node.returnExpression, expGen);
-        StringUtility.appendIndLn(returnText, "mov eax, [eax] \t; delete frame");
+        //StringUtility.appendIndLn(returnText, "mov eax, [eax] \t; delete frame");
         StringUtility.appendIndLn(returnText, "mov esp, ebp \t; delete frame");
         StringUtility.appendIndLn(returnText, "pop ebp \t; restore to previous frame");
         StringUtility.appendIndLn(returnText, "ret \t; end of method");
