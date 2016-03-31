@@ -36,7 +36,7 @@ public class SigHelper {
                 sigName = ptype.toString().substring(0, 1).toUpperCase();
             }
         } else if (type instanceof ArrayType) {
-            ArrayType atype = (ArrayType) type;
+	    ArrayType atype = (ArrayType) type;
             String arrayTypeName = getTypeSig(atype.type);
             if (atype.type instanceof SimpleType) {
                 sigName = "@L" + arrayTypeName;
