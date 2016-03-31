@@ -1,6 +1,8 @@
 import os
 import subprocess
 
+
+
 def getAllPath(l, path):
     for root, directories, filenames in os.walk(path):
         for f in filenames:
@@ -16,16 +18,18 @@ def getStdLib():
 if __name__=='__main__':
     program = 'sh joosc'
     l = getStdLib()
+    l += ['test/testprogram/code_gen/Var.java']
     program = program.split() + l
     #print(program)
-    p = subprocess.Popen(program)
-    p.wait()
+    p = subprocess.Popen(program).wait()
+    
+    subprocess.Popen('cp /u/cs444/pub/stdlib/5.0/runtime.s output/runtime.s'.split()).wait()
 
     for root,_,filenames in os.walk('output'):
         for f in filenames:
             fn = os.path.join(root, f)
-            nasm = subprocess.Popen('/u/cs444/bin/nasm -O1 -f elf -g -F dwarf'.split() + [fn])
-            nasm.wait()
+            nasm = subprocess.Popen('/u/cs444/bin/nasm -O1 -f elf -g -F dwarf'.split() + [fn]).wait()
+            
     
     ldl = list()
     for root,_,filenames in os.walk('output'):
@@ -34,9 +38,8 @@ if __name__=='__main__':
                 fn = os.path.join(root, f)
                 ldl.append(fn)
     
-    ld = subprocess.Popen('ld -melf_i386 -o output/main'.split() + ldl)
-    ld.wait()
-    
+    ld = subprocess.Popen('ld -melf_i386 -o output/main'.split() + ldl).wait()
+        
     main = subprocess.Popen(['./output/main']).wait()
     print(main)
     
