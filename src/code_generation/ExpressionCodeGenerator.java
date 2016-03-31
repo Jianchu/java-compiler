@@ -35,6 +35,7 @@ import ast.ThisExpression;
 import ast.Type;
 import ast.TypeDeclaration;
 import ast.VariableDeclaration;
+import ast.VariableDeclarationExpression;
 import environment.NameHelper;
 import environment.TraversalVisitor;
 import exceptions.NameException;
@@ -406,6 +407,21 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
             StringUtility.appendLine(castText, "mov eax, ebx \t ;restore eax", 2);
         }
         node.attachCode(castText.toString());
+    }
+
+    // TODO:
+    public void visit(VariableDeclaration node) throws Exception {
+        node.type.accept(this);
+        if (node.initializer != null) {
+            node.initializer.accept(this);
+        }
+    }
+
+    // TODO:
+    public void visit(VariableDeclarationExpression node) throws Exception {
+        if (node.variableDeclaration != null) {
+            node.variableDeclaration.accept(this);
+        }
     }
 
     /*
