@@ -113,6 +113,9 @@ public class CodeGenerator extends TraversalVisitor {
 	            textSection.append(methodText);
         	}
        	}
+        StringUtility.appendLine(vTableText, "global VTable#" + SigHelper.getArrayClssSigWithVTable(node));
+        StringUtility.appendIndLn(vTableText, "VTable#" + SigHelper.getArrayClssSigWithVTable(node) + ":");   
+        StringUtility.appendLine(vTableText, "dd " + SigHelper.getClassSigWithHierarchy(node), 2);
         
         dataSection.append(ExpressionCodeGenerator.stringLitData);
         textSection.append(getInstanceFieldInit() + "\n");
