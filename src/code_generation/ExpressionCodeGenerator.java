@@ -333,15 +333,15 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
     }
 
     public void visit(InstanceofExpression node) throws Exception {
+        
         instanceOfCounter++;
         StringBuilder instanceofText = new StringBuilder();
         if (node.expr != null) {
             node.expr.accept(this);
         }
-        Type exprType = node.expr.getType();
-        String exprVTableSig = SigHelper.getClssSigWithVTable(exprType);
-        this.extern.add(exprVTableSig);
-        //[[vtable] + offset * 4] 
+        String exprCode = node.expr.getCode();
+        instanceofText.append(exprCode);
+        //[[[eax]] + offset * 4]
         if (node.type != null) {
             node.type.accept(this);
             int offset = 0;
@@ -353,11 +353,13 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
                 offset = HierarchyTableBuilder.getTypeOffSet(aType.toString());
             }
             int frame = offset * 4;
-            StringUtility.appendLine(instanceofText, "mov eax, " + FALSE, 2);
-            StringUtility.appendLine(instanceofText, "mov ecx, [" + exprVTableSig + "]", 2);
-            StringUtility.appendLine(instanceofText, "add ecx, " + frame, 2);
-            StringUtility.appendLine(instanceofText, "cmp dword [ecx], " + TRUE, 2);
-            //StringUtility.appendLine(instanceofText, "cmp [[" + exprVTableSig + "]+" + frame + "], " + TRUE, 2);
+            StringUtility.appendLine(instanceofText, "mov eax, [eax] \t ;get first frame of object, the pointer of VTable", 2);
+            StringUtility.appendLine(instanceofText, "mov eax, [eax] \t ;get first frame of VTable, the point of subclass table", 2);
+            StringUtility.appendLine(instanceofText, "add eax, " + frame + "\t ;get the pointer of type in subclass table", 2);
+            StringUtility.appendLine(instanceofText, "push eax \t ;put eax in stack", 2);
+            StringUtility.appendLine(instanceofText, "mov eax, " + FALSE + " \t ;set eax to false", 2);
+            StringUtility.appendLine(instanceofText, "pop ebx", 2);
+            StringUtility.appendLine(instanceofText, "cmp dword [ebx], " + TRUE, 2);
             StringUtility.appendLine(instanceofText, "jne _INSTANCEOFEND_" + instanceOfCounter, 2);
             StringUtility.appendLine(instanceofText, "mov eax, " + TRUE, 2);
             StringUtility.appendLine(instanceofText, "_INSTANCEOFEND_" + instanceOfCounter + ":", 2);
