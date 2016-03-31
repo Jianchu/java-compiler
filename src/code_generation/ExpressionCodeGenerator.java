@@ -43,7 +43,7 @@ import exceptions.NameException;
 public class ExpressionCodeGenerator extends TraversalVisitor {
 
     private static final String FALSE = "0x0";
-    private static final String TRUE = "0xffffffff";
+    private static final String TRUE = "1";
     private int litCounter = 0;
     public static StringBuilder stringLitData = new StringBuilder();
     private Set<String> extern;
@@ -152,11 +152,11 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
                 if (node.expr instanceof IntegerLiteral) {
                     ((IntegerLiteral)node.expr).value = "-" + ((IntegerLiteral)node.expr).value;
                 } else {
-                    StringUtility.appendIndLn(prefixText, "mov eax, - eax" + "\t; negation operation");
+                    StringUtility.appendIndLn(prefixText, "neg eax" + "\t; negation operation");
                 }
                 
             } else if (node.op.equals(Operator.NOT)) {
-                StringUtility.appendIndLn(prefixText, "neg eax" + "\t; logical negation operation");
+                StringUtility.appendIndLn(prefixText, "not eax" + "\t; logical negation operation");
             }
             node.expr.accept(this);
             String exprCode = node.expr.getCode();

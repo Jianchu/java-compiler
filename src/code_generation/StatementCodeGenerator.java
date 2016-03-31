@@ -17,7 +17,7 @@ import environment.TraversalVisitor;
 public class StatementCodeGenerator extends TraversalVisitor {
 
     private static final String FALSE = "0x0";
-    private static final String TRUE = "0xffffffff";
+    private static final String TRUE = "1";
     private ExpressionCodeGenerator expGen;
     private int stmtCounter = 0;
     private Set<String> extern;
@@ -67,7 +67,7 @@ public class StatementCodeGenerator extends TraversalVisitor {
 
     public void visit(ExpressionStatement node) throws Exception {
         StringBuilder exprStmtText = new StringBuilder();
-        appendNode(exprStmtText, node.statementExpression, this);
+        appendNode(exprStmtText, node.statementExpression, expGen);
         node.attachCode(exprStmtText.toString());
     }
 
