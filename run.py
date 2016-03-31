@@ -1,7 +1,10 @@
 import os
 import subprocess
+import sys
 
-
+compile = False
+folder = 'test/testprogram/code_gen/'
+p = folder +'Var.java'
 
 def getAllPath(l, path):
     for root, directories, filenames in os.walk(path):
@@ -18,17 +21,20 @@ def getStdLib():
 if __name__=='__main__':
     program = 'sh joosc'
     l = getStdLib()
-    l += ['test/testprogram/code_gen/Var.java']
+    l += [p]
     program = program.split() + l
     #print(program)
-    p = subprocess.Popen(program).wait()
+        
+    if (compile):
+        p = subprocess.Popen(program).wait()
     
     subprocess.Popen('cp /u/cs444/pub/stdlib/5.0/runtime.s output/runtime.s'.split()).wait()
 
     for root,_,filenames in os.walk('output'):
         for f in filenames:
-            fn = os.path.join(root, f)
-            nasm = subprocess.Popen('/u/cs444/bin/nasm -O1 -f elf -g -F dwarf'.split() + [fn]).wait()
+            if f[-2:] == '.s':
+                fn = os.path.join(root, f)
+                nasm = subprocess.Popen('/u/cs444/bin/nasm -O1 -f elf -g -F dwarf'.split() + [fn]).wait()
             
     
     ldl = list()

@@ -228,7 +228,7 @@ public class CodeGenerator extends TraversalVisitor {
     	
 		StringUtility.appendIndLn(sb, "push ebp \t; save old frame pointer");
 		StringUtility.appendIndLn(sb, "mov ebp, esp \t; move ebp to top of stack");
-		StringUtility.appendIndLn(sb, "sub esp, " + node.frameSize + "\t; space for local variables");
+		StringUtility.appendIndLn(sb, "sub esp, " + (node.frameSize * 4) + "\t; space for local variables");
 		
 		// if constructor, call field initializer
 		if (node.isConstructor) {
