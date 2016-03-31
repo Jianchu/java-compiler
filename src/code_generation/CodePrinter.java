@@ -7,6 +7,9 @@ import java.util.List;
 
 import utility.StringUtility;
 import ast.AST;
+import ast.ArrayType;
+import ast.PrimitiveType;
+import ast.PrimitiveType.Value;
 import ast.TypeDeclaration;
 import ast.Visitor;
 import environment.TraversalVisitor;
@@ -29,6 +32,7 @@ public class CodePrinter extends TraversalVisitor {
         writeUgly();
         writeStaticFieldInit();
         writeHierarchyTable();
+        writePrimitiveVTable();
         for (AST t : trees) {
             Visitor rv = new CodePrinter();
             t.root.accept(rv);
@@ -61,7 +65,35 @@ public class CodePrinter extends TraversalVisitor {
         writer.write(HierarchyTable);
         writer.close();
     }
-
+    
+    private static void writePrimitiveVTable() throws FileNotFoundException {
+        File primitiveVTableFile = new File(output.getAbsolutePath() + "/primitivevtable.s");
+        PrintWriter writer = new PrintWriter(primitiveVTableFile);
+        StringBuilder pvtable = new StringBuilder();
+        StringBuilder header = new StringBuilder();
+        header.append(PrimitiveVTableHelper(Value.BOOLEAN, pvtable));
+        header.append(PrimitiveVTableHelper(Value.BYTE, pvtable));
+        header.append(PrimitiveVTableHelper(Value.CHAR, pvtable));
+        header.append(PrimitiveVTableHelper(Value.CHAR, pvtable));
+        header.append(PrimitiveVTableHelper(Value.SHORT, pvtable));
+        writer.write(header.toString() + pvtable.toString());
+        writer.close();
+    }
+    
+    private static String PrimitiveVTableHelper(Value value, StringBuilder pvtable) {
+        PrimitiveType primitiveType = new PrimitiveType(value);
+        ArrayType arrayType = new ArrayType(primitiveType);
+        StringBuilder extern = new StringBuilder();
+        StringUtility.appendLine(extern, "extern " + SigHelper.getClassSigWithHierarchy(arrayType));
+        
+        StringUtility.appendLine(pvtable, "global VTable#" + SigHelper.getClssSigWithVTable(arrayType));
+        StringUtility.appendIndLn(pvtable, "VTable#" + SigHelper.getClssSigWithVTable(arrayType) + ":");   
+        StringUtility.appendLine(pvtable, "dd " + SigHelper.getClassSigWithHierarchy(arrayType), 2);
+      
+        return extern.toString();
+        
+    }
+    
     @Override
     public void visit(TypeDeclaration node) throws Exception {
         String fullName = node.getFullName();
