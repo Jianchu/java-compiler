@@ -1,5 +1,6 @@
 package code_generation;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -9,10 +10,11 @@ import utility.StringUtility;
 import ast.TypeDeclaration;
 
 public class UglyTableBuilder {
-    private static final Map<TypeDeclaration, List<String>> ugly = OffSet.ugly;
-    private static StringBuilder uglyText = new StringBuilder();
+    static Map<TypeDeclaration, List<String>> ugly = new HashMap<TypeDeclaration, List<String>>();
+    static StringBuilder uglyText = new StringBuilder();
 
     public static void build() {
+        ugly = OffSet.ugly;
         StringBuilder uglyHeader = new StringBuilder();
         Set<String> sigs = new HashSet<String>();
         StringUtility.appendLine(uglyText, "section .data");

@@ -1,6 +1,7 @@
 package code_gen_test;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
@@ -8,7 +9,7 @@ import joosc.Joosc;
 import utility.FileUtility;
 
 public class CodeGenTestMain {
-
+    private static final File output = new File(System.getProperty("user.dir") + "/output");
     final static String myDir = System.getProperty("user.dir");
 
     public static void main(String[] args) throws IOException,InterruptedException {

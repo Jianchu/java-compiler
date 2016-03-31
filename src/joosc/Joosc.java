@@ -71,7 +71,8 @@ public class Joosc {
 		    UglyTableBuilder.build();
 		    HierarchyTableBuilder.build(trees);
 		    CodeGenerator.generate(trees);
-		    CodePrinter.printCode(trees);
+		    CodePrinter printer = new CodePrinter();
+		    printer.printCode(trees);
         } catch (Exception e) {
         	e.printStackTrace();
         	return 42;

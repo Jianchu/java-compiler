@@ -21,13 +21,13 @@ public class CodeGenerator extends TraversalVisitor {
     StatementCodeGenerator stmtGen;
     ExpressionCodeGenerator expGen;
     Map<Integer, String> SigOffsets = new HashMap<Integer, String>();
-    private static StringBuilder[] staticFieldInit = {new StringBuilder(), new StringBuilder()};
-    private static StringBuilder[] instanceFieldInit = {new StringBuilder(), new StringBuilder()};
+    static StringBuilder[] staticFieldInit = {new StringBuilder(), new StringBuilder()};
+    static StringBuilder[] instanceFieldInit = {new StringBuilder(), new StringBuilder()};
     TypeDeclaration currentTypeDec;
     Set<String> extern;
     Set<String> exclude;
     StringBuilder dataSection;
-    private static Set<String> staticInitExtern = new HashSet<String>();
+    static Set<String> staticInitExtern = new HashSet<String>();
 
     public CodeGenerator() {
         this.extern = new HashSet<String>();

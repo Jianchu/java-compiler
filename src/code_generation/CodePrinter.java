@@ -3,6 +3,9 @@ package code_generation;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 
 import utility.StringUtility;
@@ -10,18 +13,19 @@ import ast.AST;
 import ast.ArrayType;
 import ast.PrimitiveType;
 import ast.PrimitiveType.Value;
+import ast.Type;
 import ast.TypeDeclaration;
 import ast.Visitor;
 import environment.TraversalVisitor;
 
 public class CodePrinter extends TraversalVisitor {
 
-    private static final File output = new File(System.getProperty("user.dir") + "/output");
-    private static final String uglyText = UglyTableBuilder.getUgly();
-    private static final String staticFieldInit = CodeGenerator.getStaticFieldInit();
-    private static final String HierarchyTable = HierarchyTableBuilder.getHierarchyTable();
+    private File output = new File(System.getProperty("user.dir") + "/output");
+    private String uglyText = UglyTableBuilder.getUgly();
+    private String staticFieldInit = CodeGenerator.getStaticFieldInit();
+    private String HierarchyTable = HierarchyTableBuilder.getHierarchyTable();
 
-    public static void printCode(List<AST> trees) throws Exception {
+    public void printCode(List<AST> trees) throws Exception {
         if (!output.exists()) {
             output.mkdirs();
         } else {
@@ -37,16 +41,29 @@ public class CodePrinter extends TraversalVisitor {
             Visitor rv = new CodePrinter();
             t.root.accept(rv);
         }
+        UglyTableBuilder.uglyText = new StringBuilder();
+        UglyTableBuilder.ugly = new HashMap<TypeDeclaration, List<String>>();
+        HierarchyTableBuilder.hierarchyTable = new HashMap<Type, List<String>>();
+        HierarchyTableBuilder.Alltypes = new ArrayList<String>();
+        HierarchyTableBuilder.offSets = new HashMap<Type, Integer>();
+        HierarchyTableBuilder.offSetCounter = new Integer(0);
+        OffSet.ugly = new HashMap<TypeDeclaration, List<String>>();
+        CodeGenerator.staticFieldInit[0].setLength(0);
+        CodeGenerator.staticFieldInit[1].setLength(0);
+        CodeGenerator.instanceFieldInit[0].setLength(0);
+        CodeGenerator.instanceFieldInit[1].setLength(0);
+        CodeGenerator.staticInitExtern = new HashSet<String>();
+
     }
 
-    private static void writeUgly() throws FileNotFoundException {
+    private void writeUgly() throws FileNotFoundException {
         File uglyFile = new File(output.getAbsolutePath() + "/ugly.s");
         PrintWriter writer = new PrintWriter(uglyFile);
         writer.write(uglyText);
         writer.close();
     }
 
-    private static void writeStaticFieldInit() throws FileNotFoundException {
+    private void writeStaticFieldInit() throws FileNotFoundException {
         File staticFieldInitFile = new File(output.getAbsolutePath() + "/staticinit.s");
         PrintWriter writer = new PrintWriter(staticFieldInitFile);
         StringBuilder fileHead = new StringBuilder();
@@ -59,14 +76,14 @@ public class CodePrinter extends TraversalVisitor {
         writer.close();
     }
 
-    private static void writeHierarchyTable() throws FileNotFoundException {
+    private void writeHierarchyTable() throws FileNotFoundException {
         File hierarchyFile = new File(output.getAbsolutePath() + "/hierarchy.s");
         PrintWriter writer = new PrintWriter(hierarchyFile);
         writer.write(HierarchyTable);
         writer.close();
     }
     
-    private static void writePrimitiveVTable() throws FileNotFoundException {
+    private void writePrimitiveVTable() throws FileNotFoundException {
         File primitiveVTableFile = new File(output.getAbsolutePath() + "/primitivevtable.s");
         PrintWriter writer = new PrintWriter(primitiveVTableFile);
         StringBuilder pvtable = new StringBuilder();
@@ -80,7 +97,7 @@ public class CodePrinter extends TraversalVisitor {
         writer.close();
     }
     
-    private static String PrimitiveVTableHelper(Value value, StringBuilder pvtable) {
+    private String PrimitiveVTableHelper(Value value, StringBuilder pvtable) {
         PrimitiveType primitiveType = new PrimitiveType(value);
         ArrayType arrayType = new ArrayType(primitiveType);
         StringBuilder extern = new StringBuilder();
