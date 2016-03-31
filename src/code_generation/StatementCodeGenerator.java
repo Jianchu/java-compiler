@@ -1,6 +1,5 @@
 package code_generation;
 
-import java.util.HashSet;
 import java.util.Set;
 
 import utility.StringUtility;
@@ -22,10 +21,12 @@ public class StatementCodeGenerator extends TraversalVisitor {
     private ExpressionCodeGenerator expGen;
     private int stmtCounter = 0;
     private Set<String> extern;
+    StringBuilder dataSection;
 
-    public StatementCodeGenerator(Set<String> extern) {
+    public StatementCodeGenerator(Set<String> extern, StringBuilder dataSection, ExpressionCodeGenerator expGen) {
         this.extern = extern;
-        this.expGen = new ExpressionCodeGenerator(extern);
+        this.dataSection = dataSection;
+        this.expGen = expGen;
     }
 
     public void visit(WhileStatement node) throws Exception {
@@ -46,6 +47,7 @@ public class StatementCodeGenerator extends TraversalVisitor {
     public void visit(ReturnStatement node) throws Exception {
         StringBuilder returnText = new StringBuilder();
         appendNode(returnText, node.returnExpression, expGen);
+        StringUtility.appendIndLn(returnText, "mov eax, [eax] \t; delete frame");
         StringUtility.appendIndLn(returnText, "mov esp, ebp \t; delete frame");
         StringUtility.appendIndLn(returnText, "pop ebp \t; restore to previous frame");
         StringUtility.appendIndLn(returnText, "ret \t; end of method");

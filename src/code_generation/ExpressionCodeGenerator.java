@@ -44,15 +44,17 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
 
     private static final String FALSE = "0x0";
     private static final String TRUE = "0xffffffff";
-    private int stringLitCounter = 0;
+    private int litCounter = 0;
     public static StringBuilder stringLitData = new StringBuilder();
     private Set<String> extern;
     public int infixCounter = 0;
     private int instanceOfCounter = 0;
+    StringBuilder dataSection;
     public static MethodDeclaration currentMethod;
 
-    public ExpressionCodeGenerator(Set<String> extern) {
+    public ExpressionCodeGenerator(Set<String> extern, StringBuilder dataSection) {
         this.extern = extern;
+        this.dataSection = dataSection;
     }
 
     /*
@@ -61,25 +63,34 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
     // String is Object.
     public void visit(StringLiteral node) throws Exception {
         // can use counter because string literal is not global.
-        stringLitCounter++;
+        litCounter++;
         // TODO:integrate stringLitData into data section.
-        StringUtility.appendLine(stringLitData, "STRING_" + stringLitCounter + ":" + "\t; define label for string literal");
-        StringUtility.appendLine(stringLitData, "\t" + "dw " + '\'' + node.value + '\'');
+        StringUtility.appendLine(dataSection, "STRING_" + litCounter + ":" + "\t; define label for string literal");
+        StringUtility.appendLine(dataSection, "\t" + "dd " + '\'' + node.value + '\'');
 
-        node.attachCode("\tmov eax, " + "STRING_" + stringLitCounter + "\n");
+        node.attachCode("\tmov eax, " + "STRING_" + litCounter + "\n");
     }
 
     public void visit(NullLiteral node) throws Exception {
-        node.attachCode("\tmov eax, " + FALSE + "\n");
+        StringBuilder nullText = new StringBuilder();
+        litCounter++;
+        StringUtility.appendLine(dataSection, "NULL_" + litCounter + ":" + "\t; define label for null literal");
+        StringUtility.appendLine(dataSection, "\t" + "dd " + FALSE);
+        StringUtility.appendLine(nullText, "\t" + "mov eax, " + "NULL_" + litCounter);
+        node.attachCode(nullText.toString());
+        
     }
 
     public void visit(BooleanLiteral node) throws Exception {
-        String booleanText;
+        StringBuilder booleanText = new StringBuilder();
+        litCounter++;
+        StringUtility.appendLine(dataSection, "BOOLEAN_" + litCounter + ":" + "\t; define label for boolean literal");
         if (node.value == true) {
-            booleanText = "\tmov eax, " + TRUE;
+            StringUtility.appendLine(dataSection, "\t" + "dd " + TRUE);
         } else {
-            booleanText = "\tmov eax, " + FALSE;
+            StringUtility.appendLine(dataSection, "\t" + "dd " + FALSE);
         }
+        StringUtility.appendLine(booleanText, "\t" + "mov eax, " + "BOOLEAN_" + litCounter);
         node.attachCode(booleanText + "\n");
     }
 
@@ -97,9 +108,12 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
     }
 
     public void visit(IntegerLiteral node) throws Exception {
-        String intText;
-        intText = "\tmov eax, " + node.value + "\n";
-        node.attachCode(intText);
+        StringBuilder intText = new StringBuilder();
+        litCounter++;
+        StringUtility.appendLine(dataSection, "INT_" + litCounter + ":" + "\t; define label for int literal");
+        StringUtility.appendLine(dataSection, "\t" + "dd " + node.value);
+        StringUtility.appendLine(intText, "\t" + "mov eax, " + "INT_" + litCounter);
+        node.attachCode(intText.toString());
     }
     
     @Override
@@ -119,6 +133,7 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
             StringUtility.appendIndLn(assignText, "mov eax, " + FALSE + "\t; rhs is null");
         }
         StringUtility.appendIndLn(assignText, "pop ebx" + "\t; pop lhs to ebx");
+        StringUtility.appendIndLn(assignText, "mov eax, [eax]" + "\t; assignment");
         StringUtility.appendIndLn(assignText, "mov [ebx], eax" + "\t; assignment");
         node.attachCode(assignText.toString());
     }
@@ -423,6 +438,7 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
             StringUtility.appendIndLn(varDecText, "mov eax, " + FALSE + "\t; init is null");
         }
         StringUtility.appendIndLn(varDecText, "pop ebx" + "\t; pop variable address to ebx");
+        StringUtility.appendIndLn(varDecText, "mov eax, [eax]" + "\t; assignment");
         StringUtility.appendIndLn(varDecText, "mov [ebx], eax" + "\t; assignment");
         node.attachCode(varDecText.toString());
     }
