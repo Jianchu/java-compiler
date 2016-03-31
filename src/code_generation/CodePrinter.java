@@ -74,7 +74,7 @@ public class CodePrinter extends TraversalVisitor {
         header.append(PrimitiveVTableHelper(Value.BOOLEAN, pvtable));
         header.append(PrimitiveVTableHelper(Value.BYTE, pvtable));
         header.append(PrimitiveVTableHelper(Value.CHAR, pvtable));
-        header.append(PrimitiveVTableHelper(Value.CHAR, pvtable));
+        header.append(PrimitiveVTableHelper(Value.INT, pvtable));
         header.append(PrimitiveVTableHelper(Value.SHORT, pvtable));
         writer.write(header.toString() + pvtable.toString());
         writer.close();
@@ -86,8 +86,8 @@ public class CodePrinter extends TraversalVisitor {
         StringBuilder extern = new StringBuilder();
         StringUtility.appendLine(extern, "extern " + SigHelper.getClassSigWithHierarchy(arrayType));
         
-        StringUtility.appendLine(pvtable, "global VTable#" + SigHelper.getClssSigWithVTable(arrayType));
-        StringUtility.appendIndLn(pvtable, "VTable#" + SigHelper.getClssSigWithVTable(arrayType) + ":");   
+        StringUtility.appendLine(pvtable, "global " + SigHelper.getClssSigWithVTable(arrayType));
+        StringUtility.appendIndLn(pvtable, SigHelper.getClssSigWithVTable(arrayType) + ":");   
         StringUtility.appendLine(pvtable, "dd " + SigHelper.getClassSigWithHierarchy(arrayType), 2);
       
         return extern.toString();
