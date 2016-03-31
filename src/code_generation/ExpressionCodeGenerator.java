@@ -4,7 +4,9 @@ import java.util.List;
 import java.util.Set;
 
 import utility.StringUtility;
+import ast.ArrayAccess;
 import ast.ASTNode;
+import ast.ArrayCreationExpression;
 import ast.ArrayType;
 import ast.AssignmentExpression;
 import ast.BooleanLiteral;
@@ -608,7 +610,7 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
     		
 		if (node.getDeclaration() == null && node.getID().equals("length")) {
 		    // fucking array length
-		    StringUtility.appendIndLn(sb, "mov eax [eax]"); // enter array 
+		    StringUtility.appendIndLn(sb, "mov eax, [eax]"); // enter array 
 		    StringUtility.appendIndLn(sb, "add eax, 4"); // array length
 		    return;
 		}
@@ -618,7 +620,7 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
 		TypeDeclaration tDecl = (TypeDeclaration) fDecl.getParent();
     		int offset = tDecl.getFieldOffSet(fDecl.id);
     		offset = (offset + 1) * 4;	// real offset 
-    		StringUtility.appendIndLn(sb, "mov eax [eax]");	// enter object
+    		StringUtility.appendIndLn(sb, "mov eax, [eax]");	// enter object
     		StringUtility.appendIndLn(sb, "add eax, " + offset);
     	} else {
     		throw new Exception("qualified name prefix not recoginsed: " + qualifier.toString());
@@ -628,21 +630,62 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
     }
     
     public void visit(FieldAccess node) throws Exception {
+		StringBuilder sb = new StringBuilder();
+		
+		node.expr.accept(this);
+		StringUtility.appendLine(sb, node.getCode());
+		// assume object at eax
+		if (node.expr.getType() instanceof ArrayType && node.id.equals("length")) {    // array.length
+		    StringUtility.appendIndLn(sb, "mov eax, [eax] \t; enter array"); // enter array
+		    StringUtility.appendIndLn(sb, "add eax, 4");
+		} else {// instance field
+		    TypeDeclaration tDecl = node.expr.getType().getDeclaration();
+		    int offset = tDecl.getFieldOffSet(node.id.toString());
+		    offset = offset * 4;// real offset
+		    StringUtility.appendIndLn(sb, "mov eax, [eax] \t; enter object");
+		    StringUtility.appendIndLn(sb, "add eax, " + offset);
+		}
+		
+		node.attachCode(sb.toString());
+    }
+    
+    public void visit(ArrayCreationExpression node) throws Exception {
+    	StringBuilder sb = new StringBuilder();
+    	
+    	// evaluate expression
+    	node.expr.accept(this);
+    	sb.append(node.getCode());
+    	
+    	// size in eax
+    	StringUtility.appendIndLn(sb, "push eax");
+    	extern.add("__malloc");
+    	StringUtility.appendIndLn(sb, "call __malloc");
+    	StringUtility.appendIndLn(sb, "pop ebx"); // put size in ebx
+    	
+    	// array address in eax
+    	StringUtility.appendIndLn(sb, "push eax");
+    	StringUtility.appendIndLn(sb, "mov eax, [eax]"); // enter array
+    	StringUtility.appendIndLn(sb, "mov dword [eax], " + SigHelper.getClssSigWithVTable(node.type));	// first place is the vtable, vtable then points to hierarchy
+    	StringUtility.appendIndLn(sb, "add eax, 1"); // second place holds size
+    	StringUtility.appendIndLn(sb, "mov dword [eax], ebx" );
+    	StringUtility.appendIndLn(sb, "pop eax");	// put array address back in eax, done
+
+	node.attachCode(sb.toString());
+    }
+
+    public void visit(ArrayAccess node) throws Exception {
 	StringBuilder sb = new StringBuilder();
-	
-	node.expr.accept(this);
-	StringUtility.appendLine(sb, node.getCode());
-	// assume object at eax
-	if (node.expr.getType() instanceof ArrayType && node.id.equals("length")) {    // array.length
-	    StringUtility.appendIndLn(sb, "mov eax, [eax] \t; enter array"); // enter array
-	    StringUtility.appendIndLn(sb, "add eax, 4");
-	} else {// instance field
-	    TypeDeclaration tDecl = node.expr.getType().getDeclaration();
-	    int offset = tDecl.getFieldOffSet(node.id.toString());
-	    offset = offset * 4;// real offset
-	    StringUtility.appendIndLn(sb, "mov eax, [eax] \t; enter object");
-	    StringUtility.appendIndLn(sb, "add eax, " + offset);
-	}
+
+	node.index.accept(this);
+	sb.append(node.index.getCode());
+	StringUtility.appendIndLn(sb, "push eax"); // push index
+
+	node.array.accept(this);
+	sb.append(node.array.getCode());
+	StringUtility.appendIndLn(sb, "pop ebx"); // get index
+	StringUtility.appendIndLn(sb, "mov eax, [eax]"); // enter array
+	StringUtility.appendIndLn(sb, "add eax, 1"); // skip vtable
+	StringUtility.appendIndLn(sb, "add eax, ebx");
 	
 	node.attachCode(sb.toString());
     }
