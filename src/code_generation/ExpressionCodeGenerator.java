@@ -124,8 +124,10 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
     public void visit(AssignmentExpression node) throws Exception {
         StringBuilder assignText = new StringBuilder();
         if (node.lhs != null) {
+	    isLV = true;
             node.lhs.accept(this);
-            String lhsText = node.lhs.getCode();
+            isLV = false;
+	    String lhsText = node.lhs.getCode();
             assignText.append(lhsText);
             StringUtility.appendIndLn(assignText, "push eax" + "\t; push lhs to stack");
         }
