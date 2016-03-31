@@ -411,20 +411,28 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
 
     // TODO:
     public void visit(VariableDeclaration node) throws Exception {
-	StringBuilder sb = new StringBuilder();
-	genVarAddress(sb, node);
+	StringBuilder varDecText = new StringBuilder();
+	genVarAddress(varDecText, node);
 	// now eax should contain address of variable
-
+	StringUtility.appendIndLn(varDecText, "push eax" + "\t; push variable address to stack");
 	if (node.initializer != null) {
             node.initializer.accept(this);
+            String initText = node.initializer.getCode();
+            varDecText.append(initText);
+        } else {
+            StringUtility.appendIndLn(varDecText, "mov eax, " + FALSE + "\t; init is null");
         }
+        StringUtility.appendIndLn(varDecText, "pop ebx" + "\t; pop variable address to ebx");
+        StringUtility.appendIndLn(varDecText, "mov [ebx], eax" + "\t; assignment");
+        node.attachCode(varDecText.toString());
     }
 
-    // TODO:
     public void visit(VariableDeclarationExpression node) throws Exception {
-       
-            node.variableDeclaration.accept(this);
-       
+        StringBuilder varDecExprText = new StringBuilder();
+        node.variableDeclaration.accept(this);
+        String varDecCode = node.variableDeclaration.getCode();
+        varDecExprText.append(varDecCode);
+        node.attachCode(varDecExprText.toString());
     }
 
     private void genVarAddress(StringBuilder sb, VariableDeclaration vDecl) throws Exception {
