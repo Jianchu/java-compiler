@@ -411,17 +411,33 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
 
     // TODO:
     public void visit(VariableDeclaration node) throws Exception {
-        node.type.accept(this);
-        if (node.initializer != null) {
+	StringBuilder sb = new StringBuilder();
+	genVarAddress(sb, node);
+	// now eax should contain address of variable
+
+	if (node.initializer != null) {
             node.initializer.accept(this);
         }
     }
 
     // TODO:
     public void visit(VariableDeclarationExpression node) throws Exception {
-        if (node.variableDeclaration != null) {
+       
             node.variableDeclaration.accept(this);
-        }
+       
+    }
+
+    private void genVarAddress(StringBuilder sb, VariableDeclaration vDecl) throws Exception {
+	int offset = currentMethod.getVarOffSet(vDecl);
+	if (offset < 0) {	// formals starts from -1
+	    offset = (-(offset - 1)) * 4;	// real offset 
+	    StringUtility.appendIndLn(sb, "mov dword eax, ebp ");
+	    StringUtility.appendIndLn(sb, "add eax, " + offset + " \t; eax contains formal address");
+	} else {	// locals starts from 0
+	    offset = (offset + 1) * 4;
+	    StringUtility.appendIndLn(sb, "mov dword eax, ebp ");
+	    StringUtility.appendIndLn(sb, "sub eax, " + offset + "\t; eax contains local address");	// eax now points to object
+	}
     }
 
     /*
@@ -604,16 +620,8 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
     		StringUtility.appendIndLn(sb, "add eax, " +  offset + " \t; field address");	// eax contains field address
     	} else if (decl instanceof VariableDeclaration) {	// variable
     		VariableDeclaration vDecl = (VariableDeclaration) decl;
-    		int offset = currentMethod.getVarOffSet(vDecl);
-    		if (offset < 0) {	// formals starts from -1
-    			offset = (-(offset - 1)) * 4;	// real offset 
-    			StringUtility.appendIndLn(sb, "mov dword eax, ebp ");
-    			StringUtility.appendIndLn(sb, "add eax, " + offset + " \t; eax contains formal address");
-    		} else {	// locals starts from 0
-    			offset = (offset + 1) * 4;
-    			StringUtility.appendIndLn(sb, "mov dword eax, ebp ");
-    			StringUtility.appendIndLn(sb, "sub eax, " + offset + "\t; eax contains local address");	// eax now points to object
-    		}
+		genVarAddress(sb, vDecl);
+	
     	} else {
     		throw new Exception("Simple name declaration unexpected: " + node);
     	}
