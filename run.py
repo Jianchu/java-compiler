@@ -2,9 +2,9 @@ import os
 import subprocess
 import sys
 
-compile = False
+compile = True
 folder = 'test/testprogram/code_gen/'
-p = folder +'Var.java'
+p = folder +'Var1.java'
 
 def getAllPath(l, path):
     for root, directories, filenames in os.walk(path):

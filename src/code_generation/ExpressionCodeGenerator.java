@@ -52,6 +52,8 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
     StringBuilder dataSection;
     public static MethodDeclaration currentMethod;
 
+    private boolean isLV = false;
+
     public ExpressionCodeGenerator(Set<String> extern, StringBuilder dataSection) {
         this.extern = extern;
         this.dataSection = dataSection;
@@ -652,6 +654,10 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
     	} else {
     		throw new Exception("Simple name declaration unexpected: " + node);
     	}
+	if (!isLV) {
+	    StringUtility.appendIndLn(sb, "mov eax, [eax]"); // if not lvalue, move value into eax
+	}
+
     	node.attachCode(sb.toString());
     }
     
@@ -684,6 +690,9 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
     		throw new Exception("qualified name prefix not recoginsed: " + qualifier.toString());
     	}
 
+	if (!isLV) {
+	    StringUtility.appendIndLn(sb, "mov eax, [eax]"); // if not lvalue, move value into eax
+	}
 	node.attachCode(sb.toString());
     }
     
