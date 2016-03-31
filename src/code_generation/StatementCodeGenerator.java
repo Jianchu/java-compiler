@@ -67,7 +67,7 @@ public class StatementCodeGenerator extends TraversalVisitor {
 
     public void visit(ExpressionStatement node) throws Exception {
         StringBuilder exprStmtText = new StringBuilder();
-        appendNode(exprStmtText, node.statementExpression, this);
+        appendNode(exprStmtText, node.statementExpression, expGen);
         node.attachCode(exprStmtText.toString());
     }
 

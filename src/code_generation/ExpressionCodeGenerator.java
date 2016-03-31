@@ -152,11 +152,11 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
                 if (node.expr instanceof IntegerLiteral) {
                     ((IntegerLiteral)node.expr).value = "-" + ((IntegerLiteral)node.expr).value;
                 } else {
-                    StringUtility.appendIndLn(prefixText, "mov eax, - eax" + "\t; negation operation");
+                    StringUtility.appendIndLn(prefixText, "neg eax" + "\t; negation operation");
                 }
                 
             } else if (node.op.equals(Operator.NOT)) {
-                StringUtility.appendIndLn(prefixText, "neg eax" + "\t; logical negation operation");
+                StringUtility.appendIndLn(prefixText, "not eax" + "\t; logical negation operation");
             }
             node.expr.accept(this);
             String exprCode = node.expr.getCode();
