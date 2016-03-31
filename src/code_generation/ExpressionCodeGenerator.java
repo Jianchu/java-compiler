@@ -95,15 +95,17 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
     }
 
     public void visit(CharacterLiteral node) throws Exception {
-        String charText;
+        StringBuilder charText = new StringBuilder();
+        litCounter++;
+        StringUtility.appendLine(dataSection, "CHAR_" + litCounter + ":" + "\t; define label for char literal");
 
         // Assuming octal is valid.
         if (node.value.length() > 3) {
-            charText = "\tmov eax, " + "0o" + node.value.substring(1);
+            StringUtility.appendLine(dataSection, "\t" + "dd " + node.value.substring(1));
         } else {
-            charText = "\tmov eax, " + "'" + node.value + "'";
+            StringUtility.appendLine(dataSection, "\t" + "dd " + "'" + node.value + "'");
         }
-
+        StringUtility.appendLine(charText, "\t" + "mov eax, " + "CHAR_" + litCounter);
         node.attachCode(charText + "\n");
     }
 
