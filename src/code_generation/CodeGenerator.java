@@ -203,7 +203,7 @@ public class CodeGenerator extends TraversalVisitor {
                 StringUtility.appendIndLn(staticFieldInit[1], "global static_init_" + fieldSig);
                 StringUtility.appendIndLn(staticFieldInit[1], "static_init_" + fieldSig + ":");
                 StringUtility.appendLine(staticFieldInit[1], initCode, 2);
-                StringUtility.appendIndLn(instanceFieldInit[1], "mov eax, [eax]" + "\t; initiallize field");
+                //StringUtility.appendIndLn(instanceFieldInit[1], "mov eax, [eax]" + "\t; initiallize field");
                 StringUtility.appendIndLn(instanceFieldInit[1], "mov " + "[" + fieldSig + "]" + ", eax" + "\t; initiallize field");
                 //StringUtility.appendLine(staticFieldInit[1], "mov " + "[" + fieldSig + "]" + ", [eax]", 2);
             } else {
@@ -215,7 +215,7 @@ public class CodeGenerator extends TraversalVisitor {
                 StringUtility.appendLine(instanceFieldInit[1], initCode, 2);
                 StringUtility.appendLine(instanceFieldInit[1], "mov edx, eax \t; put value of field to edx", 2);
                 StringUtility.appendLine(instanceFieldInit[1], "pop eax \t; pop field address back to eax", 2);
-                StringUtility.appendIndLn(instanceFieldInit[1], "mov edx, [edx]" + "\t; initiallize field");
+                //StringUtility.appendIndLn(instanceFieldInit[1], "mov edx, [edx]" + "\t; initiallize field");
                 StringUtility.appendIndLn(instanceFieldInit[1], "mov [eax], edx" + "\t; initiallize field");
                 
                 //StringUtility.appendLine(instanceFieldInit[1], "mov dword [eax], [edx] \t; initiallize field", 2);
