@@ -1,7 +1,7 @@
 public class Var {
     public Var() {}
     public static int test() {
-	
-	return 1;
+	int i = 1;
+	return i;
     }
 }

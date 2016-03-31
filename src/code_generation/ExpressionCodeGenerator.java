@@ -455,7 +455,8 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
     @Override
     public void visit(ClassInstanceCreationExpression node) throws Exception {
     	StringBuilder sb = new StringBuilder();    	
-    	// generate code for arguments
+    	StringUtility.appendIndLn(sb, "; class instance creation: " + node.type);
+	// generate code for arguments
     	int numArgs = 0;
     	numArgs = generateArgs(sb, node.arglist);
     	
@@ -690,7 +691,8 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
     
     public void visit(ArrayCreationExpression node) throws Exception {
     	StringBuilder sb = new StringBuilder();
-    	
+	StringUtility.appendIndLn(sb, "; array creation");
+
     	// evaluate expression
     	node.expr.accept(this);
     	sb.append(node.getCode());
