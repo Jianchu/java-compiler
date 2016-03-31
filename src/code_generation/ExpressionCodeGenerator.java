@@ -395,7 +395,8 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
         StringUtility.appendLine(castText, "mov ecx, [" + unaryVTableSig + "]", 2);
         StringUtility.appendLine(castText, "add ecx, " + frame, 2);
         StringUtility.appendLine(castText, "cmp dword [ecx], " + TRUE, 2);
-        StringUtility.appendLine(castText, "jne __exception:", 2);
+        StringUtility.appendLine(castText, "jne __exception", 2);
+        // node.attachCode(castText.toString());
     }
 
     /*
