@@ -142,8 +142,10 @@ public class CodeGenerator extends TraversalVisitor {
     private void generateStart(StringBuilder start, String testSig) {
         StringUtility.appendLine(start, "global _start");
         StringUtility.appendIndLn(start, "_start:");
+        StringUtility.appendLine(start, ";call [static_init]", 2);
         StringUtility.appendLine(start, "call " + testSig, 2);
         StringUtility.appendLine(start, "call __debexit", 2);
+        this.extern.add("static_init");
     }
 
     private void staticMethodVTableHandler(Map.Entry<String, MethodDeclaration> entry, TypeDeclaration node, StringBuilder textSection) throws Exception {

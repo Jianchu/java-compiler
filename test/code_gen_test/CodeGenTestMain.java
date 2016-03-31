@@ -13,7 +13,7 @@ public class CodeGenTestMain {
 
     public static void main(String[] args) throws IOException,InterruptedException {
         String[] paths = new String[0];
-        paths = FileUtility.getFileNames(myDir + "/test/testprogram/TestCode.java").toArray(paths);
+        paths = FileUtility.getFileNames(myDir + "/test/testprogram/codegentests/TestLocalDec.java").toArray(paths);
         Joosc.compileSTL(paths);
         callBash();
     }
