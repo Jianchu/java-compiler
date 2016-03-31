@@ -637,6 +637,15 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
     	}
     	return numArgs;
     }
+
+    public static void generateFieldAddr(StringBuilder sb, FieldDeclaration fDecl) throws Exception {
+	TypeDeclaration parent = (TypeDeclaration) fDecl.getParent();
+	int offset = parent.getFieldOffSet(fDecl.id);
+	offset = 4 * offset;
+	StringUtility.appendIndLn(sb, "mov dword eax, [ebp + 8] \t; put object address in eax");
+	StringUtility.appendIndLn(sb, "mov dword eax, [eax] \t; enter object");
+	StringUtility.appendIndLn(sb, "add eax, " +  offset + " \t; field address");	// eax contains field address
+    }
     
     public void visit(SimpleName node) throws Exception {
     	StringBuilder sb = new StringBuilder();
