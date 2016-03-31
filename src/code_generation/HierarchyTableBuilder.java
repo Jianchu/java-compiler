@@ -98,11 +98,11 @@ public class HierarchyTableBuilder {
 
     private static void primitiveOffSetHelper(Value value) {
         PrimitiveType primitiveType = new PrimitiveType(value);
-        offSets.put(primitiveType, offSetCounter);
-        offSetCounter++;
+//        offSets.put(primitiveType, offSetCounter);
+//        offSetCounter++;
 
-        ArrayType booleanArrayType = arrayTypeBuilder(primitiveType);
-        offSets.put(booleanArrayType, offSetCounter);
+        ArrayType primitiveArrayType = arrayTypeBuilder(primitiveType);
+        offSets.put(primitiveArrayType, offSetCounter);
         offSetCounter++;
     }
 

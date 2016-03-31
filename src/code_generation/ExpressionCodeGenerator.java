@@ -4,8 +4,8 @@ import java.util.List;
 import java.util.Set;
 
 import utility.StringUtility;
-import ast.ArrayAccess;
 import ast.ASTNode;
+import ast.ArrayAccess;
 import ast.ArrayCreationExpression;
 import ast.ArrayType;
 import ast.AssignmentExpression;
@@ -381,26 +381,31 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
         if (node.unary != null) {
             node.unary.accept(this);
         }
-
-        Type unaryType = node.unary.getType();
-        String unaryVTableSig = SigHelper.getClssSigWithVTable(unaryType);
-        this.extern.add(unaryVTableSig);
+        String unaryCode = node.unary.getCode();
+        castText.append(unaryCode);
 
         int offset = 0;
+        boolean isPrimitive = false;
         if (castToType instanceof SimpleType) {
             SimpleType sType = (SimpleType)castToType;
             offset = HierarchyTableBuilder.getTypeOffSet(sType.getDeclaration().getFullName());
-        } else if (node.type instanceof ArrayType) {
+        } else if (castToType instanceof ArrayType) {
             ArrayType aType = (ArrayType)castToType;
             offset = HierarchyTableBuilder.getTypeOffSet(aType.toString());
+        } else if (castToType instanceof PrimitiveType) {
+            isPrimitive = true;
         }
-        int frame = offset * 4;
-        //StringUtility.appendLine(castText, "cmp [[" + unaryVTableSig + "]+"  + frame + "], " + TRUE, 2);
-        StringUtility.appendLine(castText, "mov ecx, [" + unaryVTableSig + "]", 2);
-        StringUtility.appendLine(castText, "add ecx, " + frame, 2);
-        StringUtility.appendLine(castText, "cmp dword [ecx], " + TRUE, 2);
-        StringUtility.appendLine(castText, "jne __exception", 2);
-        // node.attachCode(castText.toString());
+        if (!isPrimitive) {
+            int frame = offset * 4;
+            StringUtility.appendLine(castText, "mov ebx, eax \t ;copy eax", 2);
+            StringUtility.appendLine(castText, "mov eax, [eax] \t ;get first frame of object, the pointer of VTable", 2);
+            StringUtility.appendLine(castText, "mov eax, [eax] \t ;get first frame of VTable, the point of subclass table", 2);
+            StringUtility.appendLine(castText, "add eax, " + frame + "\t ;get the pointer of type in subclass table", 2);                
+            StringUtility.appendLine(castText, "cmp dword [eax], " + TRUE, 2);
+            StringUtility.appendLine(castText, "jne __exception", 2);
+            StringUtility.appendLine(castText, "mov eax, ebx \t ;restore eax", 2);
+        }
+        node.attachCode(castText.toString());
     }
 
     /*
