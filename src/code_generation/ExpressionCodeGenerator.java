@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Set;
 
 import utility.StringUtility;
+import ast.ArrayAccess;
 import ast.ASTNode;
 import ast.ArrayCreationExpression;
 import ast.ArrayType;
@@ -608,7 +609,7 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
     		
 		if (node.getDeclaration() == null && node.getID().equals("length")) {
 		    // fucking array length
-		    StringUtility.appendIndLn(sb, "mov eax [eax]"); // enter array 
+		    StringUtility.appendIndLn(sb, "mov eax, [eax]"); // enter array 
 		    StringUtility.appendIndLn(sb, "add eax, 4"); // array length
 		    return;
 		}
@@ -618,7 +619,7 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
 		TypeDeclaration tDecl = (TypeDeclaration) fDecl.getParent();
     		int offset = tDecl.getFieldOffSet(fDecl.id);
     		offset = (offset + 1) * 4;	// real offset 
-    		StringUtility.appendIndLn(sb, "mov eax [eax]");	// enter object
+    		StringUtility.appendIndLn(sb, "mov eax, [eax]");	// enter object
     		StringUtility.appendIndLn(sb, "add eax, " + offset);
     	} else {
     		throw new Exception("qualified name prefix not recoginsed: " + qualifier.toString());
@@ -667,6 +668,25 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
     	StringUtility.appendIndLn(sb, "add eax, 1"); // second place holds size
     	StringUtility.appendIndLn(sb, "mov dword [eax], ebx" );
     	StringUtility.appendIndLn(sb, "pop eax");	// put array address back in eax, done
+
+	node.attachCode(sb.toString());
+    }
+
+    public void visit(ArrayAccess node) throws Exception {
+	StringBuilder sb = new StringBuilder();
+
+	node.index.accept(this);
+	sb.append(node.index.getCode());
+	StringUtility.appendIndLn(sb, "push eax"); // push index
+
+	node.array.accept(this);
+	sb.append(node.array.getCode());
+	StringUtility.appendIndLn(sb, "pop ebx"); // get index
+	StringUtility.appendIndLn(sb, "mov eax, [eax]"); // enter array
+	StringUtility.appendIndLn(sb, "add eax, 1"); // skip vtable
+	StringUtility.appendIndLn(sb, "add eax, ebx");
+	
+	node.attachCode(sb.toString());
     }
     
     public void visit(SimpleType node) throws Exception {
