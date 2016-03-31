@@ -704,11 +704,11 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
     	// array address in eax
     	StringUtility.appendIndLn(sb, "push eax");
     	StringUtility.appendIndLn(sb, "mov eax, [eax]"); // enter array
-    	StringUtility.appendIndLn(sb, "mov dword [eax], " + SigHelper.getClssSigWithVTable(node.type));	// first place is the vtable, vtable then points to hierarchy
+    	StringUtility.appendIndLn(sb, "mov dword [eax], " + SigHelper.getArrayVTableSigFromNonArray(node.type));	// first place is the vtable, vtable then points to hierarchy
     	StringUtility.appendIndLn(sb, "add eax, 1"); // second place holds size
     	StringUtility.appendIndLn(sb, "mov dword [eax], ebx" );
     	StringUtility.appendIndLn(sb, "pop eax");	// put array address back in eax, done
-
+        extern.add(SigHelper.getArrayVTableSigFromNonArray(node.type));
 	node.attachCode(sb.toString());
     }
 
