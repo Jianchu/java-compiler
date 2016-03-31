@@ -26,13 +26,15 @@ public class CodeGenerator extends TraversalVisitor {
     TypeDeclaration currentTypeDec;
     Set<String> extern;
     Set<String> exclude;
+    StringBuilder dataSection;
     private static Set<String> staticInitExtern = new HashSet<String>();
 
     public CodeGenerator() {
         this.extern = new HashSet<String>();
         this.exclude = new HashSet<String>();
-        stmtGen = new StatementCodeGenerator(extern);
-        expGen = new ExpressionCodeGenerator(extern);
+        dataSection = new StringBuilder();
+        expGen = new ExpressionCodeGenerator(extern, dataSection);
+        stmtGen = new StatementCodeGenerator(extern, dataSection, expGen);
     }
 
     public void visit(TypeDeclaration node) throws Exception {
@@ -42,7 +44,6 @@ public class CodeGenerator extends TraversalVisitor {
         String classSig = SigHelper.getClassSig(node);
         String testSig = classSig + "#test$$implementation";
         StringUtility.appendLine(instanceFieldInit[0], "instance_field_init$" + classSig + ":");
-        StringBuilder dataSection = new StringBuilder();
         StringBuilder vTableText = new StringBuilder();
         StringBuilder textSection = new StringBuilder();
         StringBuilder start = new StringBuilder();
@@ -51,6 +52,7 @@ public class CodeGenerator extends TraversalVisitor {
         StringUtility.appendIndLn(vTableText, "VTable#" + SigHelper.getClassSig(node) + ":");        
         // creating .data section for static field
         StringUtility.appendLine(dataSection, "section .data");
+        StringUtility.appendLine(dataSection, "align 4");
         for (FieldDeclaration fDecl : node.getEnvironment().fields.values()) {
             if (fDecl.modifiers.contains(Modifier.STATIC)) {
                 String fieldSig = SigHelper.getFieldSig(fDecl);
@@ -123,7 +125,7 @@ public class CodeGenerator extends TraversalVisitor {
         textSection.append(vTableText + "\n");
         this.extern.add("__malloc");
         this.extern.add("__exception");
-        node.attachCode(getExtern().toString() + dataSection.toString() + textSection.toString() + staticFieldInit[1].toString());
+        node.attachCode(getExtern().toString() + textSection.toString() + staticFieldInit[1].toString() + dataSection.toString());
         staticFieldInit[1].setLength(0);
     }
     
@@ -142,8 +144,10 @@ public class CodeGenerator extends TraversalVisitor {
     private void generateStart(StringBuilder start, String testSig) {
         StringUtility.appendLine(start, "global _start");
         StringUtility.appendIndLn(start, "_start:");
+        StringUtility.appendLine(start, ";call [static_init]", 2);
         StringUtility.appendLine(start, "call " + testSig, 2);
         StringUtility.appendLine(start, "call __debexit", 2);
+        this.extern.add("static_init");
     }
 
     private void staticMethodVTableHandler(Map.Entry<String, MethodDeclaration> entry, TypeDeclaration node, StringBuilder textSection) throws Exception {
@@ -199,7 +203,9 @@ public class CodeGenerator extends TraversalVisitor {
                 StringUtility.appendIndLn(staticFieldInit[1], "global static_init_" + fieldSig);
                 StringUtility.appendIndLn(staticFieldInit[1], "static_init_" + fieldSig + ":");
                 StringUtility.appendLine(staticFieldInit[1], initCode, 2);
-                StringUtility.appendLine(staticFieldInit[1], "mov " + "[" + fieldSig + "]" + ", eax", 2);
+                StringUtility.appendIndLn(instanceFieldInit[1], "mov eax, [eax]" + "\t; initiallize field");
+                StringUtility.appendIndLn(instanceFieldInit[1], "mov " + "[" + fieldSig + "]" + ", eax" + "\t; initiallize field");
+                //StringUtility.appendLine(staticFieldInit[1], "mov " + "[" + fieldSig + "]" + ", [eax]", 2);
             } else {
                 StringUtility.appendIndLn(instanceFieldInit[0], "call instance_init_" + fieldSig);
                 StringUtility.appendIndLn(instanceFieldInit[1], "instance_init_" + fieldSig + ":");
@@ -209,7 +215,10 @@ public class CodeGenerator extends TraversalVisitor {
                 StringUtility.appendLine(instanceFieldInit[1], initCode, 2);
                 StringUtility.appendLine(instanceFieldInit[1], "mov edx, eax \t; put value of field to edx", 2);
                 StringUtility.appendLine(instanceFieldInit[1], "pop eax \t; pop field address back to eax", 2);
-                StringUtility.appendLine(instanceFieldInit[1], "mov dword [eax], edx \t; initiallize field", 2);
+                StringUtility.appendIndLn(instanceFieldInit[1], "mov edx, [edx]" + "\t; initiallize field");
+                StringUtility.appendIndLn(instanceFieldInit[1], "mov [eax], edx" + "\t; initiallize field");
+                
+                //StringUtility.appendLine(instanceFieldInit[1], "mov dword [eax], [edx] \t; initiallize field", 2);
                 
             }
         }
