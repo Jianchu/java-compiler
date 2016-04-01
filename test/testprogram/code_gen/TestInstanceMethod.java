@@ -1,7 +1,7 @@
 public class TestInstanceMethod {
     public TestInstanceMethod() {}
     public static int test() {
-        TestWhile a = new TestWhile();
+        TestInstanceMethod a = new TestInstanceMethod();
         int b = a.m();
         return 1;
     }

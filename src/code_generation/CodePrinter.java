@@ -3,9 +3,6 @@ package code_generation;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 
 import utility.StringUtility;
@@ -13,7 +10,6 @@ import ast.AST;
 import ast.ArrayType;
 import ast.PrimitiveType;
 import ast.PrimitiveType.Value;
-import ast.Type;
 import ast.TypeDeclaration;
 import ast.Visitor;
 import environment.TraversalVisitor;
@@ -41,19 +37,6 @@ public class CodePrinter extends TraversalVisitor {
             Visitor rv = new CodePrinter();
             t.root.accept(rv);
         }
-        UglyTableBuilder.uglyText = new StringBuilder();
-        UglyTableBuilder.ugly = new HashMap<TypeDeclaration, List<String>>();
-        HierarchyTableBuilder.hierarchyTable = new HashMap<Type, List<String>>();
-        HierarchyTableBuilder.Alltypes = new ArrayList<String>();
-        HierarchyTableBuilder.offSets = new HashMap<Type, Integer>();
-        HierarchyTableBuilder.offSetCounter = new Integer(0);
-        OffSet.ugly = new HashMap<TypeDeclaration, List<String>>();
-        CodeGenerator.staticFieldInit[0].setLength(0);
-        CodeGenerator.staticFieldInit[1].setLength(0);
-        CodeGenerator.instanceFieldInit[0].setLength(0);
-        CodeGenerator.instanceFieldInit[1].setLength(0);
-        CodeGenerator.staticInitExtern = new HashSet<String>();
-
     }
 
     private void writeUgly() throws FileNotFoundException {

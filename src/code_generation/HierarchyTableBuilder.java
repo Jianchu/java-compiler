@@ -26,6 +26,10 @@ public class HierarchyTableBuilder {
     static List<String> Alltypes = new ArrayList<String>();
 
     public static void build(List<AST> trees) throws Exception {
+        hierarchyTable = new HashMap<Type, List<String>>();
+        offSets = new HashMap<Type, Integer>();
+        offSetCounter = new Integer(0);
+        Alltypes = new ArrayList<String>();
         List<TypeDeclaration> typeDecs = new LinkedList<TypeDeclaration>();
         for (AST ast : trees) {
             if (ast.root.types.size() > 0) {
