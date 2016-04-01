@@ -495,8 +495,8 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
     	String vt = SigHelper.getClssSigWithVTable(tDecl);
     	extern.add(vt);
     	StringUtility.appendIndLn(sb, "push eax");	// save object reference to exit vtable
-    	StringUtility.appendIndLn(sb, "mov eax, [eax] \t; enter object");	
-    	StringUtility.appendIndLn(sb, "mov dword eax, " + vt);
+    	//StringUtility.appendIndLn(sb, "mov eax, [eax] \t; enter object");	
+    	StringUtility.appendIndLn(sb, "mov dword [eax], " + vt);
     	StringUtility.appendIndLn(sb, "pop eax	\n");
     	
     	// implicit super call
@@ -639,12 +639,17 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
     }
 
     public static void generateFieldAddr(StringBuilder sb, FieldDeclaration fDecl) throws Exception {
-	TypeDeclaration parent = (TypeDeclaration) fDecl.getParent();
-	int offset = parent.getFieldOffSet(fDecl.id);
-	offset = 4 * offset;
-	StringUtility.appendIndLn(sb, "mov dword eax, [ebp + 8] \t; put object address in eax");
-	StringUtility.appendIndLn(sb, "mov dword eax, [eax] \t; enter object");
-	StringUtility.appendIndLn(sb, "add eax, " +  offset + " \t; field address");	// eax contains field address
+	if (fDecl.modifiers.contains(Modifier.STATIC)) {
+	    String label = SigHelper.getFieldSigWithImp(fDecl);
+	    StringUtility.appendIndLn(sb, "mov eax, " + label);
+	}else {
+	    TypeDeclaration parent = (TypeDeclaration) fDecl.getParent();
+	    int offset = parent.getFieldOffSet(fDecl.id);
+	    offset = 4 * (offset + 1);
+	    StringUtility.appendIndLn(sb, "mov dword eax, [ebp + 8] \t; put object address in eax");
+	    //StringUtility.appendIndLn(sb, "mov dword eax, [eax] \t; enter object");
+	    StringUtility.appendIndLn(sb, "add eax, " +  offset + " \t; field address");	// eax contains field address
+	}
     }
     
     public void visit(SimpleName node) throws Exception {
@@ -652,12 +657,8 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
     	ASTNode decl = node.getDeclaration();
     	if (decl instanceof FieldDeclaration) {	// field, has to be instance field
     		FieldDeclaration fDecl = (FieldDeclaration) decl;
-    		TypeDeclaration parent = (TypeDeclaration) fDecl.getParent();
-    		int offset = parent.getFieldOffSet(fDecl.id);
-    		offset = 4 * offset;
-    		StringUtility.appendIndLn(sb, "mov dword eax, [ebp + 8] \t; put object address in eax");
-    		StringUtility.appendIndLn(sb, "mov dword eax, [eax] \t; enter object");
-    		StringUtility.appendIndLn(sb, "add eax, " +  offset + " \t; field address");	// eax contains field address
+    		generateFieldAddr(sb, fDecl);
+		
     	} else if (decl instanceof VariableDeclaration) {	// variable
     		VariableDeclaration vDecl = (VariableDeclaration) decl;
 		genVarAddress(sb, vDecl);
@@ -680,13 +681,16 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
     		String label = SigHelper.getFieldSig((FieldDeclaration) node.getDeclaration());	// directs to parent, not instance field
     		StringUtility.appendIndLn(sb, "mov dword eax, " + label);
     	} else if (qDecl instanceof FieldDeclaration || qDecl instanceof VariableDeclaration) {
+	    boolean oldLV = isLV;
+	    isLV = false;
     		qualifier.accept(this);
+		isLV = oldLV;
     		StringUtility.appendIndLn(sb, qualifier.getCode());
     		
 		if (node.getDeclaration() == null && node.getID().equals("length")) {
 		    // fucking array length
-		    StringUtility.appendIndLn(sb, "mov eax, [eax]"); // enter array 
-		    StringUtility.appendIndLn(sb, "add eax, 4"); // array length
+		    //StringUtility.appendIndLn(sb, "mov eax, [eax] ; enter array"); // enter array 
+		    StringUtility.appendIndLn(sb, "add eax, 4 ; array.length"); // array length
 		    return;
 		}
 		
@@ -695,7 +699,7 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
 		TypeDeclaration tDecl = (TypeDeclaration) fDecl.getParent();
     		int offset = tDecl.getFieldOffSet(fDecl.id);
     		offset = (offset + 1) * 4;	// real offset 
-    		StringUtility.appendIndLn(sb, "mov eax, [eax]");	// enter object
+    		//StringUtility.appendIndLn(sb, "mov eax, [eax]");	// enter object
     		StringUtility.appendIndLn(sb, "add eax, " + offset);
     	} else {
     		throw new Exception("qualified name prefix not recoginsed: " + qualifier.toString());
@@ -714,13 +718,13 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
 		StringUtility.appendLine(sb, node.getCode());
 		// assume object at eax
 		if (node.expr.getType() instanceof ArrayType && node.id.equals("length")) {    // array.length
-		    StringUtility.appendIndLn(sb, "mov eax, [eax] \t; enter array"); // enter array
+		    //StringUtility.appendIndLn(sb, "mov eax, [eax] \t; enter array"); // enter array
 		    StringUtility.appendIndLn(sb, "add eax, 4");
 		} else {// instance field
 		    TypeDeclaration tDecl = node.expr.getType().getDeclaration();
 		    int offset = tDecl.getFieldOffSet(node.id.toString());
 		    offset = offset * 4;// real offset
-		    StringUtility.appendIndLn(sb, "mov eax, [eax] \t; enter object");
+		    //StringUtility.appendIndLn(sb, "mov eax, [eax] \t; enter object");
 		    StringUtility.appendIndLn(sb, "add eax, " + offset);
 		}
 		
@@ -743,7 +747,7 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
     	
     	// array address in eax
     	StringUtility.appendIndLn(sb, "push eax");
-    	StringUtility.appendIndLn(sb, "mov eax, [eax]"); // enter array
+    	//StringUtility.appendIndLn(sb, "mov eax, [eax]"); // enter array
     	StringUtility.appendIndLn(sb, "mov dword [eax], " + SigHelper.getArrayVTableSigFromNonArray(node.type));	// first place is the vtable, vtable then points to hierarchy
     	StringUtility.appendIndLn(sb, "add eax, 1"); // second place holds size
     	StringUtility.appendIndLn(sb, "mov dword [eax], ebx" );
@@ -762,7 +766,7 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
 	node.array.accept(this);
 	sb.append(node.array.getCode());
 	StringUtility.appendIndLn(sb, "pop ebx"); // get index
-	StringUtility.appendIndLn(sb, "mov eax, [eax]"); // enter array
+	//StringUtility.appendIndLn(sb, "mov eax, [eax]"); // enter array
 	StringUtility.appendIndLn(sb, "add eax, 1"); // skip vtable
 	StringUtility.appendIndLn(sb, "add eax, ebx");
 	

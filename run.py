@@ -4,7 +4,7 @@ import sys
 
 compile = True
 folder = 'test/testprogram/code_gen/'
-p = folder +'Var.java'
+p = folder +'InstanceField.java'
 
 def getAllPath(l, path):
     for root, directories, filenames in os.walk(path):
