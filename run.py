@@ -2,9 +2,9 @@ import os
 import subprocess
 import sys
 
-compile = False
+compile = True
 folder = 'test/testprogram/code_gen/'
-p = folder +'InstanceField2.java'
+p = folder +'InstanceField3.java'
 
 def getAllPath(l, path):
     for root, directories, filenames in os.walk(path):
