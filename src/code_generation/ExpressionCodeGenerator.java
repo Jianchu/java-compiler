@@ -556,7 +556,7 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
 	 if (node.id != null) {
 		 // Primary.ID(...)
 		 node.expr.accept(this);	// generate code for Primary expression
-		 StringUtility.appendLine(sb, node.getCode());	// by this point eax should contain address to object return by Primary expression
+		 StringUtility.appendLine(sb, node.expr.getCode());	// by this point eax should contain address to object return by Primary expression
 		 StringUtility.appendIndLn(sb, "push eax \t; push object for method invocation");
 		 MethodDeclaration mDecl = (MethodDeclaration) node.id.getDeclaration();	// the actual method being called
 		 // call method
