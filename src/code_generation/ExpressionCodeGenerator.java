@@ -699,15 +699,15 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
 		     // fucking array length
 
 		     StringUtility.appendIndLn(sb, "add eax, 4 ; array.length"); // array length
-		     return;
-		 }
+		 } else {
 
-		 // node is instance field, with object in eax
-		 FieldDeclaration fDecl = (FieldDeclaration) node.getDeclaration();
-		 TypeDeclaration tDecl = (TypeDeclaration) fDecl.getParent();
-		 int offset = tDecl.getFieldOffSet(fDecl.id);
-		 offset = (offset + 1) * 4;	// real offset 
-		 StringUtility.appendIndLn(sb, "add eax, " + offset);
+		     // node is instance field, with object in eax
+		     FieldDeclaration fDecl = (FieldDeclaration) node.getDeclaration();
+		     TypeDeclaration tDecl = (TypeDeclaration) fDecl.getParent();
+		     int offset = tDecl.getFieldOffSet(fDecl.id);
+		     offset = (offset + 1) * 4;	// real offset 
+		     StringUtility.appendIndLn(sb, "add eax, " + offset);
+		 }
 	 } else {
 		 throw new Exception("qualified name prefix not recoginsed: " + qualifier.toString());
 	 }
