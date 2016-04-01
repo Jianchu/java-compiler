@@ -3,9 +3,8 @@ import subprocess
 import sys
 
 compile = True
-
 folder = 'test/testprogram/code_gen/'
-p = folder +'Array1.java'
+p = folder +'Array2.java'
 
 def getAllPath(l, path):
     for root, directories, filenames in os.walk(path):
