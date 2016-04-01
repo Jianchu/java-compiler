@@ -3,7 +3,7 @@ public class TestInstanceMethod {
     public static int test() {
         TestInstanceMethod a = new TestInstanceMethod();
         int b = a.m();
-        return 1;
+        return b;
     }
     
     public int m() {
