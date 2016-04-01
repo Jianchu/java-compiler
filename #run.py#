@@ -3,7 +3,6 @@ import subprocess
 import sys
 
 compile = True
-
 folder = 'test/testprogram/code_gen/'
 p = folder +'Array1.java'
 

@@ -460,11 +460,11 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
 
     private void genVarAddress(StringBuilder sb, VariableDeclaration vDecl) throws Exception {
 	int offset = currentMethod.getVarOffSet(vDecl);
-	if (offset < 0) {	// formals starts from -1
-	    offset = (-(offset - 1)) * 4;	// real offset 
+	if (offset < 0) {	// formals starts from -1, actual offset should be 12
+	    offset = (-(offset - 2)) * 4;	// real offset 
 	    StringUtility.appendIndLn(sb, "mov dword eax, ebp ");
 	    StringUtility.appendIndLn(sb, "add eax, " + offset + " \t; eax contains formal address");
-	} else {	// locals starts from 0
+	} else {	// locals starts from 0, actual offset should be 4
 	    offset = (offset + 1) * 4;
 	    StringUtility.appendIndLn(sb, "mov dword eax, ebp ");
 	    StringUtility.appendIndLn(sb, "sub eax, " + offset + "\t; eax contains local address");	// eax now points to object
@@ -477,50 +477,49 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
     
     @Override
     public void visit(ClassInstanceCreationExpression node) throws Exception {
-    	StringBuilder sb = new StringBuilder();    	
-    	StringUtility.appendIndLn(sb, "; class instance creation: " + node.type);
+    	StringBuilder sb = new StringBuilder();    
+	StringUtility.appendIndLn(sb, "; class instance creation: " + node.type);
+	CodeGenUtil.saveRegisters(sb);
+	
+	int numArgs = 0;
 	// generate code for arguments
-    	int numArgs = 0;
-    	numArgs = generateArgs(sb, node.arglist);
-    	
+	numArgs = generateArgs(sb, node.arglist);
+	    	
     	// malloc
     	TypeDeclaration tDecl = node.type.getDeclaration();
     	int objSize = tDecl.getFieldOffSetList().size() + 1;	//	leave space for counter
     	StringUtility.appendIndLn(sb, "mov eax, 4*" + objSize + "\t; size of object");
     	extern.add("__malloc");
     	StringUtility.appendIndLn(sb, "call __malloc");
-    	
-    	StringUtility.appendIndLn(sb, "push eax \t; push object address");
-    	
-    	// pointer to VTable
+	
+	// pointer to VTable
     	String vt = SigHelper.getClssSigWithVTable(tDecl);
     	extern.add(vt);
-    	StringUtility.appendIndLn(sb, "push eax");	// save object reference to exit vtable
-    	//StringUtility.appendIndLn(sb, "mov eax, [eax] \t; enter object");	
-    	StringUtility.appendIndLn(sb, "mov dword [eax], " + vt);
-    	StringUtility.appendIndLn(sb, "pop eax	\n");
+	StringUtility.appendIndLn(sb, "mov dword [eax], " + vt);
     	
-    	// implicit super call
+	// implicit super call
     	if (tDecl.superClass != null) {
     		MethodDeclaration superConstructor = getDefaultConstructor(tDecl.superClass.getDeclaration());
     		generateConstructorCall(sb, superConstructor);
     	}
-
-    	// call actual constructor
+	
+	// call actual constructor
     	generateConstructorCall(sb, node.getConstructor());
     	
-    	// clean up
-    	StringUtility.appendIndLn(sb, "pop eax \t; pop object address back in eax");
-    	StringUtility.appendIndLn(sb, "add esp, 4 * " + numArgs);
+	//clean up arguments
+	StringUtility.appendIndLn(sb, "add esp, 4 * " + numArgs);
+	CodeGenUtil.restoreRegisters(sb);
+	
     	node.attachCode(sb.toString());
     }
     
     private void generateConstructorCall(StringBuilder sb, MethodDeclaration constructorDecl) {
-    	StringUtility.appendIndLn(sb, "push eax");	// save object reference
-		String constructorLabel = SigHelper.getMethodSigWithImp(constructorDecl);
-		extern.add(constructorLabel.trim());
+	StringUtility.appendIndLn(sb, "push eax");	// save object reference
+	String constructorLabel = SigHelper.getMethodSigWithImp(constructorDecl);
+	extern.add(constructorLabel.trim());
     	StringUtility.appendIndLn(sb, "call " + constructorLabel);
-    	StringUtility.appendIndLn(sb, "pop eax	\n");
+	// clean up
+    	StringUtility.appendIndLn(sb, "pop eax \t; pop object address back in eax");
     }
     
     private MethodDeclaration getDefaultConstructor(TypeDeclaration superClass) throws Exception {
@@ -546,8 +545,9 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
     public void visit(MethodInvocation node) throws Exception {
     	StringBuilder sb = new StringBuilder();
 
-    	//TODO: caller save registers
-    	
+    	//caller save registers
+	CodeGenUtil.saveRegisters(sb);
+
     	// generate code for arguments
     	int numArgs = 0;
     	numArgs = generateArgs(sb, node.arglist);
@@ -592,6 +592,7 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
     	
 		// clean up
 		StringUtility.appendIndLn(sb, "add esp, " + (numArgs+1) + "*4" + "\t; caller cleanup arguments.");	
+		CodeGenUtil.restoreRegisters(sb);
 		node.attachCode(sb.toString());
     	
     }
@@ -732,6 +733,8 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
 		    StringUtility.appendIndLn(sb, "add eax, " + offset);
 		}
 		
+		processLV(sb);
+	
 		node.attachCode(sb.toString());
     }
     
@@ -741,7 +744,7 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
 
     	// evaluate expression
     	node.expr.accept(this);
-    	sb.append(node.getCode());
+    	sb.append(node.expr.getCode());
     	
     	// size in eax
     	StringUtility.appendIndLn(sb, "push eax");
@@ -753,7 +756,7 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
     	StringUtility.appendIndLn(sb, "push eax");
     	//StringUtility.appendIndLn(sb, "mov eax, [eax]"); // enter array
     	StringUtility.appendIndLn(sb, "mov dword [eax], " + SigHelper.getArrayVTableSigFromNonArray(node.type));	// first place is the vtable, vtable then points to hierarchy
-    	StringUtility.appendIndLn(sb, "add eax, 1"); // second place holds size
+    	StringUtility.appendIndLn(sb, "add eax, 4"); // second place holds size
     	StringUtility.appendIndLn(sb, "mov dword [eax], ebx" );
     	StringUtility.appendIndLn(sb, "pop eax");	// put array address back in eax, done
         extern.add(SigHelper.getArrayVTableSigFromNonArray(node.type));
@@ -765,16 +768,29 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
 
 	node.index.accept(this);
 	sb.append(node.index.getCode());
-	StringUtility.appendIndLn(sb, "push eax"); // push index
-
+	StringUtility.appendIndLn(sb, "mov ebx, eax ");
+	StringUtility.appendIndLn(sb, "mov eax, 4 "); 
+	StringUtility.appendIndLn(sb, "imul ebx ; get real offset");
+	StringUtility.appendIndLn(sb, "push eax"); // push offset
+	
+	isPrefix = true;
 	node.array.accept(this);
+	isPrefix = false;
 	sb.append(node.array.getCode());
 	StringUtility.appendIndLn(sb, "pop ebx"); // get index
 	//StringUtility.appendIndLn(sb, "mov eax, [eax]"); // enter array
-	StringUtility.appendIndLn(sb, "add eax, 1"); // skip vtable
+	StringUtility.appendIndLn(sb, "add eax, 8"); // skip vtable and size
 	StringUtility.appendIndLn(sb, "add eax, ebx");
 	
+	processLV(sb);
+	
 	node.attachCode(sb.toString());
+    }
+
+    private void processLV(StringBuilder sb) throws Exception {
+	if (!isLV || isPrefix) {
+	    StringUtility.appendIndLn(sb, "mov eax, [eax]");
+	}
     }
     
     public void visit(SimpleType node) throws Exception {

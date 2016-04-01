@@ -33,7 +33,7 @@ public class VariableOffSetVisitor extends TraversalVisitor{
         int paramMaxOffSet = -node.parameters.size();
         for (int i = 0; i < node.parameters.size(); i++) {
         	// parameter offsets are negative numbers
-        	node.addVarOffSet(node.parameters.get(i), paramMaxOffSet - i); 
+        	node.addVarOffSet(node.parameters.get(i), paramMaxOffSet + i); 
         }
         
         if (node.body != null) {
