@@ -144,7 +144,7 @@ public class CodeGenerator extends TraversalVisitor {
     private void generateStart(StringBuilder start, String testSig) {
         StringUtility.appendLine(start, "global _start");
         StringUtility.appendIndLn(start, "_start:");
-        StringUtility.appendLine(start, ";call [static_init]", 2);
+        StringUtility.appendLine(start, "call static_init", 2);
         StringUtility.appendLine(start, "call " + testSig, 2);
         StringUtility.appendLine(start, "call __debexit", 2);
         this.extern.add("static_init");
@@ -203,6 +203,7 @@ public class CodeGenerator extends TraversalVisitor {
                 StringUtility.appendIndLn(staticFieldInit[1], "global static_init_" + fieldSig);
                 StringUtility.appendIndLn(staticFieldInit[1], "static_init_" + fieldSig + ":");
                 StringUtility.appendLine(staticFieldInit[1], initCode, 2);
+                StringUtility.appendLine(staticFieldInit[1], "ret", 2);
                 //StringUtility.appendIndLn(instanceFieldInit[1], "mov eax, [eax]" + "\t; initiallize field");
                 StringUtility.appendIndLn(instanceFieldInit[1], "mov " + "[" + fieldSig + "]" + ", eax" + "\t; initiallize field");
                 //StringUtility.appendLine(staticFieldInit[1], "mov " + "[" + fieldSig + "]" + ", [eax]", 2);
@@ -270,6 +271,7 @@ public class CodeGenerator extends TraversalVisitor {
     }
     
     protected static String getStaticFieldInit() {
+        StringUtility.appendIndLn(staticFieldInit[0], "ret");
         String staticFieldInitString = staticFieldInit[0].toString();
         staticFieldInit[0].setLength(0);
         return getStaticFieldInitExtern() + staticFieldInitString;
