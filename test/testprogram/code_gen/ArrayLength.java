@@ -4,5 +4,4 @@ public class ArrayLength {
 	int[] x = new int[123];
 	return x.length;
     }
-
 }

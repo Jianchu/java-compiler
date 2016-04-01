@@ -4,7 +4,7 @@ import sys
 
 compile = True
 folder = 'test/testprogram/code_gen/'
-p = folder +'ArrayLength.java'
+p = folder +'StaticMethod.java'
 
 def getAllPath(l, path):
     for root, directories, filenames in os.walk(path):

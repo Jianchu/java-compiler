@@ -12,9 +12,9 @@ src/TestMain.java
 src/joosc/TestMain.java
 output/
 
-run.py
-#*
-.#*
+/run.py
+/#*
+/.#*
 
 *~
 .pdf
