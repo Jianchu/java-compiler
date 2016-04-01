@@ -174,4 +174,9 @@ public class SigHelper {
     public static String getClassSigWithHierarchy(TypeDeclaration typeDec) {
         return "hierarchy#" + getClassSig(typeDec);
     }
+
+    public static String getNativeSig(MethodDeclaration mDecl) {
+	TypeDeclaration tDecl = (TypeDeclaration) mDecl.getParent();
+	return "NATIVE" + tDecl.getFullName() + "." + mDecl.id;
+    }
 }
