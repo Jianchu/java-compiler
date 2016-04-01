@@ -219,7 +219,7 @@ public class CodeGenerator extends TraversalVisitor {
                 StringUtility.appendLine(instanceFieldInit[1], "pop eax \t; pop field address back to eax", 2);
                 //StringUtility.appendIndLn(instanceFieldInit[1], "mov edx, [edx]" + "\t; initiallize field");
                 StringUtility.appendIndLn(instanceFieldInit[1], "mov [eax], edx" + "\t; initiallize field");
-                
+                StringUtility.appendIndLn(instanceFieldInit[1], "ret" + "\t; initiallize field ret");
                 //StringUtility.appendLine(instanceFieldInit[1], "mov dword [eax], [edx] \t; initiallize field", 2);
                 
             }
