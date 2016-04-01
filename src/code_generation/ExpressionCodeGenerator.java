@@ -188,6 +188,7 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
 	     switch (node.op) {
 	       case LOR: // fall through
 	       case AND:
+                 StringUtility.appendLine(infixText, "mov eax, ebx");
 		 StringUtility.appendLine(infixText, "INFIX_" + n + ":");
 		 break;
 	       case BITOR:
