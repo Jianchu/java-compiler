@@ -293,6 +293,11 @@ public class CodeGenerator extends TraversalVisitor {
     }
 
     public static void generate(List<AST> trees) throws Exception {
+        staticFieldInit[0].setLength(0);
+        staticFieldInit[1].setLength(0);
+        instanceFieldInit[0].setLength(0);
+        instanceFieldInit[1].setLength(0);
+        staticInitExtern = new HashSet<String>();
         for (AST t : trees) {
             Visitor rv = new CodeGenerator();
             t.root.accept(rv);

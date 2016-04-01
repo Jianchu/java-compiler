@@ -14,7 +14,9 @@ public class UglyTableBuilder {
     static StringBuilder uglyText = new StringBuilder();
 
     public static void build() {
+        ugly = new HashMap<TypeDeclaration, List<String>>();
         ugly = OffSet.ugly;
+        uglyText = new StringBuilder();
         StringBuilder uglyHeader = new StringBuilder();
         Set<String> sigs = new HashSet<String>();
         StringUtility.appendLine(uglyText, "section .data");

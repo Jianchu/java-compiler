@@ -8,11 +8,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import ast.*;
-import environment.NameHelper;
-import exceptions.NameException;
 import joosc.Joosc;
 import utility.FileUtility;
+import ast.AST;
+import ast.BodyDeclaration;
+import ast.FieldDeclaration;
+import ast.MethodDeclaration;
+import ast.Modifier;
+import ast.TypeDeclaration;
+import ast.Visitor;
+import environment.NameHelper;
+import exceptions.NameException;
 
 public class OffSet {
 	// separate classes from interfaces
@@ -23,6 +29,7 @@ public class OffSet {
 	static boolean debug = false;
 	
 	public static void computeOffSet(List<AST> trees) throws Exception {
+                ugly = new HashMap<TypeDeclaration, List<String>>();
 		List<TypeDeclaration> clsDecls = new LinkedList<TypeDeclaration>();
 		List<TypeDeclaration> itfDecls = new LinkedList<TypeDeclaration>();
 		
