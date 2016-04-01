@@ -260,7 +260,7 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
 			     StringUtility.appendLine(infixText, "call java.lang.Boolean#toString$$implementation");
 			     break;
 			   case CHAR:
-			     extern.add("java.lang.Character#~init~$B$implementation");
+			     extern.add("java.lang.Character#~init~$C$implementation");
 			     StringUtility.appendLine(infixText, "call java.lang.Character#~init~$C$implementation");
 			     StringUtility.appendLine(infixText, "pop ebx\t; clean up");
 			     StringUtility.appendLine(infixText, "pop ebx\t; clean up");
