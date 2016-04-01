@@ -1,8 +1,7 @@
 public class TestInstanceMethod {
     public TestInstanceMethod() {}
     public static int test() {
-        TestInstanceMethod a = new TestInstanceMethod();
-        int b = a.m();
+        int b = new TestInstanceMethod().m();
         return b;
     }
     

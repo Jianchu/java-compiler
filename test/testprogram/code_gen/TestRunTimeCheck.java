@@ -3,7 +3,8 @@ public class TestRunTimeCheck {
     public TestRunTimeCheck() {}
     public static int test() {
         Object a = new Object();
-        if (a instanceof Object) {
+        Integer b = new Integer(3);
+        if (a instanceof Integer) {
             return 10;
         } else {
             return 9;
