@@ -647,7 +647,7 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
 	    int offset = parent.getFieldOffSet(fDecl.id);
 	    offset = 4 * (offset + 1);
 	    StringUtility.appendIndLn(sb, "mov dword eax, [ebp + 8] \t; put object address in eax");
-	    //StringUtility.appendIndLn(sb, "mov dword eax, [eax] \t; enter object");
+
 	    StringUtility.appendIndLn(sb, "add eax, " +  offset + " \t; field address");	// eax contains field address
 	}
     }
@@ -689,7 +689,7 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
     		
 		if (node.getDeclaration() == null && node.getID().equals("length")) {
 		    // fucking array length
-		    //StringUtility.appendIndLn(sb, "mov eax, [eax] ; enter array"); // enter array 
+
 		    StringUtility.appendIndLn(sb, "add eax, 4 ; array.length"); // array length
 		    return;
 		}
@@ -699,7 +699,6 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
 		TypeDeclaration tDecl = (TypeDeclaration) fDecl.getParent();
     		int offset = tDecl.getFieldOffSet(fDecl.id);
     		offset = (offset + 1) * 4;	// real offset 
-    		//StringUtility.appendIndLn(sb, "mov eax, [eax]");	// enter object
     		StringUtility.appendIndLn(sb, "add eax, " + offset);
     	} else {
     		throw new Exception("qualified name prefix not recoginsed: " + qualifier.toString());
@@ -718,13 +717,12 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
 		StringUtility.appendLine(sb, node.getCode());
 		// assume object at eax
 		if (node.expr.getType() instanceof ArrayType && node.id.equals("length")) {    // array.length
-		    //StringUtility.appendIndLn(sb, "mov eax, [eax] \t; enter array"); // enter array
+
 		    StringUtility.appendIndLn(sb, "add eax, 4");
 		} else {// instance field
 		    TypeDeclaration tDecl = node.expr.getType().getDeclaration();
 		    int offset = tDecl.getFieldOffSet(node.id.toString());
 		    offset = offset * 4;// real offset
-		    //StringUtility.appendIndLn(sb, "mov eax, [eax] \t; enter object");
 		    StringUtility.appendIndLn(sb, "add eax, " + offset);
 		}
 		
