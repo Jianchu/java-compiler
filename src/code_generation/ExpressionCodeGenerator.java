@@ -69,12 +69,17 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
      public void visit(StringLiteral node) throws Exception {
          StringBuilder stringText = new StringBuilder();
 	 litCounter++;
+
+         String strSig = SigHelper.getClssSigWithVTable(SymbolTable.getGlobal().get("java.lang.String"));
+         extern.add(strSig);
 	 StringUtility.appendLine(dataSection, "STRING_" + litCounter + ":" + "\t; define label for string literal");
-         StringUtility.appendLine(dataSection, "\t" + SigHelper.getClssSigWithVTable(SymbolTable.getGlobal().get("java.lang.String")));
+         StringUtility.appendLine(dataSection, "\tdd " + strSig);
          StringUtility.appendLine(dataSection, "\tmov dword eax, " + "STRCHARS_" + litCounter);
 
+         String charArrSig = SigHelper.getArrayVTableSigFromNonArray(new PrimitiveType(PrimitiveType.Value.CHAR));
+         extern.add(charArrSig);
 	 StringUtility.appendLine(dataSection, "STRCHARS_" + litCounter + ":");
-         StringUtility.appendLine(dataSection, "\t" + SigHelper.getArrayVTableSigFromNonArray(new PrimitiveType(PrimitiveType.Value.CHAR)));
+         StringUtility.appendLine(dataSection, "\tdd " + charArrSig);
 	 StringUtility.appendLine(dataSection, "\t" + "dd " + node.value.length());
          for (int i = 0; i < node.value.length(); i++) {
              StringUtility.appendLine(dataSection, "\t" + "dd '" + node.value.charAt(i) + "'");
