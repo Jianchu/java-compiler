@@ -158,6 +158,15 @@ public class SigHelper {
         return "VTable#" + arraySig;
     }
 
+    public static String getArrayVTableSigFromNonArray(TypeDeclaration typeDec) {
+        String typeName = typeDec.getFullName();
+        SimpleType simpleType = new SimpleType(new SimpleName(typeName));
+        simpleType.attachDeclaration(typeDec);
+        ArrayType arrayType = new ArrayType(simpleType);
+        String arraySig = getTypeSig(arrayType);
+        return "VTable#" + arraySig;
+    }
+
     public static String getArrayClssSigWithVTable(TypeDeclaration typeDec) {
         String typeName = typeDec.getFullName();
         SimpleType simpleType = new SimpleType(new SimpleName(typeName));

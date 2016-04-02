@@ -40,6 +40,7 @@ public class CodeGenerator extends TraversalVisitor {
     public void visit(TypeDeclaration node) throws Exception {
         this.currentTypeDec = node;
         this.exclude.add(SigHelper.getClssSigWithVTable(node));
+        this.exclude.add(SigHelper.getArrayVTableSigFromNonArray(node));
         ExpressionCodeGenerator.stringLitData.setLength(0);
         String classSig = SigHelper.getClassSig(node);
         String testSig = classSig + "#test$$implementation";

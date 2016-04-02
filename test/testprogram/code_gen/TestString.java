@@ -4,12 +4,10 @@ public class TestString {
     }
     public static int test() {
         boolean a = false;
-        if (!a) {
-            return 12;
-        } else {
+        if ("" + a instanceof String) {
             return 123;
+        } else {
+            return 12;
         }
-//        String b = new String("abc");
-//        return 123;
     }
 }
