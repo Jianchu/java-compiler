@@ -52,7 +52,6 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
     private int instanceOfCounter = 0;
     StringBuilder dataSection;
     public static MethodDeclaration currentMethod;
-    
     private int ncCounter = 0;
     private int aaCounter = 0; // for array access label
      private boolean isLV = false;
@@ -61,6 +60,7 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
      public ExpressionCodeGenerator(Set<String> extern, StringBuilder dataSection) {
 	 this.extern = extern;
 	 this.dataSection = dataSection;
+	 
      }
 
      /*
@@ -306,15 +306,15 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
 		 } else if (rhsType instanceof SimpleType &&
 			    rhsType.getDeclaration().getFullName().equals("java.lang.String")) {
 		     StringUtility.appendLine(infixText, "push ebx");
-		     if (rhsType instanceof PrimitiveType) {
+		     if (lhsType instanceof PrimitiveType) {
 			 StringUtility.appendLine(infixText, "push eax");
 			 extern.add("__malloc");
 			 StringUtility.appendLine(infixText, "call __malloc");
 			 StringUtility.appendLine(infixText, "push eax \t; push object address");
-			 switch (((PrimitiveType) rhsType).value) {
+			 switch (((PrimitiveType) lhsType).value) {
 			   case BOOLEAN:
-			     extern.add("java.lang.Boolean#~init~$B$implementation");
-			     StringUtility.appendLine(infixText, "call java.lang.Boolean#~init~$B$implementation");
+			     extern.add("java.lang.Boolean#~init~$Z$implementation");
+			     StringUtility.appendLine(infixText, "call java.lang.Boolean#~init~$Z$implementation");
 			     StringUtility.appendLine(infixText, "pop ebx\t; clean up");
 			     StringUtility.appendLine(infixText, "pop ebx\t; clean up");
 			     StringUtility.appendLine(infixText, "push eax");
