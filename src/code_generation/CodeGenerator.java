@@ -210,8 +210,8 @@ public class CodeGenerator extends TraversalVisitor {
                 StringUtility.appendIndLn(staticFieldInit[1], "static_init_" + fieldSig + ":");
                 ExpressionCodeGenerator.generateFieldAddr(staticFieldInit[1], node);
                 StringUtility.appendLine(staticFieldInit[1], initCode, 2);
+                StringUtility.appendIndLn(staticFieldInit[1], "mov " + "[" + fieldSig + "]" + ", eax" + "\t; initiallize field");              
                 StringUtility.appendLine(staticFieldInit[1], "ret", 2);
-                StringUtility.appendIndLn(instanceFieldInit[1], "mov " + "[" + fieldSig + "]" + ", eax" + "\t; initiallize field");
             } else {
                 StringUtility.appendIndLn(instanceFieldInit[0], "call instance_init_" + fieldSig);
                 StringUtility.appendIndLn(instanceFieldInit[1], "instance_init_" + fieldSig + ":");
