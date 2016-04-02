@@ -806,9 +806,12 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
 	StringUtility.appendIndLn(sb, "push eax"); // push array address
 	StringUtility.appendIndLn(sb, "push eax"); //again for later
 
+	boolean oldIsLV = isLV;
+	isLV = false;
 	node.index.accept(this);
 	sb.append(node.index.getCode());
-	
+	isLV = true;
+
 	//StringUtility.appendIndLn(sb, "mov ecx, eax");
 	StringUtility.appendIndLn(sb, "pop ebx");
 	StringUtility.appendIndLn(sb, "mov ebx, [ebx+4]");

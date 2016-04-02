@@ -1,14 +1,12 @@
 public class StrConcat {
     public StrConcat() {}
     public static int test() {
-
-	char[] nc = new char[3];
+	char[] x = new char[0];
+		
+	String s = new String(x);
 	
-	for (int i = 0; i < 3; i = i + 1) {
-	    nc[i] = '1';
-	}
+	return s.length();
 	
-	return 123;
     }
 
     
