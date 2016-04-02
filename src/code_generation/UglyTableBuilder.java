@@ -32,6 +32,9 @@ public class UglyTableBuilder {
         }
         
         for (String sig : sigs) {
+            if (sig.trim().equals("0")) {
+                continue;
+            }
             StringUtility.appendLine(uglyHeader, "extern " + sig);
         }
         uglyHeader.append("\n");
