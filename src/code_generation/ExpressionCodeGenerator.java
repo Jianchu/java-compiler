@@ -430,7 +430,11 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
 	     offset = HierarchyTableBuilder.getTypeOffSet(sType.getDeclaration().getFullName());
 	 } else if (castToType instanceof ArrayType) {
 	     ArrayType aType = (ArrayType)castToType;
-	     offset = HierarchyTableBuilder.getTypeOffSet(aType.type.getDeclaration().getFullName() + "[]");
+	     if (aType.type instanceof SimpleType) {
+	         offset = HierarchyTableBuilder.getTypeOffSet(aType.type.getDeclaration().getFullName() + "[]");
+	     } else {
+	         offset = HierarchyTableBuilder.getTypeOffSet(aType.type.toString() + "[]");
+	     }
 	 } else if (castToType instanceof PrimitiveType) {
 	     isPrimitive = true;
 	 }
