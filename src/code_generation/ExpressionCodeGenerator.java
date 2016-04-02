@@ -767,9 +767,10 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
 
      public void visit(FieldAccess node) throws Exception {
 		 StringBuilder sb = new StringBuilder();
-
-		 node.expr.accept(this);
-		 StringUtility.appendLine(sb, node.expr.getCode());
+		 
+		 StringUtility.appendIndLn(sb, getCodeForPrefix(node.expr));
+		 //node.expr.accept(this);
+		 //StringUtility.appendLine(sb, node.expr.getCode());
 		 // assume object at eax
 		 if (node.expr.getType() instanceof ArrayType && node.id.toString().equals("length")) {    // array.length
 		     
@@ -777,7 +778,7 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
 		 } else {// instance field
 		     TypeDeclaration tDecl = node.expr.getType().getDeclaration();
 		     int offset = tDecl.getFieldOffSet(node.id.toString());
-		     offset = offset * 4;// real offset
+		     offset = (offset+1) * 4;// real offset
 		     StringUtility.appendIndLn(sb, "add eax, " + offset);
 		 }
 
@@ -786,6 +787,14 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
 		 node.attachCode(sb.toString());
      }
 
+    private String getCodeForPrefix(Expression e) throws Exception {
+	boolean oldIsLV = isLV;
+	isLV = false;
+	e.accept(this);
+	isLV = oldIsLV;
+	return e.getCode();
+    }
+
      public void visit(ArrayCreationExpression node) throws Exception {
 	 StringBuilder sb = new StringBuilder();
 	 StringUtility.appendIndLn(sb, "; array creation");
@@ -793,6 +802,7 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
 	 // evaluate expression
 	 node.expr.accept(this);
 	 sb.append(node.expr.getCode());
+	
 
 	 // size in eax
 	 StringUtility.appendIndLn(sb, "push eax");
@@ -817,7 +827,7 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
 
     public void visit(ArrayAccess node) throws Exception {
 	StringBuilder sb = new StringBuilder();
-
+	
 	isPrefix = true;
 	node.array.accept(this);
 	isPrefix = false;
