@@ -644,9 +644,10 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
 	 return numArgs;
      }
 
-     public static void generateFieldAddr(StringBuilder sb, FieldDeclaration fDecl) throws Exception {
+    public static void generateFieldAddr(StringBuilder sb, FieldDeclaration fDecl, Set<String> extern) throws Exception {
 	 if (fDecl.modifiers.contains(Modifier.STATIC)) {
 	     String label = SigHelper.getFieldSigWithImp(fDecl);
+	     extern.add(label);
 	     StringUtility.appendIndLn(sb, "mov eax, " + label);
 	 }else {
 	     TypeDeclaration parent = (TypeDeclaration) fDecl.getParent();
@@ -663,7 +664,7 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
 	 ASTNode decl = node.getDeclaration();
 	 if (decl instanceof FieldDeclaration) {	// field, has to be instance field
 		 FieldDeclaration fDecl = (FieldDeclaration) decl;
-		 generateFieldAddr(sb, fDecl);
+		 generateFieldAddr(sb, fDecl, extern);
 
 	 } else if (decl instanceof VariableDeclaration) {	// variable
 		 VariableDeclaration vDecl = (VariableDeclaration) decl;
@@ -684,8 +685,10 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
 	 Name qualifier = node.getQualifier();
 	 ASTNode qDecl = qualifier.getDeclaration();
 	 if (qDecl instanceof TypeDeclaration) {	//A.B.c.d, node is static field
-		 String label = SigHelper.getFieldSig((FieldDeclaration) node.getDeclaration());	// directs to parent, not instance field
-		 StringUtility.appendIndLn(sb, "mov dword eax, " + label);
+	     
+	     String label = SigHelper.getFieldSig((FieldDeclaration) node.getDeclaration());	// directs to parent, not instance field
+	     extern.add(label);
+	     StringUtility.appendIndLn(sb, "mov dword eax, " + label);
 	 } else if (qDecl instanceof FieldDeclaration || qDecl instanceof VariableDeclaration) {
 	     boolean oldLV = isLV;
 	     isLV = false;
