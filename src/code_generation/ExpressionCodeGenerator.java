@@ -53,6 +53,7 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
     StringBuilder dataSection;
     public static MethodDeclaration currentMethod;
     
+    private int ncCounter = 0;
     private int aaCounter = 0; // for array access label
      private boolean isLV = false;
      private boolean isPrefix = false;
@@ -612,7 +613,8 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
 			     qn.getQualifier().accept(this); 	// generate code from name (accessing instance field, or local variable
 			     isPrefix = false;
 			     StringUtility.appendLine(sb, qn.getQualifier().getCode());
-				 StringUtility.appendIndLn(sb, "push eax \t; push object for method invocation");
+			     generateNullCheck(sb);
+			     StringUtility.appendIndLn(sb, "push eax \t; push object for method invocation");
 				 // call method
 				 generateMethodCall(sb, mDecl);
 			 } else {
@@ -624,9 +626,17 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
 		 // clean up
 		 StringUtility.appendIndLn(sb, "add esp, " + (numArgs+1) + "*4" + "\t; caller cleanup arguments.");	
 		 CodeGenUtil.restoreRegisters(sb);
-		 node.attachCode(sb.toString());
+		 node.attachCode(sb.toString()); 
 
      }
+    
+    private void generateNullCheck(StringBuilder sb) {
+	StringUtility.appendIndLn(sb, "cmp eax, 0");
+	StringUtility.appendIndLn(sb, "jne NullCheckOK" + ncCounter);
+	extern.add("__exception");
+	StringUtility.appendIndLn(sb, "call __exception");
+	StringUtility.appendLine(sb, "NullCheckOK" + (ncCounter++) + ":");
+    }
 
      /**
       * generating actual method call by offset, assumes that the object is in eax
@@ -727,6 +737,9 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
 	     isPrefix = oldIsPrefix;
 		 isLV = oldLV;
 		 StringUtility.appendIndLn(sb, qualifier.getCode());
+		 
+		 // before accessm, check null
+		 generateNullCheck(sb);
 
 		 if (node.getDeclaration() == null && node.getID().equals("length")) {
 		     // fucking array length
@@ -741,6 +754,7 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
 		     offset = (offset + 1) * 4;	// real offset 
 		     StringUtility.appendIndLn(sb, "add eax, " + offset);
 		 }
+		 
 	 } else {
 		 throw new Exception("qualified name prefix not recoginsed: " + qualifier.toString());
 	 }
@@ -758,6 +772,7 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
 		 StringUtility.appendLine(sb, node.expr.getCode());
 		 // assume object at eax
 		 if (node.expr.getType() instanceof ArrayType && node.id.toString().equals("length")) {    // array.length
+		     
 		     StringUtility.appendIndLn(sb, "add eax, 4");
 		 } else {// instance field
 		     TypeDeclaration tDecl = node.expr.getType().getDeclaration();
