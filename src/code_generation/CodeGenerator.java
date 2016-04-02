@@ -210,6 +210,7 @@ public class CodeGenerator extends TraversalVisitor {
                 initCode = "; no right hand side yet.\n";
             }
             if (node.modifiers.contains(Modifier.STATIC)) {
+                this.exclude.add(fieldSigInDec);
                 StringUtility.appendIndLn(staticFieldInit[1], "global static_init_" + fieldSig);
                 StringUtility.appendIndLn(staticFieldInit[1], "static_init_" + fieldSig + ":");
                 ExpressionCodeGenerator.generateFieldAddr(staticFieldInit[1], node);
