@@ -128,9 +128,6 @@ public class CodeGenerator extends TraversalVisitor {
         this.extern.add("__exception");
         node.attachCode(getExtern().toString() + textSection.toString() + staticFieldInit[1].toString() + dataSection.toString());
         staticFieldInit[1].setLength(0);
-        if (this.currentTypeDec.getFullName().contains("J1e_divisionbyzero")) {
-            System.out.println(this.exclude);
-        }
     }
     
     private StringBuilder getExtern() {
