@@ -44,7 +44,7 @@ import exceptions.NameException;
 public class ExpressionCodeGenerator extends TraversalVisitor {
 
     private static final String FALSE = "0x0";
-    private static final String TRUE = "1";
+    private static final String TRUE = "0xffffffff";
     private int litCounter = 0;
     public static StringBuilder stringLitData = new StringBuilder();
     private Set<String> extern;
@@ -285,7 +285,7 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
 			     break;
 			   default:
 			     extern.add("java.lang.Integer#~init~$I$implementation");
-			     StringUtility.appendLine(infixText, "call java.lang.Inteter#~init~$I$implementation");
+			     StringUtility.appendLine(infixText, "call java.lang.Integer#~init~$I$implementation");
 			     StringUtility.appendLine(infixText, "pop ebx\t; clean up");
 			     StringUtility.appendLine(infixText, "pop ebx\t; clean up");
 			     StringUtility.appendLine(infixText, "push eax");
@@ -358,11 +358,21 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
 		 StringUtility.appendLine(infixText, "imul eax, ebx");
 		 break;
 	       case SLASH:
+		 StringUtility.appendLine(infixText, "cmp ebx, 0");
+                 StringUtility.appendLine(infixText, "jne INFIX_" + n);
+                 extern.add("__exception");
+                 StringUtility.appendLine(infixText, "call __exception");
+                 StringUtility.appendLine(infixText, "INFIX_" + n + ":");
 		 StringUtility.appendLine(infixText, "cdq\t; sign-extend");
 		 StringUtility.appendLine(infixText, "idiv ebx");
 		 break;
 	       case MOD:
-		 StringUtility.appendLine(infixText, "mov edx, 0");
+		 StringUtility.appendLine(infixText, "cmp ebx, 0");
+                 StringUtility.appendLine(infixText, "jne INFIX_" + n);
+                 extern.add("__exception");
+                 StringUtility.appendLine(infixText, "call __exception");
+                 StringUtility.appendLine(infixText, "INFIX_" + n + ":");
+		 StringUtility.appendLine(infixText, "cdq\t; sign-extend");
 		 StringUtility.appendLine(infixText, "idiv ebx");
 		 StringUtility.appendLine(infixText, "mov eax, edx");
 		 break;
@@ -430,7 +440,11 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
 	     offset = HierarchyTableBuilder.getTypeOffSet(sType.getDeclaration().getFullName());
 	 } else if (castToType instanceof ArrayType) {
 	     ArrayType aType = (ArrayType)castToType;
-	     offset = HierarchyTableBuilder.getTypeOffSet(aType.type.getDeclaration().getFullName() + "[]");
+	     if (aType.type instanceof SimpleType) {
+	         offset = HierarchyTableBuilder.getTypeOffSet(aType.type.getDeclaration().getFullName() + "[]");
+	     } else {
+	         offset = HierarchyTableBuilder.getTypeOffSet(aType.type.toString() + "[]");
+	     }
 	 } else if (castToType instanceof PrimitiveType) {
 	     isPrimitive = true;
 	 }
@@ -701,7 +715,7 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
 	 ASTNode qDecl = qualifier.getDeclaration();
 	 if (qDecl instanceof TypeDeclaration) {	//A.B.c.d, node is static field
 	     
-	     String label = SigHelper.getFieldSig((FieldDeclaration) node.getDeclaration());	// directs to parent, not instance field
+	     String label = SigHelper.getFieldSigWithImp((FieldDeclaration) node.getDeclaration());	// directs to parent, not instance field
 	     extern.add(label);
 	     StringUtility.appendIndLn(sb, "mov dword eax, " + label);
 	 } else if (qDecl instanceof FieldDeclaration || qDecl instanceof VariableDeclaration) {

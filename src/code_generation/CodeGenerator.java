@@ -113,6 +113,12 @@ public class CodeGenerator extends TraversalVisitor {
 	                methodText = "; no method body yet\n";
 	            }
 	            textSection.append(methodText);
+        	} else if (bDecl instanceof FieldDeclaration) {
+        	    FieldDeclaration fDecl = (FieldDeclaration) bDecl;
+        	    String fieldSig = SigHelper.getFieldSig(node, fDecl);
+        	    if (fDecl.modifiers.contains(Modifier.STATIC)) {
+        	        StringUtility.appendLine(staticFieldInit[0], "call static_init_" + fieldSig, 2);
+        	    }
         	}
        	}
         StringUtility.appendLine(vTableText, "global " + SigHelper.getArrayClssSigWithVTable(node));
@@ -182,8 +188,7 @@ public class CodeGenerator extends TraversalVisitor {
         StringUtility.appendLine(sb, "\t" + "dd " + fieldSigWithImp + "\t; points to the dec");
         if (!fromEnclosing ) {
             staticInitExtern.add(fieldSig);
-            StringUtility.appendLine(staticFieldInit[0], "call static_init_"
-                    + fieldSig, 2);
+            //StringUtility.appendLine(staticFieldInit[0], "call static_init_" + fieldSig, 2);
             StringUtility.appendLine(sb, "global " + fieldSigWithImp + "\t; define global label for field");
             StringUtility.appendLine(sb, fieldSigWithImp + ":" + "\t; label start");
             StringUtility.appendLine(sb, "\t" + "dd 0x0" + "\t; default value: 0 false null");
@@ -210,9 +215,10 @@ public class CodeGenerator extends TraversalVisitor {
                 this.exclude.add(fieldSigInDec);
                 StringUtility.appendIndLn(staticFieldInit[1], "global static_init_" + fieldSig);
                 StringUtility.appendIndLn(staticFieldInit[1], "static_init_" + fieldSig + ":");
-                ExpressionCodeGenerator.generateFieldAddr(staticFieldInit[1], node, extern);
+                // ExpressionCodeGenerator.generateFieldAddr(staticFieldInit[1],
+                // node, extern);
                 StringUtility.appendLine(staticFieldInit[1], initCode, 2);
-                StringUtility.appendIndLn(staticFieldInit[1], "mov " + "[" + fieldSig + "]" + ", eax" + "\t; initiallize field");              
+                StringUtility.appendIndLn(staticFieldInit[1], "mov " + "[" + fieldSigInDec + "]" + ", eax" + "\t; initiallize field");              
                 StringUtility.appendLine(staticFieldInit[1], "ret", 2);
             } else {
                 StringUtility.appendIndLn(instanceFieldInit[0], "call instance_init_" + fieldSig);
