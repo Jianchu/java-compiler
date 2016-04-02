@@ -723,10 +723,9 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
 		 StringBuilder sb = new StringBuilder();
 
 		 node.expr.accept(this);
-		 StringUtility.appendLine(sb, node.getCode());
+		 StringUtility.appendLine(sb, node.expr.getCode());
 		 // assume object at eax
-		 if (node.expr.getType() instanceof ArrayType && node.id.equals("length")) {    // array.length
-
+		 if (node.expr.getType() instanceof ArrayType && node.id.toString().equals("length")) {    // array.length
 		     StringUtility.appendIndLn(sb, "add eax, 4");
 		 } else {// instance field
 		     TypeDeclaration tDecl = node.expr.getType().getDeclaration();
