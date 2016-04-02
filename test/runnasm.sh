@@ -2,8 +2,8 @@ export MYDIR=`dirname $0`
 export output=$MYDIR/../output
 export lib=$MYDIR/../lib
 
-rm $output/*.o
-rm $output/main
+#rm $output/*.o
+#rm $output/main
 
 for f in $output/*.s
 do
