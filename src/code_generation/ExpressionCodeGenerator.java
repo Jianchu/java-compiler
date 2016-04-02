@@ -781,6 +781,8 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
 
 	 // size in eax
 	 StringUtility.appendIndLn(sb, "push eax");
+	 StringUtility.appendIndLn(sb, "mov ebx, 4");
+	 StringUtility.appendIndLn(sb, "mul ebx");
 	 StringUtility.appendIndLn(sb, "add eax, 8"); //room for vtable and size
 
 	 extern.add("__malloc");
