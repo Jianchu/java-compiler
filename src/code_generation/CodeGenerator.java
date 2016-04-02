@@ -13,6 +13,7 @@ import ast.BodyDeclaration;
 import ast.FieldDeclaration;
 import ast.MethodDeclaration;
 import ast.Modifier;
+import ast.PrimitiveType;
 import ast.TypeDeclaration;
 import ast.Visitor;
 import environment.TraversalVisitor;
@@ -207,11 +208,14 @@ public class CodeGenerator extends TraversalVisitor {
         node.type.accept(this);
         
         if (node.initializer != null) {
-            node.initializer.accept(expGen);
-            String initCode = node.initializer.getCode();
-            if (initCode == null) {
-                initCode = "; no right hand side yet.\n";
+            String initCode = "";
+            if (node.initializer.getType() instanceof PrimitiveType) {
+                initCode = this.expGen.CreateCICEText(node.initializer);
+            } else {
+                node.initializer.accept(expGen);
+                initCode = node.initializer.getCode();
             }
+
             if (node.modifiers.contains(Modifier.STATIC)) {
                 this.exclude.add(fieldSigInDec);
                 StringUtility.appendIndLn(staticFieldInit[1], "global static_init_" + fieldSig);

@@ -3,6 +3,7 @@ public class TestString {
         
     }
     public static int test() {
-        return "a".length();
+        Boolean a = new Boolean(false);
+        return 3;
     }
 }
