@@ -358,11 +358,21 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
 		 StringUtility.appendLine(infixText, "imul eax, ebx");
 		 break;
 	       case SLASH:
+		 StringUtility.appendLine(infixText, "cmp ebx, 0");
+                 StringUtility.appendLine(infixText, "jne INFIX_" + n);
+                 extern.add("__exception");
+                 StringUtility.appendLine(infixText, "call __exception");
+                 StringUtility.appendLine(infixText, "INFIX_" + n + ":");
 		 StringUtility.appendLine(infixText, "cdq\t; sign-extend");
 		 StringUtility.appendLine(infixText, "idiv ebx");
 		 break;
 	       case MOD:
-		 StringUtility.appendLine(infixText, "mov edx, 0");
+		 StringUtility.appendLine(infixText, "cmp ebx, 0");
+                 StringUtility.appendLine(infixText, "jne INFIX_" + n);
+                 extern.add("__exception");
+                 StringUtility.appendLine(infixText, "call __exception");
+                 StringUtility.appendLine(infixText, "INFIX_" + n + ":");
+		 StringUtility.appendLine(infixText, "cdq\t; sign-extend");
 		 StringUtility.appendLine(infixText, "idiv ebx");
 		 StringUtility.appendLine(infixText, "mov eax, edx");
 		 break;
