@@ -188,6 +188,7 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
 	     switch (node.op) {
 	       case LOR: // fall through
 	       case AND:
+                 StringUtility.appendLine(infixText, "mov eax, ebx");
 		 StringUtility.appendLine(infixText, "INFIX_" + n + ":");
 		 break;
 	       case BITOR:
@@ -260,7 +261,7 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
 			     StringUtility.appendLine(infixText, "call java.lang.Boolean#toString$$implementation");
 			     break;
 			   case CHAR:
-			     extern.add("java.lang.Character#~init~$B$implementation");
+			     extern.add("java.lang.Character#~init~$C$implementation");
 			     StringUtility.appendLine(infixText, "call java.lang.Character#~init~$C$implementation");
 			     StringUtility.appendLine(infixText, "pop ebx\t; clean up");
 			     StringUtility.appendLine(infixText, "pop ebx\t; clean up");
@@ -343,7 +344,7 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
 		 StringUtility.appendLine(infixText, "imul eax, ebx");
 		 break;
 	       case SLASH:
-		 StringUtility.appendLine(infixText, "mov edx, 0");
+		 StringUtility.appendLine(infixText, "cdq\t; sign-extend");
 		 StringUtility.appendLine(infixText, "idiv ebx");
 		 break;
 	       case MOD:
