@@ -202,36 +202,23 @@ public class CodeGenerator extends TraversalVisitor {
             if (node.modifiers.contains(Modifier.STATIC)) {
                 StringUtility.appendIndLn(staticFieldInit[1], "global static_init_" + fieldSig);
                 StringUtility.appendIndLn(staticFieldInit[1], "static_init_" + fieldSig + ":");
+                ExpressionCodeGenerator.generateFieldAddr(staticFieldInit[1], node);
                 StringUtility.appendLine(staticFieldInit[1], initCode, 2);
                 StringUtility.appendLine(staticFieldInit[1], "ret", 2);
-                //StringUtility.appendIndLn(instanceFieldInit[1], "mov eax, [eax]" + "\t; initiallize field");
                 StringUtility.appendIndLn(instanceFieldInit[1], "mov " + "[" + fieldSig + "]" + ", eax" + "\t; initiallize field");
-                //StringUtility.appendLine(staticFieldInit[1], "mov " + "[" + fieldSig + "]" + ", [eax]", 2);
             } else {
                 StringUtility.appendIndLn(instanceFieldInit[0], "call instance_init_" + fieldSig);
                 StringUtility.appendIndLn(instanceFieldInit[1], "instance_init_" + fieldSig + ":");
-                // TODO: add a method for evaluating the address of instance field, and putting it to eax. 
-                //StringUtility.appendIndLn(instanceFieldInit[1], codeGenFieldAddr(node));
-		
 		ExpressionCodeGenerator.generateFieldAddr(instanceFieldInit[1], node);
                 StringUtility.appendLine(instanceFieldInit[1], "push eax \t;store field address", 2);
                 StringUtility.appendLine(instanceFieldInit[1], initCode, 2);
                 StringUtility.appendLine(instanceFieldInit[1], "mov edx, eax \t; put value of field to edx", 2);
                 StringUtility.appendLine(instanceFieldInit[1], "pop eax \t; pop field address back to eax", 2);
-                //StringUtility.appendIndLn(instanceFieldInit[1], "mov edx, [edx]" + "\t; initiallize field");
                 StringUtility.appendIndLn(instanceFieldInit[1], "mov [eax], edx" + "\t; initiallize field");
                 StringUtility.appendIndLn(instanceFieldInit[1], "ret" + "\t; initiallize field ret");
-                //StringUtility.appendLine(instanceFieldInit[1], "mov dword [eax], [edx] \t; initiallize field", 2);
                 
             }
         }
-        // node.attachCode(fieldAssemblyText.toString());
-    }
-
-    private String codeGenFieldAddr(FieldDeclaration node) {
-        // TODO Auto-generated method stub
-	
-        return null;
     }
 
     public void visit(MethodDeclaration node) throws Exception {
