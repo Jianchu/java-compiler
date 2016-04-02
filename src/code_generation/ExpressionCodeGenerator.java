@@ -266,8 +266,8 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
 			 StringUtility.appendLine(infixText, "push eax \t; push object address");
 			 switch (((PrimitiveType) rhsType).value) {
 			   case BOOLEAN:
-			     extern.add("java.lang.Boolean#~init~$B$implementation");
-			     StringUtility.appendLine(infixText, "call java.lang.Boolean#~init~$B$implementation");
+			     extern.add("java.lang.Boolean#~init~$Z$implementation");
+			     StringUtility.appendLine(infixText, "call java.lang.Boolean#~init~$Z$implementation");
 			     StringUtility.appendLine(infixText, "pop ebx\t; clean up");
 			     StringUtility.appendLine(infixText, "pop ebx\t; clean up");
 			     StringUtility.appendLine(infixText, "push eax");
