@@ -61,7 +61,7 @@ public class HierarchyTableBuilder {
                 boolean isSubType = TypeHelper.assignable(typeInLeft, typeInTop);
                 if (isSubType) {
                     //System.out.println("super: " + typeInLeft + ", sub: " + typeInTop);
-                    column.add("1");
+                    column.add("0xffffffff");
                 } else {
                     column.add("0x0");
                 }

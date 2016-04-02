@@ -14,8 +14,8 @@ public class CodeGenTestMain {
 
     public static void main(String[] args) throws IOException,InterruptedException {
         String[] paths = new String[0];
-        paths = FileUtility.getFileNames(myDir + "/test/testprogram/code_gen/TestLogic.java").toArray(paths);
-        paths = FileUtility.getFileNames(myDir + "/assignment_testcases/a5/J2_A_FieldInitialization_Static_Before.java").toArray(paths);
+        paths = FileUtility.getFileNames(myDir + "/test/testprogram/code_gen/TestString.java").toArray(paths);
+        //paths = FileUtility.getFileNames(myDir + "/assignment_testcases/a5/J1_01.java").toArray(paths);
         Joosc.compileSTL(paths);
         callBash();
     }

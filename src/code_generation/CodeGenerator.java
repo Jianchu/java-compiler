@@ -134,9 +134,6 @@ public class CodeGenerator extends TraversalVisitor {
         this.extern.add("__exception");
         node.attachCode(getExtern().toString() + textSection.toString() + staticFieldInit[1].toString() + dataSection.toString());
         staticFieldInit[1].setLength(0);
-        if (this.currentTypeDec.getFullName().contains("typecheck")) {
-            System.out.println(this.extern);
-        }
     }
     
     private StringBuilder getExtern() {
