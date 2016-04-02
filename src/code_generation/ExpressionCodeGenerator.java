@@ -619,7 +619,7 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
 				 int offset = OffSet.getInterfaceMethodOffset(NameHelper.mangle(mDecl));
 				 offset = offset*4;
 				 StringUtility.appendIndLn(sb, "mov dword eax, [eax] \t; point to VTable");	//enter object
-				 StringUtility.appendIndLn(sb, "mov dword eax, [eax + 1] \t; point to Ugly");	// ASSUME: the second entry of VTable is ugly column
+				 StringUtility.appendIndLn(sb, "mov dword eax, [eax + 4] \t; point to Ugly");	// ASSUME: the second entry of VTable is ugly column
 				 StringUtility.appendIndLn(sb, "call [eax + " + offset + "] \t; call interface method.");
 				 //TODO: check if the level of indirection is proper 
 			 } else {
