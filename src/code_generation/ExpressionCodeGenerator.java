@@ -37,6 +37,7 @@ import ast.TypeDeclaration;
 import ast.VariableDeclaration;
 import ast.VariableDeclarationExpression;
 import environment.NameHelper;
+import environment.SymbolTable;
 import environment.TraversalVisitor;
 import exceptions.NameException;
 
@@ -66,13 +67,26 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
       */
      // String is Object.
      public void visit(StringLiteral node) throws Exception {
-	 // can use counter because string literal is not global.
+         StringBuilder stringText = new StringBuilder();
 	 litCounter++;
-	 // TODO:integrate stringLitData into data section.
-	 StringUtility.appendLine(dataSection, "STRING_" + litCounter + ":" + "\t; define label for string literal");
-	 StringUtility.appendLine(dataSection, "\t" + "dd " + '\'' + node.value + '\'');
 
-	 node.attachCode("\tmov dword eax, " + "[STRING_" + litCounter + "]" + "\n");
+         String strSig = SigHelper.getClssSigWithVTable(SymbolTable.getGlobal().get("java.lang.String"));
+         extern.add(strSig);
+	 StringUtility.appendLine(dataSection, "STRING_" + litCounter + ":" + "\t; define label for string literal");
+         StringUtility.appendLine(dataSection, "\tdd " + strSig);
+         StringUtility.appendLine(dataSection, "\tmov dword eax, " + "STRCHARS_" + litCounter);
+
+         String charArrSig = SigHelper.getArrayVTableSigFromNonArray(new PrimitiveType(PrimitiveType.Value.CHAR));
+         extern.add(charArrSig);
+	 StringUtility.appendLine(dataSection, "STRCHARS_" + litCounter + ":");
+         StringUtility.appendLine(dataSection, "\tdd " + charArrSig);
+	 StringUtility.appendLine(dataSection, "\t" + "dd " + node.value.length());
+         for (int i = 0; i < node.value.length(); i++) {
+             StringUtility.appendLine(dataSection, "\t" + "dd '" + node.value.charAt(i) + "'");
+         }
+
+         StringUtility.appendLine(stringText, "\tmov dword eax, " + "[STRING_" + litCounter + "]");
+	 node.attachCode(stringText.toString());
      }
 
      public void visit(NullLiteral node) throws Exception {
@@ -416,7 +430,7 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
 	     offset = HierarchyTableBuilder.getTypeOffSet(sType.getDeclaration().getFullName());
 	 } else if (castToType instanceof ArrayType) {
 	     ArrayType aType = (ArrayType)castToType;
-	     offset = HierarchyTableBuilder.getTypeOffSet(aType.toString());
+	     offset = HierarchyTableBuilder.getTypeOffSet(aType.type.getDeclaration().getFullName() + "[]");
 	 } else if (castToType instanceof PrimitiveType) {
 	     isPrimitive = true;
 	 }
@@ -425,7 +439,8 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
 	     StringUtility.appendLine(castText, "mov ebx, eax \t ;copy eax", 2);
 	     StringUtility.appendLine(castText, "mov eax, [eax] \t ;get first frame of object, the pointer of VTable", 2);
 	     StringUtility.appendLine(castText, "mov eax, [eax] \t ;get first frame of VTable, the point of subclass table", 2);
-	     StringUtility.appendLine(castText, "add eax, " + frame + "\t ;get the pointer of type in subclass table", 2);                
+            StringUtility.appendLine(castText, "add eax, " + frame
+                    + "\t ;get the pointer of type in subclass table", 2);
 	     StringUtility.appendLine(castText, "cmp dword [eax], " + TRUE, 2);
 	     StringUtility.appendLine(castText, "jne __exception", 2);
 	     StringUtility.appendLine(castText, "mov eax, ebx \t ;restore eax", 2);
