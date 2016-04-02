@@ -810,7 +810,7 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
 	isLV = false;
 	node.index.accept(this);
 	sb.append(node.index.getCode());
-	isLV = true;
+	isLV = oldIsLV;
 
 	//StringUtility.appendIndLn(sb, "mov ecx, eax");
 	StringUtility.appendIndLn(sb, "pop ebx");
