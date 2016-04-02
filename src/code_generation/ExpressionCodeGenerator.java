@@ -75,7 +75,7 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
          extern.add(strSig);
 	 StringUtility.appendLine(dataSection, "STRING_" + litCounter + ":" + "\t; define label for string literal");
          StringUtility.appendLine(dataSection, "\tdd " + strSig);
-         StringUtility.appendLine(dataSection, "\tmov dword eax, " + "STRCHARS_" + litCounter);
+         StringUtility.appendLine(dataSection, "\tdd " + "STRCHARS_" + litCounter);
 
          String charArrSig = SigHelper.getArrayVTableSigFromNonArray(new PrimitiveType(PrimitiveType.Value.CHAR));
          extern.add(charArrSig);
@@ -86,7 +86,7 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
              StringUtility.appendLine(dataSection, "\t" + "dd '" + node.value.charAt(i) + "'");
          }
 
-         StringUtility.appendLine(stringText, "\tmov dword eax, " + "[STRING_" + litCounter + "]");
+        StringUtility.appendLine(stringText, "\tmov dword eax, " + "STRING_" + litCounter);
 	 node.attachCode(stringText.toString());
      }
 
