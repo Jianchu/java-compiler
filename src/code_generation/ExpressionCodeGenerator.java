@@ -285,7 +285,7 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
 			     break;
 			   default:
 			     extern.add("java.lang.Integer#~init~$I$implementation");
-			     StringUtility.appendLine(infixText, "call java.lang.Inteter#~init~$I$implementation");
+			     StringUtility.appendLine(infixText, "call java.lang.Integer#~init~$I$implementation");
 			     StringUtility.appendLine(infixText, "pop ebx\t; clean up");
 			     StringUtility.appendLine(infixText, "pop ebx\t; clean up");
 			     StringUtility.appendLine(infixText, "push eax");
