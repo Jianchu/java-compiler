@@ -166,6 +166,15 @@ public class SigHelper {
         String classSig = getTypeSig(arrayType);
         return "VTable#" + classSig;
     }
+    
+    public static String getArrayClassSigWithHierarchy(TypeDeclaration typeDec) {
+        String typeName = typeDec.getFullName();
+        SimpleType simpleType = new SimpleType(new SimpleName(typeName));
+        simpleType.attachDeclaration(typeDec);
+        ArrayType arrayType = new ArrayType(simpleType);
+        String classSig = getTypeSig(arrayType);
+        return "hierarchy#" + classSig;
+    }
 
     public static String getClassSigWithHierarchy(Type type) {
         return "hierarchy#" + getTypeSig(type);
