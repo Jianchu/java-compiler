@@ -715,7 +715,7 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
 	 ASTNode qDecl = qualifier.getDeclaration();
 	 if (qDecl instanceof TypeDeclaration) {	//A.B.c.d, node is static field
 	     
-	     String label = SigHelper.getFieldSig((FieldDeclaration) node.getDeclaration());	// directs to parent, not instance field
+	     String label = SigHelper.getFieldSigWithImp((FieldDeclaration) node.getDeclaration());	// directs to parent, not instance field
 	     extern.add(label);
 	     StringUtility.appendIndLn(sb, "mov dword eax, " + label);
 	 } else if (qDecl instanceof FieldDeclaration || qDecl instanceof VariableDeclaration) {
