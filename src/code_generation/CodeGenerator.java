@@ -157,13 +157,19 @@ public class CodeGenerator extends TraversalVisitor {
         String methodSigInDec = SigHelper.getMethodSigWithImp(mDecl);
         if (mDecl.modifiers.contains(Modifier.STATIC)) {
             StringUtility.appendLine(textSection, "global " + methodSig);
-            StringUtility.appendIndLn(textSection, methodSig + ":");
-            StringUtility.appendLine(textSection, "dd " + methodSigInDec, 2);
+	    StringUtility.appendIndLn(textSection, methodSig + ":");
+	    if (mDecl.modifiers.contains(Modifier.NATIVE)) {
+		String nativeSig = SigHelper.getNativeSig(mDecl);
+		extern.add(nativeSig);
+		StringUtility.appendLine(textSection, "dd " + nativeSig, 2);
+	    } else {
+		StringUtility.appendLine(textSection, "dd " + methodSigInDec, 2);
+	    }
         } else {
             if (!node.isInterface) {
                 int offSet = node.getMethodOffSet(mName);
-                SigOffsets.put(offSet, methodSigInDec);
-            }
+		SigOffsets.put(offSet, methodSigInDec);
+	    }
         }
     }
 
@@ -223,7 +229,8 @@ public class CodeGenerator extends TraversalVisitor {
 
     public void visit(MethodDeclaration node) throws Exception {
     	StringBuilder sb = new StringBuilder();
-    	StringUtility.appendLine(sb, "global " + SigHelper.getMethodSigWithImp(node));
+    		
+	StringUtility.appendLine(sb, "global " + SigHelper.getMethodSigWithImp(node));
     	StringUtility.appendLine(sb, SigHelper.getMethodSigWithImp(node) + ":");	// generate method label
     	
 		StringUtility.appendIndLn(sb, "push ebp \t; save old frame pointer");
@@ -245,8 +252,7 @@ public class CodeGenerator extends TraversalVisitor {
 			node.body.accept(stmtGen);
 			ExpressionCodeGenerator.currentMethod = null;	// remove current method
 			sb.append(node.body.getCode());
-			
-		}
+		} 
 		
 		// clean up in case there is no return statement
 		StringUtility.appendIndLn(sb, "mov eax, 0 \t; in the case of no return, make sure eax is null"); 

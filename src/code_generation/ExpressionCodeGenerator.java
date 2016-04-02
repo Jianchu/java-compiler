@@ -344,7 +344,7 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
 		 StringUtility.appendLine(infixText, "imul eax, ebx");
 		 break;
 	       case SLASH:
-		 StringUtility.appendLine(infixText, "mov edx, 0");
+		 StringUtility.appendLine(infixText, "cdq\t; sign-extend");
 		 StringUtility.appendLine(infixText, "idiv ebx");
 		 break;
 	       case MOD:
