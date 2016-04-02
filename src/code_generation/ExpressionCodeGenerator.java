@@ -37,6 +37,7 @@ import ast.TypeDeclaration;
 import ast.VariableDeclaration;
 import ast.VariableDeclarationExpression;
 import environment.NameHelper;
+import environment.SymbolTable;
 import environment.TraversalVisitor;
 import exceptions.NameException;
 
@@ -66,13 +67,21 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
       */
      // String is Object.
      public void visit(StringLiteral node) throws Exception {
-	 // can use counter because string literal is not global.
+         StringBuilder stringText = new StringBuilder();
 	 litCounter++;
-	 // TODO:integrate stringLitData into data section.
 	 StringUtility.appendLine(dataSection, "STRING_" + litCounter + ":" + "\t; define label for string literal");
-	 StringUtility.appendLine(dataSection, "\t" + "dd " + '\'' + node.value + '\'');
+         StringUtility.appendLine(dataSection, "\t" + SigHelper.getClssSigWithVTable(SymbolTable.getGlobal().get("java.lang.String")));
+         StringUtility.appendLine(dataSection, "\tmov dword eax, " + "STRCHARS_" + litCounter);
 
-	 node.attachCode("\tmov dword eax, " + "[STRING_" + litCounter + "]" + "\n");
+	 StringUtility.appendLine(dataSection, "STRCHARS_" + litCounter + ":");
+         StringUtility.appendLine(dataSection, "\t" + SigHelper.getArrayVTableSigFromNonArray(new PrimitiveType(PrimitiveType.Value.CHAR)));
+	 StringUtility.appendLine(dataSection, "\t" + "dd " + node.value.length());
+         for (int i = 0; i < node.value.length(); i++) {
+             StringUtility.appendLine(dataSection, "\t" + "dd '" + node.value.charAt(i) + "'");
+         }
+
+         StringUtility.appendLine(stringText, "\tmov dword eax, " + "[STRING_" + litCounter + "]");
+	 node.attachCode(stringText.toString());
      }
 
      public void visit(NullLiteral node) throws Exception {
