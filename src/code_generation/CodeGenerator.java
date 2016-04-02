@@ -117,7 +117,8 @@ public class CodeGenerator extends TraversalVisitor {
        	}
         StringUtility.appendLine(vTableText, "global " + SigHelper.getArrayClssSigWithVTable(node));
         StringUtility.appendIndLn(vTableText, SigHelper.getArrayClssSigWithVTable(node) + ":");   
-        StringUtility.appendLine(vTableText, "dd " + SigHelper.getClassSigWithHierarchy(node), 2);
+        StringUtility.appendLine(vTableText, "dd " + SigHelper.getArrayClassSigWithHierarchy(node), 2);
+        this.extern.add(SigHelper.getArrayClassSigWithHierarchy(node));
         
         dataSection.append(ExpressionCodeGenerator.stringLitData);
         textSection.append(getInstanceFieldInit() + "\n");
@@ -127,6 +128,9 @@ public class CodeGenerator extends TraversalVisitor {
         this.extern.add("__exception");
         node.attachCode(getExtern().toString() + textSection.toString() + staticFieldInit[1].toString() + dataSection.toString());
         staticFieldInit[1].setLength(0);
+        if (this.currentTypeDec.getFullName().contains("J1e_divisionbyzero")) {
+            System.out.println(this.exclude);
+        }
     }
     
     private StringBuilder getExtern() {
@@ -185,7 +189,7 @@ public class CodeGenerator extends TraversalVisitor {
                     + fieldSig, 2);
             StringUtility.appendLine(sb, "global " + fieldSigWithImp + "\t; define global label for field");
             StringUtility.appendLine(sb, fieldSigWithImp + ":" + "\t; label start");
-            StringUtility.appendLine(sb, "\t" + "dw 0x0" + "\t; default value: 0 false null");
+            StringUtility.appendLine(sb, "\t" + "dd 0x0" + "\t; default value: 0 false null");
         } else {
             this.extern.add(fieldSigWithImp);
         }
