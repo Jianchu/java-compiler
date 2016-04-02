@@ -76,6 +76,10 @@ public class CodePrinter extends TraversalVisitor {
         header.append(PrimitiveVTableHelper(Value.CHAR, pvtable));
         header.append(PrimitiveVTableHelper(Value.INT, pvtable));
         header.append(PrimitiveVTableHelper(Value.SHORT, pvtable));
+        header.append("extern hierarchy#null\n");
+        StringUtility.appendLine(pvtable, "global " + "VTable#null");
+        StringUtility.appendIndLn(pvtable, "VTable#null:");
+        StringUtility.appendLine(pvtable, "dd hierarchy#null", 2);
         writer.write(header.toString() + pvtable.toString());
         writer.close();
     }
@@ -85,11 +89,14 @@ public class CodePrinter extends TraversalVisitor {
         ArrayType arrayType = new ArrayType(primitiveType);
         StringBuilder extern = new StringBuilder();
         StringUtility.appendLine(extern, "extern " + SigHelper.getClassSigWithHierarchy(arrayType));
-        
+        StringUtility.appendLine(extern, "extern " + SigHelper.getClassSigWithHierarchy(primitiveType));
         StringUtility.appendLine(pvtable, "global " + SigHelper.getClssSigWithVTable(arrayType));
         StringUtility.appendIndLn(pvtable, SigHelper.getClssSigWithVTable(arrayType) + ":");   
         StringUtility.appendLine(pvtable, "dd " + SigHelper.getClassSigWithHierarchy(arrayType), 2);
       
+        StringUtility.appendLine(pvtable, "global " + SigHelper.getClssSigWithVTable(primitiveType));
+        StringUtility.appendIndLn(pvtable, SigHelper.getClssSigWithVTable(primitiveType) + ":");   
+        StringUtility.appendLine(pvtable, "dd " + SigHelper.getClassSigWithHierarchy(primitiveType), 2);
         return extern.toString();
         
     }

@@ -92,8 +92,10 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
 
      public void visit(NullLiteral node) throws Exception {
 	 StringBuilder nullText = new StringBuilder();
+	 //this.extern.add("VTable#null");
 	 litCounter++;
 	 StringUtility.appendLine(dataSection, "NULL_" + litCounter + ":" + "\t; define label for null literal");
+	 //StringUtility.appendLine(dataSection, "\t" + "dd VTable#null");
 	 StringUtility.appendLine(dataSection, "\t" + "dd " + FALSE);
 	 StringUtility.appendLine(nullText, "\t" + "mov dword eax, " + "[NULL_" + litCounter + "]");
 	 node.attachCode(nullText.toString());
@@ -103,7 +105,9 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
      public void visit(BooleanLiteral node) throws Exception {
 	 StringBuilder booleanText = new StringBuilder();
 	 litCounter++;
+	 //this.extern.add("VTable#Z");
 	 StringUtility.appendLine(dataSection, "BOOLEAN_" + litCounter + ":" + "\t; define label for boolean literal");
+	 //StringUtility.appendLine(dataSection, "\t" + "dd VTable#Z");
 	 if (node.value == true) {
 	     StringUtility.appendLine(dataSection, "\t" + "dd " + TRUE);
 	 } else {
@@ -116,9 +120,10 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
      public void visit(CharacterLiteral node) throws Exception {
 	 StringBuilder charText = new StringBuilder();
 	 litCounter++;
+	 //this.extern.add("VTable#C");
 	 StringUtility.appendLine(dataSection, "CHAR_" + litCounter + ":" + "\t; define label for char literal");
-
 	 // Assuming octal is valid.
+	 //StringUtility.appendLine(dataSection, "\t" + "dd VTable#C");
 	 if (node.value.length() > 3) {
 	     StringUtility.appendLine(dataSection, "\t" + "dd " + node.value.substring(1));
 	 } else {
@@ -130,8 +135,10 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
 
      public void visit(IntegerLiteral node) throws Exception {
 	 StringBuilder intText = new StringBuilder();
+	 //this.extern.add("VTable#I");
 	 litCounter++;
 	 StringUtility.appendLine(dataSection, "INT_" + litCounter + ":" + "\t; define label for int literal");
+	 //StringUtility.appendLine(dataSection, "\t" + "dd VTable#I");
 	 StringUtility.appendLine(dataSection, "\t" + "dd " + node.value);
 	 StringUtility.appendLine(intText, "\t" + "mov dword eax, " + "[INT_" + litCounter + "]");
 	 node.attachCode(intText.toString());

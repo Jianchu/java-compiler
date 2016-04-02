@@ -66,7 +66,11 @@ public class HierarchyTableBuilder {
                     column.add("0x0");
                 }
             }
-            Alltypes.add(typeInTop.toString());
+            if (typeInTop == null) {
+                Alltypes.add(null);
+            } else {
+                Alltypes.add(typeInTop.toString());
+            }
             hierarchyTable.put(typeInTop, column);
         }
 //        for (Type type : hierarchyTable.keySet()) {
@@ -78,6 +82,8 @@ public class HierarchyTableBuilder {
     }
 
     private static void setOffSet(List<TypeDeclaration> typeDecs) {
+        offSets.put(null, offSetCounter);
+        offSetCounter++;
 
         setPrimitiveOffSet();
 
@@ -102,8 +108,8 @@ public class HierarchyTableBuilder {
 
     private static void primitiveOffSetHelper(Value value) {
         PrimitiveType primitiveType = new PrimitiveType(value);
-//        offSets.put(primitiveType, offSetCounter);
-//        offSetCounter++;
+        offSets.put(primitiveType, offSetCounter);
+        offSetCounter++;
 
         ArrayType primitiveArrayType = arrayTypeBuilder(primitiveType);
         offSets.put(primitiveArrayType, offSetCounter);
