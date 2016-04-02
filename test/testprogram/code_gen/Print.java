@@ -4,7 +4,7 @@ public class Print {
     public Print() {}
     public static int test() {
 	PrintStream p = new PrintStream();
-	p.println(1234);
+	p.println('a');
 	return 123;
     }
 }
