@@ -57,6 +57,7 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
     public static MethodDeclaration currentMethod;
     private int ncCounter = 0;
     private int aaCounter = 0; // for array access label
+    private int castCounter = 0; // for cast finish label
      private boolean isLV = false;
     //private boolean isPrefix = false;
 
@@ -584,6 +585,9 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
 	 }
 	 if (!isPrimitive) {
 	     //TODO: check for null
+	     StringUtility.appendIndLn(castText, "cmp eax, 0"); // check for null
+	     StringUtility.appendIndLn(castText, "je CastFinish" + castCounter);
+
 	     int frame = offset * 4;
 	     StringUtility.appendLine(castText, "mov ebx, eax \t ;copy eax", 2);
 	     StringUtility.appendLine(castText, "mov eax, [eax] \t ;get first frame of object, the pointer of VTable", 2);
@@ -593,6 +597,8 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
 	     StringUtility.appendLine(castText, "cmp dword [eax], " + TRUE, 2);
 	     StringUtility.appendLine(castText, "jne __exception", 2);
 	     StringUtility.appendLine(castText, "mov eax, ebx \t ;restore eax", 2);
+	     
+	     StringUtility.appendLine(castText, "CastFinish" + (castCounter++) + ":");	     
 	 }
 	 node.attachCode(castText.toString());
      }

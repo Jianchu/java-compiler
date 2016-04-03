@@ -9,14 +9,14 @@ public class J1_sideeffects_obj3 {
 
     public static int test() {
 	J1_sideeffects_obj3 tmp = null;
-      	//J1_sideeffects_obj3 obj =
-	//  new J1_sideeffects_obj3(1,
-	//	    tmp=new J1_sideeffects_obj3(2,
-	//			(J1_sideeffects_obj3)null));
-	J1_sideeffects_obj3 o = new J1_sideeffects_obj3(3, (J1_sideeffects_obj3) null);
+      	J1_sideeffects_obj3 obj =
+	  new J1_sideeffects_obj3(1,
+		    tmp=new J1_sideeffects_obj3(2,
+				(J1_sideeffects_obj3)null));
+	//	J1_sideeffects_obj3 o = new J1_sideeffects_obj3(3, (J1_sideeffects_obj3) null);
 
-	//obj.foo().a = 1;//obj.bar();
-	return 1;//4*tmp.a + 5*obj.a + obj.subject.a;
+	obj.foo().a = obj.bar();
+	return 4*tmp.a + 5*obj.a + obj.subject.a;
     }
 
 
@@ -27,7 +27,7 @@ public class J1_sideeffects_obj3 {
 	return subject;
     }
     public int bar() {
-	//subject = new J1_sideeffects_obj3(a+10*subject.a,(J1_sideeffects_obj3)null);
+	subject = new J1_sideeffects_obj3(a+10*subject.a,(J1_sideeffects_obj3)null);
 	a = a+5;
 	return a+7;
     }
