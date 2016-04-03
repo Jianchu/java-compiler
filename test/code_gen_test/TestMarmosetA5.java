@@ -38,7 +38,6 @@ public class TestMarmosetA5 {
         String[] input = new String[testCases.get(testCase).size()];
         input = testCases.get(testCase).toArray(input);
         int result = CodeGenTestMain.testA5(input);
-        System.out.println(testCase);
         if (result != expectedResult) {
             System.err.println(testCase);
         }
