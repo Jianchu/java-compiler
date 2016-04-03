@@ -3,6 +3,7 @@ package scannertest;
 import static org.junit.Assert.assertEquals;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.List;
 
@@ -65,11 +66,21 @@ public class TestLiteral {
 
     @Test
     public void testCharEscape() {
-        String in = "\'\\b\'";
+        String in = "\'\t\'";
         List<Token> tokens = scannerTest.inputSetUp(in);
         assertEquals(1, tokens.size());
         assertEquals(in, tokens.get(0).getLexeme());
-        // printTokens(tokens);
+        scannerTest.printlnTokens(tokens);
+    }
+    
+    @Test
+    public void testCharEscape2() throws Exception {
+    	File f = new File(System.getProperty("user.dir") + "/test/testprogram/runaway_string.txt");
+    	FileReader reader = new FileReader(f);
+    	Scanner s = new Scanner(reader);
+    	List<Token> t = s.scan();        
+    	scannerTest.printlnTokens(t);
+
     }
 
     @Test
