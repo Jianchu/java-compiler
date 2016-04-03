@@ -192,8 +192,13 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
 
     private void generatePlus(InfixExpression node) throws Exception {
         StringBuilder plusText = new StringBuilder();
-        node.lhs.accept(this);
-        node.rhs.accept(this);
+        if (node.lhs != null) {
+            node.lhs.accept(this);
+        }
+        if (node.rhs != null) {
+            node.rhs.accept(this);
+        }
+
         Type lhsType = node.lhs.getType();
         Type rhsType = node.rhs.getType();
         if ((lhsType instanceof SimpleType && lhsType.getDeclaration().getFullName().equals("java.lang.String"))
@@ -201,6 +206,9 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
             MethodInvocation lhsValueOf = createValueOf(node.lhs);
             MethodInvocation rhsValueOf = createValueOf(node.rhs);
             MethodInvocation concat = crateConcat(lhsValueOf, rhsValueOf);
+            if (this.currentMethod.id.equals("test")) {
+                System.out.println(((StringLiteral)rhsValueOf.arglist.get(0)).value);
+            }
             this.visit(concat);
             plusText.append(concat.getCode());
         } else {
@@ -251,7 +259,12 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
             } else {
                 Mdec = methods.get("7valueOf16java.lang.Object");
             }
+        } else if (type == null) {
+            StringLiteral nullLit = new StringLiteral("null");
+            nullLit.attachType(this.simpleTypeBuilder(tDec));
+            expr = nullLit;
         }
+
         // qualifier
         SimpleName sName = new SimpleName("java.lang.String");
         sName.attachDeclaration(tDec);

@@ -3,6 +3,7 @@ public class Test {
         
     }
     public static int test() {
-        return 1 + 1;
+        String a = "1" + null;
+        return a.length();
     }
 }
