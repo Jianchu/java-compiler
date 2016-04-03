@@ -435,10 +435,14 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
 	     node.expr.accept(this);
 	     castToType = node.expr.getType();
 	 }
+	 String unaryCode;
 	 if (node.unary != null) {
-	     node.unary.accept(this);
+	     node.unary.accept(this); //NOTE added this -- Z
+	     unaryCode = node.unary.getCode();
+	 } else {
+	     unaryCode = "\tmov eax, 0";
 	 }
-	 String unaryCode = node.unary.getCode();
+	 
 	 castText.append(unaryCode);
 
 	 int offset = 0;
