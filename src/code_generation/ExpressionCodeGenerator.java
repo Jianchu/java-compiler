@@ -85,13 +85,16 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
          extern.add(charArrSig);
 	 StringUtility.appendLine(dataSection, "STRCHARS_" + litCounter + ":");
          StringUtility.appendLine(dataSection, "\tdd " + charArrSig);
-        List<String> string = StringLitHelper(node.value);
-        StringUtility.appendLine(dataSection, "\t" + "dd " + string.size());
-	 StringLitHelper(node.value);
-        for (String s : string) {
-            StringUtility.appendLine(dataSection, "\t" + "dd '" + s + "'");
-        }
-        StringUtility.appendLine(stringText, "\tmov dword eax, " + "STRING_" + litCounter);
+         List<String> string = StringLitHelper(node.value);
+         StringUtility.appendLine(dataSection, "\t" + "dd " + string.size());
+         for (String s : string) {
+             if (s.charAt(0) == '\\') {
+                 StringUtility.appendLine(dataSection, "\t" + "dd `" + s + "`");
+             } else {
+                 StringUtility.appendLine(dataSection, "\t" + "dd '" + s + "'");
+             }
+         }
+         StringUtility.appendLine(stringText, "\tmov dword eax, " + "STRING_" + litCounter);
 	 node.attachCode(stringText.toString());
      }
 
