@@ -530,6 +530,8 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
 		 offset = HierarchyTableBuilder.getTypeOffSet(aType.toString());
 	     }
 	     int frame = offset * 4;
+	     StringUtility.appendLine(instanceofText, "cmp eax, " + FALSE + "\t ;check null", 2);
+	     StringUtility.appendLine(instanceofText, "je _INSTANCEOFEND_" + instanceOfCounter, 2);
 	     StringUtility.appendLine(instanceofText, "mov eax, [eax] \t ;get first frame of object, the pointer of VTable", 2);
 	     StringUtility.appendLine(instanceofText, "mov eax, [eax] \t ;get first frame of VTable, the point of subclass table", 2);
 	     StringUtility.appendLine(instanceofText, "add eax, " + frame + "\t ;get the pointer of type in subclass table", 2);
