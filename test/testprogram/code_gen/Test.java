@@ -3,11 +3,8 @@ public class Test {
         
     }
     public static int test() {
-
-        // String
-        String s = null;
-        s = "null"+null;
-        s = "array"+new int[5];
+        String a = "\n";
+        
         return 123;
     }
 }
