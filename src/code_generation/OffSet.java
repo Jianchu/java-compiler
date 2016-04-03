@@ -159,7 +159,7 @@ public class OffSet {
 		}
 		
 		// compute offset for fields and methods separately
-		// no need to process inherited methods, because they are offset has been inherited
+		// no need to process inherited methods, because their offset has been inherited
 		for (BodyDeclaration bDecl : cls.members) {
 			if (bDecl instanceof FieldDeclaration) {	// field
 				FieldDeclaration fDecl = (FieldDeclaration) bDecl;
@@ -167,11 +167,14 @@ public class OffSet {
 					continue;
 				}
 				
-				int offset = cls.getFieldOffSetList().indexOf(fDecl.id);
-				if (offset < 0) {
-					// this field has not been declared in super class, append to offset
-					cls.addFieldOffSet(fDecl.id);
-				}	// else the name is already there, do nothing.
+				// no polymorphism, all fields need new offset
+				cls.addFieldOffSet(SigHelper.getFieldSig(fDecl));
+				
+//				int offset = cls.getFieldOffSetList().indexOf(fDecl.id);
+//				if (offset < 0) {
+//					// this field has not been declared in super class, append to offset
+//					cls.addFieldOffSet(fDecl.id);
+//				}	// else the name is already there, do nothing.
 				
 			} else {	// method
 				MethodDeclaration mDecl = (MethodDeclaration) bDecl;

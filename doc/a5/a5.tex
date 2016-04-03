@@ -1,0 +1,140 @@
+\documentclass[a4paper, notitlepage]{report}
+\usepackage{graphicx}
+
+\usepackage{subcaption}
+\usepackage{hyperref}
+\usepackage{algpseudocode}
+\usepackage{algorithm}
+\usepackage{amsmath}
+\usepackage{listings}
+\usepackage[parfill]{parskip}
+\usepackage[a4paper,left=3cm,right=3cm,top=2.5cm,bottom=2.5cm]{geometry}
+\usepackage{titlesec, color}
+%\usepackage[T1]{fontenc}
+%\definecolor{gray75}{gray}{0.75}
+%\newcommand{\hsp}{\hspace{20pt}}
+%\titleformat{\chapter}[hang]{\Huge\bfseries}{\thechapter\hsp\hsp}{0pt}{\Huge\bfseries}
+\usepackage[Lenny]{fncychap}
+
+
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd{\chapter}{\if@openright\cleardoublepage\else\clearpage\fi}{}{}{}
+
+\title{CS444/644 Assignment 1 Technical Report}
+\author{Ho-Yi Fung, Jianchu Li, Zhiyuan Lin}
+\date{\today}
+
+\begin{document}
+
+{\let\newpage\relax\maketitle}
+
+\vspace{30pt}
+\begin{abstract}
+bleh
+\end{abstract}
+
+
+\tableofcontents
+
+\newpage
+
+%\begingroup
+%\let\clearpage\relax
+\chapter{Introduction}
+
+
+
+\chapter{Design}
+\label{design}
+
+\section{Calling Convention}
+
+A consistent subroutine calling convention is used in all the NASM code generated. The scheme implemented by the team requires that:
+\begin{enumerate}
+\item All arguments for a subroutine are stored on the stack.
+\item The arguments are pushed on to stack from left to right (consistent with the order they are evaluated).
+\item In the case where the subroutine is the implementation of an instance method, the object address needs to be pushed to the stack \emph{after} all the arguments. In the case of a static method or a native subroutine, the value \emph{0} (null) is pushed to the stack in place of object address to ensure that the arguments have consistent offsets. This value 0 should never be accessed.
+\item The \emph{caller} of a subroutine is responsible for saving registers and restoring registers when calling a subroutine.
+\item The \emph{callee} allocates its own stack frame for local variables and cleans the frame at the end of the subroutine.
+\item The frame pointer of the caller is pushed on the stack by callee at the very beginning of the subroutine and restored before the subroutine exits. 
+\item The caller is responsible for cleaning up the arguments (including object address for instance method).
+\item The return value of a subroutine is stored in the register \emph{eax}.
+\end{enumerate}
+
+We choose to push arguments onto stack from left to right because this makes left-to-right evaluation of arguments straight-forward. However the object address of an instance method must be evaluated before any arguments to produce side effects consistent with the Java semantics. Therefore the object address is first evaluted and pushed on the stack, and then the arguments are evaluated. However, whenever an argument needs to be pushed onto stack, the code generated would pop the object address from stack, push the argument, and then push the object address back on the stack. This way the object is always kept on the top of the stack and has the same offset for all instance methods.
+
+The order of arguments in this scheme is different from that in \textbf{cdecl} or \textbf{thisdecl} (used by C++ for instance methods), however, because there is no variadic function (variable length argument) in Joos 1W, this scheme works correctly and is time efficient.
+
+In general, this scheme applies no matter the subroutine generated is in effect a Java method or a helper subroutine used in the NASM code generated. The only exceptions are the subroutines provided by the library \emph{runtime.s}, where we will store the input for the subroutine in register \emph{eax}. This includes when the native method \emph{PrintStream.nativeWrite()} is called.
+
+\section{Stack Frame and Local Variable Storage}
+
+As specified by the calling convention described in the last section, in a subroutine call the callee allocates and cleans the stack frame. Local variables are assigned addresses in reference to the frame pointer (\emph{ebp}, also called base pointer in NASM). For example the first local variable declared in a Java method is stored in the address (ebp - 4), and the second is in (ebp - 8). The real offset starts from 4 because [ebp] is the old frame pointer from the caller stored by callee, following our calling scheme. Figure~\ref{stack_frame} shows the structure of the stack frame implemented.
+
+\begin{figure}
+  \caption{Stack Frame}
+  \label{stack_frame}
+\end{figure}
+
+% possible algo for stack allocation and cleanup.
+
+\section{Class Layout}
+
+For the sake of clarity, we decide to generate an assembly file for each Java class given as input. Each assembly file for Java classe normally has the following components:
+\begin{enumerate}
+\item Virtual method table for the class
+\item Class Fields
+\item Separate initialization subroutines for instance and class fields
+\item Implementation of methods
+\end{enumerate}
+
+In the case where a \emph{test()} method is specified in the class, a \emph{\_start} subroutine is also generated in the class assembly file. The \emph{\_start} subroutine initializes the class fields by calling the initialization subroutines for each class. Within each class the class fields are initialized in the order they are declared. After the initialization, the subroutine that implements the \emph{test()} method in assembly is called. Each non-native method is implemented as a subroutine in assembly and follows the calling convention.
+
+The virtual method table is used in order to support method overriding. It also contains pointers to tables for computing interface method offset and class hierarchy. The detail of the virtual method table will be discussed later in Section~\ref{method_invoke}. 
+
+\section{Object and Array Layout}
+
+Space for objects and arrays is allocated using the \emph{\_\_malloc} subroutine provided in the \emph{runtime.s} library. Each object contains a pointer to the virtual method table of its runtime class. This is stored as the first word in the object memory. In each object, the virtual table pointer is followed by the instance fields for the object. Offsets for instance fields are calculated prior to the actual code generation process, and follows the inheritance relationship between classes to support instance field polymorphism. For example, if class \emph{A} inherits the instance field \emph{x} from class \emph{B}, the field \emph{x} has the same offset in both \emph{A} and \emph{B} objects. 
+
+
+
+
+
+
+
+\section{Method Invocation}
+\label{method_invoke}
+
+
+
+
+
+\clearpage
+\chapter{Implementation}
+\label{implementation}
+
+
+
+
+
+\chapter{Testing}
+\label{testing}
+Following the practice during the implementation of the scanner and parser phases, we adopt the unit testing strategy, and utilizes the JUnit 4 testing framework to test our program. The unit testing strategy allows us to ensure that each requirement from the assignments is satisfied. For example, in order to test that all accesses of protected class members are legal, we created test cases with different class hierarchy and access scenario. This way we can make sure the protected access checking works as expected. Both positive and negative test cases, derived from the language specification, were used in this process. For instance, each rule that should be checked by the type checker has its own test cases to verify that the implementation is correct.
+
+A major purpose of the semantic analysis is to ensure that the subject program conforms to the Joos 1W specification semantically. In each step, a large number of checks is performed. Therefore there are a lot of different functionalities/requirements to be tested. To allow for more efficient testing, we combined smaller test cases for different scenarios into three test suites, one for each assignment.
+
+Because the development includes occasional modifications and bug fixes to the previous modules, we decided to test the program incrementally. Once a module is integrated into the compiler or a major change is made, all the previous test suites are run to ensure that no new bugs are introduced to the program, and the changes work as planned.
+
+The test cases from Marmoset were added to our test suites and tested against after each assignment is finished. In each JUnit 4 test suite, the parameterized testing method was used to run the test cases from Marmoset, so that we can make sure the program passes every test case. 
+
+The final product has successfully passed all the test cases from our test suites. This includes both the test cases created by the team, and those from Marmoset. This gives the team confidence that the implementation is robust and our design reasonable.
+
+\chapter{Conclusion}
+In this report we discussed the design and implementation of the semantic analysis phase of our compiler. The implementation is complete and successful. All requirements from the assignments are satisfied, and all test cases, both those devised by the team and those obtained from Marmoset, are passed. The analyses are performed in time linear to the size of the ASTs, therefore their running time is acceptable and would work for even very large programs. There are, of course, ways to improve the program. For example, reachability analysis and variable analysis could be combined to save one traversal of the AST. It was a conscious choice to separate the two functions to achieve better modularized code. Besides, this choice does not affect the program's runtime asymptotically.
+
+
+\bibliographystyle{ieeetr}
+\bibliography{a5}
+
+\end{document}
