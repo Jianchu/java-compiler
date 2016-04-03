@@ -648,32 +648,31 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
 
 	 // generate code for arguments
 	 int numArgs = 0;
-	 numArgs = generateArgs(sb, node.arglist);
-
+	 //	 numArgs = generateArgs(sb, node.arglist);
+	 
+	 MethodDeclaration mDecl = null;
 	 if (node.id != null) {
 		 // Primary.ID(...)
 		 node.expr.accept(this);	// generate code for Primary expression
 		 StringUtility.appendLine(sb, node.expr.getCode());	// by this point eax should contain address to object return by Primary expression
 		 StringUtility.appendIndLn(sb, "push eax \t; push object for method invocation");
-		 MethodDeclaration mDecl = (MethodDeclaration) node.id.getDeclaration();	// the actual method being called
-		 // call method
-		 generateMethodCall(sb, mDecl);
-
+		 mDecl = (MethodDeclaration) node.id.getDeclaration();	// the actual method being called
+		 
 	 } else {
 		 // Name(...)
-		 if (node.expr instanceof SimpleName) {	// SimpleName(...), implicit this
+	     if (node.expr instanceof SimpleName) {	// SimpleName(...), implicit this
 			 SimpleName sn = (SimpleName) node.expr;
 			 StringUtility.appendIndLn(sb, "mov dword eax, [ebp + 8] \t; move object address to eax"); // this only happens in the method of the same class
 			 StringUtility.appendIndLn(sb, "push eax \t; push object address");
-			 MethodDeclaration mDecl = (MethodDeclaration) sn.getDeclaration();
-			 generateMethodCall(sb, mDecl);
+			 mDecl = (MethodDeclaration) sn.getDeclaration();
+			 
 		 } else {	// QualifiedName(...)
 			 QualifiedName qn = (QualifiedName) node.expr;
-			 MethodDeclaration mDecl = (MethodDeclaration) qn.getDeclaration();
+			 mDecl = (MethodDeclaration) qn.getDeclaration();
 			 Name qualifier = qn.getQualifier();
 			 if (qualifier.getDeclaration() instanceof TypeDeclaration) {	// static methods
 				 StringUtility.appendIndLn(sb, "push 0 \t; place holder because there is no this object for static method");
-				 generateMethodCall(sb, mDecl);
+			
 			 } else if (qualifier.getDeclaration() instanceof FieldDeclaration || qualifier.getDeclaration() instanceof VariableDeclaration) {	// instance method
 			     boolean oldIsLV = isLV;
 			     isLV = false;
@@ -682,13 +681,15 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
 			     StringUtility.appendLine(sb, qn.getQualifier().getCode());
 			     generateNullCheck(sb);
 			     StringUtility.appendIndLn(sb, "push eax \t; push object for method invocation");
-				 // call method
-				 generateMethodCall(sb, mDecl);
 			 } else {
 			     throw new Exception("qualifier type unexpected: " + qualifier + ":" + qualifier.getDeclaration());
 			 }
-		 }
+	     }
 	 }
+	 numArgs = generateArgsAndSwap(sb, node.arglist);
+	 // call method
+	 generateMethodCall(sb, mDecl);
+
 
 		 // clean up
 		 StringUtility.appendIndLn(sb, "add esp, " + (numArgs+1) + "*4" + "\t; caller cleanup arguments.");	
@@ -736,6 +737,24 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
 			 }
 	 }
      }
+
+     private int generateArgsAndSwap(StringBuilder sb, List<Expression> argList) throws Exception {
+	 int numArgs = 0;
+	 if (argList != null) {
+		 for (numArgs =0; numArgs < argList.size() ; numArgs++) {
+			 Expression expr = argList.get(numArgs);
+			 expr.accept(this);
+			 StringUtility.appendLine(sb, expr.getCode());
+			 StringUtility.appendLine(sb, "pop ebx"); //pop object address
+			 StringUtility.appendIndLn(sb, "push eax \t; push argument " + numArgs);
+			 StringUtility.appendIndLn(sb, "push ebx"); // push object address back
+		 }
+	 }
+	 StringUtility.appendIndLn(sb, "pop eax"); // to keep object address in eax
+	 StringUtility.appendIndLn(sb, "push eax"); 
+	 return numArgs;
+     }
+
 
      private int generateArgs(StringBuilder sb, List<Expression> argList) throws Exception {
 	 int numArgs = 0;
