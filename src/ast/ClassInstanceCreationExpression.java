@@ -2,8 +2,8 @@ package ast;
 
 import java.util.List;
 
-import exceptions.ASTException;
 import parser.ParseTree;
+import exceptions.ASTException;
 
 public class ClassInstanceCreationExpression extends Expression {
     public Type type;
@@ -18,6 +18,11 @@ public class ClassInstanceCreationExpression extends Expression {
         if (subtrees.size() > 4) {
             arglist = Expression.parseArglist(subtrees.get(3));
         }
+    }
+    
+    public ClassInstanceCreationExpression(Type type , List<Expression> arglist) {
+        this.type = type;
+        this.arglist = arglist;
     }
     
 	public void accept(Visitor v) throws Exception {

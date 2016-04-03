@@ -82,9 +82,6 @@ public class HierarchyTableBuilder {
     }
 
     private static void setOffSet(List<TypeDeclaration> typeDecs) {
-        offSets.put(null, offSetCounter);
-        offSetCounter++;
-
         setPrimitiveOffSet();
 
         for (TypeDeclaration typeDec : typeDecs) {
@@ -108,8 +105,8 @@ public class HierarchyTableBuilder {
 
     private static void primitiveOffSetHelper(Value value) {
         PrimitiveType primitiveType = new PrimitiveType(value);
-        offSets.put(primitiveType, offSetCounter);
-        offSetCounter++;
+        // offSets.put(primitiveType, offSetCounter);
+        // offSetCounter++;
 
         ArrayType primitiveArrayType = arrayTypeBuilder(primitiveType);
         offSets.put(primitiveArrayType, offSetCounter);
