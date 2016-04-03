@@ -209,7 +209,7 @@ public class CodeGenerator extends TraversalVisitor {
         
         if (node.initializer != null) {
             String initCode = "";
-            if (node.initializer.getType() instanceof PrimitiveType) {
+            if ((node.initializer.getType() instanceof PrimitiveType) && !(node.type instanceof PrimitiveType)) {
                 initCode = this.expGen.CreateCICEText(node.initializer);
             } else {
                 node.initializer.accept(expGen);

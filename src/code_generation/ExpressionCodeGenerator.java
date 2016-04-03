@@ -151,7 +151,7 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
 	 }
 	 if (node.expr != null) {
              String rhsText = "";
-             if (node.expr.getType() instanceof PrimitiveType) {
+             if (!(node.lhs.getType() instanceof PrimitiveType) && node.expr.getType() instanceof PrimitiveType) {
                 rhsText = CreateCICEText(node.expr);
              } else {
                 node.expr.accept(this);
@@ -478,7 +478,7 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
 	 StringUtility.appendIndLn(varDecText, "push eax" + "\t; push variable address to stack");
 	 if (node.initializer != null) {
 	     String initText = "";
-	     if (node.initializer.getType() instanceof PrimitiveType) {
+	     if (!(node.type instanceof PrimitiveType) && node.initializer.getType() instanceof PrimitiveType) {
                 initText = CreateCICEText(node.initializer);
 	     } else {
 	         node.initializer.accept(this);
