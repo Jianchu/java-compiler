@@ -57,7 +57,7 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
     private int ncCounter = 0;
     private int aaCounter = 0; // for array access label
      private boolean isLV = false;
-     private boolean isPrefix = false;
+    //private boolean isPrefix = false;
 
      public ExpressionCodeGenerator(Set<String> extern, StringBuilder dataSection) {
 	 this.extern = extern;
@@ -675,9 +675,10 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
 				 StringUtility.appendIndLn(sb, "push 0 \t; place holder because there is no this object for static method");
 				 generateMethodCall(sb, mDecl);
 			 } else if (qualifier.getDeclaration() instanceof FieldDeclaration || qualifier.getDeclaration() instanceof VariableDeclaration) {	// instance method
-			     isPrefix = true;
+			     boolean oldIsLV = isLV;
+			     isLV = false;
 			     qn.getQualifier().accept(this); 	// generate code from name (accessing instance field, or local variable
-			     isPrefix = false;
+			     isLV = oldIsLV;
 			     StringUtility.appendLine(sb, qn.getQualifier().getCode());
 			     generateNullCheck(sb);
 			     StringUtility.appendIndLn(sb, "push eax \t; push object for method invocation");
@@ -778,7 +779,7 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
 	 } else {
 		 throw new Exception("Simple name declaration unexpected: " + node);
 	 }
-	 if (!isLV || isPrefix) {
+	 if (!isLV) {
 	     StringUtility.appendIndLn(sb, "mov eax, [eax]"); // if not lvalue, move value into eax
 	 }
 
@@ -797,11 +798,9 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
 	 } else if (qDecl instanceof FieldDeclaration || qDecl instanceof VariableDeclaration) {
 	     boolean oldLV = isLV;
 	     isLV = false;
-	     boolean oldIsPrefix = isPrefix;
-	     isPrefix = true;
+	     // used to be a isPrefix
 	     qualifier.accept(this);
-	     isPrefix = oldIsPrefix;
-		 isLV = oldLV;
+	     isLV = oldLV;
 		 StringUtility.appendIndLn(sb, qualifier.getCode());
 		 
 		 // before accessm, check null
@@ -825,7 +824,7 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
 		 throw new Exception("qualified name prefix not recoginsed: " + qualifier.toString());
 	 }
 
-	 if (!isLV || isPrefix ) {
+	 if (!isLV) {
 	     StringUtility.appendIndLn(sb, "mov eax, [eax]"); // if not lvalue, move value into eax
 	 }
 	 node.attachCode(sb.toString());
@@ -894,14 +893,16 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
     public void visit(ArrayAccess node) throws Exception {
 	StringBuilder sb = new StringBuilder();
 	
-	isPrefix = true;
+	boolean oldIsLV = isLV;
+	
+	isLV = false;
 	node.array.accept(this);
-	isPrefix = false;
+	isLV = oldIsLV;
 	sb.append(node.array.getCode());
 	StringUtility.appendIndLn(sb, "push eax"); // push array address
 	StringUtility.appendIndLn(sb, "push eax"); //again for later
 
-	boolean oldIsLV = isLV;
+	oldIsLV = isLV;
 	isLV = false;
 	node.index.accept(this);
 	sb.append(node.index.getCode());
@@ -932,7 +933,7 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
     }
 
     private void processLV(StringBuilder sb) throws Exception {
-	if (!isLV || isPrefix) {
+	if (!isLV ) {
 	    StringUtility.appendIndLn(sb, "mov eax, [eax]");
 	}
     }
