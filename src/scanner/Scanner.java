@@ -473,7 +473,7 @@ public class Scanner {
     	// missing case 1 - 2147483648
     	try {
     		String intStr = _sb.toString();
-    		if (_tokens.get(_tokens.size() -1).getTokenType() == Symbol.MINUS) {
+    		if (_tokens.size() > 0 && _tokens.get(_tokens.size() -1).getTokenType() == Symbol.MINUS) {
     			intStr = "-" + _sb.toString();
     		}
     		Integer.parseInt(intStr);
