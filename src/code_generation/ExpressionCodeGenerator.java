@@ -209,7 +209,7 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
             if (this.currentMethod.id.equals("test")) {
                 System.out.println(((StringLiteral)rhsValueOf.arglist.get(0)).value);
             }
-            this.visit(concat);
+            concat.accept(this);
             plusText.append(concat.getCode());
         } else {
             String lhsCode = node.lhs.getCode();
