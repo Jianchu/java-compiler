@@ -83,7 +83,7 @@ public class CodeGenUtil {
 	}
 	
 	public String fieldAccess(String base, TypeDeclaration tDecl, FieldDeclaration fDecl) throws Exception {
-		return "[" + base + "+" + tDecl.getFieldOffSet(fDecl.id) + "*4]";
+		return "[" + base + "+" + tDecl.getFieldOffSet(SigHelper.getFieldSig(fDecl)) + "*4]";
 	}
 	
 	public static void callExternLabel(StringBuilder sb, Set<String> extern, String label) {

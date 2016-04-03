@@ -976,7 +976,7 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
 	     StringUtility.appendIndLn(sb, "mov eax, " + label);
 	 }else {
 	     TypeDeclaration parent = (TypeDeclaration) fDecl.getParent();
-	     int offset = parent.getFieldOffSet(fDecl.id);
+	     int offset = parent.getFieldOffSet(SigHelper.getFieldSig(fDecl));
 	     offset = 4 * (offset + 1);
 	     StringUtility.appendIndLn(sb, "mov dword eax, [ebp + 8] \t; put object address in eax");
 
@@ -1034,7 +1034,7 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
 		     // node is instance field, with object in eax
 		     FieldDeclaration fDecl = (FieldDeclaration) node.getDeclaration();
 		     TypeDeclaration tDecl = (TypeDeclaration) fDecl.getParent();
-		     int offset = tDecl.getFieldOffSet(fDecl.id);
+		     int offset = tDecl.getFieldOffSet(SigHelper.getFieldSig(fDecl));
 		     offset = (offset + 1) * 4;	// real offset 
 		     StringUtility.appendIndLn(sb, "add eax, " + offset);
 		 }
@@ -1061,7 +1061,7 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
 		     StringUtility.appendIndLn(sb, "add eax, 4");
 		 } else {// instance field
 		     TypeDeclaration tDecl = node.expr.getType().getDeclaration();
-		     int offset = tDecl.getFieldOffSet(node.id.toString());
+		     int offset = tDecl.getFieldOffSet(SigHelper.getFieldSig((FieldDeclaration) node.id.getDeclaration()));
 		     offset = (offset+1) * 4;// real offset
 		     StringUtility.appendIndLn(sb, "add eax, " + offset);
 		 }
