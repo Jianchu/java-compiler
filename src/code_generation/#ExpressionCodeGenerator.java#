@@ -1,6 +1,5 @@
 package code_generation;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -10,7 +9,6 @@ import ast.ArrayAccess;
 import ast.ArrayCreationExpression;
 import ast.ArrayType;
 import ast.AssignmentExpression;
-import ast.BodyDeclaration;
 import ast.BooleanLiteral;
 import ast.CastExpression;
 import ast.CharacterLiteral;
@@ -94,8 +92,10 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
 
      public void visit(NullLiteral node) throws Exception {
 	 StringBuilder nullText = new StringBuilder();
+	 //this.extern.add("VTable#null");
 	 litCounter++;
 	 StringUtility.appendLine(dataSection, "NULL_" + litCounter + ":" + "\t; define label for null literal");
+	 //StringUtility.appendLine(dataSection, "\t" + "dd VTable#null");
 	 StringUtility.appendLine(dataSection, "\t" + "dd " + FALSE);
 	 StringUtility.appendLine(nullText, "\t" + "mov dword eax, " + "[NULL_" + litCounter + "]");
 	 node.attachCode(nullText.toString());
@@ -105,7 +105,9 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
      public void visit(BooleanLiteral node) throws Exception {
 	 StringBuilder booleanText = new StringBuilder();
 	 litCounter++;
+	 //this.extern.add("VTable#Z");
 	 StringUtility.appendLine(dataSection, "BOOLEAN_" + litCounter + ":" + "\t; define label for boolean literal");
+	 //StringUtility.appendLine(dataSection, "\t" + "dd VTable#Z");
 	 if (node.value == true) {
 	     StringUtility.appendLine(dataSection, "\t" + "dd " + TRUE);
 	 } else {
@@ -118,8 +120,10 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
      public void visit(CharacterLiteral node) throws Exception {
 	 StringBuilder charText = new StringBuilder();
 	 litCounter++;
+	 //this.extern.add("VTable#C");
 	 StringUtility.appendLine(dataSection, "CHAR_" + litCounter + ":" + "\t; define label for char literal");
 	 // Assuming octal is valid.
+	 //StringUtility.appendLine(dataSection, "\t" + "dd VTable#C");
 	 if (node.value.length() > 3) {
 	     StringUtility.appendLine(dataSection, "\t" + "dd " + node.value.substring(1));
 	 } else {
@@ -131,8 +135,10 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
 
      public void visit(IntegerLiteral node) throws Exception {
 	 StringBuilder intText = new StringBuilder();
+	 //this.extern.add("VTable#I");
 	 litCounter++;
 	 StringUtility.appendLine(dataSection, "INT_" + litCounter + ":" + "\t; define label for int literal");
+	 //StringUtility.appendLine(dataSection, "\t" + "dd VTable#I");
 	 StringUtility.appendLine(dataSection, "\t" + "dd " + node.value);
 	 StringUtility.appendLine(intText, "\t" + "mov dword eax, " + "[INT_" + litCounter + "]");
 	 node.attachCode(intText.toString());
@@ -150,13 +156,8 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
 	     StringUtility.appendIndLn(assignText, "push eax" + "\t; push lhs to stack");
 	 }
 	 if (node.expr != null) {
-             String rhsText = "";
-             if (!(node.lhs.getType() instanceof PrimitiveType) && node.expr.getType() instanceof PrimitiveType) {
-                rhsText = CreateCICEText(node.expr);
-             } else {
-                node.expr.accept(this);
-                 rhsText = node.expr.getCode();
-             }
+	     node.expr.accept(this);
+	     String rhsText = node.expr.getCode();
 	     assignText.append(rhsText);
 	 } else {
 	     StringUtility.appendIndLn(assignText, "mov eax, " + FALSE + "\t; rhs is null");
@@ -397,7 +398,6 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
 	 }
 	 String exprCode = node.expr.getCode();
 	 instanceofText.append(exprCode);
-	 
 	 //[[[eax]] + offset * 4]
 	 if (node.type != null) {
 	     node.type.accept(this);
@@ -477,13 +477,8 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
 	 // now eax should contain address of variable
 	 StringUtility.appendIndLn(varDecText, "push eax" + "\t; push variable address to stack");
 	 if (node.initializer != null) {
-	     String initText = "";
-	     if (!(node.type instanceof PrimitiveType) && node.initializer.getType() instanceof PrimitiveType) {
-                initText = CreateCICEText(node.initializer);
-	     } else {
-	         node.initializer.accept(this);
-	         initText = node.initializer.getCode();
-	     }
+	     node.initializer.accept(this);
+	     String initText = node.initializer.getCode();
 	     varDecText.append(initText);
 	 } else {
 	     StringUtility.appendIndLn(varDecText, "mov eax, " + FALSE + "\t; init is null");
@@ -515,60 +510,6 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
 	 }
      }
 
-    public String CreateCICEText(Expression expr) throws Exception {
-         List<Expression> arglist = new ArrayList<Expression>();
-         arglist.add(expr);
-         Type type = expr.getType();
-         ClassInstanceCreationExpression cice = null;
-         String ciceText = "";
-         if (type instanceof PrimitiveType) {
-             PrimitiveType pType = (PrimitiveType) type;
-             switch (pType.value) {
-             case BOOLEAN:
-                 TypeDeclaration bDec = SymbolTable.getGlobal().get("java.lang.Boolean");
-                 SimpleType sBType = simpleTypeBuilder(bDec);
-                 MethodDeclaration bConstructor = getConstructor(bDec);
-                 cice = new ClassInstanceCreationExpression(sBType, arglist);
-                 cice.addConstructor(getConstructor(bDec));
-               break;
-             case CHAR:
-                 TypeDeclaration cDec = SymbolTable.getGlobal().get("java.lang.Character");
-                 SimpleType sCType = simpleTypeBuilder(cDec);
-                 cice = new ClassInstanceCreationExpression(sCType, arglist);
-                 cice.addConstructor(getConstructor(cDec));
-               break;
-             default:
-                 TypeDeclaration iDec = SymbolTable.getGlobal().get("java.lang.Integer");
-                 SimpleType sIType = simpleTypeBuilder(iDec);
-                 cice = new ClassInstanceCreationExpression(sIType, arglist);
-                 cice.addConstructor(getConstructor(iDec));
-           } 
-         }
-         if (cice != null) {
-             this.visit(cice);
-             ciceText = cice.getCode();
-         }
-         return ciceText;
-     }
-     
-    private MethodDeclaration getConstructor(TypeDeclaration tDec) {
-        for (BodyDeclaration bDecl : tDec.members) {
-            if (bDecl instanceof MethodDeclaration) {
-                MethodDeclaration mDec = (MethodDeclaration)bDecl;
-                if (mDec.isConstructor) {
-                    return mDec;
-                }
-            }
-        }
-        return null;
-    }
-
-     private SimpleType simpleTypeBuilder(TypeDeclaration typeDec) {
-         String name = typeDec.getFullName();
-         SimpleType simpleType = new SimpleType(new SimpleName(name));
-         simpleType.attachDeclaration(typeDec);
-         return simpleType;
-     }
      /*
       * OO features
       */
@@ -919,7 +860,7 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
 	StringUtility.appendIndLn(sb, "mov ebx, eax ");
 	StringUtility.appendIndLn(sb, "mov eax, 4 "); 
 	StringUtility.appendIndLn(sb, "imul ebx ; get real offset");
-	StringUtility.appendIndLn(sb, "mov ebx, eax"); // store offset in ebx
+	StringUtility.appendIndLn(sb, "mov eax, ebx"); // push offset
 	
 
 	StringUtility.appendIndLn(sb, "pop eax"); // get array
