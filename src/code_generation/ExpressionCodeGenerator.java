@@ -206,9 +206,6 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
             MethodInvocation lhsValueOf = createValueOf(node.lhs);
             MethodInvocation rhsValueOf = createValueOf(node.rhs);
             MethodInvocation concat = crateConcat(lhsValueOf, rhsValueOf);
-            if (this.currentMethod.id.equals("test")) {
-                System.out.println(((StringLiteral)rhsValueOf.arglist.get(0)).value);
-            }
             concat.accept(this);
             plusText.append(concat.getCode());
         } else {
@@ -260,6 +257,7 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
                 Mdec = methods.get("7valueOf16java.lang.Object");
             }
         } else if (type == null) {
+            Mdec = methods.get("7valueOf16java.lang.String");
             StringLiteral nullLit = new StringLiteral("null");
             nullLit.attachType(this.simpleTypeBuilder(tDec));
             expr = nullLit;
