@@ -3,6 +3,6 @@ public class Test {
         
     }
     public static int test() {
-        return 123;
+        return 1 + 1;
     }
 }

@@ -28,6 +28,12 @@ public class MethodInvocation extends Expression {
         }
     }
     
+    public MethodInvocation(Expression expr, SimpleName id, List<Expression> arglist ) {
+        this.expr = expr;
+        this.id = id;
+        this.arglist = arglist;
+    }
+    
 	public void accept(Visitor v) throws Exception {
 		v.visit(this);
 	}

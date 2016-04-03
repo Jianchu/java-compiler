@@ -2,6 +2,7 @@ package code_generation;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import utility.StringUtility;
@@ -189,8 +190,109 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
      }
 
 
+    private void generatePlus(InfixExpression node) throws Exception {
+        StringBuilder plusText = new StringBuilder();
+        Type lhsType = node.lhs.getType();
+        Type rhsType = node.rhs.getType();
+        if ((lhsType instanceof SimpleType && lhsType.getDeclaration().getFullName().equals("java.lang.String"))
+                || (rhsType instanceof SimpleType && rhsType.getDeclaration().getFullName().equals("java.lang.String"))) {
+            MethodInvocation lhsValueOf = createValueOf(node.lhs);
+            MethodInvocation rhsValueOf = createValueOf(node.rhs);
+            MethodInvocation concat = crateConcat(lhsValueOf, rhsValueOf);
+            this.visit(concat);
+            plusText.append(concat.getCode());
+        } else {
+            String lhsCode = node.lhs.getCode();
+            String rhsCode = node.rhs.getCode();
+            plusText.append(lhsCode);
+            StringUtility.appendLine(plusText, "push eax ; store lhs");
+            plusText.append(rhsCode);
+            StringUtility.appendLine(plusText, "pop ebx ; restore lhs");
+            StringUtility.appendLine(plusText, "add eax, ebx");
+        }
+        node.attachCode(plusText.toString());
+    }
+
+    /**
+     * 6concat16java.lang.String
+     * 7valueOf16java.lang.String
+     * 7valueOf16java.lang.Object
+     * 7valueOf5short
+     * 7valueOf4char
+     * 7valueOf7boolean
+     * 7valueOf3int
+     * 7valueOf4byte
+     */
+    
+    private MethodInvocation createValueOf(Expression expr) {
+        TypeDeclaration tDec = SymbolTable.getGlobal().get("java.lang.String");
+        Map<String, MethodDeclaration> methods = tDec.getEnvironment().methods;
+        Type type = expr.getType();
+        MethodDeclaration Mdec = null;
+        if (type instanceof PrimitiveType) {
+            PrimitiveType pType = (PrimitiveType) type;
+            switch (pType.value) {
+            case BOOLEAN:
+                Mdec =  methods.get("7valueOf7boolean");
+              break;
+            case CHAR:
+                Mdec =  methods.get("7valueOf4char");
+              break;
+            default:
+                Mdec =  methods.get("7valueOf3int");
+          }
+        } else if (type instanceof SimpleType) {
+            // String
+            if (type.getDeclaration().getFullName().equals("java.lang.String")) {
+                Mdec = methods.get("7valueOf16java.lang.String");
+                // Object
+            } else {
+                Mdec = methods.get("7valueOf16java.lang.Object");
+            }
+        }
+        // qualifier
+        SimpleName sName = new SimpleName("java.lang.String");
+        sName.attachDeclaration(tDec);
+        // qualified name
+        QualifiedName qName = new QualifiedName(sName, "valueOf");
+        qName.attachDeclaration(Mdec);
+        // parameter
+        List<Expression> arglist = new ArrayList<Expression>();
+        arglist.add(expr);
+        MethodInvocation mInvo = new MethodInvocation(qName, null, arglist);
+        return mInvo;
+    }
+
+    //
+    private MethodInvocation crateConcat(Expression fromStringType, Expression fromNonStringType) {
+        TypeDeclaration tDec = SymbolTable.getGlobal().get("java.lang.String");
+        Map<String, MethodDeclaration> methods = tDec.getEnvironment().methods;
+        MethodDeclaration Mdec =  methods.get("6concat16java.lang.String");
+        //name and declaration
+        SimpleName sName = new SimpleName("concat");
+        sName.attachDeclaration(Mdec);
+        //parameters
+        List<Expression> arglist = new ArrayList<Expression>();
+        arglist.add(fromNonStringType);
+        MethodInvocation mInvo = new MethodInvocation(fromStringType, sName, arglist);
+        return mInvo;
+    }
+    
+    private void env() {
+        TypeDeclaration tDec = SymbolTable.getGlobal().get("java.lang.String");
+        Map<String, MethodDeclaration> methods = tDec.getEnvironment().methods;
+        for (String s : methods.keySet()) {
+            System.out.println(s);
+        }
+    }
+    
+    
      @Override
      public void visit(InfixExpression node) throws Exception {
+        if (node.op.equals(InfixExpression.Operator.PLUS)) {
+            generatePlus(node);
+            return;
+        }
 	 StringBuilder infixText = new StringBuilder();
 	 if (node.lhs != null && node.rhs != null) {
 	     int n = infixCounter;
