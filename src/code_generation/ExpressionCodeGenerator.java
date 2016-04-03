@@ -850,9 +850,16 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
 
 	 TypeDeclaration tDecl = (TypeDeclaration) mDecl.getParent();
 	 if (mDecl.modifiers.contains(Modifier.STATIC)) {
-		 String label = SigHelper.getMethodSigWithImp(mDecl);
-		 extern.add(label.trim());
-		 StringUtility.appendIndLn(sb, "call " + label);
+	     String label;
+	     if (mDecl.modifiers.contains(Modifier.NATIVE)) {
+		 StringUtility.appendIndLn(sb, "mov eax, [esp + 4]");
+		 label = SigHelper.getNativeSig(mDecl);
+	     } else {
+		 label = SigHelper.getMethodSigWithImp(mDecl);
+	     }
+	     extern.add(label.trim());
+	     StringUtility.appendIndLn(sb, "call " + label);
+	     
 	 } else {	// instance method
 			 // generate method call
 			 if (tDecl.isInterface) {	// interface method
