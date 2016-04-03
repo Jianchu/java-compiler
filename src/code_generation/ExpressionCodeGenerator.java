@@ -261,6 +261,11 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
             StringLiteral nullLit = new StringLiteral("null");
             nullLit.attachType(this.simpleTypeBuilder(tDec));
             expr = nullLit;
+        } else if (type instanceof ArrayType) {
+            Mdec = methods.get("7valueOf16java.lang.String");
+            StringLiteral nullLit = new StringLiteral(SigHelper.getTypeSig(type));
+            nullLit.attachType(this.simpleTypeBuilder(tDec));
+            expr = nullLit;
         }
 
         // qualifier
