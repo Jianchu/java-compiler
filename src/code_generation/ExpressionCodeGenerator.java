@@ -85,14 +85,74 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
          extern.add(charArrSig);
 	 StringUtility.appendLine(dataSection, "STRCHARS_" + litCounter + ":");
          StringUtility.appendLine(dataSection, "\tdd " + charArrSig);
-	 StringUtility.appendLine(dataSection, "\t" + "dd " + node.value.length());
-         for (int i = 0; i < node.value.length(); i++) {
-             StringUtility.appendLine(dataSection, "\t" + "dd '" + node.value.charAt(i) + "'");
-         }
-
+        List<String> string = StringLitHelper(node.value);
+        StringUtility.appendLine(dataSection, "\t" + "dd " + string.size());
+	 StringLitHelper(node.value);
+        for (String s : string) {
+            StringUtility.appendLine(dataSection, "\t" + "dd '" + s + "'");
+        }
         StringUtility.appendLine(stringText, "\tmov dword eax, " + "STRING_" + litCounter);
 	 node.attachCode(stringText.toString());
      }
+
+    private List<String> StringLitHelper(String value) {
+        List<String> string = new ArrayList<String>();
+        int length = value.length();
+        for (int i = 0; i < length; i++) {
+            char current = value.charAt(i);
+            if (current == '\\') {
+                StringBuilder escape = new StringBuilder();
+                escape.append(current);
+                char next = value.charAt(++i);
+                if (next >= '0' && next <= '3') {
+                    escape.append(next);
+                    if (i < length - 1) {
+                        next = value.charAt(++i);
+                        if (next >= '0' && next <= '7') {
+                            escape.append(next);
+                            if (i < length - 1) {
+                                next = value.charAt(++i);
+                                if (next >= '0' && next <= '7') {
+                                    escape.append(next);
+                                    string.add(escape.toString());
+                                } else {
+                                    escape.append(next);
+                                    next = value.charAt(++i);
+                                }
+                            } else {
+                                string.add(escape.toString());
+                            }
+                        } else {
+                            string.add(escape.toString());
+                            string.add(String.valueOf(next));
+                        }
+                    } else {
+                        string.add(escape.toString());
+                    }
+                } else if (next >= '4' && next <= '7') {
+                    escape.append(next);
+                    if (i < length - 1) {
+                        next = value.charAt(++i);
+                        if (next >= '0' && next <= '7') {
+                            escape.append(next);
+                            string.add(escape.toString());
+                        } else {
+                            string.add(escape.toString());
+                            string.add(String.valueOf(next));
+                        }
+                    } else {
+                        string.add(escape.toString());
+                    }
+                } else {
+                    escape.append(next);
+                    string.add(escape.toString());
+                }
+            } else {
+                string.add(String.valueOf(current));
+            }
+        }
+        return string;
+    }
 
      public void visit(NullLiteral node) throws Exception {
 	 StringBuilder nullText = new StringBuilder();
