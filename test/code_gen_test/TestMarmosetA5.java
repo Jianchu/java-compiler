@@ -39,7 +39,7 @@ public class TestMarmosetA5 {
         input = testCases.get(testCase).toArray(input);
         int result = CodeGenTestMain.testA5(input);
         if (result != expectedResult) {
-            System.out.println(testCase);
+            System.err.println(testCase);
         }
         assertEquals(expectedResult, result);
     }

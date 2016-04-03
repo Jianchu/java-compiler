@@ -3,8 +3,8 @@ package ast;
 import java.util.LinkedList;
 import java.util.List;
 
-import exceptions.ASTException;
 import parser.ParseTree;
+import exceptions.ASTException;
 
 /**
  * getters are provided for this class. 
@@ -41,7 +41,7 @@ public class QualifiedName extends Name{
 		}
 	}
 	
-	private QualifiedName(Name quali, String id) {
+	public QualifiedName(Name quali, String id) {
 		this.qualifier = quali;
 		this.id = id;
 		if (id != null) {
