@@ -3,8 +3,7 @@ public class Test {
         
     }
     public static int test() {
-        //String a = "\n";
-        char a = '\n';
+        String a = "Hello World!";
         System.out.println(a);
         return 123;
     }
