@@ -29,6 +29,7 @@ public class CodeGenerator extends TraversalVisitor {
     Set<String> exclude;
     StringBuilder dataSection;
     static Set<String> staticInitExtern = new HashSet<String>();
+    private static final String FALSE = "0x0";
 
     public CodeGenerator() {
         this.extern = new HashSet<String>();
@@ -45,7 +46,7 @@ public class CodeGenerator extends TraversalVisitor {
         ExpressionCodeGenerator.stringLitData.setLength(0);
         String classSig = SigHelper.getClassSig(node);
         String testSig = classSig + "#test$$implementation";
-        StringUtility.appendLine(instanceFieldInit[0], "instance_field_init$" + classSig + ":");
+//        StringUtility.appendLine(instanceFieldInit[0], "instance_field_init$" + classSig + ":");
         StringBuilder vTableText = new StringBuilder();
         StringBuilder textSection = new StringBuilder();
         StringBuilder start = new StringBuilder();
@@ -74,7 +75,7 @@ public class CodeGenerator extends TraversalVisitor {
             fDecl.accept(this);
 
         }
-        StringUtility.appendIndLn(instanceFieldInit[0], "ret");
+        
         
         // methods
         for (Map.Entry<String, MethodDeclaration> entry : node.getEnvironment().methods.entrySet()) {
@@ -101,6 +102,7 @@ public class CodeGenerator extends TraversalVisitor {
         
         	
         for (BodyDeclaration bDecl : node.members) {
+            StringBuilder instanceFieldInitDefault = new StringBuilder();
         	if (bDecl instanceof MethodDeclaration) {
         		MethodDeclaration mDecl = (MethodDeclaration) bDecl;
         	        String methodSigInDec = SigHelper.getMethodSigWithImp(mDecl);
@@ -120,9 +122,18 @@ public class CodeGenerator extends TraversalVisitor {
         	    String fieldSig = SigHelper.getFieldSig(node, fDecl);
         	    if (fDecl.modifiers.contains(Modifier.STATIC)) {
         	        StringUtility.appendLine(staticFieldInit[0], "call static_init_" + fieldSig, 2);
+        	    } else {
+        	        StringUtility.appendIndLn(instanceFieldInitDefault, "call instance_init_default_" + fieldSig);
+        	        if (fDecl.initializer != null) {
+        	            StringUtility.appendIndLn(instanceFieldInit[0], "call instance_init_" + fieldSig);
+        	        }
         	    }
         	}
+        	instanceFieldInit[0].insert(0, instanceFieldInitDefault + "\n");
+        	
        	}
+        instanceFieldInit[0].insert(0, "instance_field_init$" + classSig + ":" + "\n");
+        StringUtility.appendIndLn(instanceFieldInit[0], "ret");
         StringUtility.appendLine(vTableText, "global " + SigHelper.getArrayClssSigWithVTable(node));
         StringUtility.appendIndLn(vTableText, SigHelper.getArrayClssSigWithVTable(node) + ":");   
         StringUtility.appendLine(vTableText, "dd " + SigHelper.getArrayClassSigWithHierarchy(node), 2);
@@ -207,6 +218,18 @@ public class CodeGenerator extends TraversalVisitor {
         }
         node.type.accept(this);
         
+        if (!node.modifiers.contains(Modifier.STATIC)) {
+            //StringUtility.appendIndLn(instanceFieldInit[0], "call instance_init_default_" + fieldSig);
+            StringUtility.appendIndLn(instanceFieldInit[1], "instance_init_default_" + fieldSig + ":");
+            ExpressionCodeGenerator.generateFieldAddr(instanceFieldInit[1], node, extern);
+            StringUtility.appendLine(instanceFieldInit[1], "push eax \t;store field address", 2);
+            StringUtility.appendIndLn(instanceFieldInit[1], "mov eax, " + FALSE + "\t; init is null");
+            StringUtility.appendLine(instanceFieldInit[1], "mov edx, eax \t; put value of field to edx", 2);
+            StringUtility.appendLine(instanceFieldInit[1], "pop eax \t; pop field address back to eax", 2);
+            StringUtility.appendIndLn(instanceFieldInit[1], "mov [eax], edx" + "\t; initiallize field");
+            StringUtility.appendIndLn(instanceFieldInit[1], "ret" + "\t; initiallize field ret");     
+        }
+        
         if (node.initializer != null) {
             String initCode = "";
             if ((node.initializer.getType() instanceof PrimitiveType) && !(node.type instanceof PrimitiveType)) {
@@ -226,7 +249,7 @@ public class CodeGenerator extends TraversalVisitor {
                 StringUtility.appendIndLn(staticFieldInit[1], "mov " + "[" + fieldSigInDec + "]" + ", eax" + "\t; initiallize field");              
                 StringUtility.appendLine(staticFieldInit[1], "ret", 2);
             } else {
-                StringUtility.appendIndLn(instanceFieldInit[0], "call instance_init_" + fieldSig);
+                //StringUtility.appendIndLn(instanceFieldInit[0], "call instance_init_" + fieldSig);
                 StringUtility.appendIndLn(instanceFieldInit[1], "instance_init_" + fieldSig + ":");
 		ExpressionCodeGenerator.generateFieldAddr(instanceFieldInit[1], node, extern);
                 StringUtility.appendLine(instanceFieldInit[1], "push eax \t;store field address", 2);
@@ -235,7 +258,6 @@ public class CodeGenerator extends TraversalVisitor {
                 StringUtility.appendLine(instanceFieldInit[1], "pop eax \t; pop field address back to eax", 2);
                 StringUtility.appendIndLn(instanceFieldInit[1], "mov [eax], edx" + "\t; initiallize field");
                 StringUtility.appendIndLn(instanceFieldInit[1], "ret" + "\t; initiallize field ret");
-                
             }
         }
     }
