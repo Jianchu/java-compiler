@@ -3,7 +3,11 @@ public class Test {
         
     }
     public static int test() {
-        String a = "1" + null;
-        return a.length();
+
+        // String
+        String s = null;
+        s = "null"+null;
+        s = "array"+new int[5];
+        return 123;
     }
 }
