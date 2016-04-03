@@ -192,6 +192,8 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
 
     private void generatePlus(InfixExpression node) throws Exception {
         StringBuilder plusText = new StringBuilder();
+        node.lhs.accept(this);
+        node.rhs.accept(this);
         Type lhsType = node.lhs.getType();
         Type rhsType = node.rhs.getType();
         if ((lhsType instanceof SimpleType && lhsType.getDeclaration().getFullName().equals("java.lang.String"))
