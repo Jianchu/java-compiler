@@ -440,7 +440,7 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
 	     node.unary.accept(this); //NOTE added this -- Z
 	     unaryCode = node.unary.getCode();
 	 } else {
-	     unaryCode = "\tmov eax, 0";
+	     unaryCode = "\tmov eax, 0\n";
 	 }
 	 
 	 castText.append(unaryCode);
@@ -461,6 +461,7 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
 	     isPrimitive = true;
 	 }
 	 if (!isPrimitive) {
+	     //TODO: check for null
 	     int frame = offset * 4;
 	     StringUtility.appendLine(castText, "mov ebx, eax \t ;copy eax", 2);
 	     StringUtility.appendLine(castText, "mov eax, [eax] \t ;get first frame of object, the pointer of VTable", 2);
