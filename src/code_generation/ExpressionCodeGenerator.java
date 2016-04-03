@@ -186,9 +186,14 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
 	 StringUtility.appendLine(dataSection, "CHAR_" + litCounter + ":" + "\t; define label for char literal");
 	 // Assuming octal is valid.
 	 if (node.value.length() > 3) {
-	     StringUtility.appendLine(dataSection, "\t" + "dd " + node.value.substring(1));
+	     StringUtility.appendLine(dataSection, "\t" + "dd 0o" + node.value.substring(1));
 	 } else {
-	     StringUtility.appendLine(dataSection, "\t" + "dd " + "'" + node.value + "'");
+	     if (node.value.charAt(0) == '\\') {
+	         StringUtility.appendLine(dataSection, "\t" + "dd " + "`" + node.value + "`");
+	     } else {
+	         StringUtility.appendLine(dataSection, "\t" + "dd " + "'" + node.value + "'");
+	     }
+	     
 	 }
 	 StringUtility.appendLine(charText, "\t" + "mov dword eax, " + "[CHAR_" + litCounter + "]");
 	 node.attachCode(charText + "\n");
