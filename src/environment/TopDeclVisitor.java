@@ -209,6 +209,7 @@ public class TopDeclVisitor extends TraversalVisitor {
 			Statement first = block.statements.get(0);
 			first.accept(this);
 		}
+		visitNextStatement(block);
 		table.closeScope();
 	}
 	

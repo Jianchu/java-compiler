@@ -88,6 +88,7 @@ public class TraversalVisitor implements Visitor{
 			Statement first = node.statements.get(0);
 			first.accept(this);
 		}
+		visitNextStatement(node);
     }
 
     public void visit(ExpressionStatement node) throws Exception {

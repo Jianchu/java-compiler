@@ -28,7 +28,9 @@ public class EnvTraversalVisitor extends TraversalVisitor{
 	@Override
 	public void visit(Block node) throws Exception {
 		last = curr;
-		curr = node.getEnvironment();
+		if (node.getEnvironment() != null) {
+		    curr = node.getEnvironment();
+		}
 		super.visit(node);
 		curr = last;
 	}
