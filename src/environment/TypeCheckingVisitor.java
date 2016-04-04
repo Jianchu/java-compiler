@@ -835,8 +835,19 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
     private void checkProtectedField(TypeDeclaration previousTd, FieldDeclaration fDecl) throws TypeCheckingException {
 		// if this type does not inherit from the type where field is declared, error
 		TypeDeclaration fDeclType = (TypeDeclaration) fDecl.getParent();
-		if (!TypeHelper.inheritsFrom(fDeclType, currentTypeDecl))
-			throw new TypeCheckingException("Illegal access to protected field: " + fDecl.id);
+		if (!TypeHelper.inheritsFrom(fDeclType, currentTypeDecl)) {
+		    boolean inSamePackage = false;
+		    for (String s : SymbolTable.getAllPackages().keySet()) {
+		        List<String> classes = SymbolTable.getAllPackages().get(s);
+		        if (classes.contains(fDeclType.id) && classes.contains(currentTypeDecl.id)) {
+		            inSamePackage = true;
+		        }
+		    }
+		    if (!inSamePackage) {
+		        throw new TypeCheckingException("Illegal access to protected field: " + fDecl.id);
+		    }
+		}
+			
 		
 		// in addition for instance field, if the prefix is not subclass of this class, error
 		if (!fDecl.modifiers.contains(Modifier.STATIC))
