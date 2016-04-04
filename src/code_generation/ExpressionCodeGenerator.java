@@ -261,12 +261,6 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
 
     private void generatePlus(InfixExpression node) throws Exception {
         StringBuilder plusText = new StringBuilder();
-        if (node.lhs != null) {
-            node.lhs.accept(this);
-        }
-        if (node.rhs != null) {
-            node.rhs.accept(this);
-        }
 
         Type lhsType = node.lhs.getType();
         Type rhsType = node.rhs.getType();
@@ -278,6 +272,13 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
             concat.accept(this);
             plusText.append(concat.getCode());
         } else {
+	    if (node.lhs != null) {
+		node.lhs.accept(this);
+	    }
+	    if (node.rhs != null) {
+		node.rhs.accept(this);
+	    }
+
             String lhsCode = node.lhs.getCode();
             String rhsCode = node.rhs.getCode();
             plusText.append(lhsCode);
