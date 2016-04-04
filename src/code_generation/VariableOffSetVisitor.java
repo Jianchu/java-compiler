@@ -49,10 +49,17 @@ public class VariableOffSetVisitor extends TraversalVisitor{
 	@Override
     public void visit(Block node) throws Exception {
 		int oldCounter = offsetCounter;	// store for later
-		if (node.statements.size() > 0) {
-			Statement first = node.statements.get(0);
-			first.accept(this);
-		}
+		super.visit(node);
+		//if (node.statements.size() > 0) {
+		//   Statement first = node.statements.get(0);
+		//  first.accept(this);
+		//}
+		
+		
+		//for (Statement s : node.statements) {
+		//  s.accept(this);
+		//}
+
 		offsetCounter = oldCounter;
     }
 	
@@ -67,9 +74,15 @@ public class VariableOffSetVisitor extends TraversalVisitor{
         }
         // store offset
         currMethod.addVarOffSet(node, offsetCounter);
+	if (currMethod.frameSize < offsetCounter + 1) {
+	    currMethod.frameSize = offsetCounter + 1;
+	}
         currMethod.frameSize ++;	// increment framesize
         offsetCounter ++;
         
+	if (debug) {
+	    System.out.println(node.id);
+	}
+	}
 
-    }
 }
