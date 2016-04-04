@@ -14,8 +14,8 @@ public class CodeGenTestMain {
 
     public static void main(String[] args) throws IOException,InterruptedException {
         String[] paths = new String[0];
-        paths = FileUtility.getFileNames(myDir + "/test/testprogram/code_gen/Test.java").toArray(paths);
-        //paths = FileUtility.getFileNames(myDir + "/assignment_testcases/a5/J1_sim_xor.java").toArray(paths);
+        //paths = FileUtility.getFileNames(myDir + "/test/testprogram/code_gen/Test.java").toArray(paths);
+        paths = FileUtility.getFileNames(myDir + "/assignment_testcases/a5/J1_sim_xor.java").toArray(paths);
         Joosc.compileSTL(paths);
         callBash();
     }
@@ -65,7 +65,12 @@ public class CodeGenTestMain {
     public static int testA5(String[] paths) throws IOException, InterruptedException {
         Joosc.compileSTL(paths);
         String exitCode = callBash();
-        int result = Integer.parseInt(exitCode);
+        String[] raw = exitCode.split("\\\\");
+        int result;
+        if (raw.length > 1) {
+            exitCode = raw[1];
+        }
+        result = Integer.parseInt(exitCode);
         return result;
     }
  }

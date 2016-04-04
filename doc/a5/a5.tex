@@ -7,6 +7,7 @@
 \usepackage{algorithm}
 \usepackage{amsmath}
 \usepackage{listings}
+
 %\usepackage[parfill]{parskip}
 \usepackage[a4paper,left=3cm,right=3cm,top=2.5cm,bottom=2.5cm]{geometry}
 \usepackage{titlesec, color}
@@ -48,10 +49,11 @@ bleh
 \chapter{Design}
 \label{design}
 
-\section{Conventions}
+\secion{Conventions}
 
 \subsection{Calling Convention}
 \label{calling}
+
 A consistent subroutine calling convention is used in all the NASM code generated. The scheme implemented by the team requires that:
 \begin{enumerate}
 \item All arguments for a subroutine are stored on the stack.
@@ -70,7 +72,9 @@ The order of arguments in this scheme is different from that in \textbf{cdecl} o
 
 In general, this scheme applies no matter the subroutine generated is in effect a Java method or a helper subroutine used in the NASM code generated. The only exceptions are the subroutines provided by the library \emph{runtime.s}, where we will store the input for the subroutine in register \emph{eax}. This includes when the native method \emph{PrintStream.nativeWrite()} is called.
 
+
 \subsection{Stack Frame and Local Variable Storage}
+
 
 As specified by the calling convention described in the last section, in a subroutine call the callee allocates and cleans the stack frame. Local variables are assigned addresses in reference to the frame pointer (\emph{ebp}, also called base pointer in NASM). For example the first local variable declared in a Java method is stored in the address (ebp - 4), and the second is in (ebp - 8). The real offset starts from 4 because [ebp] is the old frame pointer from the caller stored by callee, following our calling scheme. Figure~\ref{stack_frame} shows the structure of the stack frame implemented.
 
@@ -80,6 +84,7 @@ As specified by the calling convention described in the last section, in a subro
 \end{figure}
 
 % possible algo for stack allocation and cleanup.
+
 
 \subsection{Class Layout}
 \label{class_layout}
@@ -96,6 +101,7 @@ For the sake of clarity, we decide to generate an assembly file for each Java cl
 In the case where a \emph{test()} method is specified in the class, a \emph{\_start} subroutine is also generated in the class assembly file. The \emph{\_start} subroutine initializes the class fields by calling the initialization subroutines for each class. Within each class the class fields are initialized in the order they are declared. After the initialization, the subroutine that implements the \emph{test()} method in assembly is called. Each non-native method is implemented as a subroutine in assembly and follows the calling convention.
 
 The virtual method table is used in order to support method overriding. It also contains pointers to tables for computing interface method offset and class hierarchy. The detail of the virtual method table will be discussed later in Section~\ref{method_invoke}. 
+
 
 \subsection{Object and Array Layout}
 \label{object_layout}
@@ -185,6 +191,7 @@ Constructors are invoked through their labels, just like static methods. Constru
 Java requires type checking at runtime for the \emph{cast} expression and \emph{instanceof} expression. This is supported by the subtype table. The subtype table is similar to the interface method table as it contains a column (array) for each type. However in this case columns for array types are included too. When checking if an object $a$ is an instance type $T$, we access the subtype table through $a$'s pointer to its class, and then the pointer in its class to the subtype table column. Each type is also associated with an offset in the subtype table. Therefore we could retrieve $T$'s offset in compile-time and access its entry in $a$'s column based on the offset. The entry is \emph{true} if $a$ is an instance of $T$, and \emph{false} otherwise. The checking for the cast expression goes through the same process.
 
 It should be noted that array types do not have their own assembly files, so their type label is generated in a special file and contains only a pointer to their column in the subtype table.
+
 
 
 \clearpage

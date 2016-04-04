@@ -85,13 +85,16 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
          extern.add(charArrSig);
 	 StringUtility.appendLine(dataSection, "STRCHARS_" + litCounter + ":");
          StringUtility.appendLine(dataSection, "\tdd " + charArrSig);
-        List<String> string = StringLitHelper(node.value);
-        StringUtility.appendLine(dataSection, "\t" + "dd " + string.size());
-	 StringLitHelper(node.value);
-        for (String s : string) {
-            StringUtility.appendLine(dataSection, "\t" + "dd '" + s + "'");
-        }
-        StringUtility.appendLine(stringText, "\tmov dword eax, " + "STRING_" + litCounter);
+         List<String> string = StringLitHelper(node.value);
+         StringUtility.appendLine(dataSection, "\t" + "dd " + string.size());
+         for (String s : string) {
+             if (s.charAt(0) == '\\') {
+                 StringUtility.appendLine(dataSection, "\t" + "dd `" + s + "`");
+             } else {
+                 StringUtility.appendLine(dataSection, "\t" + "dd '" + s + "'");
+             }
+         }
+         StringUtility.appendLine(stringText, "\tmov dword eax, " + "STRING_" + litCounter);
 	 node.attachCode(stringText.toString());
      }
 
@@ -183,9 +186,14 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
 	 StringUtility.appendLine(dataSection, "CHAR_" + litCounter + ":" + "\t; define label for char literal");
 	 // Assuming octal is valid.
 	 if (node.value.length() > 3) {
-	     StringUtility.appendLine(dataSection, "\t" + "dd " + node.value.substring(1));
+	     StringUtility.appendLine(dataSection, "\t" + "dd 0o" + node.value.substring(1));
 	 } else {
-	     StringUtility.appendLine(dataSection, "\t" + "dd " + "'" + node.value + "'");
+	     if (node.value.charAt(0) == '\\') {
+	         StringUtility.appendLine(dataSection, "\t" + "dd " + "`" + node.value + "`");
+	     } else {
+	         StringUtility.appendLine(dataSection, "\t" + "dd " + "'" + node.value + "'");
+	     }
+	     
 	 }
 	 StringUtility.appendLine(charText, "\t" + "mov dword eax, " + "[CHAR_" + litCounter + "]");
 	 node.attachCode(charText + "\n");
@@ -253,12 +261,6 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
 
     private void generatePlus(InfixExpression node) throws Exception {
         StringBuilder plusText = new StringBuilder();
-        if (node.lhs != null) {
-            node.lhs.accept(this);
-        }
-        if (node.rhs != null) {
-            node.rhs.accept(this);
-        }
 
         Type lhsType = node.lhs.getType();
         Type rhsType = node.rhs.getType();
@@ -270,6 +272,13 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
             concat.accept(this);
             plusText.append(concat.getCode());
         } else {
+	    if (node.lhs != null) {
+		node.lhs.accept(this);
+	    }
+	    if (node.rhs != null) {
+		node.rhs.accept(this);
+	    }
+
             String lhsCode = node.lhs.getCode();
             String rhsCode = node.rhs.getCode();
             plusText.append(lhsCode);
@@ -976,7 +985,7 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
 	     StringUtility.appendIndLn(sb, "mov eax, " + label);
 	 }else {
 	     TypeDeclaration parent = (TypeDeclaration) fDecl.getParent();
-	     int offset = parent.getFieldOffSet(fDecl.id);
+	     int offset = parent.getFieldOffSet(SigHelper.getFieldSig(fDecl));
 	     offset = 4 * (offset + 1);
 	     StringUtility.appendIndLn(sb, "mov dword eax, [ebp + 8] \t; put object address in eax");
 
@@ -1034,7 +1043,7 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
 		     // node is instance field, with object in eax
 		     FieldDeclaration fDecl = (FieldDeclaration) node.getDeclaration();
 		     TypeDeclaration tDecl = (TypeDeclaration) fDecl.getParent();
-		     int offset = tDecl.getFieldOffSet(fDecl.id);
+		     int offset = tDecl.getFieldOffSet(SigHelper.getFieldSig(fDecl));
 		     offset = (offset + 1) * 4;	// real offset 
 		     StringUtility.appendIndLn(sb, "add eax, " + offset);
 		 }
@@ -1061,7 +1070,7 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
 		     StringUtility.appendIndLn(sb, "add eax, 4");
 		 } else {// instance field
 		     TypeDeclaration tDecl = node.expr.getType().getDeclaration();
-		     int offset = tDecl.getFieldOffSet(node.id.toString());
+		     int offset = tDecl.getFieldOffSet(SigHelper.getFieldSig((FieldDeclaration) node.id.getDeclaration()));
 		     offset = (offset+1) * 4;// real offset
 		     StringUtility.appendIndLn(sb, "add eax, " + offset);
 		 }
