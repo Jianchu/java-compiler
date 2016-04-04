@@ -186,7 +186,8 @@ public class CodeGenerator extends TraversalVisitor {
 		StringUtility.appendLine(textSection, "dd " + methodSigInDec, 2);
 	    }
         } else {
-            if (!mDecl.isAbstract) {
+            TypeDeclaration Tdec = (TypeDeclaration) mDecl.getParent();
+            if (!Tdec.isInterface) {
                 int offSet = node.getMethodOffSet(mName);
 		SigOffsets.put(offSet, methodSigInDec);
 	    }
