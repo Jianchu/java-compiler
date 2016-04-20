@@ -2,8 +2,8 @@ package ast;
 
 import java.util.List;
 
-import exceptions.ASTException;
 import parser.ParseTree;
+import exceptions.ASTException;
 
 public class InstanceofExpression extends Expression {
     public Expression expr;
@@ -15,7 +15,7 @@ public class InstanceofExpression extends Expression {
         type = Type.parseType(subtrees.get(2));
     }
     
-	public void accept(Visitor v) throws Exception {
-		v.visit(this);
-	}
+    public void accept(Visitor v) throws Exception {
+        v.visit(this);
+    }
 }

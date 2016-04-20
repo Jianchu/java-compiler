@@ -1,6 +1,47 @@
 package environment;
 
-import ast.*;
+import ast.ArrayAccess;
+import ast.ArrayCreationExpression;
+import ast.ArrayType;
+import ast.AssignmentExpression;
+import ast.Block;
+import ast.BodyDeclaration;
+import ast.BooleanLiteral;
+import ast.CastExpression;
+import ast.CharacterLiteral;
+import ast.ClassInstanceCreationExpression;
+import ast.CompilationUnit;
+import ast.Expression;
+import ast.ExpressionStatement;
+import ast.FieldAccess;
+import ast.FieldDeclaration;
+import ast.ForStatement;
+import ast.IfStatement;
+import ast.ImportDeclaration;
+import ast.InfixExpression;
+import ast.InstanceofExpression;
+import ast.IntegerLiteral;
+import ast.MethodDeclaration;
+import ast.MethodInvocation;
+import ast.Modifier;
+import ast.NullLiteral;
+import ast.PackageDeclaration;
+import ast.PrefixExpression;
+import ast.PrimitiveType;
+import ast.QualifiedName;
+import ast.ReturnStatement;
+import ast.SimpleName;
+import ast.SimpleType;
+import ast.Statement;
+import ast.StringLiteral;
+import ast.ThisExpression;
+import ast.Type;
+import ast.TypeDeclaration;
+import ast.VariableDeclaration;
+import ast.VariableDeclarationExpression;
+import ast.VariableDeclarationStatement;
+import ast.Visitor;
+import ast.WhileStatement;
 
 
 /**
@@ -84,11 +125,11 @@ public class TraversalVisitor implements Visitor{
      * Statement
      */
     public void visit(Block node) throws Exception {
-		if (node.statements.size() > 0) {
-			Statement first = node.statements.get(0);
-			first.accept(this);
-		}
-		visitNextStatement(node);
+        if (node.statements.size() > 0) {
+            Statement first = node.statements.get(0);
+            first.accept(this);
+        }
+        visitNextStatement(node);
     }
 
     public void visit(ExpressionStatement node) throws Exception {
@@ -128,8 +169,8 @@ public class TraversalVisitor implements Visitor{
     }
 
     public void visit(ReturnStatement node) throws Exception {
-    	if (node.returnExpression != null)
-    		node.returnExpression.accept(this);
+        if (node.returnExpression != null)
+            node.returnExpression.accept(this);
         visitNextStatement(node);
     }
 
@@ -260,8 +301,8 @@ public class TraversalVisitor implements Visitor{
     public void visit(IntegerLiteral node) throws Exception {
     }
 
-    public void visit(MethodInvocation node) throws Exception {    	
-    	if (node.expr != null) {
+    public void visit(MethodInvocation node) throws Exception {
+        if (node.expr != null) {
             node.expr.accept(this);
         }
         if (node.arglist != null) {

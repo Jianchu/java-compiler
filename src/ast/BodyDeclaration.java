@@ -9,5 +9,5 @@ package ast;
  *
  */
 public abstract class BodyDeclaration extends ASTNode{
-	
+
 }

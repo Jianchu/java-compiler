@@ -2,8 +2,8 @@ package ast;
 
 import java.util.List;
 
-import exceptions.ASTException;
 import parser.ParseTree;
+import exceptions.ASTException;
 
 public class ArrayCreationExpression extends Expression {
     public Type type;
@@ -14,8 +14,8 @@ public class ArrayCreationExpression extends Expression {
         type = Type.parseType(subtrees.get(1));
         expr = Expression.parseExpression(subtrees.get(2).getChildren().get(1));
     }
-    
-	public void accept(Visitor v) throws Exception {
-		v.visit(this);
-	}
+
+    public void accept(Visitor v) throws Exception {
+        v.visit(this);
+    }
 }

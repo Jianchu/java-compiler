@@ -18,7 +18,7 @@ public class VariableDeclarationStatement extends Statement {
     // return this.varDeclar;
     // }
     
-	public void accept(Visitor v) throws Exception {
-		v.visit(this);
-	}
+    public void accept(Visitor v) throws Exception {
+        v.visit(this);
+    }
 }

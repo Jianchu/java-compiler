@@ -54,7 +54,7 @@ public class CastExpression extends Expression {
             this.type = new ArrayType(this.type);
         }
     }
-    
+
     public void accept(Visitor v) throws Exception {
         v.visit(this);
     }

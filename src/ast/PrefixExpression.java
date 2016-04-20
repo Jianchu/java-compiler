@@ -2,8 +2,8 @@ package ast;
 
 import java.util.List;
 
-import exceptions.ASTException;
 import parser.ParseTree;
+import exceptions.ASTException;
 
 public class PrefixExpression extends Expression {
     public Operator op;
@@ -21,7 +21,7 @@ public class PrefixExpression extends Expression {
         expr = Expression.parseExpression(subtrees.get(1));
     }
     
-	public void accept(Visitor v) throws Exception {
-		v.visit(this);
-	}
+    public void accept(Visitor v) throws Exception {
+        v.visit(this);
+    }
 }

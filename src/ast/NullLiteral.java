@@ -1,6 +1,5 @@
 package ast;
 
-import exceptions.ASTException;
 
 /**
  * for now empty class is enough.
@@ -8,12 +7,12 @@ import exceptions.ASTException;
  *
  */
 public class NullLiteral extends Expression {
-	
-	public NullLiteral() {
-		
-	}
-	
-	public void accept(Visitor v) throws Exception {
-		v.visit(this);
-	}
+
+    public NullLiteral() {
+
+    }
+
+    public void accept(Visitor v) throws Exception {
+        v.visit(this);
+    }
 }

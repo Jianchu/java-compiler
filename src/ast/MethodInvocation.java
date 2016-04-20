@@ -2,8 +2,8 @@ package ast;
 
 import java.util.List;
 
-import exceptions.ASTException;
 import parser.ParseTree;
+import exceptions.ASTException;
 
 public class MethodInvocation extends Expression {
     public Expression expr;
@@ -27,14 +27,14 @@ public class MethodInvocation extends Expression {
             }
         }
     }
-    
+
     public MethodInvocation(Expression expr, SimpleName id, List<Expression> arglist ) {
         this.expr = expr;
         this.id = id;
         this.arglist = arglist;
     }
-    
-	public void accept(Visitor v) throws Exception {
-		v.visit(this);
-	}
+
+    public void accept(Visitor v) throws Exception {
+        v.visit(this);
+    }
 }

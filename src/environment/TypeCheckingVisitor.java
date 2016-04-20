@@ -60,11 +60,9 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
     private TypeDeclaration currentTypeDecl;
     private FieldDeclaration currentField;
     // maybe need to add or delete some methods...
-    
-
     // for forward reference checking
-	Set<FieldDeclaration> unseenFields = new HashSet<FieldDeclaration>();
-	boolean isFieldInit = false;
+    Set<FieldDeclaration> unseenFields = new HashSet<FieldDeclaration>();
+    boolean isFieldInit = false;
     
     @Override
     public void visit(CompilationUnit node) throws Exception {
@@ -157,7 +155,7 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
         if (TypeHelper.assignable(lhsType, exprType)) {
             node.attachType(lhsType);
         } else {
-//        	System.out.println((lhsType instanceof ArrayType) + " : " + (exprType instanceof ArrayType));
+//            System.out.println((lhsType instanceof ArrayType) + " : " + (exprType instanceof ArrayType));
             throw new TypeCheckingException("Invalid assignment, incomparable types: " + lhsType + ":=" + exprType);
         }
     }
@@ -182,16 +180,14 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
             node.unary.accept(this);
         }
         Type unaryType = node.unary.getType();
-        
+
 //        System.out.println("" + castToType + (castToType.getDeclaration() == null));
 //        System.out.println("" + unaryType + (unaryType.getDeclaration() == null));
-
-
         // break cast into three cases:
         if (checkPrimitive(castToType, unaryType, false)) {
-        	node.attachType(castToType);
+            node.attachType(castToType);
         } else if (checkPrimitive(castToType, unaryType, true)) {
-        	node.attachType(new PrimitiveType(Value.BOOLEAN));
+            node.attachType(new PrimitiveType(Value.BOOLEAN));
         } else if (TypeHelper.assignable(castToType, unaryType) || TypeHelper.assignable(unaryType, castToType)) {
             if (castToType instanceof ArrayType) {
                 ArrayType aCastToType = (ArrayType) castToType;
@@ -200,7 +196,7 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
                 node.attachType(simpleTypeBuilder((SimpleType) castToType));
             }
         } else {
-        	throw new TypeCheckingException("No type found for cast.");
+            throw new TypeCheckingException("No type found for cast.");
         }
     }
 
@@ -208,8 +204,6 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
     public void visit(CharacterLiteral node) throws Exception {
         node.attachType(new PrimitiveType(Value.CHAR));
     }
-    
-
     /**
      * get the constructors of node.type
      * check whether node.arglist matches the parameters of one of the constructors
@@ -240,7 +234,7 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
         Map<String, MethodDeclaration> constructors = typeDec.getEnvironment().constructors;
         if (constructors.containsKey(realConstructorName)) {
             MethodDeclaration conDec = constructors.get(realConstructorName);
-            node.addConstructor(conDec); 	// add pointer from expression to actual method declaration
+            node.addConstructor(conDec);     // add pointer from expression to actual method declaration
             if (conDec.modifiers.contains(Modifier.PROTECTED)) {
                 checkConstructorProtected(typeDec);
             }
@@ -266,31 +260,27 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
     @Override
     public void visit(FieldAccess node) throws Exception {
         // TODO: check protected
-    	if (node.expr != null) {
+        if (node.expr != null) {
             node.expr.accept(this);
         }
         Type exprType = node.expr.getType();
         
         if (exprType instanceof ArrayType && node.id.toString().equals("length")) {
-        	node.attachType(new PrimitiveType(Value.INT));
+            node.attachType(new PrimitiveType(Value.INT));
         } else if (exprType instanceof SimpleType) {
             TypeDeclaration prefixDecl = node.expr.getType().getDeclaration();
             FieldDeclaration fDecl = prefixDecl.getEnvironment().lookUpField(node.id.toString());
             node.id.attachDeclaration(fDecl);
             node.attachType(fDecl.type);
             if (fDecl.modifiers.contains(Modifier.PROTECTED))
-            	checkProtectedField(prefixDecl, fDecl);
+                checkProtectedField(prefixDecl, fDecl);
             
         } else {
-        	throw new TypeCheckingException("field access unrecognized type." );
+            throw new TypeCheckingException("field access unrecognized type." );
         }
-
-        
     }
 
-
-
-	@Override
+    @Override
     public void visit(InfixExpression node) throws Exception {
         if (node.lhs != null) {
             node.lhs.accept(this);
@@ -352,57 +342,57 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
                 expr.accept(this);
                 // save the parameter types to a list
                 if (expr.getType() instanceof Void || expr.getType() == null) {
-                	throw new TypeCheckingException("return type of parameter cannot be void.");
+                    throw new TypeCheckingException("return type of parameter cannot be void.");
                 }
                 argTypes.add(expr.getType());
             }
         }
         
         if (node.id != null) {
-        	// Primary.id(...)
-        	node.expr.accept(this);	// there should always be an expression
-        	TypeDeclaration prefixDecl = node.expr.getType().getDeclaration();
-        	String methodName = NameHelper.mangle(node.id.toString(), argTypes);
-        	MethodDeclaration mDecl = prefixDecl.getEnvironment().lookUpMethod(methodName);
-        	if (mDecl == null)
-        		throw new TypeCheckingException("Method invocation [Primary].[ID]() not recoginzed: " + node.expr + " " + node.id);
-        	
-        	if (mDecl.returnType != null) {
-        		node.attachType(mDecl.returnType);
-        	} else {
-        		node.attachType(new Void());
-        	}
-        	
-        	// resolve the declaration of id too
-        	node.id.attachDeclaration(mDecl);
-        	
-        	// check protected method
-        	if (mDecl.modifiers.contains(Modifier.PROTECTED)) {
-        		checkInstanceProtected(prefixDecl, methodName);
-        	}
-        	// check that it is not a static method
-        	checkNonStatic(mDecl);
-        	
+            // Primary.id(...)
+            node.expr.accept(this);    // there should always be an expression
+            TypeDeclaration prefixDecl = node.expr.getType().getDeclaration();
+            String methodName = NameHelper.mangle(node.id.toString(), argTypes);
+            MethodDeclaration mDecl = prefixDecl.getEnvironment().lookUpMethod(methodName);
+            if (mDecl == null)
+                throw new TypeCheckingException("Method invocation [Primary].[ID]() not recoginzed: " + node.expr + " " + node.id);
+            
+            if (mDecl.returnType != null) {
+                node.attachType(mDecl.returnType);
+            } else {
+                node.attachType(new Void());
+            }
+            
+            // resolve the declaration of id too
+            node.id.attachDeclaration(mDecl);
+            
+            // check protected method
+            if (mDecl.modifiers.contains(Modifier.PROTECTED)) {
+                checkInstanceProtected(prefixDecl, methodName);
+            }
+            // check that it is not a static method
+            checkNonStatic(mDecl);
+            
         } else if (node.expr instanceof Name) {
-        	// Name(...)
-        	Name mn = (Name) node.expr;
+            // Name(...)
+            Name mn = (Name) node.expr;
                 // TODO: Check whether this check is right...
-        	if (!checkThisInMethod(mn)) {
-        	    throw new TypeCheckingException("Cannot implicitly call this expression in static method.");
-        	}
-        	resolveMethodName(mn, argTypes);
-        	MethodDeclaration mDecl = (MethodDeclaration) mn.getDeclaration();
-        	if (mDecl.returnType != null)
-        		node.attachType(mDecl.returnType);
-        	else {
-        		node.attachType(new Void());
-        	}
+            if (!checkThisInMethod(mn)) {
+                throw new TypeCheckingException("Cannot implicitly call this expression in static method.");
+            }
+            resolveMethodName(mn, argTypes);
+            MethodDeclaration mDecl = (MethodDeclaration) mn.getDeclaration();
+            if (mDecl.returnType != null)
+                node.attachType(mDecl.returnType);
+            else {
+                node.attachType(new Void());
+            }
         } else {
-        	throw new TypeCheckingException("Method invocation: " + node.expr + " " + node.id);
+            throw new TypeCheckingException("Method invocation: " + node.expr + " " + node.id);
         }
 //        System.out.println("~~~~~~~");
     }
-    
+
     private boolean checkThisInMethod(Name name) {
         if (name instanceof SimpleName) {
             if (!checkThisInField()) {
@@ -465,7 +455,7 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
                     + node.variableDeclaration.type.toString());
         }
     }
-    
+
     @Override
     public void visit(SimpleType node) {
             // do nothing. Types have already been processed
@@ -515,7 +505,7 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
         }
         curr = last;
     }
-    
+
     @Override
     public void visit(ForStatement node) throws Exception {
         last = curr;
@@ -572,36 +562,35 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
         }
         visitNextStatement(node);
     }
- 
-    
-    @Override
-	public void visit(TypeDeclaration node) throws Exception {
-		currentTypeDecl = node;
-		for (FieldDeclaration fd : node.getEnvironment().fields.values()) {
-			unseenFields.add(fd);
-		}
-		super.visit(node);
 
-		// Because there is no explicit super call in joos1W, so every super
+    @Override
+    public void visit(TypeDeclaration node) throws Exception {
+        currentTypeDecl = node;
+        for (FieldDeclaration fd : node.getEnvironment().fields.values()) {
+            unseenFields.add(fd);
+        }
+        super.visit(node);
+
+        // Because there is no explicit super call in joos1W, so every super
                 // class has to have a constructor without any parameters, otherwise
                 // the implicit super call will fail.
-		boolean hasValidConstructor = false;
-		if ((node.superClass != null) && (node.getEnvironment().constructors.size() > 0)) {
-		    Map<String, MethodDeclaration> superConstructors = node.superClass.getDeclaration().getEnvironment().constructors;
-		    for (String s : superConstructors.keySet()) {
-		        List<VariableDeclaration> parameters = superConstructors.get(s).parameters;
-		        if (parameters.size() == 0) {
-		            hasValidConstructor = true;
-		        }
-		    }
-		} else {
-		    //means implicit super call won't happen.
-		    hasValidConstructor = true;
-		}
-		if (!hasValidConstructor) {
-		    throw new TypeCheckingException("No constructor without parameters in super class");
-		}
-	}
+        boolean hasValidConstructor = false;
+        if ((node.superClass != null) && (node.getEnvironment().constructors.size() > 0)) {
+            Map<String, MethodDeclaration> superConstructors = node.superClass.getDeclaration().getEnvironment().constructors;
+            for (String s : superConstructors.keySet()) {
+                List<VariableDeclaration> parameters = superConstructors.get(s).parameters;
+                if (parameters.size() == 0) {
+                    hasValidConstructor = true;
+                }
+            }
+        } else {
+            //means implicit super call won't happen.
+            hasValidConstructor = true;
+        }
+        if (!hasValidConstructor) {
+            throw new TypeCheckingException("No constructor without parameters in super class");
+        }
+    }
 
     @Override
     public void visit(FieldDeclaration node) throws Exception {
@@ -698,7 +687,7 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
                 throw new TypeCheckingException("Cannot implicitly call this in static method.");
             }
         }
-    	resolveNameType(name);
+        resolveNameType(name);
     }
     
     private boolean checkThisInField() {
@@ -714,15 +703,14 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
      * only search for variable or field name
      */
     public void visit(QualifiedName name) throws TypeCheckingException {
-    	checkProtected(name);
-    	checkStaticUseOfNonStatic(name);
-    	resolveNameType(name);
-    	
+        checkProtected(name);
+        checkStaticUseOfNonStatic(name);
+        resolveNameType(name);
+        
     }
     
 
-
-	private boolean checkThisInMethod(Name name, FieldDeclaration fDecl) {
+    private boolean checkThisInMethod(Name name, FieldDeclaration fDecl) {
         if (name instanceof SimpleName) {
             if (this.currentMethod != null) {
                 if (this.currentMethod.modifiers.contains(Modifier.STATIC)) {
@@ -747,149 +735,148 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
     }
 
     private void checkStaticUseOfNonStatic(QualifiedName name) throws TypeCheckingException {
-    	// TODO Auto-generated method stub
-    	List<Name> prefixList = name.getPrefixList();
-    	for (Name n : prefixList) {
-    		ASTNode decl = name.getDeclaration();
-    		if (decl instanceof FieldDeclaration) {
-    			FieldDeclaration fDecl = (FieldDeclaration) decl;
-    			if (!fDecl.modifiers.contains(Modifier.STATIC)) {
-    				if (checkStaticUse(name)) {
-    					throw new TypeCheckingException("Statically using a non-static field");
-    				}
-    			}
-    		}
-    	}
-	}
-    
+        // TODO Auto-generated method stub
+        List<Name> prefixList = name.getPrefixList();
+        for (Name n : prefixList) {
+            ASTNode decl = name.getDeclaration();
+            if (decl instanceof FieldDeclaration) {
+                FieldDeclaration fDecl = (FieldDeclaration) decl;
+                if (!fDecl.modifiers.contains(Modifier.STATIC)) {
+                    if (checkStaticUse(name)) {
+                        throw new TypeCheckingException("Statically using a non-static field");
+                    }
+                }
+            }
+        }
+    }
+
     private void resolveNameType(Name name) throws TypeCheckingException {
-//    	System.out.println("\t" + name + ":" + (name.getDeclaration() == null));
-    	ASTNode decl = name.getDeclaration();
-    	if (decl instanceof VariableDeclaration) {
-    		VariableDeclaration vDecl = (VariableDeclaration) decl;
-//    		System.out.println(name + ":" +vDecl.type +" " + vDecl.id );
-    		name.attachType(vDecl.type);
-    	} else if (decl instanceof FieldDeclaration) {
-    		FieldDeclaration fDecl = (FieldDeclaration) decl;
+//        System.out.println("\t" + name + ":" + (name.getDeclaration() == null));
+        ASTNode decl = name.getDeclaration();
+        if (decl instanceof VariableDeclaration) {
+            VariableDeclaration vDecl = (VariableDeclaration) decl;
+//            System.out.println(name + ":" +vDecl.type +" " + vDecl.id );
+            name.attachType(vDecl.type);
+        } else if (decl instanceof FieldDeclaration) {
+            FieldDeclaration fDecl = (FieldDeclaration) decl;
 //            if (!fDecl.modifiers.contains(Modifier.STATIC)) {
 //                if (checkStaticUse(name)) {
 //                    throw new TypeCheckingException("Statically using a non-static field");
 //                }
 //            }
-    		name.attachType(fDecl.type);
-    	} else if (decl == null && name instanceof QualifiedName){
-    		// array.length
-    		QualifiedName qn = (QualifiedName) name;
-    		if (qn.isArrayLength) {
-    			
-    		    //check that the qualifier is ArrayType.
-    		    Name qualifier = qn.getQualifier();
-    		    if (qualifier != null) {
-    		        resolveNameType(qualifier);
-    		    }
-    		    if (qualifier.getType() instanceof ArrayType) {
-    		        name.attachType(new PrimitiveType(Value.INT));
-    		    } else {
-    		        throw new TypeCheckingException("non-array type cannot call length: " + name);
-    		    }
-    		} else {
-    			throw new TypeCheckingException("Declaration found for non-array fields.");
-    		}
-    	} else {
-    		throw new TypeCheckingException("Field or variable name not recoginzed: " + name.toString());
-    	}
-    	
+            name.attachType(fDecl.type);
+        } else if (decl == null && name instanceof QualifiedName){
+            // array.length
+            QualifiedName qn = (QualifiedName) name;
+            if (qn.isArrayLength) {
+                
+                //check that the qualifier is ArrayType.
+                Name qualifier = qn.getQualifier();
+                if (qualifier != null) {
+                    resolveNameType(qualifier);
+                }
+                if (qualifier.getType() instanceof ArrayType) {
+                    name.attachType(new PrimitiveType(Value.INT));
+                } else {
+                    throw new TypeCheckingException("non-array type cannot call length: " + name);
+                }
+            } else {
+                throw new TypeCheckingException("Declaration found for non-array fields.");
+            }
+        } else {
+            throw new TypeCheckingException("Field or variable name not recoginzed: " + name.toString());
+        }
+        
     }
-    
-    private void checkProtected(QualifiedName name) throws TypeCheckingException {
-		List<Name> prefixList = name.getPrefixList();
-		ASTNode previousDecl = prefixList.get(0).getDeclaration();
-		TypeDeclaration previousTd = null;	// type declaration containing fDecl
-		
-		int i;
-		ASTNode prefixDecl = null;
-		for (i = 1; i < prefixList.size(); i++) {	// skip the first one
-			Name prefix = prefixList.get(i);
-			prefixDecl = prefix.getDeclaration();
-			if (prefixDecl instanceof FieldDeclaration) {
-				FieldDeclaration fDecl = (FieldDeclaration) prefixDecl;
-				previousTd = getTypeDecl(previousDecl);
-				if (fDecl.modifiers.contains(Modifier.PROTECTED) ) {
-					// check preivous declaration
-					checkProtectedField(previousTd, fDecl);
-					
-				}
-			} 
-			// if TypeDeclaration or null, just go on.
-			previousDecl = prefixDecl;
-		}
-		// if the last part is a method
-		if (prefixDecl instanceof MethodDeclaration) {
-			previousTd = getTypeDecl(prefixList.get(prefixList.size() - 2).getDeclaration());
-			MethodDeclaration md = (MethodDeclaration) prefixDecl;
-			if (md.modifiers.contains(Modifier.PROTECTED))
-				checkProtectedMethod(previousTd, md);
-		}
-	}
-    
-    private void checkProtectedField(TypeDeclaration previousTd, FieldDeclaration fDecl) throws TypeCheckingException {
-		// if this type does not inherit from the type where field is declared, error
-		TypeDeclaration fDeclType = (TypeDeclaration) fDecl.getParent();
-		if (!TypeHelper.inheritsFrom(fDeclType, currentTypeDecl)) {
-		    if (!samePkg(fDeclType, currentTypeDecl)) {
-		        throw new TypeCheckingException("Illegal access to protected field: " + fDecl.id);
-		    }
-		}
-			
-		
-		// in addition for instance field, if the prefix is not subclass of this class, error
-		if (!fDecl.modifiers.contains(Modifier.STATIC))
-			checkInstanceProtected(previousTd, fDecl.id);
-    }
-    
-    private void checkProtectedMethod(TypeDeclaration previousTd, MethodDeclaration mDecl) throws TypeCheckingException {
-		// if this type does not inherit from the type where field is declared, error
-		TypeDeclaration fDeclType = (TypeDeclaration) mDecl.getParent();
-		if (!TypeHelper.inheritsFrom(fDeclType, currentTypeDecl))
-			throw new TypeCheckingException("Illegal access to protected field: " + mDecl.id);
-		
-		// in addition for instance field, if the prefix is not subclass of this class, error
-		if (!mDecl.modifiers.contains(Modifier.STATIC))
-			checkInstanceProtected(previousTd, mDecl.id);
-    }
-    
-    private void checkInstanceProtected(TypeDeclaration prefixDecl, String name) throws TypeCheckingException {
-		if (!(samePkg(prefixDecl, currentTypeDecl) || TypeHelper.inheritsFrom(currentTypeDecl, prefixDecl))) {
-			// if not from the same package or subclass
-			throw new TypeCheckingException("Illegal access to protected member: " + name);
-		}
-	}
-    
-    private TypeDeclaration getTypeDecl(ASTNode previousDecl) throws TypeCheckingException {
-    	TypeDeclaration previousTd = null;
-    	if (previousDecl instanceof TypeDeclaration) {
-			// static access
-			 previousTd = (TypeDeclaration) previousDecl;
-		} else if (previousDecl instanceof FieldDeclaration || previousDecl instanceof VariableDeclaration) {
-			
-			Type previousType;
-			if (previousDecl instanceof FieldDeclaration) {
-				FieldDeclaration previousFd = (FieldDeclaration) previousDecl;
-				previousType = previousFd.type;
-			} else {
-				VariableDeclaration previousFd = (VariableDeclaration) previousDecl;
-				previousType = previousFd.type;
-			}
 
-			if (! (previousType instanceof SimpleType)) {
-				throw new TypeCheckingException("unexpected type in qualified name " + previousType);
-			}
-			previousTd = previousType.getDeclaration();
-		}
-    	return previousTd;
+    private void checkProtected(QualifiedName name) throws TypeCheckingException {
+        List<Name> prefixList = name.getPrefixList();
+        ASTNode previousDecl = prefixList.get(0).getDeclaration();
+        TypeDeclaration previousTd = null;    // type declaration containing fDecl
+        
+        int i;
+        ASTNode prefixDecl = null;
+        for (i = 1; i < prefixList.size(); i++) {    // skip the first one
+            Name prefix = prefixList.get(i);
+            prefixDecl = prefix.getDeclaration();
+            if (prefixDecl instanceof FieldDeclaration) {
+                FieldDeclaration fDecl = (FieldDeclaration) prefixDecl;
+                previousTd = getTypeDecl(previousDecl);
+                if (fDecl.modifiers.contains(Modifier.PROTECTED) ) {
+                    // check preivous declaration
+                    checkProtectedField(previousTd, fDecl);
+                    
+                }
+            } 
+            // if TypeDeclaration or null, just go on.
+            previousDecl = prefixDecl;
+        }
+        // if the last part is a method
+        if (prefixDecl instanceof MethodDeclaration) {
+            previousTd = getTypeDecl(prefixList.get(prefixList.size() - 2).getDeclaration());
+            MethodDeclaration md = (MethodDeclaration) prefixDecl;
+            if (md.modifiers.contains(Modifier.PROTECTED))
+                checkProtectedMethod(previousTd, md);
+        }
     }
-    
-	private SimpleType checkeStringConcat(Type type1, Type type2)
+
+    private void checkProtectedField(TypeDeclaration previousTd, FieldDeclaration fDecl) throws TypeCheckingException {
+        // if this type does not inherit from the type where field is declared, error
+        TypeDeclaration fDeclType = (TypeDeclaration) fDecl.getParent();
+        if (!TypeHelper.inheritsFrom(fDeclType, currentTypeDecl)) {
+            if (!samePkg(fDeclType, currentTypeDecl)) {
+                throw new TypeCheckingException("Illegal access to protected field: " + fDecl.id);
+            }
+        }
+
+        // in addition for instance field, if the prefix is not subclass of this class, error
+        if (!fDecl.modifiers.contains(Modifier.STATIC))
+            checkInstanceProtected(previousTd, fDecl.id);
+    }
+
+    private void checkProtectedMethod(TypeDeclaration previousTd, MethodDeclaration mDecl) throws TypeCheckingException {
+        // if this type does not inherit from the type where field is declared, error
+        TypeDeclaration fDeclType = (TypeDeclaration) mDecl.getParent();
+        if (!TypeHelper.inheritsFrom(fDeclType, currentTypeDecl))
+            throw new TypeCheckingException("Illegal access to protected field: " + mDecl.id);
+        
+        // in addition for instance field, if the prefix is not subclass of this class, error
+        if (!mDecl.modifiers.contains(Modifier.STATIC))
+            checkInstanceProtected(previousTd, mDecl.id);
+    }
+
+    private void checkInstanceProtected(TypeDeclaration prefixDecl, String name) throws TypeCheckingException {
+        if (!(samePkg(prefixDecl, currentTypeDecl) || TypeHelper.inheritsFrom(currentTypeDecl, prefixDecl))) {
+            // if not from the same package or subclass
+            throw new TypeCheckingException("Illegal access to protected member: " + name);
+        }
+    }
+
+    private TypeDeclaration getTypeDecl(ASTNode previousDecl) throws TypeCheckingException {
+        TypeDeclaration previousTd = null;
+        if (previousDecl instanceof TypeDeclaration) {
+            // static access
+             previousTd = (TypeDeclaration) previousDecl;
+        } else if (previousDecl instanceof FieldDeclaration || previousDecl instanceof VariableDeclaration) {
+            
+            Type previousType;
+            if (previousDecl instanceof FieldDeclaration) {
+                FieldDeclaration previousFd = (FieldDeclaration) previousDecl;
+                previousType = previousFd.type;
+            } else {
+                VariableDeclaration previousFd = (VariableDeclaration) previousDecl;
+                previousType = previousFd.type;
+            }
+
+            if (! (previousType instanceof SimpleType)) {
+                throw new TypeCheckingException("unexpected type in qualified name " + previousType);
+            }
+            previousTd = previousType.getDeclaration();
+        }
+        return previousTd;
+    }
+
+    private SimpleType checkeStringConcat(Type type1, Type type2)
             throws TypeCheckingException {
         if (type1 instanceof SimpleType) {
             if (type1.getDeclaration().getFullName().equals("java.lang.String")) {
@@ -998,124 +985,124 @@ public class TypeCheckingVisitor extends EnvTraversalVisitor {
         type.attachDeclaration(typeDec);
         return type;
     }
-    
-	private void resolveMethodName(Name name, List<Type> paramTypes) throws Exception {
-		if (name instanceof SimpleName)
-			resolveMethodName((SimpleName) name, paramTypes);
-		else {
-			QualifiedName qn = (QualifiedName) name;
-			resolveMethodName(qn, paramTypes);
-			checkProtected(qn);
-		}
-	}
-	
-	private void resolveMethodName(SimpleName name, List<Type> paramTypes) throws NameException {
-		MethodDeclaration mDecl = curr.lookUpMethod(NameHelper.mangle(name.toString(), paramTypes));
-		if (mDecl == null)
-			throw new NameException("Simple method name not recognized: " + name );
-		
-		name.attachDeclaration(mDecl);
-	}
-	
-	private void resolveMethodName(QualifiedName name, List<Type> paramTypes) throws Exception {
-		List<String> fn = name.getFullName();
-		List<Name> prefixList = name.getPrefixList();
-		ASTNode a1Decl;
-		if ((a1Decl  = curr.lookUpVariable(fn.get(0))) != null || (a1Decl = curr.lookUpField(fn.get(0))) != null) {
-			prefixList.get(0).attachDeclaration(a1Decl);
-			
-			// A1 is variable or a field, everything in the middle is an instance field
-			TypeDeclaration prefixDecl;
-			if (a1Decl instanceof VariableDeclaration)
-				prefixDecl = ((VariableDeclaration) a1Decl).type.getDeclaration();
-			else  {
-				prefixDecl = ((FieldDeclaration) a1Decl).type.getDeclaration();
-				if (isFieldInit && unseenFields.contains((FieldDeclaration) a1Decl)) {
-					throw new TypeCheckingException("forward reference of fields in method invocation: " + prefixDecl.id);
-				}
-			}
-			MethodDeclaration mDecl = searchMethod(name, prefixDecl, paramTypes);
-			name.attachDeclaration(mDecl);
-			return;
-		}
-		
-		for (int i = 1; i < fn.size(); i++) {
-			String prefix = String.join(".", fn.subList(0, i));
-			TypeDeclaration prefixDecl = curr.lookUpType(prefix);
-			if (prefixDecl != null) { // the prefix resolve to a type
-				prefixList.get(i-1).attachDeclaration(prefixDecl);	// attach type declaration
-				
-				int j = i;
-				while (j != fn.size() - 1) {	// everything in between is fields
-					FieldDeclaration fDecl = prefixDecl.getEnvironment().lookUpField(fn.get(j));	
-					if (j != i) {
-						checkNonStatic(fDecl);
-					}
-					prefixList.get(j).attachDeclaration(fDecl);
-					prefixDecl = fDecl.type.getDeclaration();
-					j++;
-				}
-				MethodDeclaration mDecl = prefixDecl.getEnvironment().lookUpMethod(NameHelper.mangle(fn.get(j), paramTypes));
-				if (i == j && !mDecl.modifiers.contains(Modifier.STATIC)) {
-					// static method
-					throw new TypeCheckingException("Nonstatic method accessed in a static manner: " + name);
-				} 
-				if (mDecl == null)
-					throw new TypeCheckingException("Method unrecognized: " + name.toString() + " ");
-				name.attachDeclaration(mDecl);
-				return;
-			}
-		}
-		
-		throw new NameException("Qualified Method not recognized: " + name);
-		
-	}
 
-	private MethodDeclaration searchMethod(QualifiedName name, TypeDeclaration prefixDecl, List<Type> paramTypes) throws NameException {
-		List<String> fn = name.getFullName();
-		List<Name> prefixList = name.getPrefixList();
-		int i = 1;
-		while (i < fn.size()-1) {
-			FieldDeclaration fDecl = prefixDecl.getEnvironment().lookUpField(fn.get(i));
-			if (fDecl == null) {
-				throw new NameException("Method prefix not recognized: " + String.join(".", fn.subList(0, i)));
-			}
-			checkNonStatic(fDecl);
-			prefixList.get(i).attachDeclaration(fDecl);
-			prefixDecl = fDecl.type.getDeclaration();
-			i++;
-		}
-		
-		MethodDeclaration mDecl = prefixDecl.getEnvironment().lookUpMethod(NameHelper.mangle(fn.get(i), paramTypes));
-		checkNonStatic(mDecl);
-		return mDecl;
-	}
-	
-	public static void typeCheck(List<AST> trees) throws Exception {
-		for (AST t : trees) {
-			Visitor tcv = new TypeCheckingVisitor();
-			t.root.accept(tcv);
-		}
-	}
-	
-	private boolean samePkg(TypeDeclaration typeDecl1, TypeDeclaration typeDecl2) {
-		String fn1 = typeDecl1.getFullName();
-		String pkg1 = fn1.substring(0, fn1.length() - typeDecl1.id.length());
-		String fn2 = typeDecl2.getFullName();
-		String pkg2 = fn2.substring(0, fn2.length() - typeDecl2.id.length());
-		return pkg1.equals(pkg2);
-		
-	}
-	
-	private void checkNonStatic(FieldDeclaration fd) throws NameException {
-		if (fd.modifiers.contains(Modifier.STATIC)) {
-			throw new NameException("Nonstatic access to static field. Static fields can only be accessed by type name in Joos");
-		}
-	}
-	
-	private void checkNonStatic(MethodDeclaration fd) throws NameException {
-		if (fd.modifiers.contains(Modifier.STATIC)) {
-			throw new NameException("Nonstatic access to static field. Static fields can only be accessed by type name in Joos");
-		}
-	}
+    private void resolveMethodName(Name name, List<Type> paramTypes) throws Exception {
+        if (name instanceof SimpleName)
+            resolveMethodName((SimpleName) name, paramTypes);
+        else {
+            QualifiedName qn = (QualifiedName) name;
+            resolveMethodName(qn, paramTypes);
+            checkProtected(qn);
+        }
+    }
+
+    private void resolveMethodName(SimpleName name, List<Type> paramTypes) throws NameException {
+        MethodDeclaration mDecl = curr.lookUpMethod(NameHelper.mangle(name.toString(), paramTypes));
+        if (mDecl == null)
+            throw new NameException("Simple method name not recognized: " + name );
+        
+        name.attachDeclaration(mDecl);
+    }
+
+    private void resolveMethodName(QualifiedName name, List<Type> paramTypes) throws Exception {
+        List<String> fn = name.getFullName();
+        List<Name> prefixList = name.getPrefixList();
+        ASTNode a1Decl;
+        if ((a1Decl  = curr.lookUpVariable(fn.get(0))) != null || (a1Decl = curr.lookUpField(fn.get(0))) != null) {
+            prefixList.get(0).attachDeclaration(a1Decl);
+            
+            // A1 is variable or a field, everything in the middle is an instance field
+            TypeDeclaration prefixDecl;
+            if (a1Decl instanceof VariableDeclaration)
+                prefixDecl = ((VariableDeclaration) a1Decl).type.getDeclaration();
+            else  {
+                prefixDecl = ((FieldDeclaration) a1Decl).type.getDeclaration();
+                if (isFieldInit && unseenFields.contains((FieldDeclaration) a1Decl)) {
+                    throw new TypeCheckingException("forward reference of fields in method invocation: " + prefixDecl.id);
+                }
+            }
+            MethodDeclaration mDecl = searchMethod(name, prefixDecl, paramTypes);
+            name.attachDeclaration(mDecl);
+            return;
+        }
+
+        for (int i = 1; i < fn.size(); i++) {
+            String prefix = String.join(".", fn.subList(0, i));
+            TypeDeclaration prefixDecl = curr.lookUpType(prefix);
+            if (prefixDecl != null) { // the prefix resolve to a type
+                prefixList.get(i-1).attachDeclaration(prefixDecl);    // attach type declaration
+                
+                int j = i;
+                while (j != fn.size() - 1) {    // everything in between is fields
+                    FieldDeclaration fDecl = prefixDecl.getEnvironment().lookUpField(fn.get(j));    
+                    if (j != i) {
+                        checkNonStatic(fDecl);
+                    }
+                    prefixList.get(j).attachDeclaration(fDecl);
+                    prefixDecl = fDecl.type.getDeclaration();
+                    j++;
+                }
+                MethodDeclaration mDecl = prefixDecl.getEnvironment().lookUpMethod(NameHelper.mangle(fn.get(j), paramTypes));
+                if (i == j && !mDecl.modifiers.contains(Modifier.STATIC)) {
+                    // static method
+                    throw new TypeCheckingException("Nonstatic method accessed in a static manner: " + name);
+                } 
+                if (mDecl == null)
+                    throw new TypeCheckingException("Method unrecognized: " + name.toString() + " ");
+                name.attachDeclaration(mDecl);
+                return;
+            }
+        }
+        
+        throw new NameException("Qualified Method not recognized: " + name);
+        
+    }
+
+    private MethodDeclaration searchMethod(QualifiedName name, TypeDeclaration prefixDecl, List<Type> paramTypes) throws NameException {
+        List<String> fn = name.getFullName();
+        List<Name> prefixList = name.getPrefixList();
+        int i = 1;
+        while (i < fn.size()-1) {
+            FieldDeclaration fDecl = prefixDecl.getEnvironment().lookUpField(fn.get(i));
+            if (fDecl == null) {
+                throw new NameException("Method prefix not recognized: " + String.join(".", fn.subList(0, i)));
+            }
+            checkNonStatic(fDecl);
+            prefixList.get(i).attachDeclaration(fDecl);
+            prefixDecl = fDecl.type.getDeclaration();
+            i++;
+        }
+        
+        MethodDeclaration mDecl = prefixDecl.getEnvironment().lookUpMethod(NameHelper.mangle(fn.get(i), paramTypes));
+        checkNonStatic(mDecl);
+        return mDecl;
+    }
+
+    public static void typeCheck(List<AST> trees) throws Exception {
+        for (AST t : trees) {
+            Visitor tcv = new TypeCheckingVisitor();
+            t.root.accept(tcv);
+        }
+    }
+
+    private boolean samePkg(TypeDeclaration typeDecl1, TypeDeclaration typeDecl2) {
+        String fn1 = typeDecl1.getFullName();
+        String pkg1 = fn1.substring(0, fn1.length() - typeDecl1.id.length());
+        String fn2 = typeDecl2.getFullName();
+        String pkg2 = fn2.substring(0, fn2.length() - typeDecl2.id.length());
+        return pkg1.equals(pkg2);
+        
+    }
+
+    private void checkNonStatic(FieldDeclaration fd) throws NameException {
+        if (fd.modifiers.contains(Modifier.STATIC)) {
+            throw new NameException("Nonstatic access to static field. Static fields can only be accessed by type name in Joos");
+        }
+    }
+
+    private void checkNonStatic(MethodDeclaration fd) throws NameException {
+        if (fd.modifiers.contains(Modifier.STATIC)) {
+            throw new NameException("Nonstatic access to static field. Static fields can only be accessed by type name in Joos");
+        }
+    }
 }

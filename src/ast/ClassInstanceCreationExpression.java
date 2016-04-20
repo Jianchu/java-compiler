@@ -25,19 +25,19 @@ public class ClassInstanceCreationExpression extends Expression {
         this.arglist = arglist;
     }
     
-	public void accept(Visitor v) throws Exception {
-		v.visit(this);
-	}
-	
-	public void addConstructor(MethodDeclaration constructor) {
-		this.constructor = constructor;
-	}
-	
-	public MethodDeclaration getConstructor() throws Exception {
-		if (this.constructor == null) {
-			throw new Exception("Constructor not found.");
-		}
-		return constructor;
-	}
-	
+    public void accept(Visitor v) throws Exception {
+        v.visit(this);
+    }
+
+    public void addConstructor(MethodDeclaration constructor) {
+        this.constructor = constructor;
+    }
+
+    public MethodDeclaration getConstructor() throws Exception {
+        if (this.constructor == null) {
+            throw new Exception("Constructor not found.");
+        }
+        return constructor;
+    }
+
 }

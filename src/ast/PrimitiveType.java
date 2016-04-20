@@ -57,11 +57,11 @@ public class PrimitiveType extends Type {
     }
     
     public static Set<String> primitives() {
-    	Set<String> primitives = new TreeSet<String>();
-		for (Value v : Value.values()) {
-			primitives.add(v.toString().toLowerCase());
-		}
-		return primitives;
+        Set<String> primitives = new TreeSet<String>();
+        for (Value v : Value.values()) {
+            primitives.add(v.toString().toLowerCase());
+        }
+        return primitives;
     }
     
 }

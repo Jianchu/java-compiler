@@ -58,44 +58,43 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
     private int ncCounter = 0;
     private int aaCounter = 0; // for array access label
     private int castCounter = 0; // for cast finish label
-     private boolean isLV = false;
+    private boolean isLV = false;
     //private boolean isPrefix = false;
 
-     public ExpressionCodeGenerator(Set<String> extern, StringBuilder dataSection) {
-	 this.extern = extern;
-	 this.dataSection = dataSection;
-	 
-     }
+    public ExpressionCodeGenerator(Set<String> extern, StringBuilder dataSection) {
+        this.extern = extern;
+        this.dataSection = dataSection;
+    }
 
      /*
       * Literals
       */
      // String is Object.
-     public void visit(StringLiteral node) throws Exception {
-         StringBuilder stringText = new StringBuilder();
-	 litCounter++;
+    public void visit(StringLiteral node) throws Exception {
+        StringBuilder stringText = new StringBuilder();
+        litCounter++;
 
-         String strSig = SigHelper.getClssSigWithVTable(SymbolTable.getGlobal().get("java.lang.String"));
-         extern.add(strSig);
-	 StringUtility.appendLine(dataSection, "STRING_" + litCounter + ":" + "\t; define label for string literal");
-         StringUtility.appendLine(dataSection, "\tdd " + strSig);
-         StringUtility.appendLine(dataSection, "\tdd " + "STRCHARS_" + litCounter);
+        String strSig = SigHelper.getClssSigWithVTable(SymbolTable.getGlobal().get("java.lang.String"));
+        extern.add(strSig);
+        StringUtility.appendLine(dataSection, "STRING_" + litCounter + ":" + "\t; define label for string literal");
+        StringUtility.appendLine(dataSection, "\tdd " + strSig);
+        StringUtility.appendLine(dataSection, "\tdd " + "STRCHARS_" + litCounter);
 
-         String charArrSig = SigHelper.getArrayVTableSigFromNonArray(new PrimitiveType(PrimitiveType.Value.CHAR));
-         extern.add(charArrSig);
-	 StringUtility.appendLine(dataSection, "STRCHARS_" + litCounter + ":");
-         StringUtility.appendLine(dataSection, "\tdd " + charArrSig);
-         List<String> string = StringLitHelper(node.value);
-         StringUtility.appendLine(dataSection, "\t" + "dd " + string.size());
-         for (String s : string) {
-             if (s.charAt(0) == '\\') {
-                 StringUtility.appendLine(dataSection, "\t" + "dd `" + s + "`");
-             } else {
-                 StringUtility.appendLine(dataSection, "\t" + "dd '" + s + "'");
-             }
-         }
-         StringUtility.appendLine(stringText, "\tmov dword eax, " + "STRING_" + litCounter);
-	 node.attachCode(stringText.toString());
+        String charArrSig = SigHelper.getArrayVTableSigFromNonArray(new PrimitiveType(PrimitiveType.Value.CHAR));
+        extern.add(charArrSig);
+        StringUtility.appendLine(dataSection, "STRCHARS_" + litCounter + ":");
+        StringUtility.appendLine(dataSection, "\tdd " + charArrSig);
+        List<String> string = StringLitHelper(node.value);
+        StringUtility.appendLine(dataSection, "\t" + "dd " + string.size());
+        for (String s : string) {
+            if (s.charAt(0) == '\\') {
+                StringUtility.appendLine(dataSection, "\t" + "dd `" + s + "`");
+            } else {
+                StringUtility.appendLine(dataSection, "\t" + "dd '" + s + "'");
+            }
+        }
+        StringUtility.appendLine(stringText, "\tmov dword eax, " + "STRING_" + litCounter);
+        node.attachCode(stringText.toString());
      }
 
     private List<String> StringLitHelper(String value) {
@@ -1119,55 +1118,53 @@ public class ExpressionCodeGenerator extends TraversalVisitor {
      }
 
     public void visit(ArrayAccess node) throws Exception {
-	StringBuilder sb = new StringBuilder();
-	
-	boolean oldIsLV = isLV;
-	
-	isLV = false;
-	node.array.accept(this);
-	isLV = oldIsLV;
-	sb.append(node.array.getCode());
-	StringUtility.appendIndLn(sb, "push eax"); // push array address
-	StringUtility.appendIndLn(sb, "push eax"); //again for later
+        StringBuilder sb = new StringBuilder();
+        boolean oldIsLV = isLV;
 
-	oldIsLV = isLV;
-	isLV = false;
-	node.index.accept(this);
-	sb.append(node.index.getCode());
-	isLV = oldIsLV;
+        isLV = false;
+        node.array.accept(this);
+        isLV = oldIsLV;
+        sb.append(node.array.getCode());
+        StringUtility.appendIndLn(sb, "push eax"); // push array address
+        StringUtility.appendIndLn(sb, "push eax"); // again for later
 
-	//StringUtility.appendIndLn(sb, "mov ecx, eax");
-	StringUtility.appendIndLn(sb, "pop ebx");
-	StringUtility.appendIndLn(sb, "mov ebx, [ebx+4]");
-	StringUtility.appendIndLn(sb, "cmp eax, ebx");
-	StringUtility.appendIndLn(sb, "jl ArrayAccessBody" + aaCounter);
-	extern.add("__exception");
-	StringUtility.appendIndLn(sb, "call __exception");
-	
-	StringUtility.appendLine(sb, "ArrayAccessBody" + (aaCounter++)  +": ");
-	StringUtility.appendIndLn(sb, "mov ebx, eax ");
-	StringUtility.appendIndLn(sb, "mov eax, 4 "); 
-	StringUtility.appendIndLn(sb, "imul ebx ; get real offset");
-	StringUtility.appendIndLn(sb, "mov ebx, eax"); // store offset in ebx
-	
+        oldIsLV = isLV;
+        isLV = false;
+        node.index.accept(this);
+        sb.append(node.index.getCode());
+        isLV = oldIsLV;
 
-	StringUtility.appendIndLn(sb, "pop eax"); // get array
-	StringUtility.appendIndLn(sb, "add eax, 8"); // skip vtable and size
-	StringUtility.appendIndLn(sb, "add eax, ebx");
-	
-	processLV(sb);
-	
-	node.attachCode(sb.toString());
+        // StringUtility.appendIndLn(sb, "mov ecx, eax");
+        StringUtility.appendIndLn(sb, "pop ebx");
+        StringUtility.appendIndLn(sb, "mov ebx, [ebx+4]");
+        StringUtility.appendIndLn(sb, "cmp eax, ebx");
+        StringUtility.appendIndLn(sb, "jl ArrayAccessBody" + aaCounter);
+        extern.add("__exception");
+        StringUtility.appendIndLn(sb, "call __exception");
+
+        StringUtility.appendLine(sb, "ArrayAccessBody" + (aaCounter++) + ": ");
+        StringUtility.appendIndLn(sb, "mov ebx, eax ");
+        StringUtility.appendIndLn(sb, "mov eax, 4 ");
+        StringUtility.appendIndLn(sb, "imul ebx ; get real offset");
+        StringUtility.appendIndLn(sb, "mov ebx, eax"); // store offset in ebx
+
+        StringUtility.appendIndLn(sb, "pop eax"); // get array
+        StringUtility.appendIndLn(sb, "add eax, 8"); // skip vtable and size
+        StringUtility.appendIndLn(sb, "add eax, ebx");
+
+        processLV(sb);
+
+        node.attachCode(sb.toString());
     }
 
     private void processLV(StringBuilder sb) throws Exception {
-	if (!isLV ) {
-	    StringUtility.appendIndLn(sb, "mov eax, [eax]");
-	}
+        if (!isLV) {
+            StringUtility.appendIndLn(sb, "mov eax, [eax]");
+        }
     }
-    
+
     public void visit(SimpleType node) throws Exception {
-	// intentionally do nothing
+        // intentionally do nothing
     }
-    
+
 }

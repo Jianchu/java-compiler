@@ -5,4 +5,3 @@ public class IllegalBlockCommentException extends Exception {
         super("block comment not terminated");
     }
 }
-

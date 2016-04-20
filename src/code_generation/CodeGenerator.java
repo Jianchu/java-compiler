@@ -75,8 +75,7 @@ public class CodeGenerator extends TraversalVisitor {
             fDecl.accept(this);
 
         }
-        
-        
+
         // methods
         for (Map.Entry<String, MethodDeclaration> entry : node.getEnvironment().methods.entrySet()) {
             staticMethodVTableHandler(entry, node, textSection);
@@ -99,39 +98,38 @@ public class CodeGenerator extends TraversalVisitor {
                 
             }
         }
-        
-        	
+
         for (BodyDeclaration bDecl : node.members) {
             StringBuilder instanceFieldInitDefault = new StringBuilder();
-        	if (bDecl instanceof MethodDeclaration) {
-        		MethodDeclaration mDecl = (MethodDeclaration) bDecl;
-        	        String methodSigInDec = SigHelper.getMethodSigWithImp(mDecl);
-        	        this.exclude.add(methodSigInDec);
-	            if (SigHelper.getMethodSigWithImp(mDecl).equals(testSig)) {
-	                this.extern.add("__debexit");
-	                generateStart(start, testSig);
-	            }
-	            mDecl.accept(this);
-	            String methodText = mDecl.getCode();
-	            if (methodText == null) {
-	                methodText = "; no method body yet\n";
-	            }
-	            textSection.append(methodText);
-        	} else if (bDecl instanceof FieldDeclaration) {
-        	    FieldDeclaration fDecl = (FieldDeclaration) bDecl;
-        	    String fieldSig = SigHelper.getFieldSig(node, fDecl);
-        	    if (fDecl.modifiers.contains(Modifier.STATIC)) {
-        	        StringUtility.appendLine(staticFieldInit[0], "call static_init_" + fieldSig, 2);
-        	    } else {
-        	        StringUtility.appendIndLn(instanceFieldInitDefault, "call instance_init_default_" + fieldSig);
-        	        if (fDecl.initializer != null) {
-        	            StringUtility.appendIndLn(instanceFieldInit[0], "call instance_init_" + fieldSig);
-        	        }
-        	    }
-        	}
-        	instanceFieldInit[0].insert(0, instanceFieldInitDefault + "\n");
-        	
-       	}
+            if (bDecl instanceof MethodDeclaration) {
+                MethodDeclaration mDecl = (MethodDeclaration) bDecl;
+                    String methodSigInDec = SigHelper.getMethodSigWithImp(mDecl);
+                    this.exclude.add(methodSigInDec);
+                if (SigHelper.getMethodSigWithImp(mDecl).equals(testSig)) {
+                    this.extern.add("__debexit");
+                    generateStart(start, testSig);
+                }
+                mDecl.accept(this);
+                String methodText = mDecl.getCode();
+                if (methodText == null) {
+                    methodText = "; no method body yet\n";
+                }
+                textSection.append(methodText);
+            } else if (bDecl instanceof FieldDeclaration) {
+                FieldDeclaration fDecl = (FieldDeclaration) bDecl;
+                String fieldSig = SigHelper.getFieldSig(node, fDecl);
+                if (fDecl.modifiers.contains(Modifier.STATIC)) {
+                    StringUtility.appendLine(staticFieldInit[0], "call static_init_" + fieldSig, 2);
+                } else {
+                    StringUtility.appendIndLn(instanceFieldInitDefault, "call instance_init_default_" + fieldSig);
+                    if (fDecl.initializer != null) {
+                        StringUtility.appendIndLn(instanceFieldInit[0], "call instance_init_" + fieldSig);
+                    }
+                }
+            }
+            instanceFieldInit[0].insert(0, instanceFieldInitDefault + "\n");
+            
+           }
         instanceFieldInit[0].insert(0, "instance_field_init$" + classSig + ":" + "\n");
         StringUtility.appendIndLn(instanceFieldInit[0], "ret");
         StringUtility.appendLine(vTableText, "global " + SigHelper.getArrayClssSigWithVTable(node));
@@ -148,7 +146,7 @@ public class CodeGenerator extends TraversalVisitor {
         node.attachCode(getExtern().toString() + textSection.toString() + staticFieldInit[1].toString() + dataSection.toString());
         staticFieldInit[1].setLength(0);
     }
-    
+
     private StringBuilder getExtern() {
         StringBuilder sb = new StringBuilder();
         for (String s : this.extern) {
@@ -177,20 +175,20 @@ public class CodeGenerator extends TraversalVisitor {
         String methodSigInDec = SigHelper.getMethodSigWithImp(mDecl);
         if (mDecl.modifiers.contains(Modifier.STATIC)) {
             StringUtility.appendLine(textSection, "global " + methodSig);
-	    StringUtility.appendIndLn(textSection, methodSig + ":");
-	    if (mDecl.modifiers.contains(Modifier.NATIVE)) {
-		String nativeSig = SigHelper.getNativeSig(mDecl);
-		extern.add(nativeSig);
-		StringUtility.appendLine(textSection, "dd " + nativeSig, 2);
-	    } else {
-		StringUtility.appendLine(textSection, "dd " + methodSigInDec, 2);
-	    }
+        StringUtility.appendIndLn(textSection, methodSig + ":");
+        if (mDecl.modifiers.contains(Modifier.NATIVE)) {
+        String nativeSig = SigHelper.getNativeSig(mDecl);
+        extern.add(nativeSig);
+        StringUtility.appendLine(textSection, "dd " + nativeSig, 2);
+        } else {
+        StringUtility.appendLine(textSection, "dd " + methodSigInDec, 2);
+        }
         } else {
             TypeDeclaration Tdec = (TypeDeclaration) mDecl.getParent();
             if (!Tdec.isInterface) {
                 int offSet = node.getMethodOffSet(mName);
-		SigOffsets.put(offSet, methodSigInDec);
-	    }
+        SigOffsets.put(offSet, methodSigInDec);
+        }
         }
     }
 
@@ -252,7 +250,7 @@ public class CodeGenerator extends TraversalVisitor {
             } else {
                 //StringUtility.appendIndLn(instanceFieldInit[0], "call instance_init_" + fieldSig);
                 StringUtility.appendIndLn(instanceFieldInit[1], "instance_init_" + fieldSig + ":");
-		ExpressionCodeGenerator.generateFieldAddr(instanceFieldInit[1], node, extern);
+        ExpressionCodeGenerator.generateFieldAddr(instanceFieldInit[1], node, extern);
                 StringUtility.appendLine(instanceFieldInit[1], "push eax \t;store field address", 2);
                 StringUtility.appendLine(instanceFieldInit[1], initCode, 2);
                 StringUtility.appendLine(instanceFieldInit[1], "mov edx, eax \t; put value of field to edx", 2);
@@ -264,48 +262,47 @@ public class CodeGenerator extends TraversalVisitor {
     }
 
     public void visit(MethodDeclaration node) throws Exception {
-    	StringBuilder sb = new StringBuilder();
-    		
-	StringUtility.appendLine(sb, "global " + SigHelper.getMethodSigWithImp(node));
-    	StringUtility.appendLine(sb, SigHelper.getMethodSigWithImp(node) + ":");	// generate method label
-    	
-		StringUtility.appendIndLn(sb, "push ebp \t; save old frame pointer");
-		StringUtility.appendIndLn(sb, "mov ebp, esp \t; move ebp to top of stack");
-		StringUtility.appendIndLn(sb, "sub esp, " + (node.frameSize * 4) + "\t; space for local variables");
-		
-		// if constructor, call field initializer
-		if (node.isConstructor) {
-			TypeDeclaration tDecl = (TypeDeclaration) node.getParent();
-			StringUtility.appendIndLn(sb, "push dword [ebp+8] \t; push object for initialiser"); 	// push object for initializer call
-			StringUtility.appendIndLn(sb, "call " + SigHelper.instanceFieldInitSig(tDecl));
-			StringUtility.appendIndLn(sb, "add esp, 4 \t; remove object for initializer");
-		}
-		
-		
-		if (node.body != null) {
-			// TODO: check occasions where this would be null
-			ExpressionCodeGenerator.currentMethod = node;	// set current method 
-			node.body.accept(stmtGen);
-			ExpressionCodeGenerator.currentMethod = null;	// remove current method
-			sb.append(node.body.getCode());
-		} 
-		
-		// clean up in case there is no return statement
-		StringUtility.appendIndLn(sb, "mov eax, 0 \t; in the case of no return, make sure eax is null"); 
-		StringUtility.appendIndLn(sb, "mov esp, ebp \t; delete frame");
-		StringUtility.appendIndLn(sb, "pop ebp \t; restore to previous frame");
-		StringUtility.appendIndLn(sb, "ret \t; end of method");
-		
-		node.attachCode(sb.toString());
+        StringBuilder sb = new StringBuilder();
+
+        StringUtility.appendLine(sb, "global " + SigHelper.getMethodSigWithImp(node));
+        StringUtility.appendLine(sb, SigHelper.getMethodSigWithImp(node) + ":");    // generate method label
+
+        StringUtility.appendIndLn(sb, "push ebp \t; save old frame pointer");
+        StringUtility.appendIndLn(sb, "mov ebp, esp \t; move ebp to top of stack");
+        StringUtility.appendIndLn(sb, "sub esp, " + (node.frameSize * 4) + "\t; space for local variables");
+
+        // if constructor, call field initializer
+        if (node.isConstructor) {
+            TypeDeclaration tDecl = (TypeDeclaration) node.getParent();
+            StringUtility.appendIndLn(sb, "push dword [ebp+8] \t; push object for initialiser");     // push object for initializer call
+            StringUtility.appendIndLn(sb, "call " + SigHelper.instanceFieldInitSig(tDecl));
+            StringUtility.appendIndLn(sb, "add esp, 4 \t; remove object for initializer");
+        }
+
+        if (node.body != null) {
+            // TODO: check occasions where this would be null
+            ExpressionCodeGenerator.currentMethod = node;    // set current method 
+            node.body.accept(stmtGen);
+            ExpressionCodeGenerator.currentMethod = null;    // remove current method
+            sb.append(node.body.getCode());
+        } 
+
+        // clean up in case there is no return statement
+        StringUtility.appendIndLn(sb, "mov eax, 0 \t; in the case of no return, make sure eax is null"); 
+        StringUtility.appendIndLn(sb, "mov esp, ebp \t; delete frame");
+        StringUtility.appendIndLn(sb, "pop ebp \t; restore to previous frame");
+        StringUtility.appendIndLn(sb, "ret \t; end of method");
+
+        node.attachCode(sb.toString());
     }
-    
+
     protected static String getStaticFieldInit() {
         StringUtility.appendIndLn(staticFieldInit[0], "ret");
         String staticFieldInitString = staticFieldInit[0].toString();
         staticFieldInit[0].setLength(0);
         return getStaticFieldInitExtern() + staticFieldInitString;
     }
-    
+
     private static String getStaticFieldInitExtern() {
         StringBuilder sb = new StringBuilder();
         for (String s : staticInitExtern) {

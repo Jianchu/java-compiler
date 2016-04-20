@@ -25,38 +25,38 @@ public class Block extends Statement {
     }
 
     private void parseBlockStatement(ParseTree pt) throws ASTException {
-    	Statement s; // for adding next
-		
-    	// write search with recursion
-    	for (ParseTree child : pt.getChildren()) {
-    		switch(child.getTokenType()) {
-    		case BlockStatements:
-    			parseBlockStatement(child);
-    			break;
-    		case BlockStatement:
-    			parseBlockStatement(child);
-    			break;
-    		case LocalVariableDeclarationStatement:
-    			s = new VariableDeclarationStatement(child);
-    			// next is for use in TopDeclVisitor
-    			if (last != null)
-    				last.setNext(s);
-    			last = s;
-    			
-    			statements.add(s);
-    			break;
-    		case Statement:
-    			s = Statement.parseStatement(child);
-    			if (s != null) {
-	    			if (last != null)
-	    				last.setNext(s);
-	    			last = s;
-	    			
-	    			statements.add(s);
-    			}
-    			break;
-    		}
-    	}
+        Statement s; // for adding next
+
+        // write search with recursion
+        for (ParseTree child : pt.getChildren()) {
+            switch (child.getTokenType()) {
+            case BlockStatements:
+                parseBlockStatement(child);
+                break;
+            case BlockStatement:
+                parseBlockStatement(child);
+                break;
+            case LocalVariableDeclarationStatement:
+                s = new VariableDeclarationStatement(child);
+                // next is for use in TopDeclVisitor
+                if (last != null)
+                    last.setNext(s);
+                last = s;
+
+                statements.add(s);
+                break;
+            case Statement:
+                s = Statement.parseStatement(child);
+                if (s != null) {
+                    if (last != null)
+                        last.setNext(s);
+                    last = s;
+
+                    statements.add(s);
+                }
+                break;
+            }
+        }
     }
     
     private void visitBlockStatement(ParseTree blockNode) throws ASTException {
@@ -89,8 +89,8 @@ public class Block extends Statement {
     // return this.statements;
     // }
     
-	public void accept(Visitor v) throws Exception {
-		v.visit(this);
-	}
+    public void accept(Visitor v) throws Exception {
+        v.visit(this);
+    }
 }
 

@@ -1,6 +1,5 @@
 package ast;
 
-import exceptions.ASTException;
 import parser.ParseTree;
 
 /**
@@ -9,15 +8,16 @@ import parser.ParseTree;
  *
  */
 public class IntegerLiteral extends Expression {
-	public String value;
-	public IntegerLiteral(ParseTree pt) {
-		value = pt.getLexeme();
-	}
-	
-        public IntegerLiteral(int i) {
-                value = Integer.toString(i);
-        }
-	public void accept(Visitor v) throws Exception {
-		v.visit(this);
-	}
+    public String value;
+    public IntegerLiteral(ParseTree pt) {
+        value = pt.getLexeme();
+    }
+
+    public IntegerLiteral(int i) {
+        value = Integer.toString(i);
+    }
+
+    public void accept(Visitor v) throws Exception {
+        v.visit(this);
+    }
 }

@@ -1,7 +1,7 @@
 package ast;
 
-import exceptions.ASTException;
 import parser.ParseTree;
+import exceptions.ASTException;
 
 public class VariableDeclarationExpression extends Expression {
     public VariableDeclaration variableDeclaration;
@@ -10,7 +10,7 @@ public class VariableDeclarationExpression extends Expression {
         this.variableDeclaration = new VariableDeclaration(variableDecNode);
     }
     
-	public void accept(Visitor v) throws Exception {
-		v.visit(this);
-	}
+    public void accept(Visitor v) throws Exception {
+        v.visit(this);
+    }
 }

@@ -31,11 +31,11 @@ public class TypeVisitor extends TopDeclVisitor {
     }
     
     public void visit(PrimitiveType type) throws Exception {
-    	// do nothing
+        // do nothing
     }
     
     public void visit(ArrayType type) throws Exception {
-    	type.type.accept(this);
+        type.type.accept(this);
     }
     
     /**
@@ -46,7 +46,7 @@ public class TypeVisitor extends TopDeclVisitor {
      * @throws Exception
      */
     public void visit(SimpleType type) throws Exception {
-    	typeDec = null;
+        typeDec = null;
         if (type.name != null) {
             type.name.accept(this);
         }
@@ -119,19 +119,19 @@ public class TypeVisitor extends TopDeclVisitor {
             throw new TypeLinkException(
                     "The full qualified type name is not found");
         } else {
-        	this.typeDec = global.get(fullName);
+            this.typeDec = global.get(fullName);
         }
         
         if (node.getQualifier() != null) {
-        	boolean issue = true;
-        	try {
-        		node.getQualifier().accept(this);
-        	} catch (TypeLinkException e) {
-        		issue = false;
-        	}
-        	if (issue) {
-        		throw new TypeLinkException("Prefix of qualified name cannot resolve to type");
-        	}
+            boolean issue = true;
+            try {
+                node.getQualifier().accept(this);
+            } catch (TypeLinkException e) {
+                issue = false;
+            }
+            if (issue) {
+                throw new TypeLinkException("Prefix of qualified name cannot resolve to type");
+            }
         }
     }
 }

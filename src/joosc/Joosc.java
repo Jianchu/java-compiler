@@ -13,7 +13,6 @@ import static_analysis.ReachabilityVisitor;
 import static_analysis.VariableAnalysis;
 import weeder.Weeder;
 import ast.AST;
-import ast.Visitor;
 import code_generation.CodeGenerator;
 import code_generation.CodePrinter;
 import code_generation.HierarchyTableBuilder;
@@ -33,53 +32,53 @@ public class Joosc {
 
         System.exit(compile(args));
     }
-    
+
     public static int compile(String[] args) {
         String objInterfacePath = System.getProperty("user.dir") + "/data/ObjInterface.java";
         List<String> augArgs = new LinkedList<String>();
         for (String arg : args) {
-        	augArgs.add(arg);
+            augArgs.add(arg);
         }
         augArgs.add(objInterfacePath);
-        
+
         Scanner scanner = null;
         List<Token> tokens = null;
-        
+
         File grammar;
         try {
             grammar = new File(System.getProperty("user.dir") + "/data/grammar.lr1");
-		    List<AST> trees = new LinkedList<AST>();
-		    for (String arg : augArgs) {
-//		    	System.out.println(arg);
-				File input = new File(arg);
-				scanner = new Scanner(new FileReader(input));
-				tokens = scanner.scan();
-				Parser parser = new Parser(tokens, grammar);
-				ParseTree parseTree = parser.parse();
-				Weeder weeder = new Weeder(parseTree, input.getName().substring(0, input.getName().lastIndexOf('.')));
-				weeder.weed();
-				AST ast = new AST(parseTree);
-				trees.add(ast);			
-		    }
-		    SymbolTable.buildEnvs(trees);
-		    new Hierarchy(trees);
-		    Disambiguation.disambiguate(trees);
-		    TypeCheckingVisitor.typeCheck(trees);
-		    ReachabilityVisitor.checkReachability(trees);
-		    VariableAnalysis.check(trees);
-		    OffSet.computeOffSet(trees);
-		    UglyTableBuilder.build();
-		    HierarchyTableBuilder.build(trees);
-		    CodeGenerator.generate(trees);
-		    CodePrinter printer = new CodePrinter();
-		    printer.printCode(trees);
+            List<AST> trees = new LinkedList<AST>();
+            for (String arg : augArgs) {
+                // System.out.println(arg);
+                File input = new File(arg);
+                scanner = new Scanner(new FileReader(input));
+                tokens = scanner.scan();
+                Parser parser = new Parser(tokens, grammar);
+                ParseTree parseTree = parser.parse();
+                Weeder weeder = new Weeder(parseTree, input.getName().substring(0, input.getName().lastIndexOf('.')));
+                weeder.weed();
+                AST ast = new AST(parseTree);
+                trees.add(ast);
+            }
+            SymbolTable.buildEnvs(trees);
+            new Hierarchy(trees);
+            Disambiguation.disambiguate(trees);
+            TypeCheckingVisitor.typeCheck(trees);
+            ReachabilityVisitor.checkReachability(trees);
+            VariableAnalysis.check(trees);
+            OffSet.computeOffSet(trees);
+            UglyTableBuilder.build();
+            HierarchyTableBuilder.build(trees);
+            CodeGenerator.generate(trees);
+            CodePrinter printer = new CodePrinter();
+            printer.printCode(trees);
         } catch (Exception e) {
-        	e.printStackTrace();
-        	return 42;
+            e.printStackTrace();
+            return 42;
         }
         return 0;
     }
-    
+
     /**
      * write a version of main method that adds the standard library to arguments for testing.
      * @param args

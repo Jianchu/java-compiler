@@ -43,26 +43,26 @@ public class Scanner {
         
         sepMap = new HashMap<Character, Symbol>();        
         initSepMap();
-	
+
         idMap = new HashMap<String, Symbol>();
         initIdMap();
         
         ESCAPES = new TreeSet<Character>();
         for (char e : "btnfr\"\'\\".toCharArray()) {
-        	ESCAPES.add(e);
+            ESCAPES.add(e);
         }
     }
 
     private void initSepMap() {
-    	sepMap.put('(', Symbol.LPAREN);
-		sepMap.put(')', Symbol.RPAREN);
-		sepMap.put('{', Symbol.LBRACE);
-		sepMap.put('}', Symbol.RBRACE);
-		sepMap.put('[', Symbol.LBRACKET);
-		sepMap.put(']', Symbol.RBRACKET);
-		sepMap.put(';', Symbol.SEMICOLON);
-		sepMap.put(',', Symbol.COMMA);
-		sepMap.put('.', Symbol.DOT);		   
+        sepMap.put('(', Symbol.LPAREN);
+        sepMap.put(')', Symbol.RPAREN);
+        sepMap.put('{', Symbol.LBRACE);
+        sepMap.put('}', Symbol.RBRACE);
+        sepMap.put('[', Symbol.LBRACKET);
+        sepMap.put(']', Symbol.RBRACKET);
+        sepMap.put(';', Symbol.SEMICOLON);
+        sepMap.put(',', Symbol.COMMA);
+        sepMap.put('.', Symbol.DOT);
     }
     
     private void initOpMap() {
@@ -84,9 +84,9 @@ public class Scanner {
     }
 
     private void initIdMap() {
-    	// technically literals
-    	idMap.put("true", Symbol.TRUE);
-    	idMap.put("false", Symbol.FALSE);
+        // technically literals
+        idMap.put("true", Symbol.TRUE);
+        idMap.put("false", Symbol.FALSE);
         idMap.put("null", Symbol.NULL);
         // keywords
         idMap.put("abstract", Symbol.ABSTRACT);
@@ -163,9 +163,9 @@ public class Scanner {
      * @throws Exception
      */
     public List<Token> scanThrow() throws Exception {
-    	_tokens = new ArrayList<Token>();
-    	scanStart();
-    	return _tokens;
+        _tokens = new ArrayList<Token>();
+        scanStart();
+        return _tokens;
     }
 
     private void scanStart() throws Exception {
@@ -188,20 +188,20 @@ public class Scanner {
             if (Character.isLetter(_next)) {
                 scanId();
             } else if ('0' == (char) _next) {
-            	scanZero();
+                scanZero();
             } else if (Character.isDigit(_next)) {
-            	// integer literals
-            	scanInteger();
+                // integer literals
+                scanInteger();
             } else if ('\'' == (char) _next) {
-            	// character literals
-            	scanChar();
+                // character literals
+                scanChar();
             } else if ('\"' == (char) _next) {
-            	scanString();
+                scanString();
             } else if (sepMap.containsKey((char) _next)) {
-            	//find TokenType.
-            	scanSeparators();
+                // find TokenType.
+                scanSeparators();
             } else if (opMap.containsKey((char) _next)) {
-            	opMap.get((char) _next).run();
+                opMap.get((char) _next).run();
             } else {
                 throw new RuntimeException("input " + (char) _next + "["
                         + (char) _next + "] not yet implemented");
@@ -441,52 +441,50 @@ public class Scanner {
      * @throws IOException
      */
     private void scanSeparators() throws IOException, IllegalInputCharException {
-    	_sb.append((char) _next);
+        _sb.append((char) _next);
         String lexeme = _sb.toString();
         _tokens.add(new Token(lexeme, sepMap.get(lexeme.charAt(0))));
-    	_next = read();
+        _next = read();
     }
     
     private void scanZero() throws IOException, IllegalInputCharException, IllegalIDException {
-    	_tokens.add(new Token("0", Symbol.DECIMAL));
+        _tokens.add(new Token("0", Symbol.DECIMAL));
         _next = read();
-    	if (Character.isLetterOrDigit(_next) || _next == '_' || _next == '$') {
-    		throw new IllegalIDException("0" + (char) _next);
-    	}
+        if (Character.isLetterOrDigit(_next) || _next == '_' || _next == '$') {
+            throw new IllegalIDException("0" + (char) _next);
+        }
     }
+    
     /**
-     * scanning integer literals
-     * NOTE: 
-     * 		1. leaving size check for parser.
-     * 		2. No Octal, Hex or Long.
-     * 		3. Keeping the string as "\'c\'" for now.
+     * scanning integer literals NOTE: 1. leaving size check for parser. 2. No
+     * Octal, Hex or Long. 3. Keeping the string as "\'c\'" for now.
+     * 
      * @throws Exception
      */
     private void scanInteger() throws Exception {
-    	while (Character.isDigit(_next)) {
-    		_sb.append((char) _next);
-    		_next = read();
-    	}
-    	
-    	
-    	// This needs to be in the parser or weeder.
-    	// missing case 1 - 2147483648
-    	try {
-    		String intStr = _sb.toString();
-    		if (_tokens.size() > 0 && _tokens.get(_tokens.size() -1).getTokenType() == Symbol.MINUS) {
-    			intStr = "-" + _sb.toString();
-    		}
-    		Integer.parseInt(intStr);
-    	} catch (NumberFormatException e) {
-    		throw e;
-    	}
-    	
-    	_tokens.add(new Token(_sb.toString(), Symbol.DECIMAL));
-    	// A proper integer must be terminated with space, operators or ';'.
-    	// check for illegal identifiers.
-    	if (Character.isLetter(_next) || _next == '_' || _next == '$') {
-    		throw new IllegalIDException(_sb.toString() + (char) _next);
-    	}
+        while (Character.isDigit(_next)) {
+            _sb.append((char) _next);
+            _next = read();
+        }
+
+        // This needs to be in the parser or weeder.
+        // missing case 1 - 2147483648
+        try {
+            String intStr = _sb.toString();
+            if (_tokens.size() > 0 && _tokens.get(_tokens.size() - 1).getTokenType() == Symbol.MINUS) {
+                intStr = "-" + _sb.toString();
+            }
+            Integer.parseInt(intStr);
+        } catch (NumberFormatException e) {
+            throw e;
+        }
+
+        _tokens.add(new Token(_sb.toString(), Symbol.DECIMAL));
+        // A proper integer must be terminated with space, operators or ';'.
+        // check for illegal identifiers.
+        if (Character.isLetter(_next) || _next == '_' || _next == '$') {
+            throw new IllegalIDException(_sb.toString() + (char) _next);
+        }
     }
     
     /**
@@ -494,20 +492,20 @@ public class Scanner {
      * @throws Exception 
      */
     private void scanChar() throws Exception {
-    	_sb.append((char) _next);
-    	_next = read();
-    	runawayCheck();
-    	// single character
-    	readChar();
-    	
-    	// terminating literal
-    	if ('\'' != _next) {
-    		throw new IllegalCharException(_sb.toString() + (char) _next + '\'');
-    	}
-    	_sb.append((char) _next);
-    	_tokens.add(new Token(_sb.toString(), Symbol.CHARACTER));
-    	
-    	_next = read();
+        _sb.append((char) _next);
+        _next = read();
+        runawayCheck();
+        // single character
+        readChar();
+
+        // terminating literal
+        if ('\'' != _next) {
+            throw new IllegalCharException(_sb.toString() + (char) _next + '\'');
+        }
+        _sb.append((char) _next);
+        _tokens.add(new Token(_sb.toString(), Symbol.CHARACTER));
+
+        _next = read();
     }
     
     /**
@@ -515,17 +513,17 @@ public class Scanner {
      * @throws Exception 
      */
     private void scanString() throws Exception  {
-    	_sb.append((char) _next);
-    	_next = read();
-    	while ('\"' != _next) {
-    		runawayCheck();
-    		readChar();
-    	}
-    	
-    	_sb.append((char) _next);
-    	_tokens.add(new Token(_sb.toString(), Symbol.STRING));
-    	
-    	_next = read();
+        _sb.append((char) _next);
+        _next = read();
+        while ('\"' != _next) {
+            runawayCheck();
+            readChar();
+        }
+
+        _sb.append((char) _next);
+        _tokens.add(new Token(_sb.toString(), Symbol.STRING));
+
+        _next = read();
     }
     
     /**
@@ -535,15 +533,15 @@ public class Scanner {
      * @throws IllegalCharException
      */
     private void readChar() throws IOException, IllegalInputCharException, IllegalCharException {
-    	// single character
-    	if ('\\' == _next) {
-    		// escape character
-    		readEscape();
-    	} else {
-    		// normal character
-    		_sb.append((char) _next);
-    		_next = read();
-    	}
+        // single character
+        if ('\\' == _next) {
+            // escape character
+            readEscape();
+        } else {
+            // normal character
+            _sb.append((char) _next);
+            _next = read();
+        }
     }
     
     /**
@@ -553,31 +551,31 @@ public class Scanner {
      * @throws IllegalCharException
      */
     private void readEscape() throws IOException, IllegalInputCharException, IllegalCharException {
-    	_sb.append((char) _next);
-    	_next = read();
-    	
-    	//octal
-    	if (_next >= '0' && _next <= '3') {    		
-    		_sb.append((char) _next);
-    		_next = read();
-    		for (int i = 0; i < 2 && _next >= '0' && _next <= '7'; i++) {
-    			_sb.append((char) _next);
-    			_next = read();
-    		}
-    	} else if (_next >= '4' && _next <= '7' ){
-    		_sb.append((char) _next);
-    		_next = read();
-    		if (_next >= '0' && _next <= '7') {
-    			_sb.append((char) _next);
-    			_next = read();
-    		}
-    		
-    	} else if (ESCAPES.contains((char) _next)) {
-        	_sb.append((char) _next);
-        	_next = read();
-    	} else {
-    		throw new IllegalCharException(_sb.toString() + (char) _next + '\'');
-    	}
+        _sb.append((char) _next);
+        _next = read();
+
+        // octal
+        if (_next >= '0' && _next <= '3') {
+            _sb.append((char) _next);
+            _next = read();
+            for (int i = 0; i < 2 && _next >= '0' && _next <= '7'; i++) {
+                _sb.append((char) _next);
+                _next = read();
+            }
+        } else if (_next >= '4' && _next <= '7') {
+            _sb.append((char) _next);
+            _next = read();
+            if (_next >= '0' && _next <= '7') {
+                _sb.append((char) _next);
+                _next = read();
+            }
+
+        } else if (ESCAPES.contains((char) _next)) {
+            _sb.append((char) _next);
+            _next = read();
+        } else {
+            throw new IllegalCharException(_sb.toString() + (char) _next + '\'');
+        }
     }
     
     /**
@@ -585,13 +583,13 @@ public class Scanner {
      * @throws Exception
      */
     private void runawayCheck() throws Exception {
-		if (_next == -1) {
-			// file terminated before quoting back.
-			throw new Exception("EOF with unfinished String.");
-		} else if ('\n' == _next) {
-			// runaway line
-			throw new Exception("New line with unfinished String.");
-		}
+        if (_next == -1) {
+            // file terminated before quoting back.
+            throw new Exception("EOF with unfinished String.");
+        } else if ('\n' == _next) {
+            // runaway line
+            throw new Exception("New line with unfinished String.");
+        }
     }
     
 }
